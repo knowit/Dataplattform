@@ -1,0 +1,50 @@
+# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+service: NAVN_HER
+
+custom:
+  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: deploymentBucket # Name of s3 bucket
+  runtime: python3.7
+  memorySize: 1024 # MB
+  timeout: 6 # seconds
+  tags: # Tags that will be added to each of the deployment resources. Use for sub-projects like eventBox
+    # project: eventBox
+    # tagName: value
+  stackTags: # Tags for cloud formation
+    # tagName: value
+  environment: # Service wide environment variables
+    #ENVIRONMENT_VARIABLE_NAME: 123456789
+
+package:
+  individually: true
+  exclude:
+    - "./**" # Exclude everything and include what you need in the functions below
+
+functions:
+  lambdaName:
+    module: src/function1 # path to function
+    handler: fileName.handler # fileName.functionNameInFile
+    name: ${self:custom.stage}-lambdaName # Always begin name with stage
+    description: What does my lambda do?
+    package:
+      include:
+        - 'src/functions/*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+    tags: # Tag for this function. Every function are tagged with stage by default
+    events: # How to trigger the lambda
+      # Check link at line 1 for examples
+
+resources: # The resources your functions use
+  Resources:
+  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
+
+plugins:
+  - serverless-python-requirements # Installs python requirements from requirements.txt file in module folder
