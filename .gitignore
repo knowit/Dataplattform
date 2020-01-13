@@ -110,7 +110,7 @@ venv.bak/
 **.zip
 
 **/.serverless/
-**/.vscode/
+**/.vscode/ 
 **/node_modules/
 **/package-lock.json
 **/*.serverless_outputs*.json
