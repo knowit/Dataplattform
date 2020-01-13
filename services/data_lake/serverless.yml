@@ -1,0 +1,28 @@
+service: datalake
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  project: dataplattform-${self:custom.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+
+  deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
+    name: dataplattform-v2-deploymentbucket
+
+  tags:
+    project: dataplattform
+    layer: infrastructure
+  stackTags: #sets CloudFormation stack tags
+    project: dataplattform
+    layer: infrastructure
+
+resources:
+  Resources:
+    DataLake:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.stage}-dataplattform-datalake
+
