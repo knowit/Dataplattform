@@ -8,7 +8,7 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
-
+  stackName: ${self:custom.stage}-${self:service}
   deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
     name: dataplattform-v2-deploymentbucket
 
