@@ -16,10 +16,10 @@ provider:
   timeout: 6 # seconds
   tags: # Tags that will be added to each of the deployment resources.
     project: dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    service: # ingestion, processing, rest_api, infrastructure
-    #ingestion: web_hooks, pollers, iot
+    layer: # ingestion, processing, restApi, infrastructure
+    #ingestion: webHooks, pollers, iot
     #processing: linkedIn
-    #rest_api: linkedIn
+    #restApi: linkedIn
     #infrastructure: s3
     # key: value
   stackTags: # Tags for cloud formation
