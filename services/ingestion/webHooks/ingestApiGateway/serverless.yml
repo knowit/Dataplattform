@@ -1,0 +1,46 @@
+service: ingestApiGateway
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  project: dataplattform-${self:custom.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket
+  runtime: python3.7
+
+  tags:
+    project: dataplattform
+    layer: ingestion
+    ingestion: webHooks
+  stackTags:
+    project: dataplattform
+    layer: ingestion
+    ingestion: webHooks
+
+resources:
+  Resources:
+    ingestApiGateway:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: ${self:custom.stage}-ingestApiGateway
+        Description: main input api gateway
+
+  Outputs:
+    apiGatewayRestApiId:
+      Value:
+        Ref: ingestApiGateway
+      Export:
+        Name: ${self:custom.stage}-ingestApiGateway-restApiId
+
+    apiGatewayRestApiRootResourceId:
+      Value:
+        Fn::GetAtt:
+          - ingestApiGateway
+          - RootResourceId
+      Export:
+        Name: ${self:custom.stage}-ingestApiGateway-rootResourceId
