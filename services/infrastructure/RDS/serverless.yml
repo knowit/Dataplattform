@@ -1,0 +1,84 @@
+service: database
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  dev: 
+     DBInstanceClass: db.t3.micro
+     DeletionProtection: false
+  test: 
+     DBInstanceClass: db.t3.micro
+     DeletionProtection: false
+  prod: 
+     DBInstanceClass: db.t3.micro
+     DeletionProtection: true
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket
+  stackTags:
+    Project: dataplattform
+    Layer: infrastructure
+  tags:
+    Project: dataplattform
+    Layer: infrastructure
+
+
+resources:
+  Resources:
+
+    SubnetGroup: # Connects the DB to the VPC subnets
+      Type: AWS::RDS::DBSubnetGroup
+      Properties:
+        DBSubnetGroupDescription: Database subnet group
+        DBSubnetGroupName: data-base-subnet
+        SubnetIds:
+          - !ImportValue ${self:custom.stage}-SubnetAID
+          - !ImportValue ${self:custom.stage}-SubnetBID
+          - !ImportValue ${self:custom.stage}-SubnetCID
+
+
+    DB: # Database
+      Type: AWS::RDS::DBInstance
+      Properties:
+        AllocatedStorage: 8 #GiB
+        AllowMajorVersionUpgrade: false
+        AutoMinorVersionUpgrade: true
+        AvailabilityZone: eu-central-1aS
+        DBInstanceClass: ${self:custom.${self:custom.stage}.DBInstanceClass}
+        DBInstanceIdentifier: ${self:custom.stage}-dataplattform # Database id
+        DBName: Dataplattform
+        DBParameterGroupName: default.postgres11
+        DBSubnetGroupName:
+          Ref: SubnetGroup
+        DeletionProtection: ${self:custom.${self:custom.stage}.DeletionProtection} # True for provider
+        Engine: postgres
+        EngineVersion: 11.5
+        MasterUsername: postgres
+        MasterUserPassword: ${ssm:/${self:custom.stage}/auroradb/root/password~true}
+        Port: 5432
+        PubliclyAccessible: false
+
+
+  Outputs:
+    DBIdentifier:
+      Description: Database identifier
+      Value: 
+        Ref: DB
+      Export:
+        Name: ${self:custom.stage}-DBIdentifier
+
+    DBEndpointAddress:
+      Description: Database endpoint address
+      Value: !GetAtt Endpoint.Address
+      Export:
+        Name: ${self:custom.stage}-DBEndpointAddress
+
+    DBEndpointPort:
+      Description: Database endpoint port
+      Value: !GetAtt Endpoint.Port
+      Export:
+        Name: ${self:custom.stage}-DBEndpointPort
