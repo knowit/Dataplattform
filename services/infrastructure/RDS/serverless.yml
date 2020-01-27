@@ -58,7 +58,7 @@ resources:
         Engine: postgres
         EngineVersion: 11.5
         MasterUsername: postgres
-        MasterUserPassword: ${ssm:/${self:custom.stage}/auroradb/root/password~true}
+        MasterUserPassword: ${ssm:/${self:custom.stage}/rds/root/password~true}
         Port: 5432
         PubliclyAccessible: false
 
