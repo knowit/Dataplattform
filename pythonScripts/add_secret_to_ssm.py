@@ -9,12 +9,16 @@ def add_parameter(value, type):
 	service = input("Service:")
 	overwrite = bool(input("Overwrite existing value, true/false?:"))
 
-	tags = []
+	tags = [{
+				'Key': 'Project',
+				'Value': 'Dataplattform'
+			}]
+			
 	while True:
 		if input("Add new tag? y/n:") is "y":
-			key = input("Key:")
-			value = input("Value:")
-			tags.append({"Key": key, "Value": value})
+			tag_key = input("Key:")
+			tag_value = input("Value:")
+			tags.append({"Key": tag_key, "Value": tag_value})
 		else: 
 			break
 
@@ -32,11 +36,6 @@ def add_parameter(value, type):
 		Overwrite=overwrite,
 		Tier='Standard'
 	)
-
-	tags.append({
-					'Key': 'Project',
-					'Value': 'Dataplattform'
-				})
 
 	response = client.add_tags_to_resource(
 		ResourceType='Parameter',
