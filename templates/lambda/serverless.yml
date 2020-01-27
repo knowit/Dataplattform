@@ -1,5 +1,5 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: NAVN_HER
+service: navnher
 
 custom:
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
@@ -10,13 +10,13 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentBucket # Name of s3 bucket
+    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: 6 # seconds
   tags: # Tags that will be added to each of the deployment resources.
     project: dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    layer: # ingestion, processing, restApi, infrastructure
+    #layer: ingestion # ingestion, processing, restApi, infrastructure
     #ingestion: webHooks, pollers, iot
     #processing: linkedIn
     #restApi: linkedIn
@@ -40,7 +40,7 @@ functions:
     description: What does my lambda do?
     package:
       include:
-        - 'src/functions/*.py' # Files to include in deployment
+        - 'src/function_1/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
     tags: # Tag for this function. Every function are tagged with stage by default
