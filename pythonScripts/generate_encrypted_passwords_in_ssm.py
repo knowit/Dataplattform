@@ -2,9 +2,9 @@ import boto3
 from add_secret_to_ssm import add_parameter
 
 
-def generatePassword(length, name, stage, service, description, overwrite):
-	#session = boto3.Session(profile_name="new")
-	client = boto3.client('secretsmanager')
+def generatePassword(length):
+	session = boto3.Session(profile_name="new")
+	client = session.client('secretsmanager')
 	
 	response = client.get_random_password(
 		PasswordLength=length,
@@ -16,7 +16,7 @@ def generatePassword(length, name, stage, service, description, overwrite):
 		RequireEachIncludedType=False
 	)
 
-	finalName = add_parameter(name, stage, service, description, overwrite, response["RandomPassword"], "SecureString")
+	finalName = add_parameter(response["RandomPassword"], "SecureString")
 
 	return finalName
 
@@ -25,13 +25,7 @@ def generatePassword(length, name, stage, service, description, overwrite):
 
 def main():
 
-	name = input("Name:")
-	description = input("Description:")
-	stage = input("Stage(dev, test, prod):")
-	service = input("Service:")
-	overwrite = bool(input("Overwrite existing value, true/false?:"))
-
-	name = generatePassword(64, name, stage, service, description, overwrite)
+	name = generatePassword(64)
 	print("Final name: " + name)
 
 if __name__== "__main__" :
