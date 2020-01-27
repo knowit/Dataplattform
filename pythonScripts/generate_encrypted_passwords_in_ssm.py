@@ -15,7 +15,7 @@ def generatePassword(length, name, stage, service, description, overwrite):
 		RequireEachIncludedType=False
 	)
 	
-	client = session.client('ssm')
+	client = boto3.client('ssm')
 
 	finalName = "/" + stage + "/" + service + "/" + name
 	print(finalName)
