@@ -47,7 +47,7 @@ resources:
         AllocatedStorage: 8 #GiB
         AllowMajorVersionUpgrade: false
         AutoMinorVersionUpgrade: true
-        AvailabilityZone: eu-central-1aS
+        AvailabilityZone: eu-central-1a
         DBInstanceClass: ${self:custom.${self:custom.stage}.DBInstanceClass}
         DBInstanceIdentifier: ${self:custom.stage}-dataplattform # Database id
         DBName: Dataplattform
@@ -58,7 +58,7 @@ resources:
         Engine: postgres
         EngineVersion: 11.5
         MasterUsername: postgres
-        MasterUserPassword: ${ssm:/${self:custom.stage}/rds/root/password~true}
+        MasterUserPassword: ${ssm:/${self:custom.stage}/rds/postgres/password~true}
         Port: 5432
         PubliclyAccessible: false
 
@@ -73,12 +73,12 @@ resources:
 
     DBEndpointAddress:
       Description: Database endpoint address
-      Value: !GetAtt Endpoint.Address
+      Value: !GetAtt DB.Endpoint.Address
       Export:
         Name: ${self:custom.stage}-DBEndpointAddress
 
     DBEndpointPort:
       Description: Database endpoint port
-      Value: !GetAtt Endpoint.Port
+      Value: !GetAtt DB.Endpoint.Port
       Export:
         Name: ${self:custom.stage}-DBEndpointPort
