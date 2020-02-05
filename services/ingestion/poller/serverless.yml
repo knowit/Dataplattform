@@ -1,0 +1,85 @@
+# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+service: poller
+
+custom:
+  project: dataplattform
+  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  service: ${self:custom.stage}-${self:service} # this service definition includes stage
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+  runtime: python3.7
+  memorySize: 1024 # MB
+  timeout: 6 # seconds
+
+  tags: # Tags that will be added to each of the deployment resources.
+    project: ${self:custom.project} # dataplattform # When used for sub-projects like eventBox change project tag to eventBox
+    layer: ingestion # processing, restApi, infrastructure
+    ingestion: poller # webHooks, iot
+    #processing: linkedIn
+    #restApi: linkedIn
+    #infrastructure: s3
+    # key: value
+  stackTags:
+    project: ${self:custom.project}
+    layer: ingestion
+    ingestion: poller
+
+  environment: # Service wide environment variables
+    #ENVIRONMENT_VARIABLE_NAME: 123456789
+
+package:
+  individually: true
+  exclude:
+    - "./**" # Exclude everything and include what you need in the functions below
+
+functions:
+  mainPoller: # lambdaName
+    module: src/main_poller # path to function
+    handler: main_poller.handler # fileName.functionNameInFile
+    name: ${self:custom.service}-mainPoller # Always begin name with stage
+    description: main poller lambda  # What does the lambda do
+    role: mainPollerRole
+
+    package:
+      include:
+        - 'src/main_poller/*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+    tags: # Tag for this function. Every function are tagged with stage by default
+    # events: # How to trigger the lambda
+      # Check link at line 1 for examples
+    events: # The Events that trigger this Function
+      - timer:
+        name: dailyTimer
+        parameters:
+          cronExepression: '0 15 00 * * * *' # Every day at 00:15 ('sec min hour day month week year')
+          # tidspunktet kan endres til et egent tidspunkt for når vi vil polle daglig
+          enable: true
+
+resources: # The resources your functions use
+  Resources:
+    mainPollerRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: mainPollerRole
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - 'arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
+
+  # Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
+
+plugins:
+  - serverless-python-requirements # Installs python requirements from requirements.txt file in module foldervl
