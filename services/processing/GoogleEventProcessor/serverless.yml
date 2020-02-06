@@ -1,0 +1,89 @@
+# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+service: google-event-processor
+
+custom:
+  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+  runtime: python3.7
+  memorySize: 1024 # MB
+  timeout: 6 # seconds
+  tags: # Tags that will be added to each of the deployment resources.
+    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
+    Layer: Processing # ingestion, processing, restApi, infrastructure
+    #Ingestion: Pollers #webHooks, Pollers, iot
+    #processing: linkedIn
+    #restApi: linkedIn
+    #infrastructure: s3
+    # key: value
+  stackTags: # Tags for cloud formation
+    # key: value
+  environment: # Service wide environment variables
+    #ENVIRONMENT_VARIABLE_NAME: 123456789
+
+package:
+  individually: true
+  exclude:
+    - "./**" # Exclude everything and include what you need in the functions below
+
+functions:
+  eventProcessor:
+    module: src/GoogleEvents # path to function
+    handler: google_event_processor.handler # fileName.functionNameInFile
+    name: ${self:custom.stage}-GoogleEventProcessor # Always begin name with stage
+    description: Processign all google calendar events from s3
+    role: !GetAtt S3Access.Arn
+    package:
+      include:
+        - 'src/GoogleEvents/*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+    tags: # Tag for this function. Every function are tagged with stage by default
+    events:
+      - s3:
+          bucket: dataplattform-eventbox-bucket
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: GoogleCalendarEvents/
+            - suffix: .json
+          existing: true
+
+
+resources: # The resources your functions use
+  Resources:
+    S3Access:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: googleProcessorS3Access
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          #  - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-DatalakeReadGoogleEvents
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                  Resource:
+                    - arn:aws:s3:::dataplattform-eventbox-bucket/GoogleCalendarEvents/*
+  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
+
+plugins:
+  - serverless-python-requirements # Installs python requirements from requirements.txt file in module foldervl
+  - serverless-pseudo-parameters
