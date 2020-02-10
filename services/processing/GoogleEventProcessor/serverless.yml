@@ -53,6 +53,13 @@ functions:
             - prefix: GoogleCalendarEvents/
             - suffix: .json
           existing: true
+    vpc: # This is needed to access postgres
+      securityGroupIds:
+        - sg-034bf6fcaae44071b #TODO - Import value. This is now copied from aws console
+      subnetIds:
+        - !ImportValue ${self:custom.stage}-SubnetAID
+        - !ImportValue ${self:custom.stage}-SubnetBID
+        - !ImportValue ${self:custom.stage}-SubnetCID
 
 
 resources: # The resources your functions use
@@ -70,7 +77,7 @@ resources: # The resources your functions use
                   - lambda.amazonaws.com
               Action: sts:AssumeRole
         ManagedPolicyArns:
-          #  - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies: # Give lambda access to s3 data
           - PolicyName: ${self:custom.stage}-DatalakeReadGoogleEvents
