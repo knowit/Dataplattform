@@ -3,6 +3,8 @@ service: google-event-processor
 
 custom:
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  pythonRequirements:
+    dockerizePip: non-linux
 
 provider:
   name: aws
@@ -13,7 +15,7 @@ provider:
     name: dataplattform-v2-deploymentbucket # Name of s3 bucket
   runtime: python3.7
   memorySize: 1024 # MB
-  timeout: 6 # seconds
+  timeout: 60 # seconds
   tags: # Tags that will be added to each of the deployment resources.
     Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
     Layer: Processing # ingestion, processing, restApi, infrastructure
@@ -44,6 +46,11 @@ functions:
         - 'src/GoogleEvents/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+      DATABASE_USERNAME: ${ssm:/dev/rds/postgres/username}
+      DATABASE_PASSWORD: ${ssm:/dev/rds/postgres/password~true}
     tags: # Tag for this function. Every function are tagged with stage by default
     events:
       - s3: # Lambda fires when object is created in s3
@@ -89,6 +96,14 @@ resources: # The resources your functions use
                     - s3:GetObject
                   Resource: # Only give access to the folder GoogleCalendarEvents/
                     - arn:aws:s3:::dataplattform-eventbox-bucket/GoogleCalendarEvents/*
+          - PolicyName: ParameterStoreGooglePollerAccess
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/rds/postgres/*'
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
