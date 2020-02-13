@@ -74,7 +74,7 @@ resources: # The resources your functions use
     S3Access:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: googleProcessorS3Access
+        RoleName: googleProcessorRole
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -103,7 +103,7 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/rds/postgres/*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/rds/postgres/*' # Only give access to what the lambda needs
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
