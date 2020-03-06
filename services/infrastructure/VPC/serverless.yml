@@ -1,0 +1,312 @@
+service: main-vpc
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket
+  stackTags:
+    Project: dataplattform
+    Layer: infrastructure
+  tags:
+    Project: dataplattform
+    Layer: infrastructure
+    Infrastructure: VPC
+
+
+resources:
+  Resources:
+    #VPCs
+    MainVPC:
+      Type: AWS::EC2::VPC
+      Properties:
+        CidrBlock: 10.192.0.0/16
+        Tags:
+          - Key: Name
+            Value: MainVPC
+
+    #SUBNETS
+    SubnetA:
+      Type: AWS::EC2::Subnet
+      DependsOn:
+        - MainVPC
+      Properties:
+        AvailabilityZone: eu-central-1a
+        CidrBlock: 10.192.50.0/24
+        Tags:
+          - Key: Name
+            Value: SubnetA
+        VpcId: 
+          Ref: MainVPC
+
+    SubnetB:
+      Type: AWS::EC2::Subnet
+      DependsOn:
+        - MainVPC
+      Properties:
+        AvailabilityZone: eu-central-1b
+        CidrBlock: 10.192.51.0/24
+        Tags:
+          - Key: Name
+            Value: SubnetB
+        VpcId: 
+          Ref: MainVPC
+
+    SubnetC:
+      Type: AWS::EC2::Subnet
+      DependsOn:
+        - MainVPC
+      Properties:
+        AvailabilityZone: eu-central-1c
+        CidrBlock: 10.192.52.0/24
+        Tags:
+          - Key: Name
+            Value: SubnetC
+        VpcId: 
+          Ref: MainVPC
+
+    SubnetPublic:
+      Type: AWS::EC2::Subnet
+      DependsOn:
+        - MainVPC
+      Properties:
+        AvailabilityZone: eu-central-1a
+        CidrBlock: 10.192.53.0/24
+        Tags:
+          - Key: Name
+            Value: SubnetPublic
+        VpcId: 
+          Ref: MainVPC
+
+
+    #INTERNET GATEWAYS
+    InternetGateway:
+      Type: AWS::EC2::InternetGateway
+      Properties:
+        Tags:
+          - Key: Name
+            Value: Gateway
+
+    AttatchGateway:
+      Type: AWS::EC2::VPCGatewayAttachment
+      DependsOn:
+        - MainVPC
+        - InternetGateway
+      Properties:
+        InternetGatewayId:
+          Ref: InternetGateway
+        VpcId:
+          Ref: MainVPC
+
+    #ELASTIC IP
+    ElasticIP:
+      Type: AWS::EC2::EIP
+      Properties:
+        Domain: vpc
+
+    #NAT GATEWAYS
+    NATGateway:
+      Type: AWS::EC2::NatGateway
+      DependsOn:
+        - ElasticIP
+        - SubnetPublic
+      Properties: 
+        AllocationId: !GetAtt ElasticIP.AllocationId
+        SubnetId: 
+          Ref: SubnetPublic
+        Tags: 
+          - Key: Name
+            Value: PublicGateway
+
+    #ROUTE TABLE
+    RouteTablePrivate:
+      Type: AWS::EC2::RouteTable
+      DependsOn:
+        - MainVPC
+      Properties:
+        VpcId: 
+          Ref: MainVPC
+        Tags:
+          - Key: Name
+            Value: Private
+
+    RouteTablePublic:
+      Type: AWS::EC2::RouteTable
+      DependsOn:
+        - MainVPC
+      Properties:
+        VpcId: 
+          Ref: MainVPC
+        Tags:
+          - Key: Name
+            Value: Public
+
+    #ROUTES
+    RoutePrivate:
+      Type: AWS::EC2::Route
+      DependsOn:
+        - NATGateway
+        - RouteTablePrivate
+      Properties:
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: 
+          Ref: NATGateway
+        RouteTableId: 
+          Ref: RouteTablePrivate
+
+    RoutePublic:
+      Type: AWS::EC2::Route
+      DependsOn:
+        - InternetGateway
+        - RouteTablePublic
+      Properties:
+        DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: 
+          Ref: InternetGateway
+        RouteTableId: 
+          Ref: RouteTablePublic
+
+
+    #SUBNET ROUTE TABLE ASSOCIATION
+    SubnetARouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      DependsOn:
+        - RouteTablePrivate
+        - SubnetA
+      Properties:
+        RouteTableId: 
+          Ref: RouteTablePrivate
+        SubnetId: 
+          Ref: SubnetA
+
+    SubnetBRouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      DependsOn:
+        - RouteTablePrivate
+        - SubnetB
+      Properties:
+        RouteTableId: 
+          Ref: RouteTablePrivate
+        SubnetId: 
+          Ref: SubnetB
+
+    SubnetCRouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      DependsOn:
+        - RouteTablePrivate
+        - SubnetC
+      Properties:
+        RouteTableId: 
+          Ref: RouteTablePrivate
+        SubnetId: 
+          Ref: SubnetC
+
+    SubnetPublicRouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      DependsOn:
+        - RoutePublic
+        - SubnetPublic
+      Properties:
+        RouteTableId: 
+          Ref: RouteTablePublic
+        SubnetId: 
+          Ref: SubnetPublic
+
+    #SECURITY GROUPS
+    PostgresAccess:
+      Type: AWS::EC2::SecurityGroup
+      DependsOn:
+        - MainVPC
+      Properties:
+        GroupDescription: Have access to postgres
+        GroupName: PostgresAccess
+        VpcId: 
+          Ref: MainVPC
+
+    Postgres:
+      Type: AWS::EC2::SecurityGroup
+      DependsOn:
+        - MainVPC
+      Properties:
+        GroupDescription: Postgres group
+        GroupName: Postgres
+        VpcId: 
+          Ref: MainVPC
+
+    #SECURITY GROUP EGRESS
+    InboundRulePostgres:
+      Type: AWS::EC2::SecurityGroupIngress
+      DependsOn:
+        - Postgres
+        - PostgresAccess
+      Properties:
+        GroupId:
+          Ref: Postgres
+        IpProtocol: TCP
+        FromPort: 5432
+        ToPort: 5432
+        SourceSecurityGroupId: 
+          Ref: PostgresAccess
+
+    InboundRulePostgresAccess:
+      Type: AWS::EC2::SecurityGroupIngress
+      DependsOn:
+        - PostgresAccess
+      Properties:
+        GroupId:
+          Ref: PostgresAccess
+        IpProtocol: -1
+        CidrIp: 0.0.0.0/0
+        FromPort: -1
+        ToPort: -1
+
+
+  Outputs:
+    #VPCs
+    MainVPCID:
+      Description: The ID of the VPC
+      Value: 
+        Ref: MainVPC
+      Export:
+        Name: ${self:custom.stage}-MainVPCID
+
+    #SUBNETS
+    SubnetNameA:
+      Description: The subnet id
+      Value:
+        Ref: SubnetA
+      Export:
+        Name: ${self:custom.stage}-SubnetAID
+
+    SubnetNameB:
+      Description: The subnet id
+      Value:
+        Ref: SubnetB
+      Export:
+        Name: ${self:custom.stage}-SubnetBID
+
+    SubnetNameC:
+      Description: The subnet id
+      Value:
+        Ref: SubnetC
+      Export:
+        Name: ${self:custom.stage}-SubnetCID
+
+    PostgresSecurityGroupID:
+      Description: Postgres security group
+      Value:
+        Ref: Postgres
+      Export:
+        Name: ${self:custom.stage}-PostgresSecurityGroupID
+
+    PostgresAccessSecurityGroupID:
+      Description: This group has access to postgres
+      Value:
+        Ref: PostgresAccess
+      Export:
+        Name: ${self:custom.stage}-PostgresAccessSecurityGroupID

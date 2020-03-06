@@ -61,6 +61,8 @@ resources:
         MasterUserPassword: ${ssm:/${self:custom.stage}/rds/postgres/password~true}
         Port: 5432
         PubliclyAccessible: false
+        VPCSecurityGroups:
+          - !ImportValue ${self:custom.stage}-PostgresSecurityGroupID
 
 
   Outputs:
