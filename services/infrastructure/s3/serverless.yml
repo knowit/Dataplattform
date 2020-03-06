@@ -1,14 +1,16 @@
 service: datalake
 
 custom:
+  project: dataplattform
   stage: ${opt:stage, self:provider.stage}
-  project: dataplattform-${self:custom.stage}
+  service: ${self:custom.stage}-${self:service}
+
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.stage}-${self:service}
+  stackName: ${self:custom.service}
   deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
     name: dataplattform-v2-deploymentbucket
 
@@ -24,5 +26,21 @@ resources:
     DataLake:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.stage}-dataplattform-datalake
+        BucketName: ${self:custom.service}-datalake
+        VersioningConfiguration:
+          Status: Enabled #keeps different versions of object if overwrited/updated
+        PublicAccessBlockConfiguration: #blocks any public access to s3 bucket
+          BlockPublicAcls: True
+          BlockPublicPolicy: True
+          IgnorePublicAcls: True
+          RestrictPublicBuckets: True
 
+  #Arn of S3 bucket needs to be exported in order to use it from other services (ingestion and processing)
+  Outputs:
+    DataLakeArn:
+      Value:
+        Fn::GetAtt:
+          - DataLake
+          - Arn
+      Export:
+        Name: ${self:custom.service}-datalakeArn
