@@ -49,8 +49,6 @@ functions:
       STAGE: ${self:custom.stage}
       DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
       DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
-      DATABASE_USERNAME: ${ssm:/dev/rds/postgres/username}
-      DATABASE_PASSWORD: ${ssm:/dev/rds/postgres/password~true}
     tags: # Tag for this function. Every function are tagged with stage by default
     events:
       - s3: # Lambda fires when object is created in s3
