@@ -2,6 +2,7 @@ import boto3
 import json
 import os
 import boto3
+import time
 from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, BigInteger, Integer, String, MetaData, Text, Boolean
 from sqlalchemy.ext.declarative import declarative_base
@@ -9,16 +10,22 @@ from sqlalchemy.orm import sessionmaker
 
 def handler(event, context):
 	# Fetch all data from s3 first to insert all data in one DB-Session
-#	data = {}
-#	for record in event['Records']:
-#		data.update(record['s3']['bucket']['name'], get_data_from_s3(record['s3']['object']['key']))
+	data = {}
+	for record in event.get('Records', []):
+		new_dict = get_data_from_s3(record.get('s3', {}).get('bucket', {}).get('name', None),
+		                            record.get('s3', {}).get('object', {}).get('key', None))
+		if new_dict:
+			data.update(json.loads(new_dict))
 
-	engine = get_engine()
+#	engine = get_engine()
+#	create_table(engine)
 #	drop_table(engine)
 #
 #	Session = sessionmaker(bind = engine)
 #	session = Session()
-#	process_data(data)
+#	insert_data(session, "test_id", "test_event_summary", "test_creator", 0, 0)
+	process_data(data)
+#	print(vars(get_all_data(session)[0]))
 #	session.close()
 
 
@@ -32,10 +39,12 @@ def process_data(data):
 #	
 #	Reference: https://github.com/knowit/Dataplattform/tree/master/services/structured_mysql/update
 ####################################################################################################
-	print("Function can't be empty")
+	print("DATA:", data)
 
 
 def get_data_from_s3(bucket, object):
+	if not bucket and not object:
+		return None
 	client = boto3.client('s3')
 	response = client.get_object(
 		Bucket=bucket,
@@ -48,21 +57,24 @@ def get_engine():
 #	VIL EGENTLIG HA DETTE, MEN MÅ ORDNE NOE MED VPC OG NOE GREIER ¯\_(ツ)_/¯
 #	https://stackoverflow.com/questions/52134100/parameter-store-request-timing-out-inside-of-aws-lambda -- Tror dette er problemet
 #
-#	stage = os.getenv('STAGE')
-#	parameter_path = "/{}/rds/postgres/".format(stage)
-#	client = boto3.client('ssm')
-#	response_username = client.get_parameter(
-#		Name=parameter_path + "username",
-#		WithDecryption=False)
-#	response_password = client.get_parameter(
-#		Name=parameter_path + "password", 
-#		WithDecryption=True)
-#
-#	username = response_username['Parameter']['Value']
-#	password = response_password['Parameter']['Value']
+	stage = os.getenv('STAGE')
+	parameter_path = "/{}/rds/postgres/".format(stage)
+	client = boto3.client('ssm')
+	response_username = client.get_parameter(
+		Name=parameter_path + "username",
+		WithDecryption=False)
+	response_password = client.get_parameter(
+		Name=parameter_path + "password", 
+		WithDecryption=True)
 
-	username = os.getenv('DATABASE_USERNAME')
-	password = os.getenv('DATABASE_PASSWORD')
+	username = response_username.get('Parameter', {}).get('Value', None)
+	password = response_password.get('Parameter', {}).get('Value', None)
+
+	if not username or not password:
+		return -1
+
+#	username = os.getenv('DATABASE_USERNAME')
+#	password = os.getenv('DATABASE_PASSWORD')
 	host = os.getenv('DATABASE_ENDPOINT_ADDRESS')
 	port = os.getenv('DATABASE_ENDPOINT_PORT')
 	engine = create_engine('postgresql://{}:{}@{}:{}/Dataplattform'.format(username, password, host, port), echo=False)
@@ -77,16 +89,15 @@ def drop_table(engine):
 	Events.__table__.drop(engine)
 
 
-def insert_data(session, id, event_summary, creator, start, end, event_code, active=False):
+def insert_data(session, id, event_summary, creator, start, end):
 	
 	event = Events(
-		id=id, 
+		id=id,
+		created_timestamp = time.time(),
 		event_summary=event_summary, 
 		creator=creator, 
-		start=start, 
-		end=end, 
-		event_code=event_code, 
-		active=active)
+		start_timestamp=start, 
+		end_timestamp=end)
 	
 	session.add(event)
 	session.commit()

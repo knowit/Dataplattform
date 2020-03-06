@@ -62,7 +62,7 @@ functions:
           existing: true
     vpc: # This is needed to access postgres
       securityGroupIds:
-        - sg-034bf6fcaae44071b #TODO - Import value. This is now copied from aws console
+        - !ImportValue ${self:custom.stage}-PostgresAccessSecurityGroupID #This group have access to postgres
       subnetIds:
         - !ImportValue ${self:custom.stage}-SubnetAID
         - !ImportValue ${self:custom.stage}-SubnetBID
