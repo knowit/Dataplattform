@@ -54,9 +54,6 @@ def get_data_from_s3(bucket, object):
 
 
 def get_engine():
-#	VIL EGENTLIG HA DETTE, MEN MÅ ORDNE NOE MED VPC OG NOE GREIER ¯\_(ツ)_/¯
-#	https://stackoverflow.com/questions/52134100/parameter-store-request-timing-out-inside-of-aws-lambda -- Tror dette er problemet
-#
 	stage = os.getenv('STAGE')
 	parameter_path = "/{}/rds/postgres/".format(stage)
 	client = boto3.client('ssm')
@@ -73,8 +70,6 @@ def get_engine():
 	if not username or not password:
 		return -1
 
-#	username = os.getenv('DATABASE_USERNAME')
-#	password = os.getenv('DATABASE_PASSWORD')
 	host = os.getenv('DATABASE_ENDPOINT_ADDRESS')
 	port = os.getenv('DATABASE_ENDPOINT_PORT')
 	engine = create_engine('postgresql://{}:{}@{}:{}/Dataplattform'.format(username, password, host, port), echo=False)
