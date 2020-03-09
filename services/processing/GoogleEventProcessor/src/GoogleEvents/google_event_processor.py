@@ -9,6 +9,16 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 def handler(event, context):
+
+	process(event)
+
+	return {
+			'statusCode': 200,
+			'body': 'Success'
+		}
+
+
+def process(event):
 	# Fetch all data from s3 first to insert all data in one DB-Session
 	data = {}
 	for record in event.get('Records', []):

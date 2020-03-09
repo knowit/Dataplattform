@@ -2,8 +2,22 @@ import boto3
 import json
 import os
 import boto3
+import time
+from sqlalchemy import create_engine
+from sqlalchemy import Table, Column, BigInteger, Integer, String, MetaData, Text, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 def handler(event, context):
+
+	process(event)
+
+	return {
+			'statusCode': 200,
+			'body': 'Success'
+		}
+
+def process(event):
 	# Fetch all data from s3 first to insert all data in one DB-Session
 	data = {}
 	for record in event.get('Records', []):
@@ -12,12 +26,11 @@ def handler(event, context):
 		if new_dict:
 			data.update(json.loads(new_dict))
 
-	engine = get_engine()
-	Session = sessionmaker(bind = engine)
-	session = Session()
+#	engine = get_engine()
+#	Session = sessionmaker(bind = engine)
+#	session = Session()
 	process_data(data)
-	session.close()
-
+#	session.close()
 
 def process_data(data):
 	print("DATA:", data)

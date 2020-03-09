@@ -1,16 +1,16 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: google-event-poller
+service: poller
 
 custom:
   #Edit these variables###########################
   editable:
     timeout: 6
-    handlerFile: google_event_poller
-    description: Fetch events from google calendar
-    folder: GoogleEventPoller
+    handlerFile: fileName
+    description: MY_DESCRIPTION
+    folder: function_1
     scheduleRate: rate(1 hour)
     accessLevel: level-2
-    dataFolder: eventBox/events
+    dataFolder: DATA_FOLDER
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
@@ -82,15 +82,6 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ParameterStoreGooglePollerAccess
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/dev/poller/google/*'
-
           - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:custom.editable.handlerFile}
             PolicyDocument:
               Version: "2012-10-17"

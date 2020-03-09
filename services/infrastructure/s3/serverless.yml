@@ -38,9 +38,10 @@ resources:
   #Arn of S3 bucket needs to be exported in order to use it from other services (ingestion and processing)
   Outputs:
     DataLakeArn:
-      Value:
-        Fn::GetAtt:
-          - DataLake
-          - Arn
+      Value: !GetAtt DataLake.Arn
       Export:
-        Name: ${self:custom.service}-datalakeArn
+        Name: ${self:custom.stage}-datalakeArn
+    DataLakeName:
+      Value: ${self:resources.Resources.DataLake.Properties.BucketName}
+      Export:
+        Name: ${self:custom.stage}-datalakeName
