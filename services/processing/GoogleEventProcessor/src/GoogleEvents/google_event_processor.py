@@ -8,6 +8,7 @@ from sqlalchemy import Table, Column, BigInteger, Integer, String, MetaData, Tex
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+
 def handler(event, context):
 
 	process(event)
@@ -114,6 +115,7 @@ def get_all_data(session):
 
 
 Base = declarative_base()
+
 
 class Events(Base):
 	__tablename__ = 'events'

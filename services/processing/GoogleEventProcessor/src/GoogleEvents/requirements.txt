@@ -1,2 +1,4 @@
 SQLAlchemy
 psycopg2-binary
+serverless-python-requirements
+serverless-pseudo-parameters

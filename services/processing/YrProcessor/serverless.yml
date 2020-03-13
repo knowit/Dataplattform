@@ -1,15 +1,15 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: processor
+service: yr-processor
 
 custom:
   #Edit these variables#########################################
   editable:
     timeout: 6 #seconds
-    handlerFile: fileName
-    description: MY_DESCRIPTION
+    handlerFile: yr_processor
+    description: Processing yr data from s3 to database
     folder: Yr
-    accessLevel: level-2
-    dataFolder: DATA_FOLDER
+    accessLevel: level-1
+    dataFolder: yr
   ##############################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
@@ -45,7 +45,7 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  eventProcessor:
+  yrProcessor:
     module: src/${self:custom.editable.folder} # path to function
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:custom.editable.handlerFile} # Always begin name with stage

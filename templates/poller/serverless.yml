@@ -7,7 +7,7 @@ custom:
     timeout: 6
     handlerFile: fileName
     description: MY_DESCRIPTION
-    folder: function_1
+    folder: Yr
     scheduleRate: rate(1 hour)
     accessLevel: level-2
     dataFolder: DATA_FOLDER
