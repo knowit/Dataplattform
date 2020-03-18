@@ -117,12 +117,12 @@ Base = declarative_base()
 class Events(Base):
     __tablename__ = 'events'
 
-    id=Column(String(100), primary_key=True)
-    created_timestamp=Column(BigInteger, primary_key=True)
-    event_summary=Column(String(255))
-    creator=Column(String(255))
-    start_timestamp=Column(BigInteger)
-    end_timestamp=Column(BigInteger)
+    id = Column(String(100), primary_key=True)
+    created_timestamp = Column(BigInteger, primary_key=True)
+    event_summary = Column(String(255))
+    creator = Column(String(255))
+    start_timestamp = Column(BigInteger)
+    end_timestamp = Column(BigInteger)
 
 
 if __name__ == "__main__":

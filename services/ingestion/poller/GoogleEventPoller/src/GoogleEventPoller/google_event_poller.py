@@ -35,15 +35,13 @@ def poll():
         "timestamp": int(time.time())
     }
 
-    for calendar_id in calendar_ids_from_ssm:
-        events['data'].update(get_events(credsentials_from_ssm, calendar_id))
 
-    path = os.getenv("ACCESS_PATH")
+    if bool(events['data']):
+        path = os.getenv("ACCESS_PATH")
 
-    s3 = boto3.resource('s3')
-    s3_object = s3.Object(os.getenv('DATALAKE'), path +
-                          str(int(time.time())) + ".json")
-    s3_object.put(Body=(bytes(json.dumps(events).encode('UTF-8'))))
+        s3 = boto3.resource('s3')
+        s3_object = s3.Object(os.getenv('DATALAKE'), path + str(int(time.time())) + ".json")
+        s3_object.put(Body=(bytes(json.dumps(events).encode('UTF-8'))))
 
     return True
 

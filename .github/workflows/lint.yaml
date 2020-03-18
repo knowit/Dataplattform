@@ -1,0 +1,19 @@
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest # Litt usikker på denne linjen
+    steps:
+      - uses: actions/checkout@v1
+      - uses: grantmcconnaughey/lintly-flake8-github-action@v1.0
+        with:
+          # The GitHub API token to create reviews with
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Fail if "new" violations detected or "any", default "new"
+          failIf: new
+          # Additional arguments to pass to flake8, default "." (current directory)
+          # E121: continuation line under-indented for hanging indent
+          # E123: closing bracket does not match indentation of opening bracket’s line
+          # E501: line too long (82 > 79 characters)
+          # W505: doc line too long (82 > 79 characters)
+          args: "--ignore=E121,E123,E501,W505 . --max-line-length=120"
