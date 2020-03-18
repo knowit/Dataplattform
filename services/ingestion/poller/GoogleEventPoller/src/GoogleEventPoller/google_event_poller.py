@@ -64,7 +64,7 @@ def get_events(credsentials_from_env, calendar_id):
         serviceName='calendar', version='v3', http=http, cache_discovery=False)
     now = datetime.datetime.utcnow().isoformat() + '+02:00'
     tomorrow = datetime.datetime.utcfromtimestamp(datetime.datetime.now().timestamp() + (
-            60 * 60 * 24)).isoformat() + '+02:00'
+        60 * 60 * 24)).isoformat() + '+02:00'
     events_result = service.events().list(
         calendarId=calendar_id,
         timeMin=now,
