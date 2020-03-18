@@ -52,7 +52,8 @@ def get_yr_data(location) -> list:
 
     location_name = data.get("weatherdata", {}).get("location", {}).get("name", {}) # Will return {} if non-existing
     forecasts = data.get("weatherdata", {}).get("forecast", {}).get("tabular", {}).get("time", {}) # {} if non-existing
-    ret = []
+    ret = {"metadata": {"timestamp": datetime.now().timestamp()}, "data": {}}
+    temp_ret = {}
     for i in range(0, min(len(forecasts), 24)): # At most insert 25 hours of weather data
         forecast = forecasts[i]
         time_from = timestring_to_posix(forecast.get("@from", None))
@@ -66,7 +67,8 @@ def get_yr_data(location) -> list:
             "temperature": int(forecast.get("temperature", {}).get("@value", None)),
             "air_pressure": float(forecast.get("pressure", {}).get("@value", None)),
         }
-        ret.append(data_point)
+        temp_ret[i] = data_point
+    ret["data"] = temp_ret
     return ret
 
 

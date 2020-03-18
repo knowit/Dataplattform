@@ -10,6 +10,36 @@ from yr_hour import WeatherHour
 
 
 def handler(event, context):
+	event = {'Records': [{'eventVersion': '2.1',
+						  'eventSource': 'aws:s3',
+						  'awsRegion': 'eu-central-1',
+						  'eventTime': '2020-03-18T10:29:21.063Z',
+						  'eventName': 'ObjectCreated:Put',
+						  'userIdentity':
+							  {'principalId':
+								   'AWS:AROAVC5W4ROCIVQSMHVPN:dev-yr_poller'
+							   },
+						  'requestParameters': {
+							  'sourceIPAddress': '3.127.139.106'
+						  },
+						  'responseElements': {
+							  'x-amz-request-id': '0C269EEB54B678AA',
+							  'x-amz-id-2': '2WgpQKU2ZVRQTt78zquvL6paxD5Lx5afFvyeXwjwNIhMeolaVVXEq4Oq63dWwkSHFIsW9d0IWQYeO346/nhdGNntCWNAIN2J'
+						  },
+						  's3': {
+							  's3SchemaVersion': '1.0',
+							  'configurationId': 'dev-yr_processor-7228e8a9b78665a7a74dbf35903a5148',
+							  'bucket': {
+								  'name': 'dev-datalake-datalake',
+								  'ownerIdentity': {'principalId': 'A2CG4HAW1G53A4'},
+								  'arn': 'arn:aws:s3:::dev-datalake-datalake'
+							  },
+							  'object': {
+								'key': 'data/level-1/yr/Lakkegata/1584535823.json',
+								'size': 5058,
+								'eTag': 'a9aa8405cefca07b1c35abcfcdc93fdb',
+								'versionId': 'WZXJ74fGqmKTAs3rq_Jc8poVeYGRj4bk',
+								'sequencer': '005E71F8036E317D9A'}}}]}
 
 	data = process(event)
 
@@ -50,13 +80,12 @@ def process(event):
 	engine = get_engine()
 	Session = sessionmaker(bind=engine)
 	session = Session()
-	for weather_data in data:
+	for key, weather_data in data.items():
 		insert_data(session, weather_data.get('location', None), weather_data.get('location_name', None),
 					weather_data.get('time_from', None), weather_data.get('time_to', None),
 					weather_data.get('precipitation', None), weather_data.get('wind_speed', None),
 					weather_data.get('temperature', None), weather_data.get('air_pressure', None))
 	process_data(data)
-	print(vars(get_all_data(session)[0]))
 	session.close()
 	return data
 
