@@ -15,7 +15,7 @@ def add_parameter(value, type):
     }]
 
     while True:
-        if input("Add new tag? y/n:") is "y":
+        if input("Add new tag? y/n:") == "y":
             tag_key = input("Key:")
             tag_value = input("Value:")
             tags.append({"Key": tag_key, "Value": tag_value})
@@ -53,7 +53,7 @@ def main():
 
     types = ["String", "StringList", "SecureString"]
 
-    response = add_parameter(value, types[type-1])
+    response = add_parameter(value, types[type - 1])
 
     print("Final name: " + response)
 

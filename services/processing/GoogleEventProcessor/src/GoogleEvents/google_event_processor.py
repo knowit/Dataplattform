@@ -1,12 +1,10 @@
-import boto3
 import json
 import os
 import boto3
 import time
 from sqlalchemy import create_engine
-from sqlalchemy import Table, Column, BigInteger, Integer, String, MetaData, Text, Boolean
+from sqlalchemy import Column, BigInteger, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 
 def handler(event, context):
@@ -14,9 +12,9 @@ def handler(event, context):
     process(event)
 
     return {
-            'statusCode': 200,
-            'body': 'Success'
-        }
+        'statusCode': 200,
+        'body': 'Success'
+    }
 
 
 def process(event):
@@ -81,7 +79,8 @@ def get_engine():
 
     host = os.getenv('DATABASE_ENDPOINT_ADDRESS')
     port = os.getenv('DATABASE_ENDPOINT_PORT')
-    engine = create_engine('postgresql://{}:{}@{}:{}/Dataplattform'.format(username, password, host, port), echo=False)
+    engine = create_engine(
+        'postgresql://{}:{}@{}:{}/Dataplattform'.format(username, password, host, port), echo=False)
     return engine
 
 
@@ -97,7 +96,7 @@ def insert_data(session, id, event_summary, creator, start, end):
 
     event = Events(
         id=id,
-        created_timestamp = time.time(),
+        created_timestamp=time.time(),
         event_summary=event_summary,
         creator=creator,
         start_timestamp=start,
@@ -118,15 +117,13 @@ Base = declarative_base()
 class Events(Base):
     __tablename__ = 'events'
 
-    id = Column(String(100), primary_key = True)
-    created_timestamp = Column(BigInteger, primary_key = True)
-    event_summary = Column(String(255))
-    creator = Column(String(255))
-    start_timestamp = Column(BigInteger)
-    end_timestamp = Column(BigInteger)
+    id=Column(String(100), primary_key=True)
+    created_timestamp=Column(BigInteger, primary_key=True)
+    event_summary=Column(String(255))
+    creator=Column(String(255))
+    start_timestamp=Column(BigInteger)
+    end_timestamp=Column(BigInteger)
 
 
-
-
-if __name__== "__main__":
+if __name__ == "__main__":
     handler(None, None)
