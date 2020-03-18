@@ -56,7 +56,6 @@ def process(event):
 					weather_data.get('precipitation', None), weather_data.get('wind_speed', None),
 					weather_data.get('temperature', None), weather_data.get('air_pressure', None))
 	process_data(data)
-	print(vars(get_all_data(session)[0]))
 	session.close()
 	return data
 
