@@ -13,9 +13,9 @@ def handler(event, context):
     data = process(event)
 
     return {
-            'statusCode': 200,
-            'body': data
-        }
+        'statusCode': 200,
+        'body': data
+    }
 
 
 def insert_data(session, location, location_name, time_from, time_to,
@@ -51,8 +51,10 @@ def process(event):
     session = Session()
     for key, weather_data in data.items():
         insert_data(session, weather_data.get('location', None), weather_data.get('location_name', None),
-                    weather_data.get('time_from', None), weather_data.get('time_to', None),
-                    weather_data.get('precipitation', None), weather_data.get('wind_speed', None),
+                    weather_data.get('time_from', None), weather_data.get(
+                        'time_to', None),
+                    weather_data.get('precipitation', None), weather_data.get(
+                        'wind_speed', None),
                     weather_data.get('temperature', None), weather_data.get('air_pressure', None))
     process_data(data)
     session.close()
@@ -93,7 +95,8 @@ def get_engine():
 
     host = os.getenv('DATABASE_ENDPOINT_ADDRESS')
     port = os.getenv('DATABASE_ENDPOINT_PORT')
-    engine = create_engine('postgresql://{}:{}@{}:{}/Dataplattform'.format(username, password, host, port), echo=False)
+    engine = create_engine(
+        'postgresql://{}:{}@{}:{}/Dataplattform'.format(username, password, host, port), echo=False)
     if not engine.dialect.has_table(engine, 'weather'):
         create_table(engine)
     return engine
@@ -112,5 +115,5 @@ def get_all_data(session):
     return session.query(WeatherHour).all()
 
 
-if __name__== "__main__":
+if __name__ == "__main__":
     handler(None, None)

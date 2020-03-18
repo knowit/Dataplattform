@@ -10,9 +10,9 @@ def add_parameter(value, type):
     overwrite = bool(input("Overwrite existing value, true/false?:"))
 
     tags = [{
-                'Key': 'Project',
-                'Value': 'Dataplattform'
-            }]
+        'Key': 'Project',
+        'Value': 'Dataplattform'
+    }]
 
     while True:
         if input("Add new tag? y/n:") is "y":
@@ -46,10 +46,9 @@ def add_parameter(value, type):
     return finalName
 
 
-
-
 def main():
-    type = int(input("Type of parameter(1, 2, or 3)? 1=String, 2=StringList, 3=SecureString:"))
+    type = int(
+        input("Type of parameter(1, 2, or 3)? 1=String, 2=StringList, 3=SecureString:"))
     value = input("Value:")
 
     types = ["String", "StringList", "SecureString"]
@@ -58,5 +57,6 @@ def main():
 
     print("Final name: " + response)
 
-if __name__== "__main__" :
+
+if __name__ == "__main__":
     main()

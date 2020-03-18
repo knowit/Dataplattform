@@ -21,12 +21,11 @@ def generatePassword(length):
     return finalName
 
 
-
-
 def main():
 
     name = generatePassword(64)
     print("Final name: " + name)
 
-if __name__== "__main__" :
+
+if __name__ == "__main__":
     main()
