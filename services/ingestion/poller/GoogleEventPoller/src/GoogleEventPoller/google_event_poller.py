@@ -19,22 +19,22 @@ def handler(event, context):
 
 
 def poll():
-    client = boto3.client('ssm')
-    credentials = client.get_parameter(
-        Name='/dev/poller/google/credentials',
-        WithDecryption=False)
-    credsentials_from_ssm = credentials['Parameter']['Value']
-
-    calendar_ids = client.get_parameter(
-        Name='/dev/poller/google/calendarIDs',
-        WithDecryption=False)
-    calendar_ids_from_ssm = calendar_ids['Parameter']['Value'].split(',')
+    # Kommenterte ut dette, siden det ikke ble brukt noe sted
+    # client = boto3.client('ssm')
+    # credentials = client.get_parameter(
+    #     Name='/dev/poller/google/credentials',
+    #     WithDecryption=False)
+    # credsentials_from_ssm = credentials['Parameter']['Value']
+    #
+    # calendar_ids = client.get_parameter(
+    #     Name='/dev/poller/google/calendarIDs',
+    #     WithDecryption=False)
+    # calendar_ids_from_ssm = calendar_ids['Parameter']['Value'].split(',')
 
     events = {
         "data": {},
         "timestamp": int(time.time())
     }
-
 
     if bool(events['data']):
         path = os.getenv("ACCESS_PATH")
@@ -63,8 +63,8 @@ def get_events(credsentials_from_env, calendar_id):
     service = googleapiclient.discovery.build(
         serviceName='calendar', version='v3', http=http, cache_discovery=False)
     now = datetime.datetime.utcnow().isoformat() + '+02:00'
-    tomorrow = datetime.datetime.utcfromtimestamp(datetime.datetime.now().timestamp() +
-                                                  (60 * 60 * 24)).isoformat() + '+02:00'
+    tomorrow = datetime.datetime.utcfromtimestamp(datetime.datetime.now().timestamp() + (
+            60 * 60 * 24)).isoformat() + '+02:00'
     events_result = service.events().list(
         calendarId=calendar_id,
         timeMin=now,
