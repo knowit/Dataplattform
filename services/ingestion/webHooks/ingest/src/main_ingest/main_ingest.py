@@ -1,5 +1,6 @@
 import json
 
+
 def handler(event, context):
     data_type = event["pathParameters"]["type"]
     data = event["body"]
@@ -12,4 +13,3 @@ def handler(event, context):
             "data": data
         })
     }
-
