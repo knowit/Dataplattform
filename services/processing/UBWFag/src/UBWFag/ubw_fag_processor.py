@@ -34,12 +34,17 @@ def process(event):
     session.close()
 
 
-def process_data(data: List[List[Dict]], session: Session):
+def process_data(data: List[Dict], session: Session):
+    data = [
+        [dict(x, time=d['metadata']['timestamp']) for x in d['data']]
+        for d in data
+    ]
+
     data = np.hstack(data)
     df = pd.DataFrame.from_records(data)
 
     # Get unique reg_periods where used_hrs are largest
-    df = df[['reg_period', 'used_hrs']].sort_values(['used_hrs']).groupby('reg_period').first().reset_index()
+    df = df[['time', 'reg_period', 'used_hrs']].sort_values(['used_hrs']).groupby('reg_period').first().reset_index()
 
     # Table will never be very large so just get everything
     rows = session.query(UBWFagtimer).all()
@@ -47,10 +52,9 @@ def process_data(data: List[List[Dict]], session: Session):
     # Remove already inserted periods
     df = df[~df.reg_period.isin([x.reg_period for x in rows])]
 
-    now = datetime.now().time()
     insert_rows = [
         UBWFagtimer(
-            time=now,
+            time=datetime.fromtimestamp(d.time),
             reg_period=d.reg_period,
             used_hours=float(d.used_hrs)
         )
