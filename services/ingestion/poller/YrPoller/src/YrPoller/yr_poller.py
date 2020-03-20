@@ -13,9 +13,9 @@ def handler(event, context):
     poll()
 
     return {
-            'statusCode': 200,
-            'body': 'Success',
-        }
+        'statusCode': 200,
+        'body': 'Success',
+    }
 
 
 def poll():
@@ -32,7 +32,8 @@ def poll():
     for folder, data in data_points.items():
         logging.info(f"sending data to s3 about {folder}")
         s3 = boto3.resource('s3')
-        s3_object = s3.Object(os.getenv('DATALAKE'), f"{path}{folder}/" + str(int(time.time())) + ".json")
+        s3_object = s3.Object(
+            os.getenv('DATALAKE'), f"{path}{folder}/" + str(int(time.time())) + ".json")
         s3_object.put(Body=(bytes(json.dumps(data).encode('UTF-8'))))
 
     return True
@@ -47,13 +48,15 @@ def get_yr_data(location) -> list:
     def timestring_to_posix(time):
         # utc_offset = int(data["weatherdata"]["location"]["timezone"]["@utcoffsetMinutes"])
         # uts_delta = timedelta(minutes=utc_offset)
-        new_time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%S") # + utx_delta
+        new_time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%S")  # + utx_delta
         return int(new_time.timestamp())
 
-    location_name = data.get("weatherdata", {}).get("location", {}).get("name", {}) # Will return {} if non-existing
-    forecasts = data.get("weatherdata", {}).get("forecast", {}).get("tabular", {}).get("time", {}) # {} if non-existing
+    location_name = data.get("weatherdata", {}).get("location", {}).get(
+        "name", {})  # Will return {} if non-existing
+    forecasts = data.get("weatherdata", {}).get("forecast", {}).get(
+        "tabular", {}).get("time", {})  # {} if non-existing
     ret = []
-    for i in range(0, min(len(forecasts), 24)): # At most insert 25 hours of weather data
+    for i in range(0, min(len(forecasts), 24)):  # At most insert 25 hours of weather data
         forecast = forecasts[i]
         time_from = timestring_to_posix(forecast.get("@from", None))
         data_point = {
