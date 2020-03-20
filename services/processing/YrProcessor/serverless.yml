@@ -1,19 +1,20 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: yr-poller
+service: yr-processor
 
 custom:
-  #Edit these variables###########################
+  #Edit these variables#########################################
   editable:
-    timeout: 6
-    handlerFile: yr_poller
-    description: poller for yr-data
-    folder: YrPoller
-    scheduleRate: rate(1 hour)
+    timeout: 6 #seconds
+    handlerFile: yr_processor
+    description: Processing yr data from s3 to database
+    folder: Yr
     accessLevel: level-1
     dataFolder: yr
-  ################################################
+  ##############################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+  pythonRequirements:
+    dockerizePip: non-linux
 
 provider:
   name: aws
@@ -22,13 +23,13 @@ provider:
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
     name: dataplattform-v2-deploymentbucket # Name of s3 bucket
-  runtime: python3.8
+  runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
   tags: # Tags that will be added to each of the deployment resources.
     Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    Layer: Ingestion # ingestion, processing, restApi, infrastructure
-    Ingestion: Pollers #webHooks, Pollers, iot
+    Layer: Processing # ingestion, processing, restApi, infrastructure
+    #Ingestion: Pollers #webHooks, Pollers, iot
     #processing: linkedIn
     #restApi: linkedIn
     #infrastructure: s3
@@ -44,7 +45,7 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  yrEventPoller:
+  yrProcessor:
     module: src/${self:custom.editable.folder} # path to function
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:custom.editable.handlerFile} # Always begin name with stage
@@ -55,15 +56,26 @@ functions:
         - 'src/${self:custom.editable.folder}/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
-      ACCESS_PATH: ${self:custom.accessPath}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
     tags: # Tag for this function. Every function are tagged with stage by default
-    events: # How to trigger the lambda
-      - schedule:
-          name: ${self:custom.stage}-${self:custom.editable.handlerFile}-timer
-          description: ${self:custom.editable.description}
-          rate: ${self:custom.editable.scheduleRate}
-          enabled: true
+    events:
+      - s3: # Lambda fires when object is created in s3
+          bucket: !ImportValue ${self:custom.stage}-datalakeName
+          event: s3:ObjectCreated:*
+          rules: # OBject must be in within this path GoogleCalendarEvents/**.json
+            - prefix: ${self:custom.accessPath}
+            - suffix: .json
+          existing: true
+    vpc: # This is needed to access postgres
+      securityGroupIds:
+        - !ImportValue ${self:custom.stage}-PostgresAccessSecurityGroupID #This group have access to postgres
+      subnetIds:
+        - !ImportValue ${self:custom.stage}-SubnetAID
+        - !ImportValue ${self:custom.stage}-SubnetBID
+        - !ImportValue ${self:custom.stage}-SubnetCID
+
 
 resources: # The resources your functions use
   Resources:
@@ -80,21 +92,29 @@ resources: # The resources your functions use
                   - lambda.amazonaws.com
               Action: sts:AssumeRole
         ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:custom.editable.handlerFile}
+        Policies: # Give lambda access to s3 data
+          - PolicyName: ${self:custom.stage}-DatalakeRead-${self:custom.editable.handlerFile}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - s3:PutObject
-                    #- s3:ListObjects
-                  Resource:
+                    - s3:GetObject
+                  Resource: # Only give access to the folder GoogleCalendarEvents/
                     - Fn::Join:
-                      - ""
+                      - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
+          - PolicyName: ParameterStoreGooglePollerAccess
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/rds/postgres/*' # Only give access to what the lambda needs
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
