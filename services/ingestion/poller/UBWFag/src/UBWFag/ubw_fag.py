@@ -1,10 +1,10 @@
 import boto3
 import json
-import time
 from datetime import datetime
 from os import environ
 from zeep import Client
 from xmltodict import parse
+from os import path
 
 
 def handler(event, context):
@@ -89,11 +89,15 @@ def poll():
         })
 
     ubw_data = parse(res['TemplateResult'])['Agresso']['AgressoQE']
-    ubw_data = [rec for rec in ubw_data if ubw_record_filter(rec)]
+    timestamp = datetime.now().timestamp()
+    ubw_data = {
+        'metadata': {'timestamp': timestamp},
+        'data': [rec for rec in ubw_data if ubw_record_filter(rec)]
+    }
 
-    path = environ.get("ACCESS_PATH")
+    access_path = environ.get("ACCESS_PATH")
     s3 = boto3.resource('s3')
-    s3_object = s3.Object(environ.get('DATALAKE'), f"{path}/" + str(int(time.time())) + ".json")
+    s3_object = s3.Object(environ.get('DATALAKE'), path.join(access_path, f'{int(timestamp)}.json'))
     s3_object.put(Body=(bytes(json.dumps(ubw_data).encode('UTF-8'))))
 
 
