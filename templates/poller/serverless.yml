@@ -44,7 +44,7 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  eventPoller:
+  Poller:
     module: src/${self:custom.editable.folder} # path to function
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:custom.editable.handlerFile} # Always begin name with stage
