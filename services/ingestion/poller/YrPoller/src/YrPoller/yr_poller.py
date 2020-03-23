@@ -32,8 +32,7 @@ def poll():
     for folder, data in data_points.items():
         logging.info(f"sending data to s3 about {folder}")
         s3 = boto3.resource('s3')
-        s3_object = s3.Object(
-            os.getenv('DATALAKE'), f"{path}{folder}/" + str(int(time.time())) + ".json")
+        s3_object = s3.Object(os.getenv('DATALAKE'), f"{path}{folder}" + str(int(time.time())) + ".json")
         s3_object.put(Body=(bytes(json.dumps(data).encode('UTF-8'))))
 
     return True
@@ -51,11 +50,10 @@ def get_yr_data(location) -> list:
         new_time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%S")  # + utx_delta
         return int(new_time.timestamp())
 
-    location_name = data.get("weatherdata", {}).get("location", {}).get(
-        "name", {})  # Will return {} if non-existing
-    forecasts = data.get("weatherdata", {}).get("forecast", {}).get(
-        "tabular", {}).get("time", {})  # {} if non-existing
-    ret = []
+    location_name = data.get("weatherdata", {}).get("location", {}).get("name", {})  # Will return {} if non-existing
+    forecasts = data.get("weatherdata", {}).get("forecast", {}).get("tabular", {}).get("time", {})  # {} if non-existing
+    ret = {"metadata": {"timestamp": int(datetime.now().timestamp())}, "data": {}}
+    temp_ret = {}
     for i in range(0, min(len(forecasts), 24)):  # At most insert 25 hours of weather data
         forecast = forecasts[i]
         time_from = timestring_to_posix(forecast.get("@from", None))
@@ -69,7 +67,8 @@ def get_yr_data(location) -> list:
             "temperature": int(forecast.get("temperature", {}).get("@value", None)),
             "air_pressure": float(forecast.get("pressure", {}).get("@value", None)),
         }
-        ret.append(data_point)
+        temp_ret[i] = data_point
+    ret["data"] = temp_ret
     return ret
 
 
