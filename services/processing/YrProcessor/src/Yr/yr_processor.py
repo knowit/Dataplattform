@@ -1,6 +1,5 @@
 import json
 import os
-from datetime import datetime
 
 import boto3
 from sqlalchemy import create_engine
@@ -13,7 +12,7 @@ from typing import List, Dict
 
 
 def handler(event, context):
-    data = process(event)
+    process(event)
 
     return {
         'statusCode': 200,
