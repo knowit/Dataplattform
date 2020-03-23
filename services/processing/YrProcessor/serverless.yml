@@ -102,12 +102,12 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - s3:GetObject
-                  Resource: # Only give access to the folder GoogleCalendarEvents/
+                  Resource:
                     - Fn::Join:
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ParameterStoreGooglePollerAccess
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:custom.editable.handlerFile}
             PolicyDocument:
               Version: '2012-10-17'
               Statement:

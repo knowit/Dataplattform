@@ -4,9 +4,12 @@ from datetime import datetime
 
 import boto3
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import sessionmaker, Session
 
 from yr_hour import WeatherHour
+
+from typing import List, Dict
 
 
 def handler(event, context):
@@ -14,49 +17,47 @@ def handler(event, context):
 
     return {
         'statusCode': 200,
-        'body': data
+        'body': 'Success'
     }
-
-
-def insert_data(session, location, location_name, time_from, time_to,
-                precipitation, wind_speed, temperature, air_pressure, timestamp):
-
-    yr_insertion = WeatherHour(
-        time=datetime.fromtimestamp(timestamp),
-        location=location,
-        location_name=location_name,
-        time_from=time_from,
-        time_to=time_to,
-        precipitation=precipitation,
-        wind_speed=wind_speed,
-        temperature=temperature,
-        air_pressure=air_pressure
-    )
-
-    session.add(yr_insertion)
-    session.commit()
 
 
 def process(event):
     # Fetch all data from s3 first to insert all data in one DB-Session
-    data = {}
+    data = []
     for record in event.get('Records', []):
         new_dict = get_data_from_s3(record.get('s3', {}).get('bucket', {}).get('name', None),
                                     record.get('s3', {}).get('object', {}).get('key', None))
         if new_dict:
-            data.update(json.loads(new_dict))
+            data.append(json.loads(new_dict))
 
     engine = get_engine()
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    for key, weather_data in data.items():
-        insert_data(session, weather_data.get('location', None), weather_data.get('location_name', None),
-                    weather_data.get('time_from', None), weather_data.get('time_to', None),
-                    weather_data.get('precipitation', None), weather_data.get('wind_speed', None),
-                    weather_data.get('temperature', None), weather_data.get('air_pressure', None),
-                    weather_data.get('timestamp', None))
+    WeatherHour.metadata.create_all(bind=engine, checkfirst=True)
+    session = sessionmaker(bind=engine)()
+    process_data(data, session)
     session.close()
-    return data
+
+
+def process_data(weather_data: List[Dict], session: Session):
+    insert_rows = []
+    for element in weather_data:
+        timestamp = element.get('metadata').get('timestamp')
+        insert_rows.extend([
+            WeatherHour(
+                time=timestamp,
+                location=data.get('location'),
+                location_name=data.get('location_name'),
+                time_from=data.get('time_from'),
+                time_to=data.get('time_to'),
+                precipitation=data.get('precipitation'),
+                wind_speed=data.get('wind_speed'),
+                temperature=data.get('temperature'),
+                air_pressure=data.get('air_pressure')
+            )
+            for data in element.get('data').values()
+        ])
+
+    session.add_all(insert_rows)
+    session.commit()
 
 
 def get_data_from_s3(bucket, object):
@@ -70,7 +71,7 @@ def get_data_from_s3(bucket, object):
     return response['Body'].read().decode('utf-8')
 
 
-def get_engine():
+def get_engine() -> Engine:
     stage = os.getenv('STAGE')
     parameter_path = "/{}/rds/postgres/".format(stage)
     client = boto3.client('ssm')
@@ -90,7 +91,6 @@ def get_engine():
     host = os.getenv('DATABASE_ENDPOINT_ADDRESS')
     port = os.getenv('DATABASE_ENDPOINT_PORT')
     engine = create_engine('postgresql://{}:{}@{}:{}/Dataplattform'.format(username, password, host, port), echo=False)
-    WeatherHour.metadata.create_all(bind=engine, checkfirst=True)
     return engine
 
 

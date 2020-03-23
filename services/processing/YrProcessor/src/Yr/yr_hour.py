@@ -5,7 +5,7 @@ Base = declarative_base()
 
 
 class WeatherHour(Base):
-    __tablename__ = 'weather'
+    __tablename__ = 'yr_weather'
     id = Column(Integer, primary_key=True, autoincrement=True)
     time = Column(TIMESTAMP)
     location = Column(String(100))
