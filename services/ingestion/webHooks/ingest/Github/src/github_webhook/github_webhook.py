@@ -3,8 +3,6 @@ import os
 import time
 import json
 import hmac
-
-
 import hashlib
 
 
@@ -20,7 +18,9 @@ def handler(event, context):
 
     received_signature = headers["X-Hub-Signature"]
     if validate_payload_signature(body, received_signature):
-        insert_data(body)
+        data = json.loads(body)
+        if data.get('repository').get('private') is False:
+            insert_data(data, headers['X-GitHub-Event'])
         return{
             'statusCode': 200,
             'body': 'Success'
@@ -48,9 +48,18 @@ def validate_payload_signature(body, received_signature):
     return hmac.compare_digest(calculated_signature, rec_sig[1])
 
 
-def insert_data(data):
+def insert_data(data, event):
+
+    data = {
+        'metadata': {
+            'timestamp': time.time(),
+            'event': event
+        },
+        'data': data
+    }
+
     path = os.getenv("ACCESS_PATH")
 
     s3 = boto3.resource('s3')
-    s3_object = s3.Object(os.getenv('DATALAKE'), path + str(int(time.time())) + ".json")
+    s3_object = s3.Object(os.getenv('DATALAKE'), f'{path}{event}/{str(int(time.time()))}.json')
     s3_object.put(Body=(bytes(json.dumps(data).encode('UTF-8'))))
