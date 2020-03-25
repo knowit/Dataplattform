@@ -1,15 +1,13 @@
-service: slack-ingest
+service: slack-webhook
 
 custom:
   #Edit these variables###########################
   editable:
     timeout: 6
-    handlerFile: slack_ingest
+    handlerFile: slack_webhook
     description: Endpoint for slack webhooks
-    folder: slack_ingest
     accessLevel: level-2
     dataFolder: slack
-    parameterPath: /dev/web-hook/slack/
   ################################################
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
@@ -53,22 +51,21 @@ package:
 
 functions:
   slackIngest:
-    module: src/${self:custom.editable.folder} # path to function
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:custom.editable.handlerFile} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
     package:
       include:
-        - 'src/${self:custom.editable.folder}/*.py' # Files to include in deployment
+        - '*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
-      slack_SECRET: ${self:custom.editable.parameterPath}shared-secret
+      STAGE: ${self:custom.stage}
     events:
       - http:
-          path: slack-ingest/
+          path: slack-webhook/
           method: post
           private: false #if true API key is needed
 
@@ -90,7 +87,7 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ParameterStoreslackAccess
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:custom.editable.handlerFile}
             PolicyDocument:
               Version: '2012-10-17'
               Statement:

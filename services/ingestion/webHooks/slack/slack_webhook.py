@@ -4,11 +4,22 @@ import time
 import json
 import hmac
 import hashlib
+from filter import filter_slack_event
 
 
 def handler(event, context):
     status = verify_slack_event(event)
-    if status == 1:
+    if status == -1:
+        return {
+            'statusCode': 403,
+            'body': json.dumps({"reason": "Invalid signature"})
+        }
+    elif status == 0:
+        return {
+            'statusCode': 403,
+            'body': json.dumps({"reason": "No signature"})
+        }
+    elif status == 1:
         data = json.loads(event['body'])
         if data['type'] == 'url_verification':
             return {
@@ -16,17 +27,14 @@ def handler(event, context):
                 'body': json.dumps({'challenge': data['challenge']})
             }
         else:
-            insert_data(data)
-    elif status == 0:
-        return {
-            'statusCode': 403,
-            'body': json.dumps({"reason": "No signature"})
-        }
-    elif status == -1:
-        return {
-            'statusCode': 403,
-            'body': json.dumps({"reason": "Invalid signature"})
-        }
+            filtered_data = filter_slack_event(data)
+            for d in filtered_data:
+                insert_data(d)
+
+    return {
+        'statusCode': 200,
+        'body': ''
+    }
 
 
 def insert_data(data):
