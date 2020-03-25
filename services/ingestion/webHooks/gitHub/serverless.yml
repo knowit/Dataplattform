@@ -6,10 +6,9 @@ custom:
     timeout: 6
     handlerFile: github_webhook
     description: Endpoint for github webhooks
-    folder: github_webhook
     accessLevel: level-2
     dataFolder: github
-    parameterPath: /dev/web-hook/github/
+    parameterPath: /${self:custom.stage}/web-hook/github/
   ################################################
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
@@ -53,14 +52,13 @@ package:
 
 functions:
   githubIngest:
-    module: src/${self:custom.editable.folder} # path to function
-    handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    handler: src/${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:custom.editable.handlerFile} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
     package:
       include:
-        - 'src/${self:custom.editable.folder}/*.py' # Files to include in deployment
+        - 'src/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -90,15 +88,6 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ParameterStoreGithubAccess
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/dev/poller/google/*'
-
           - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:custom.editable.handlerFile}
             PolicyDocument:
               Version: "2012-10-17"
@@ -112,14 +101,14 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ParameterStoreGooglePollerAccess
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:custom.editable.handlerFile}
             PolicyDocument:
               Version: '2012-10-17'
               Statement:
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/web-hook/github/*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter${self:custom.editable.parameterPath}*'
 
 plugins:
   - serverless-python-requirements
