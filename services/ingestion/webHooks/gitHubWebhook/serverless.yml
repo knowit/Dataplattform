@@ -1,17 +1,18 @@
-# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: poller
+service: githubWebhook
 
 custom:
   #Edit these variables###########################
   editable:
     timeout: 6
-    handlerFile: function_1
-    description: MY_DESCRIPTION
-    scheduleRate: rate(1 hour)
+    handlerFile: github_webhook
+    description: Endpoint for github webhooks
     accessLevel: level-2
-    dataFolder: DATA_FOLDER
+    dataFolder: github
+    parameterPath: /${self:custom.stage}/web-hook/github/
   ################################################
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  project: dataplattform
+  stage: ${opt:stage, self:provider.stage}
+  service: ${self:custom.stage}-${self:service} #this service definition includes stage
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
 
 provider:
@@ -20,30 +21,37 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+    name: dataplattform-v2-deploymentbucket
   runtime: python3.7
-  memorySize: 1024 # MB
-  timeout: ${self:custom.editable.timeout} # seconds
-  tags: # Tags that will be added to each of the deployment resources.
-    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    Layer: Ingestion # ingestion, processing, restApi, infrastructure
-    Ingestion: Pollers #webHooks, Pollers, iot
-    #processing: linkedIn
-    #restApi: linkedIn
-    #infrastructure: s3
-    # key: value
-  stackTags: # Tags for cloud formation
-    # key: value
-  environment: # Service wide environment variables
-    #ENVIRONMENT_VARIABLE_NAME: 123456789
+  memorySize: 1024
+  timeout: 5
+
+#  apiKeys:
+#    - name: ${self:custom.stage}-mainIngestKey #when value is not set, AWS automatically generates API key
+
+  #imports api gateway resources exported by ingestApiGateway service
+  apiGateway:
+    restApiId:
+      'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
+    restApiRootResourceId:
+      'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-rootResourceId
+
+  tags:
+    project: ${self:custom.project}
+    layer: ingestion
+    ingestion: webHooks
+  stackTags:
+    project: ${self:custom.project}
+    layer: ingestion
+    ingestion: webHooks
 
 package:
   individually: true
   exclude:
-    - "./**" # Exclude everything and include what you need in the functions below
+    - "./**"
 
 functions:
-  poller:
+  githubIngest:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
@@ -55,13 +63,13 @@ functions:
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
-    tags: # Tag for this function. Every function are tagged with stage by default
-    events: # How to trigger the lambda
-      - schedule:
-          name: ${self:custom.stage}-${self:service}-timer
-          description: ${self:custom.editable.description}
-          rate: ${self:custom.editable.scheduleRate}
-          enabled: true
+      GITHUB_SECRET: ${self:custom.editable.parameterPath}shared-secret
+    events:
+      - http:
+          path: github-ingest/
+          method: post
+          private: false #if true API key is needed
+
 
 resources: # The resources your functions use
   Resources:
@@ -93,8 +101,15 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter${self:custom.editable.parameterPath}*'
 
 plugins:
-  - serverless-python-requirements # Installs python requirements from requirements.txt file in module foldervl
+  - serverless-python-requirements
   - serverless-pseudo-parameters

@@ -34,13 +34,12 @@ package:
 
 functions:
   lambdaName:
-    module: src/function_1 # path to function
-    handler: fileName.handler # fileName.functionNameInFile
+    handler: function_1.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-lambdaName # Always begin name with stage
     description: What does my lambda do?
     package:
       include:
-        - 'src/function_1/*.py' # Files to include in deployment
+        - '*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
     tags: # Tag for this function. Every function are tagged with stage by default

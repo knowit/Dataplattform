@@ -1,5 +1,5 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: google-event-poller
+service: googleEventPoller
 
 custom:
   #Edit these variables###########################
@@ -7,7 +7,6 @@ custom:
     timeout: 6
     handlerFile: google_event_poller
     description: Fetch events from google calendar
-    folder: GoogleEventPoller
     scheduleRate: rate(1 hour)
     accessLevel: level-2
     dataFolder: eventBox/events
@@ -44,15 +43,14 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  eventPoller:
-    module: src/${self:custom.editable.folder} # path to function
+  poller:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
-    name: ${self:custom.stage}-${self:custom.editable.handlerFile} # Always begin name with stage
+    name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
     package:
       include:
-        - 'src/${self:custom.editable.folder}/*.py' # Files to include in deployment
+        - '*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -60,7 +58,7 @@ functions:
     tags: # Tag for this function. Every function are tagged with stage by default
     events: # How to trigger the lambda
       - schedule:
-          name: ${self:custom.stage}-${self:custom.editable.handlerFile}-timer
+          name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
@@ -70,7 +68,7 @@ resources: # The resources your functions use
     S3Access:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.editable.handlerFile}
+        RoleName: ${self:custom.stage}-${self:service}
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -91,7 +89,7 @@ resources: # The resources your functions use
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/dev/poller/google/*'
 
-          - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:custom.editable.handlerFile}
+          - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
