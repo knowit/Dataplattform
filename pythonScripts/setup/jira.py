@@ -16,7 +16,7 @@ def register_or_update_webhooks(stage: str):
         path=f'{stage}/jiraSalesWebhook'
     ).get('jira_sales_webhook_url')
 
-    post(webhook_url, auth=HTTPBasicAuth(username, password), json={
+    res = post(webhook_url, auth=HTTPBasicAuth(username, password), json={
         "name": f"{stage}-jiraSalesWebhook",
         "url": f"https://9fdzlk5wrk.execute-api.eu-central-1.amazonaws.com/{stage}/jira-sales-webhook",
         "events": [
@@ -29,7 +29,10 @@ def register_or_update_webhooks(stage: str):
         "excludeBody": False
     })
 
-    # TODO update webhook ?
+    if res.status_code == 200:
+        print('Webhook registered')
+    else:
+        print('\n'.join([' '.join(x.values()) for x in res.json()['messages']]))
 
 
 def poll_old_data(stage: str):
@@ -72,7 +75,9 @@ def poll_old_data(stage: str):
         )
     )
 
+    print(f'Uploaded {len(data)} old issues to {stage} S3 bucket')
+
 
 def setup(stage: str):
-    # register_or_update_webhooks(stage)
+    register_or_update_webhooks(stage)
     poll_old_data(stage)

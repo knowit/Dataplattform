@@ -1,0 +1,113 @@
+service: jiraSalesWebhook
+
+custom:
+  #Edit these variables###########################
+  editable:
+    timeout: 6
+    handlerFile: jira_webhook
+    description: Endpoint for Jira webhooks
+    accessLevel: level-2
+    dataFolder: jira/sales
+  ################################################
+  project: dataplattform
+  stage: ${opt:stage, self:provider.stage}
+  service: ${self:custom.stage}-${self:service} #this service definition includes stage
+  accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket
+  runtime: python3.7
+  memorySize: 1024
+  timeout: 5
+
+#  apiKeys:
+#    - name: ${self:custom.stage}-mainIngestKey #when value is not set, AWS automatically generates API key
+
+  #imports api gateway resources exported by ingestApiGateway service
+  apiGateway:
+    restApiId:
+      'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
+    restApiRootResourceId:
+      'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-rootResourceId
+
+  tags:
+    project: ${self:custom.project}
+    layer: ingestion
+    ingestion: webHooks
+  stackTags:
+    project: ${self:custom.project}
+    layer: ingestion
+    ingestion: webHooks
+
+package:
+  individually: true
+  exclude:
+    - "./**"
+
+functions:
+  webhookIngest:
+    handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    name: ${self:custom.stage}-${self:service} # Always begin name with stage
+    description: ${self:custom.editable.description}
+    role: !GetAtt S3Access.Arn
+    package:
+      include:
+        - '*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      ACCESS_PATH: ${self:custom.accessPath}
+    events:
+      - http:
+          path: jira-sales-webhook/
+          method: post
+          private: false #if true API key is needed
+
+
+resources: # The resources your functions use
+  Resources:
+    S3Access:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    #- s3:ListObjects
+                  Resource:
+                    - Fn::Join:
+                      - "" 
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/web-hook/jira/*'
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters
