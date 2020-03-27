@@ -46,7 +46,7 @@ def insert_data(data):
     path = os.getenv("ACCESS_PATH")
     s3 = boto3.resource('s3')
     s3_object = s3.Object(os.getenv('DATALAKE'),
-                          '{}{}/{}.json'.format(path, data['data']['event']['type'], str(int(time.time()))))
+                          os.path.join(path, data['data']['event']['type'], str(int(time.time()))))
     s3_object.put(Body=(bytes(json.dumps(data).encode('UTF-8'))))
 
 
