@@ -1,5 +1,5 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: google-event-processor
+service: googleEventProcessor
 
 custom:
   #Edit these variables#########################################
@@ -7,7 +7,6 @@ custom:
     timeout: 6 #seconds
     handlerFile: google_event_processor
     description: Processign all google calendar events from s3
-    folder: GoogleEvents
     accessLevel: level-2
     dataFolder: eventBox/events
   ##############################################################
@@ -45,15 +44,14 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  eventProcessor:
-    module: src/${self:custom.editable.folder} # path to function
+  processor:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
-    name: ${self:custom.stage}-${self:custom.editable.handlerFile} # Always begin name with stage
+    name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
     package:
       include:
-        - 'src/${self:custom.editable.folder}/*.py' # Files to include in deployment
+        - '*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       STAGE: ${self:custom.stage}
@@ -82,7 +80,7 @@ resources: # The resources your functions use
     S3Access:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.editable.handlerFile}
+        RoleName: ${self:custom.stage}-${self:service}
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -95,7 +93,7 @@ resources: # The resources your functions use
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies: # Give lambda access to s3 data
-          - PolicyName: ${self:custom.stage}-DatalakeRead-${self:custom.editable.handlerFile}
+          - PolicyName: ${self:custom.stage}-DatalakeRead-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -107,7 +105,7 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ParameterStoreGooglePollerAccess
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
               Version: '2012-10-17'
               Statement:

@@ -1,15 +1,15 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: poller
+service: githubPoller
 
 custom:
   #Edit these variables###########################
   editable:
     timeout: 6
-    handlerFile: function_1
-    description: MY_DESCRIPTION
-    scheduleRate: rate(1 hour)
+    handlerFile: github_poller
+    description: Github poller
+    scheduleRate: rate(7 days)
     accessLevel: level-2
-    dataFolder: DATA_FOLDER
+    dataFolder: github/repos
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
