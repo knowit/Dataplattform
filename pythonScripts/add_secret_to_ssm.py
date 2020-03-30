@@ -1,7 +1,13 @@
 import boto3
+from argparse import ArgumentParser
 
 
-def add_parameter(value, type):
+def interactive():
+    type_ = int(
+        input("Type of parameter(1, 2, or 3)? 1=String, 2=StringList, 3=SecureString:"))
+    types = ["String", "StringList", "SecureString"]
+    type_ = types[type_ - 1]
+    value = input("Value:")
     name = input("Name:")
     description = input("Description:")
     stage = input("Stage(dev, test, prod):")
@@ -21,6 +27,10 @@ def add_parameter(value, type):
         else:
             break
 
+    return add_parameter(stage, service, name, value, type_, description, overwrite, tags)
+
+
+def add_parameter(stage, service, name, value, type_, description, overwrite, tags):
     session = boto3.Session(profile_name="new")
 
     client = session.client('ssm')
@@ -31,7 +41,7 @@ def add_parameter(value, type):
         Name=finalName,
         Description=description,
         Value=value,
-        Type=type,
+        Type=type_,
         Overwrite=overwrite,
         Tier='Standard'
     )
@@ -45,15 +55,39 @@ def add_parameter(value, type):
 
 
 def main():
-    type = int(
-        input("Type of parameter(1, 2, or 3)? 1=String, 2=StringList, 3=SecureString:"))
-    value = input("Value:")
+    parser = ArgumentParser('')
+    parser.add_argument('-i --interactive', default=False, dest='interactive', action='store_true')
 
-    types = ["String", "StringList", "SecureString"]
+    parser.add_argument('-e', '--stage', default='dev', choices=['dev', 'test', 'prod'])
+    parser.add_argument('-n', '--name')
+    parser.add_argument('-v', '--value')
+    parser.add_argument('-s', '--service')
+    parser.add_argument('-t', '--type', dest='type_', choices=["String", "StringList", "SecureString"])
+    parser.add_argument('-d', '--desc', default='')
+    parser.add_argument('--overwrite', default=False, action='store_true')
 
-    response = add_parameter(value, types[type - 1])
+    args = parser.parse_args()
 
-    print("Final name: " + response)
+    if args.interactive:
+        response = interactive()
+    else:
+        for req in ['name', 'value', 'service', 'type_']:
+            if getattr(args, req) is None:
+                parser.error(f'--{req} is required')
+
+        response = add_parameter(
+            args.stage,
+            args.service,
+            args.name,
+            args.value,
+            args.type_,
+            args.desc,
+            args.overwrite, [{
+                'Key': 'Project',
+                'Value': 'Dataplattform'
+            }])
+
+    print(f"Final name: {response}")
 
 
 if __name__ == "__main__":
