@@ -16,12 +16,21 @@ def ingestion(access_path: str = None, bucket: str = None):
         def __call__(self, event, context=None):
             if 'validate_func' in dir(self):
                 result = self.validate_func(event)
-                if result is not None:
+                if result and isinstance(result, Response):
                     return result.to_dict()
+
+                if result is False:
+                    return Response(status_code=403).to_dict()
+
+                if result and isinstance(result, str):
+                    return Response(status_code=403, body=result).to_dict()
 
             if 'ingest_func' in dir(self):
                 result = self.ingest_func(event)
-                if result is not None:
+                if result and isinstance(result, Response):
+                    return result.to_dict()
+
+                if result:
                     S3(
                         access_path=access_path,
                         bucket=bucket
@@ -31,21 +40,23 @@ def ingestion(access_path: str = None, bucket: str = None):
 
         def validate(self):
             def wrap(f):
-                self.validate_func = Handler.__wrapper_func(f, Response)
+                self.validate_func = Handler.__wrapper_func(f, bool, str, Response)
                 return self.validate_func
             return wrap
 
         def ingest(self):
             def wrap(f):
-                self.ingest_func = Handler.__wrapper_func(f, Data)
+                self.ingest_func = Handler.__wrapper_func(f, Data, Response)
                 return self.ingest_func
             return wrap
 
         @staticmethod
-        def __wrapper_func(f, returnType):
+        def __wrapper_func(f, *return_type):
             def func(event):
                 result = f(event)
-                assert result is None or isinstance(result, returnType)
+                assert result is None or any([isinstance(result, t) for t in return_type]),\
+                    f'Return type {type(result).__name__} must be None or\
+                        any {", ".join([t.__name__ for t in return_type])}'
                 return result
             return func
 

@@ -10,8 +10,9 @@ class S3:
         self.bucket = bucket or environ.get('DATALAKE')
         self.s3 = boto3.resource('s3')
 
-    def put(self, data: Data):
-        s3_object = self.s3.Object(self.bucket, path_join(self.access_path, f'{int(data.metadata.timestamp)}.json'))
+    def put(self, data: Data, path: str = ''):
+        s3_object = self.s3.Object(self.bucket, path_join(
+            self.access_path, path, f'{int(data.metadata.timestamp)}.json'))
         s3_object.put(Body=data.to_json().encode('utf-8'))
 
 

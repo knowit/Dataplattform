@@ -23,7 +23,7 @@ provider:
     name: dataplattform-v2-deploymentbucket
   runtime: python3.7
   memorySize: 1024
-  timeout: 5
+  timeout: ${self:custom.editable.timeout}
 
 #  apiKeys:
 #    - name: ${self:custom.stage}-mainIngestKey #when value is not set, AWS automatically generates API key
@@ -62,9 +62,11 @@ functions:
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
     events:
       - http:
-          path: jira-sales-webhook/
+          path: jira-sales-webhook/{secret}
           method: post
           private: false #if true API key is needed
 
@@ -106,7 +108,7 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/web-hook/jira/*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
 
 plugins:
   - serverless-python-requirements
