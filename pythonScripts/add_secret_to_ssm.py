@@ -2,12 +2,12 @@ import boto3
 from argparse import ArgumentParser
 
 
-def interactive():
-    type_ = int(
+def interactive(value=None, type_=None):
+    type_ = type_ or int(
         input("Type of parameter(1, 2, or 3)? 1=String, 2=StringList, 3=SecureString:"))
     types = ["String", "StringList", "SecureString"]
     type_ = types[type_ - 1]
-    value = input("Value:")
+    value = value or input("Value:")
     name = input("Name:")
     description = input("Description:")
     stage = input("Stage(dev, test, prod):")

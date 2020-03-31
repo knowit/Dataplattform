@@ -1,5 +1,5 @@
 import boto3
-from add_secret_to_ssm import add_parameter
+from add_secret_to_ssm import interactive
 
 
 def generatePassword(length):
@@ -16,7 +16,7 @@ def generatePassword(length):
         RequireEachIncludedType=False
     )
 
-    finalName = add_parameter(response["RandomPassword"], "SecureString")
+    finalName = interactive(response["RandomPassword"], 3)
 
     return finalName
 
