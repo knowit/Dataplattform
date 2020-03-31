@@ -121,12 +121,7 @@ def get_events(credsentials_from_env, calendar_id):
 
 
 def get_timestamp(date):
-    date = date.split('T')
-    date_array = list(map(int, date[0].split('-')))
-    time_array = list(map(int, date[1].split('Z')[0].split(':')))
-    date_start = datetime.datetime(date_array[0], date_array[1], date_array[2],
-                                   time_array[0], time_array[1], time_array[2])
-    return datetime.datetime.timestamp(date_start)
+    return datetime.datetime.fromisoformat(date).timestamp()
 
 
 if __name__ == "__main__":

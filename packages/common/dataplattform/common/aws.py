@@ -11,9 +11,10 @@ class S3:
         self.s3 = boto3.resource('s3')
 
     def put(self, data: Data, path: str = ''):
-        s3_object = self.s3.Object(self.bucket, path_join(
-            self.access_path, path, f'{int(data.metadata.timestamp)}.json'))
+        key = path_join(self.access_path, path, f'{int(data.metadata.timestamp)}.json')
+        s3_object = self.s3.Object(self.bucket, key)
         s3_object.put(Body=data.to_json().encode('utf-8'))
+        return key
 
 
 class SSM:

@@ -1,10 +1,10 @@
 
-name: Dataplattform - poller - googleEvent
+name: Dataplattform - poller - ubwFagtime
 
 on: 
   pull_request:
     paths:
-      - 'services/ingestion/poller/googleEventPoller/**'
+      - 'services/ingestion/poller/ubwFagtimePoller/**'
 
 
 jobs:
@@ -23,8 +23,8 @@ jobs:
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
-        flake8 ./services/ingestion/poller/googleEventPoller --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 ./services/ingestion/poller/googleEventPoller --count --max-line-length=120 --statistics
+        flake8 ./services/ingestion/poller/ubwFagtimePoller --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 ./services/ingestion/poller/ubwFagtimePoller --count --max-line-length=120 --statistics
   
   test:
     runs-on: ubuntu-latest
@@ -34,13 +34,13 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      working-directory: './services/ingestion/poller/googleEventPoller'
+      working-directory: './services/ingestion/poller/ubwFagtimePoller'
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-test.txt
     - name: Test with pytest
-      working-directory: './services/ingestion/poller/googleEventPoller'
+      working-directory: './services/ingestion/poller/ubwFagtimePoller'
       run: |
         pip install pytest
         pytest 

@@ -1,5 +1,5 @@
 
-name: Dataplattform - githubPoller
+name: Dataplattform - poller - github
 
 on: 
   pull_request:
@@ -23,9 +23,8 @@ jobs:
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings.
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+        flake8 ./services/ingestion/poller/gitHubPoller --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 ./services/ingestion/poller/gitHubPoller --count --max-line-length=120 --statistics
   
   test:
     runs-on: ubuntu-latest
@@ -39,6 +38,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+        pip install -r requirements-test.txt
     - name: Test with pytest
       working-directory: './services/ingestion/poller/gitHubPoller'
       run: |
