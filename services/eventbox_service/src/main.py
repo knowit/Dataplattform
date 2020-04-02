@@ -1,6 +1,6 @@
 import json
 import logging
-from util.database import create_tables, Session
+from util.database import create_tables, Session, Event
 from util.schemas import eventSchema
 
 logger = logging.getLogger()
@@ -11,11 +11,9 @@ def get_events(e, context):
     session = Session()
     result = session.query(Event).all()
     session.close()
-    logger.info('Get events')
     return {
         'statusCode': 200,
-        'body': [eventSchema.dumps(e) for e in result],
-        'body': 'test'
+        'body': [eventSchema.dumps(e) for e in result]
     }
 
 def get_event(e, context):
@@ -57,5 +55,5 @@ def update_event(e, context):
         'body': 'Hello from update event'
     }
 
-def createDb(event, context):
+def create_database(event, context):
     create_tables()

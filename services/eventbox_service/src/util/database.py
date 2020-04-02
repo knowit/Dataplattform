@@ -47,9 +47,9 @@ Session = sessionmaker(bind=_engine)
 
 
 def create_tables():
-    logger.info('Creating tables')
+    _logger.info('Creating tables')
     _Base.metadata.create_all(_engine)
-    logger.info('Tables created')
+    _logger.info('Tables created')
 
 
 def _gencode():
