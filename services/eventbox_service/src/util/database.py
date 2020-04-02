@@ -67,5 +67,5 @@ class Event(_Base):
     creator = Column(String(length=255))
     start = Column(TIMESTAMP)
     end = Column(TIMESTAMP)
-    eventcode = Column(String(length=5), default=_gencode(), unique=True)
+    eventcode = Column(String(length=5), default=_gencode, unique=True)
     active = Column(Boolean)
