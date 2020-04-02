@@ -48,6 +48,7 @@ Session = sessionmaker(bind=_engine)
 
 def create_tables():
     _logger.info('Creating tables')
+    Event.__table__.drop(_engine)
     _Base.metadata.create_all(_engine)
     _logger.info('Tables created')
 
@@ -61,7 +62,7 @@ def _gencode():
 class Event(_Base):
     __tablename__ = 'eventbox_service_events'
 
-    id = Column(String(length=100), primary_key=True)
+    id = Column(Integer, primary_key=True)
     eventname = Column(String(length=255))
     creator = Column(String(length=255))
     start = Column(TIMESTAMP)

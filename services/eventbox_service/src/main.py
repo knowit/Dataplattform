@@ -13,7 +13,7 @@ def get_events(e, context):
     session.close()
     return {
         'statusCode': 200,
-        'body': [eventSchema.dumps(e) for e in result]
+        'body': eventSchema.dumps(result, many=True)
     }
 
 def get_event(e, context):
