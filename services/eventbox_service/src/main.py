@@ -29,7 +29,9 @@ def get_event(e, context):
     }
 
 def add_event(e, context):
-    event = eventSchema.loads(e['body'])
+    body = eventSchema.loads(e['body'])
+    logger.info(body)
+    event = Event(**body)
     
     session = Session()
     session.add(event)
