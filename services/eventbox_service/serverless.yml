@@ -1,0 +1,172 @@
+# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+service: eventbox
+
+custom:
+  #Edit these variables#########################################
+  editable:
+    timeout: 6 #seconds
+    handlerFile: main
+    description: Service for the eventbox webpage
+    folder: src
+    accessLevel: level-2
+    dataFolder: eventbox
+  ##############################################################
+  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+  pythonRequirements:
+    dockerizePip: non-linux
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  apiName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+  runtime: python3.7
+  memorySize: 1024 # MB
+  role: !GetAtt S3Access.Arn
+  timeout: ${self:custom.editable.timeout} # seconds
+  tags: # Tags that will be added to each of the deployment resources.
+    Project: Eventbox # When used for sub-projects like eventBox change project tag to eventBox
+    Layer: eventbox # ingestion, processing, restApi, infrastructure
+  stackTags: # Tags for cloud formation
+    # key: value
+  environment: # Service wide environment variables
+    #ENVIRONMENT_VARIABLE_NAME: 123456789
+  vpc: # This is needed to access postgres
+      securityGroupIds:
+        - !ImportValue ${self:custom.stage}-PostgresAccessSecurityGroupID #This group have access to postgres
+      subnetIds:
+        - !ImportValue ${self:custom.stage}-SubnetAID
+        - !ImportValue ${self:custom.stage}-SubnetBID
+        - !ImportValue ${self:custom.stage}-SubnetCID
+
+
+package:
+  individually: true
+  exclude:
+    - "./**" # Exclude everything and include what you need in the functions below
+  include:
+    - "${self:custom.editable.folder}/*.py"
+    - "${self:custom.editable.folder}/util/*.py"
+
+functions:
+  getEvents:
+    module: ${self:custom.editable.folder} # path to function
+    handler: ${self:custom.editable.handlerFile}.get_events # fileName.functionNameInFile
+    description: ${self:custom.editable.description}
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+    tags: # Tag for this function. Every function are tagged with stage by default
+    events:
+      - http:
+          path: /eventbox/v1/events
+          method: get 
+    
+  getEvent:
+    module: ${self:custom.editable.folder} # path to function
+    handler: ${self:custom.editable.handlerFile}.get_event # fileName.functionNameInFile
+    description: ${self:custom.editable.description}
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+    tags: # Tag for this function. Every function are tagged with stage by default
+    events:
+      - http:
+          path: /eventbox/v1/event/{id}
+          method: get
+    
+  addEvent:
+    module: ${self:custom.editable.folder} # path to function
+    handler: ${self:custom.editable.handlerFile}.add_event # fileName.functionNameInFile
+    description: ${self:custom.editable.description}
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+    tags: # Tag for this function. Every function are tagged with stage by default
+    events:
+      - http:
+          path: /eventbox/v1/event
+          method: post
+    
+  deleteEvent:
+    module: ${self:custom.editable.folder} # path to function
+    handler: ${self:custom.editable.handlerFile}.delete_event # fileName.functionNameInFile
+    description: ${self:custom.editable.description}
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+    tags: # Tag for this function. Every function are tagged with stage by default
+    events:
+      - http:
+          path: /eventbox/v1/event/{id}
+          method: delete
+    
+  updateEvent:
+    module: ${self:custom.editable.folder} # path to function
+    handler: ${self:custom.editable.handlerFile}.update_event # fileName.functionNameInFile
+    description: ${self:custom.editable.description}
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+    tags: # Tag for this function. Every function are tagged with stage by default
+    events:
+      - http:
+          path: /eventbox/v1/event/{id}
+          method: put
+  createDb:
+    module: ${self:custom.editable.folder} # path to function
+    handler: ${self:custom.editable.handlerFile}.create_database # fileName.functionNameInFile
+    description: ${self:custom.editable.description}
+    environment: # Environment variables, often stored in SSM
+      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
+      STAGE: ${self:custom.stage}
+      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
+      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+    tags: # Tag for this function. Every function are tagged with stage by default
+    
+
+resources: # The resources your functions use
+  Resources:
+    S3Access:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:service}
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies: # Give lambda access to Parameter Store
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/rds/postgres/*' # Only give access to what the lambda needs
+  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
+
+plugins:
+  - serverless-python-requirements # Installs python requirements from requirements.txt file in module foldervl
+  - serverless-pseudo-parameters
