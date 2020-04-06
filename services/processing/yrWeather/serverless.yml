@@ -6,6 +6,7 @@ custom:
   editable:
     timeout: 6 #seconds
     handlerFile: yr_processor
+    databaseName: yr_weather
     description: Processing yr data from s3 to database
     accessLevel: level-1
     dataFolder: yr
@@ -14,6 +15,9 @@ custom:
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   pythonRequirements:
     dockerizePip: non-linux
+    noDeploy: # Default in lambdas
+      - boto3
+      - botocore
 
 provider:
   name: aws
@@ -44,7 +48,7 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  yrProcessor:
+  processor:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
@@ -55,8 +59,8 @@ functions:
     environment: # Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       STAGE: ${self:custom.stage}
-      DATABASE_ENDPOINT_ADDRESS: !ImportValue ${self:custom.stage}-DBEndpointAddress
-      DATABASE_ENDPOINT_PORT: !ImportValue ${self:custom.stage}-DBEndpointPort
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      ACCESS_PATH: ${self:custom.accessPath}
     tags: # Tag for this function. Every function are tagged with stage by default
     events:
       - s3: # Lambda fires when object is created in s3
@@ -66,17 +70,42 @@ functions:
             - prefix: ${self:custom.accessPath}
             - suffix: .json
           existing: true
-    vpc: # This is needed to access postgres
-      securityGroupIds:
-        - !ImportValue ${self:custom.stage}-PostgresAccessSecurityGroupID #This group have access to postgres
-      subnetIds:
-        - !ImportValue ${self:custom.stage}-SubnetAID
-        - !ImportValue ${self:custom.stage}-SubnetBID
-        - !ImportValue ${self:custom.stage}-SubnetCID
 
 
 resources: # The resources your functions use
   Resources:
+    GlueDatabase:
+      Type: AWS::Glue::Database
+      Properties: 
+        CatalogId: !Sub '#{AWS::AccountId}'
+        DatabaseInput: 
+          Name:  ${self:custom.stage}_${self:custom.editable.databaseName}_database
+    GlueTable:
+      Type: AWS::Glue::Table
+      Properties:
+        CatalogId: !Sub '#{AWS::AccountId}'
+        DatabaseName: ${self:custom.stage}_${self:custom.editable.databaseName}_database
+        TableInput: 
+          Name: ${file(./schema.yml):tableName}
+          Parameters:
+            'classification': 'parquet'
+            'parquet.compression': 'GZIP'
+          PartitionKeys: ${file(./schema.yml):partitions}
+          StorageDescriptor: 
+            Columns: ${file(./schema.yml):columns}
+            InputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+            Location: 
+              Fn::Join:
+                - "" 
+                - - s3://
+                  - !ImportValue ${self:custom.stage}-datalakeName
+                  - /${self:custom.accessPath}database/${file(./schema.yml):tableName}/
+            OutputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
+            SerdeInfo: 
+              SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+              Parameters:
+                'serialization.format': '1'
+          TableType: EXTERNAL_TABLE
     S3Access:
       Type: AWS::IAM::Role
       Properties:

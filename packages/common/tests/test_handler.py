@@ -55,11 +55,11 @@ def test_ingestion_handler_invalid_skip_ingest(mocker):
     def test_validate(event):
         return False
 
-    ingest_handler.ingest_func = mocker.stub()
+    ingest_handler.wrapped.ingest = mocker.stub()
 
     ingest_handler(None)
 
-    ingest_handler.ingest_func.assert_not_called()
+    ingest_handler.wrapped.ingest.assert_not_called()
 
 
 def test_ingestion_handler_valid_call_ingest(mocker):
@@ -69,8 +69,8 @@ def test_ingestion_handler_valid_call_ingest(mocker):
     def test_validate(event):
         return True
 
-    ingest_handler.ingest_func = mocker.MagicMock(return_value=handler.Response())
+    ingest_handler.wrapped.ingest = mocker.MagicMock(return_value=handler.Response())
 
     ingest_handler(None)
 
-    ingest_handler.ingest_func.assert_called_once()
+    ingest_handler.wrapped.ingest.assert_called_once()

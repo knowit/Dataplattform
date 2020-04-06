@@ -1,7 +1,22 @@
-from os import environ
 import boto3
-from os import path, sep
+from botocore.exceptions import ClientError
+from os import path, sep, environ
 from dataplattform.common.schema import Data
+from json import loads
+from s3fs import S3FileSystem
+
+
+class S3Result:
+    def __init__(self, res, error=None):
+        self.res = res
+        self.error = error
+
+    @property
+    def raw(self):
+        return self.res['Body'].read() if self.res else None
+
+    def json(self, **json_args):
+        return loads(self.res['Body'].read(), **json_args) if self.res else None
 
 
 class S3:
@@ -15,6 +30,40 @@ class S3:
         s3_object = self.s3.Object(self.bucket, key)
         s3_object.put(Body=data.to_json().encode('utf-8'))
         return key
+
+    def upload(self, filename: str, s3_file_path: str, path: str = ''):
+        key = path_join(self.access_path, path, s3_file_path)
+        s3_object = self.s3.Object(self.bucket, key)
+        s3_object.upload_file(filename)
+        return key
+
+    def get(self, key, catch_client_error=True) -> S3Result:
+        key = path_join(self.access_path, key) if not key.startswith(self.access_path) else key
+        try:
+            res = self.s3.Object(self.bucket, key).get()
+            return S3Result(res)
+        except ClientError as e:
+            if not catch_client_error:
+                raise e
+            return S3Result(None, error=e)
+
+    @property
+    def simple_fs(self):
+        s3 = S3FileSystem(anon=False)
+
+        def get_key(k):
+            return path_join(self.bucket, path_join(self.access_path, k) if not k.startswith(self.access_path) else k)
+
+        class S3FSWrapper:
+            @staticmethod
+            def open(path, *args, **kwargs):
+                return s3.open(get_key(path), *args, **kwargs)
+
+            @staticmethod
+            def exists(path):
+                return s3.exists(get_key(path))
+
+        return S3FSWrapper()
 
 
 class SSM:
