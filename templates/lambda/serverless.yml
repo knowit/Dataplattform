@@ -1,5 +1,5 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: navnher
+service: helloWorld
 
 custom:
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
@@ -33,10 +33,10 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  lambdaName:
+  helloWorld:
     handler: function_1.handler # fileName.functionNameInFile
-    name: ${self:custom.stage}-lambdaName # Always begin name with stage
-    description: What does my lambda do?
+    name: ${self:custom.stage}-HelloWorld # Always begin name with stage
+    description: Hello world lambda <3
     package:
       include:
         - '*.py' # Files to include in deployment
