@@ -2,15 +2,15 @@ from dataplattform.common import handler
 from dataplattform.common import schema
 
 
-def test_empty_ingestion_handler():
-    ingest_handler = handler.ingestion()
+def test_empty_handler():
+    ingest_handler = handler.Handler()
     res = ingest_handler(None)
 
     assert res['statusCode'] == 200 and res['body'] == ''
 
 
-def test_ingestion_handler_response():
-    ingest_handler = handler.ingestion()
+def test_handler_response():
+    ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
     def test(event):
@@ -20,8 +20,8 @@ def test_ingestion_handler_response():
     assert res['body'] == 'hello test'
 
 
-def test_ingestion_handler_data(s3_bucket):
-    ingest_handler = handler.ingestion()
+def test_handler_data(s3_bucket):
+    ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
     def test(event):
@@ -37,8 +37,8 @@ def test_ingestion_handler_data(s3_bucket):
     assert data.data == 'hello test'
 
 
-def test_ingestion_handler_validate(mocker):
-    ingest_handler = handler.ingestion()
+def test_handler_validate(mocker):
+    ingest_handler = handler.Handler()
 
     @ingest_handler.validate()
     def test_validate(event):
@@ -48,8 +48,8 @@ def test_ingestion_handler_validate(mocker):
     assert res['statusCode'] == 403
 
 
-def test_ingestion_handler_invalid_skip_ingest(mocker):
-    ingest_handler = handler.ingestion()
+def test_handler_invalid_skip_ingest(mocker):
+    ingest_handler = handler.Handler()
 
     @ingest_handler.validate()
     def test_validate(event):
@@ -62,8 +62,8 @@ def test_ingestion_handler_invalid_skip_ingest(mocker):
     ingest_handler.ingest_func.assert_not_called()
 
 
-def test_ingestion_handler_valid_call_ingest(mocker):
-    ingest_handler = handler.ingestion()
+def test_handler_valid_call_ingest(mocker):
+    ingest_handler = handler.Handler()
 
     @ingest_handler.validate()
     def test_validate(event):
