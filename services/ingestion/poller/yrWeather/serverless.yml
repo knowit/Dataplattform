@@ -6,6 +6,7 @@ custom:
   editable:
     timeout: 6
     handlerFile: yr_poller
+    databaseName: yr_weather
     description: poller for yr-data
     scheduleRate: rate(1 hour)
     accessLevel: level-1
@@ -13,6 +14,17 @@ custom:
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+  pythonRequirements:
+    dockerizePip: non-linux
+    noDeploy:
+      - boto3 # Default in lambda rt
+      - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - fastparquet
+      - numba
+      - llvmlite
 
 provider:
   name: aws
@@ -45,6 +57,10 @@ package:
 functions:
   poller:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    layers:
+      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
@@ -52,9 +68,10 @@ functions:
       include:
         - '*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
-      #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
     tags: # Tag for this function. Every function are tagged with stage by default
     events: # How to trigger the lambda
       - schedule:
@@ -65,6 +82,38 @@ functions:
 
 resources: # The resources your functions use
   Resources:
+    GlueDatabase:
+      Type: AWS::Glue::Database
+      Properties: 
+        CatalogId: !Sub '#{AWS::AccountId}'
+        DatabaseInput: 
+          Name:  ${self:custom.stage}_${self:custom.editable.databaseName}_database
+    GlueTable:
+      Type: AWS::Glue::Table
+      Properties:
+        CatalogId: !Sub '#{AWS::AccountId}'
+        DatabaseName: ${self:custom.stage}_${self:custom.editable.databaseName}_database
+        TableInput: 
+          Name: ${file(./schema.yml):tableName}
+          Parameters:
+            'classification': 'parquet'
+            'parquet.compression': 'GZIP'
+          PartitionKeys: ${file(./schema.yml):partitions}
+          StorageDescriptor: 
+            Columns: ${file(./schema.yml):columns}
+            InputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
+            Location: 
+              Fn::Join:
+                - "" 
+                - - s3://
+                  - !ImportValue ${self:custom.stage}-datalakeName
+                  - /${self:custom.accessPath}structured/${file(./schema.yml):tableName}/
+            OutputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
+            SerdeInfo: 
+              SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
+              Parameters:
+                'serialization.format': '1'
+          TableType: EXTERNAL_TABLE
     S3Access:
       Type: AWS::IAM::Role
       Properties:
@@ -80,14 +129,15 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:service}
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
                     - s3:PutObject
-                    #- s3:ListObjects
+                    - s3:ListObjects
+                    - s3:GetObject
                   Resource:
                     - Fn::Join:
                       - ""
