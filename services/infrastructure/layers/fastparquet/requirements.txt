@@ -1,0 +1,3 @@
+fastparquet
+numba
+llvmlite

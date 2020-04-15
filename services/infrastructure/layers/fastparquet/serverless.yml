@@ -1,4 +1,4 @@
-service: pandasDepLayer
+service: fastparquetDepLayer
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -7,7 +7,7 @@ custom:
     dockerizePip: non-linux
     layer:
       name: ${self:custom.stage}-${self:service}
-      description: Python requirements lambda layer for Pandas
+      description: Python requirements lambda layer for fastparquet
       compatibleRuntimes:
         - python3.7
     pipCmdExtraArgs:

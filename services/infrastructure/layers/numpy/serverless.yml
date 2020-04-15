@@ -10,6 +10,8 @@ custom:
       description: Python requirements lambda layer for numpy
       compatibleRuntimes:
         - python3.7
+    pipCmdExtraArgs:
+      - --no-deps
 
 provider:
   name: aws
