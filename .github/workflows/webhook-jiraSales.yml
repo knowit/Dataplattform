@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - 'services/ingestion/webHooks/jiraSales/**'
+      - 'packages/common/**'
 
 
 jobs:

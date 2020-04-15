@@ -1,0 +1,39 @@
+service: numpyDepLayer
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  project: dataplattform-${self:custom.stage}
+  pythonRequirements:
+    dockerizePip: non-linux
+    layer:
+      name: ${self:custom.stage}-${self:service}
+      description: Python requirements lambda layer for numpy
+      compatibleRuntimes:
+        - python3.7
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket
+  runtime: python3.7
+  tags:
+    project: dataplattform
+    layer: infrastructure
+  stackTags:
+    project: dataplattform
+    layer: infrastructure
+
+
+resources:
+  Outputs:
+    LayerArn:
+      Value: { Ref: PythonRequirementsLambdaLayer }
+      Export:
+        Name: ${self:custom.stage}-${self:service}-arn
+
+
+plugins:
+  - serverless-python-requirements
