@@ -1,2 +1,5 @@
+file:../../../../packages/common
 requests
 xmltodict
+numpy
+pandas

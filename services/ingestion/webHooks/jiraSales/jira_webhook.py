@@ -1,10 +1,10 @@
-from dataplattform.common.handler import ingestion
+from dataplattform.common.handler import Handler
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 from datetime import datetime
 from json import loads
 
-handler = ingestion()
+handler = Handler()
 
 
 @handler.validate()

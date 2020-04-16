@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - 'services/ingestion/poller/yrWeather/**'
+      - 'packages/common/**'
 
 
 jobs:

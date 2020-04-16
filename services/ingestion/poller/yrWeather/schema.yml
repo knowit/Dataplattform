@@ -1,0 +1,23 @@
+tableName: yr_weather
+
+partitions:
+  - Name: location_name
+    Type: string
+  - Name: time
+    Type: int
+  - Name: time_from
+    Type: int
+  - Name: time_to
+    Type: int
+
+columns:
+  - Name: location
+    Type: string
+  - Name: precipitation
+    Type: double
+  - Name: wind_speed
+    Type: double
+  - Name: temperature
+    Type: int
+  - Name: air_pressure
+    Type: double
