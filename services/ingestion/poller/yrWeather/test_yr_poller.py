@@ -36,7 +36,7 @@ def test_handler_data_length(s3_bucket, mocked_responses, test_data):
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
     data = loads(response['Body'].read())
 
-    assert len(data['data'].keys()) == 24
+    assert len(data['data']) == 24
 
 
 def test_handler_data(s3_bucket, mocked_responses, test_data):
@@ -56,4 +56,4 @@ def test_handler_data(s3_bucket, mocked_responses, test_data):
         'air_pressure': 997.0
     }
 
-    assert all([data['data']['0'][k] == v for k, v in expected.items()])
+    assert all([data['data'][0][k] == v for k, v in expected.items()])

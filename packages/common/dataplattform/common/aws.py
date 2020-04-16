@@ -2,7 +2,7 @@ import boto3
 from os import path, sep, environ
 from botocore.exceptions import ClientError
 from dataplattform.common.schema import Data
-from s3fs import S3FileSystem 
+from s3fs import S3FileSystem
 from json import loads
 
 

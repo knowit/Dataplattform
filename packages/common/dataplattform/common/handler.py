@@ -74,7 +74,7 @@ class Handler:
     def validate(self):
         def wrap(f):
             self.wrapped_func['validate'] = Handler.__wrapper_func(f, bool, str, Response)
-            return self.self.wrapped_func['validate']
+            return self.wrapped_func['validate']
         return wrap
 
     def ingest(self):
