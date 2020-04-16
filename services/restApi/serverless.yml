@@ -1,0 +1,52 @@
+service: API
+
+custom:
+  project: dataplattform
+  stage: ${opt:stage, self:provider.stage}
+  service: ${self:custom.stage}-${self:service} #this service definition includes stage
+  wsgi:
+    app: app.app
+    packRequirements: false
+    pythonBin: python
+  pythonRequirements:
+    dockerizePip: true
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket
+  runtime: python3.7
+  memorySize: 1024
+  timeout: 10
+
+  tags:
+    project: ${self:custom.project}
+    layer: API
+  stackTags:
+    project: ${self:custom.project}
+    layer: API
+
+package:
+  individually: true
+  exclude:
+    - "./**"
+
+functions:
+  API:
+    handler: wsgi_handler.handler
+    name: ${self:custom.stage}-${self:service}
+    description: Flask API
+    package:
+      include:
+        - '*.py'
+        - '**/*.py'
+    events:
+      - http: ANY /
+      - http: ANY {proxy+}
+
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
