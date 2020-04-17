@@ -1,3 +1,4 @@
 from flask_restplus import Namespace
 
-TEST_API = Namespace('Test API', description='My test api')
+TEST_OPEN_API = Namespace('Test open API', description='My open test api')
+TEST_LOGIN_API = Namespace('Test login API', description='My login test api')
