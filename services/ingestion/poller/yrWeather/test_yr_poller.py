@@ -2,6 +2,7 @@ from yr_poller import handler
 from pytest import fixture
 from responses import RequestsMock, GET
 from json import loads
+from os import path
 
 location = 'Norway/Oslo/Oslo/Lakkegata'
 url = f'https://www.yr.no/place/{location}/varsel_time_for_time.xml'
@@ -9,9 +10,8 @@ url = f'https://www.yr.no/place/{location}/varsel_time_for_time.xml'
 
 @fixture
 def test_data():
-    with open('test_data.xml', 'r') as f:
+    with open(path.join(path.dirname(__file__), 'test_data.xml'), 'r') as f:
         yield f.read()
-
 
 @fixture
 def mocked_responses():

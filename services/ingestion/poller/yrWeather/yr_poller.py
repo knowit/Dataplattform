@@ -51,7 +51,7 @@ def ingest(event) -> Data:
     )
 
 
-@handler.process(partitions=['location_name', 'time', 'time_from', 'time_to'])
+@handler.process(partitions={'yr_weather':['location_name', 'time', 'time_from', 'time_to']})
 def process(data) -> Dict[str, pd.DataFrame]:
 
     def make_dataframe(d):
