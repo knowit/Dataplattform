@@ -1,14 +1,14 @@
-from flask_restplus import fields
-from apis import TEST_OPEN_API, TEST_LOGIN_API
+from flask_restx import fields
+from apis import open_api, authenticated_api
 
 
-class TestResponse:
-    open_model = TEST_OPEN_API.model('Test', {
+class PersonResponse:
+    open_model = open_api.model('Test', {
         'name': fields.String(required=True, description="Name of person"),
         'age': fields.Integer(required=True, description="Age of person")
     })
 
-    login_model = TEST_LOGIN_API.model('Test', {
+    login_model = authenticated_api.model('Test', {
         'name': fields.String(required=True, description="Name of person"),
         'age': fields.Integer(required=True, description="Age of person")
     })

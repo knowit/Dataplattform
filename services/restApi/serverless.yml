@@ -1,4 +1,4 @@
-service: API
+service: FlaskAPI
 
 custom:
   project: dataplattform
@@ -39,7 +39,7 @@ functions:
     handler: wsgi_handler.handler
     name: ${self:custom.stage}-${self:service}
     description: Flask API
-    role: !GetAtt AssumeRole.Arn
+    role: !ImportValue ${self:custom.stage}-assumeRole
     package:
       include:
         - '*.py'
@@ -48,90 +48,24 @@ functions:
       - http: ANY /
       - http: ANY {proxy+}
       - http:
-          path: api/v1/login/{proxy+}
-          method: any
+          method: ANY
+          path: /api/v1/authenticated/{proxy+}
+          authorizer:
+            type: COGNITO_USER_POOLS
+            name: authorizer
+            authorizerId: !Ref Authorizer
 
-resources: # The resources your functions use
+resources:
   Resources:
-    AssumeRole:
-      Type: AWS::IAM::Role
+    Authorizer:
+      Type: AWS::ApiGateway::Authorizer
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - lambda.amazonaws.com
-              Action: sts:AssumeRole
-        ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: CanAssumeRole
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'sts:AssumeRole'
-                  Resource: "*"
-
-    Level2:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level2
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service: lambda.amazonaws.com
-                AWS: !GetAtt AssumeRole.Arn
-              Action: sts:AssumeRole
-        ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-ReadLevel2-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:GetObject
-                  Resource:
-                    - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /data/level-2/*
-    Level3:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level3
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - lambda.amazonaws.com
-              Action: sts:AssumeRole
-        ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-ReadLevel3-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:GetObject
-                  Resource:
-                    - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /data/level-3/*
-
+        IdentitySource: method.request.header.authorizer
+        Name: DataplattformAuthorizer
+        ProviderARNs:
+          - !ImportValue ${self:custom.stage}-cognito-userPool
+        RestApiId: !Ref ApiGatewayRestApi
+        Type: COGNITO_USER_POOLS
 
 plugins:
   - serverless-python-requirements
