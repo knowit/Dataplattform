@@ -1,0 +1,73 @@
+service: FlaskAPI
+
+custom:
+  project: dataplattform
+  stage: ${opt:stage, self:provider.stage}
+  service: ${self:custom.stage}-${self:service} #this service definition includes stage
+  wsgi:
+    app: app.app
+    packRequirements: false
+    pythonBin: python
+  pythonRequirements:
+    dockerizePip: true
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: dataplattform-v2-deploymentbucket
+  runtime: python3.7
+  memorySize: 1024
+  timeout: 10
+
+  tags:
+    project: ${self:custom.project}
+    layer: API
+  stackTags:
+    project: ${self:custom.project}
+    layer: API
+
+package:
+  individually: true
+  exclude:
+    - "./**"
+
+functions:
+  API:
+    handler: wsgi_handler.handler
+    name: ${self:custom.stage}-${self:service}
+    description: Flask API
+    role: !ImportValue ${self:custom.stage}-assumeRole
+    package:
+      include:
+        - '*.py'
+        - '**/*.py'
+    events:
+      - http: ANY /
+      - http: ANY {proxy+}
+      - http:
+          method: ANY
+          path: /api/v1/authenticated/{proxy+}
+          authorizer:
+            type: COGNITO_USER_POOLS
+            name: authorizer
+            authorizerId: !Ref Authorizer
+
+resources:
+  Resources:
+    Authorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        IdentitySource: method.request.header.authorizer
+        Name: DataplattformAuthorizer
+        ProviderARNs:
+          - !ImportValue ${self:custom.stage}-cognito-userPool
+        RestApiId: !Ref ApiGatewayRestApi
+        Type: COGNITO_USER_POOLS
+
+plugins:
+  - serverless-python-requirements
+  - serverless-wsgi
+  - serverless-pseudo-parameters

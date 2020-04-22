@@ -1,0 +1,145 @@
+service: cognito
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+
+resources:
+  Resources:
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:custom.stage}-dataplattform-user-pool
+        AdminCreateUserConfig:
+          AllowAdminCreateUserOnly: true
+          UnusedAccountValidityDays: 7
+        AutoVerifiedAttributes:
+          - email
+        UsernameAttributes: 
+          - email
+        UsernameConfiguration:
+          CaseSensitive: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+            RequireLowercase: false
+            RequireNumbers: false
+            RequireSymbols: false
+            RequireUppercase: false
+
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: ${self:custom.stage}-dataplattform-user-pool-client
+        UserPoolId: !Ref CognitoUserPool
+        ExplicitAuthFlows:
+          - ALLOW_USER_PASSWORD_AUTH
+          - ALLOW_REFRESH_TOKEN_AUTH
+
+    CognitoUserPoolGroupLevel2:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        Description: level-2 access
+        GroupName: level2
+        RoleArn: !GetAtt Level2.Arn
+        UserPoolId: !Ref CognitoUserPool
+    CognitoUserPoolGroupLevel3:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        Description: level-3 access
+        GroupName: level3
+        RoleArn: !GetAtt Level3.Arn
+        UserPoolId: !Ref CognitoUserPool
+
+    AssumeRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: CanAssumeRole
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'sts:AssumeRole'
+                  Resource: "*"
+
+    Level2:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-level2
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+                AWS: !GetAtt AssumeRole.Arn
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-ReadLevel2-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                  Resource:
+                    - Fn::Join:
+                      - "" 
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /data/level-2/*
+    Level3:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-level3
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+                AWS: !GetAtt AssumeRole.Arn
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-ReadLevel3-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                  Resource:
+                    - Fn::Join:
+                      - "" 
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /data/level-3/*
+
+  Outputs:
+    CognitoUserPoolOutput:
+      Value: !GetAtt CognitoUserPool.Arn
+      Export:
+        Name: ${self:custom.stage}-cognito-userPool
+    AssumeRoleOutput:
+      Value: !GetAtt AssumeRole.Arn
+      Export:
+        Name: ${self:custom.stage}-assumeRole
