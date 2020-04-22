@@ -88,3 +88,27 @@ def test_s3_get_data_json(s3_bucket):
     s3 = aws.S3(access_path='/data')
     test_json = s3.get('test.json').json()
     assert test_json['hello'] == 'world'
+
+
+def test_s3fs_open_write(s3_bucket):
+    s3 = aws.S3(access_path='data')
+
+    with s3.fs.open('test.txt', 'w') as f:
+        f.write('test')
+
+    assert s3_bucket.Object('data/test.txt').get()['Body'].read() == b'test'
+
+
+def test_s3fs_open_read(s3_bucket):
+    s3_bucket.Object('/data/test.txt').put(Body='test'.encode('utf-8'))
+
+    s3 = aws.S3(access_path='data')
+    with s3.fs.open('test.txt', 'r') as f:
+        assert f.read() == 'test'
+
+
+def test_s3fs_exists(s3_bucket):
+    s3_bucket.Object('/data/test.txt').put(Body='test'.encode('utf-8'))
+
+    s3 = aws.S3(access_path='data')
+    assert s3.fs.exists('test.txt') is True

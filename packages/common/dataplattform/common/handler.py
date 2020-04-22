@@ -33,6 +33,7 @@ class Handler:
         s3 = S3(
             access_path=self.access_path,
             bucket=self.bucket)
+        raw_data = None
 
         if 'ingest' in self.wrapped_func:
             result = self.wrapped_func['ingest'](event)

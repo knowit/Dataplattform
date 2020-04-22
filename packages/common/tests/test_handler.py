@@ -1,5 +1,4 @@
-from dataplattform.common import handler
-from dataplattform.common import schema
+from dataplattform.common import handler, schema
 
 
 def test_empty_handler():
@@ -74,3 +73,67 @@ def test_handler_valid_call_ingest(mocker):
     ingest_handler(None)
 
     ingest_handler.wrapped_func['ingest'].assert_called_once()
+
+
+def test_handler_call_process(mocker):
+    ingest_handler = handler.Handler()
+
+    @ingest_handler.ingest()
+    def test_ingest(event):
+        return schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data='hello test'
+        )
+
+    ingest_handler.wrapped_func['process'] = mocker.MagicMock(return_value={})
+    ingest_handler(None)
+
+    ingest_handler.wrapped_func['process'].assert_called_once()
+    assert ingest_handler.wrapped_func['process'].call_args[0][0][0].json()['data'] == 'hello test'
+
+
+def test_handler_call_process_with_s3_data(s3_bucket, mocker):
+    s3_bucket.Object('/data/test.json').put(
+            Body=schema.Data(
+                metadata=schema.Metadata(timestamp=0),
+                data='hello test'
+            ).to_json().encode('utf-8'))
+
+    ingest_handler = handler.Handler()
+
+    ingest_handler.wrapped_func['process'] = mocker.MagicMock(return_value={})
+    ingest_handler({
+        'Records': [{
+            's3': {
+                'object': {'key': '/data/test.json'}
+            }
+        }]
+    })
+
+    ingest_handler.wrapped_func['process'].assert_called_once()
+    assert ingest_handler.wrapped_func['process'].call_args[0][0][0].json()['data'] == 'hello test'
+
+
+def test_handler_call_process_to_parquet(mocker):
+    df_mock = mocker.MagicMock()
+    df_mock.to_parquet = mocker.stub()
+
+    ingest_handler = handler.Handler()
+
+    @ingest_handler.ingest()
+    def test_ingest(event):
+        return schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data='hello test'
+        )
+
+    @ingest_handler.process(partitions=[])
+    def test_process(data):
+        return {
+            'test': df_mock
+        }
+
+    ingest_handler(None)
+
+    df_mock.to_parquet.assert_called_once()
+    assert df_mock.to_parquet.call_args[0][0] == 'structured/test'
