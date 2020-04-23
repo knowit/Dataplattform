@@ -88,32 +88,27 @@ resources: # The resources your functions use
         CatalogId: !Sub '#{AWS::AccountId}'
         DatabaseInput: 
           Name:  ${self:custom.stage}_${self:custom.editable.databaseName}_database
-    GlueTable:
-      Type: AWS::Glue::Table
+    GlueCrawler:
+      Type: AWS::Glue::Crawler
       Properties:
-        CatalogId: !Sub '#{AWS::AccountId}'
         DatabaseName: ${self:custom.stage}_${self:custom.editable.databaseName}_database
-        TableInput: 
-          Name: ${file(./schema.yml):tableName}
-          Parameters:
-            'classification': 'parquet'
-            'parquet.compression': 'GZIP'
-          PartitionKeys: ${file(./schema.yml):partitions}
-          StorageDescriptor: 
-            Columns: ${file(./schema.yml):columns}
-            InputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat
-            Location: 
-              Fn::Join:
-                - "" 
-                - - s3://
-                  - !ImportValue ${self:custom.stage}-datalakeName
-                  - /${self:custom.accessPath}structured/${file(./schema.yml):tableName}/
-            OutputFormat: org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat
-            SerdeInfo: 
-              SerializationLibrary: org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe
-              Parameters:
-                'serialization.format': '1'
-          TableType: EXTERNAL_TABLE
+        Name: ${self:custom.stage}_${self:custom.editable.databaseName}_crawler
+        Role: !GetAtt S3Access.Arn
+        Schedule: 
+          ScheduleExpression: cron(0 0 * * ? *) 
+        SchemaChangePolicy: 
+          DeleteBehavior: DEPRECATE_IN_DATABASE
+          UpdateBehavior: UPDATE_IN_DATABASE 
+        Targets: 
+          S3Targets:
+            - Exclusions: 
+                - '*_metadata'
+              Path: 
+                Fn::Join:
+                  - "" 
+                  - - s3://
+                    - !ImportValue ${self:custom.stage}-datalakeName
+                    - /${self:custom.accessPath}structured/yr_weather/
     S3Access:
       Type: AWS::IAM::Role
       Properties:
@@ -125,9 +120,11 @@ resources: # The resources your functions use
               Principal:
                 Service:
                   - lambda.amazonaws.com
+                  - glue.amazonaws.com
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
