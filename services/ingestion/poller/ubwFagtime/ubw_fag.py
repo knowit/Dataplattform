@@ -1,55 +1,45 @@
-import boto3
-import json
+from dataplattform.common.handler import Handler
+from dataplattform.common.aws import SSM
+from dataplattform.common.schema import Data, Metadata
+from dataplattform.query.engine import Athena
 from datetime import datetime
-from os import environ
-from zeep import Client
+from typing import Dict
 from xmltodict import parse
-from os import path
+from zeep import Client
+import pandas as pd
+import numpy as np
 
 
-def handler(event, context):
-    poll()
-    return {'statusCode': 200, 'body': 'Success'}
+handler = Handler()
+ath = Athena()
 
 
-def ssm_parameters():
-    path = f'{environ.get("STAGE")}/{environ.get("SERVICE")}'
-    client = boto3.client('ssm')
-    return (
-        client.get_parameter(
-            Name=f'/{path}/UBW_USERNAME', WithDecryption=True)['Parameter']['Value'],
-        client.get_parameter(
-            Name=f'/{path}/UBW_PASSWORD', WithDecryption=True)['Parameter']['Value'],
-        client.get_parameter(
-            Name=f'/{path}/UBW_CLIENT', WithDecryption=True)['Parameter']['Value'],
-        client.get_parameter(
-            Name=f'/{path}/UBW_URL', WithDecryption=False)['Parameter']['Value'],
-        client.get_parameter(
-            Name=f'/{path}/UBW_TEMPLATE_ID', WithDecryption=True)['Parameter']['Value'])
+@handler.ingest()
+def ingest(event) -> Data:
+    def ubw_record_filter(record):
+        if "tab" not in record or "reg_period" not in record:
+            return False
 
+        # Only the "B" documents are completed, the rest should be ignored.
+        if record["tab"] != "B":
+            return False
 
-def ubw_record_filter(record):
-    if "tab" not in record or "reg_period" not in record:
-        return False
+        # You should only uploads docs that are older than 4 weeks.
+        year, week = record["reg_period"][0:4], record["reg_period"][4:]
+        cur_year, cur_week = datetime.now().isocalendar()[0:2]
 
-    # Only the "B" documents are completed, the rest should be ignored.
-    if record["tab"] != "B":
-        return False
+        number_of_weeks = int(year) * 52 + int(week)
+        current_number_of_weeks = cur_year * 52 + cur_week
+        if number_of_weeks > current_number_of_weeks - 4:
+            return False
 
-    # You should only uploads docs that are older than 4 weeks.
-    year, week = record["reg_period"][0:4], record["reg_period"][4:]
-    cur_year, cur_week = datetime.now().isocalendar()[0:2]
+        return True
 
-    number_of_weeks = int(year) * 52 + int(week)
-    current_number_of_weeks = cur_year * 52 + cur_week
-    if number_of_weeks > current_number_of_weeks - 4:
-        return False
+    username, password, client, template_id = SSM(
+        with_decryption=True
+    ).get('UBW_USERNAME', 'UBW_PASSWORD', 'UBW_CLIENT', 'UBW_TEMPLATE_ID')
 
-    return True
-
-
-def poll():
-    username, password, client, url, template_id = ssm_parameters()
+    url = SSM().get('UBW_URL')
 
     soap_client = Client(wsdl=f'{url}?QueryEngineService/QueryEngineV200606DotNet')
     res = soap_client.service.GetTemplateResultAsXML(
@@ -89,17 +79,28 @@ def poll():
         })
 
     ubw_data = parse(res['TemplateResult'])['Agresso']['AgressoQE']
-    timestamp = datetime.now().timestamp()
-    ubw_data = {
-        'metadata': {'timestamp': timestamp},
-        'data': [rec for rec in ubw_data if ubw_record_filter(rec)]
+    return Data(
+        metadata=Metadata(timestamp=datetime.now().timestamp()),
+        data=[rec for rec in ubw_data if ubw_record_filter(rec)]
+    )
+
+
+@handler.process(partitions=[])
+def process(data) -> Dict[str, pd.DataFrame]:
+    data = [
+        [dict(x, time=d['metadata']['timestamp']) for x in d['data']]
+        for d in [d.json() for d in data]
+    ]
+
+    data = np.hstack(data)
+    df = pd.DataFrame.from_records(data)
+
+    # Get unique reg_periods where used_hrs are largest
+    df = df[['time', 'reg_period', 'used_hrs']].sort_values(['used_hrs']).groupby('reg_period').first().reset_index()
+
+    reg_period_df = ath.from_('ubw_fagtimer').select('reg_period').execute(ath).as_pandas()
+    df = df[~df.reg_period.isin(reg_period_df.reg_period)]
+
+    return {
+        'ubw_fagtimer': df
     }
-
-    access_path = environ.get("ACCESS_PATH")
-    s3 = boto3.resource('s3')
-    s3_object = s3.Object(environ.get('DATALAKE'), path.join(access_path, f'{int(timestamp)}.json'))
-    s3_object.put(Body=(bytes(json.dumps(ubw_data).encode('UTF-8'))))
-
-
-if __name__ == "__main__":
-    poll()

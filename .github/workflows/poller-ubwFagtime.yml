@@ -5,6 +5,8 @@ on:
   pull_request:
     paths:
       - 'services/ingestion/poller/ubwFagtime/**'
+      - 'packages/common/**'
+      - 'packages/query/**'
 
 
 jobs:

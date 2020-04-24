@@ -4,8 +4,9 @@ service: ubwFagtimePoller
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 6
+    timeout: 12
     handlerFile: ubw_fag
+    databaseName: ubw_fag
     description: poll fagtimer from ubw
     scheduleRate: rate(7 days)
     accessLevel: level-2
@@ -14,7 +15,17 @@ custom:
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   pythonRequirements:
-    dockerizePip: 'non-linux'
+    dockerizePip: non-linux
+    noDeploy:
+      - boto3 # Default in lambda rt
+      - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
 
 provider:
   name: aws
@@ -47,6 +58,10 @@ package:
 functions:
   poller:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    layers:
+      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
@@ -58,6 +73,7 @@ functions:
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
+      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
     tags: # Tag for this function. Every function are tagged with stage by default
     events: # How to trigger the lambda
       - schedule:
@@ -68,6 +84,33 @@ functions:
 
 resources: # The resources your functions use
   Resources:
+    GlueDatabase:
+        Type: AWS::Glue::Database
+        Properties: 
+          CatalogId: !Sub '#{AWS::AccountId}'
+          DatabaseInput: 
+            Name:  ${self:custom.stage}_${self:custom.editable.databaseName}_database
+    GlueCrawler:
+      Type: AWS::Glue::Crawler
+      Properties:
+        DatabaseName: ${self:custom.stage}_${self:custom.editable.databaseName}_database
+        Name: ${self:custom.stage}_${self:custom.editable.databaseName}_crawler
+        Role: !GetAtt S3Access.Arn
+        Schedule: 
+          ScheduleExpression: cron(0 0 * * ? *) 
+        SchemaChangePolicy: 
+          DeleteBehavior: DEPRECATE_IN_DATABASE
+          UpdateBehavior: UPDATE_IN_DATABASE 
+        Targets: 
+          S3Targets:
+            - Exclusions: 
+                - '*_metadata'
+              Path: 
+                Fn::Join:
+                  - "" 
+                  - - s3://
+                    - !ImportValue ${self:custom.stage}-datalakeName
+                    - /${self:custom.accessPath}structured/ubw_fagtimer/
     S3Access:
       Type: AWS::IAM::Role
       Properties:
@@ -79,18 +122,21 @@ resources: # The resources your functions use
               Principal:
                 Service:
                   - lambda.amazonaws.com
+                  - glue.amazonaws.com
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:service}
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
                     - s3:PutObject
-                    #- s3:ListObjects
+                    - s3:ListObjects
+                    - s3:GetObject
                   Resource:
                     - Fn::Join:
                       - "" 
@@ -104,6 +150,16 @@ resources: # The resources your functions use
                   Action:
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*' # Only give access to what the lambda needs
+          - PolicyName: ${self:custom.stage}-Athena-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'athena:StartQueryExecution'
+                    - 'athena:GetQueryExecution'
+                    - 'athena:GetQueryResults'
+                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary' # TODO: dedicated work groups?
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
