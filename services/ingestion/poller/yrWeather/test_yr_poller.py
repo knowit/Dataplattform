@@ -13,6 +13,7 @@ def test_data():
     with open(path.join(path.dirname(__file__), 'test_data.xml'), 'r') as f:
         yield f.read()
 
+
 @fixture
 def mocked_responses():
     with RequestsMock() as reqs:

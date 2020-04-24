@@ -127,7 +127,7 @@ def test_handler_call_process_to_parquet(mocker):
             data='hello test'
         )
 
-    @ingest_handler.process(partitions=[])
+    @ingest_handler.process(partitions={})
     def test_process(data):
         return {
             'test': df_mock

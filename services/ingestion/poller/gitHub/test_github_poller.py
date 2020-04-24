@@ -1,5 +1,4 @@
 from github_poller import handler, url
-from os import environ
 from pytest import fixture
 from json import loads, load
 from responses import RequestsMock, GET
@@ -12,34 +11,31 @@ def mocked_responses():
     with RequestsMock() as reqs:
         yield reqs
 
+
 @fixture
 def test_data():
     with open(path.join(path.dirname(__file__), 'test.json'), 'r') as json_file:
         yield load(json_file)
 
 
-
 def test_handler_follow_links(s3_bucket, mocked_responses, test_data):
-    some_github_data = test_data
-    
-    some_extra_github_data = {}
+    some_github_data = [test_data[0]]
+    some_extra_github_data = [test_data[1]]
     follow_link = 'http://mock.link'
     mocked_responses.add(GET, url, json=[some_github_data], headers={'Link': f'{follow_link}; rel="next"'}, status=200)
-    mocked_responses.add(GET, follow_link, json=[some_extra_github_data], status=200)   
+    mocked_responses.add(GET, follow_link, json=[some_extra_github_data], status=200)
 
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
     data = loads(response['Body'].read())
 
-    assert data is not None
+    assert data['data'][0]["name"] == "Ky.yr" and data['data'][1]["name"] == "knowit.github.com"
 
-def test_handler_data_content(s3_bucket, mocked_responses,test_data):
+
+def test_handler_data_content(s3_bucket, mocked_responses, test_data):
     some_github_data = test_data
-    some_extra_github_data = {}
-    follow_link = 'http://mock.link'
-    mocked_responses.add(GET, url, json=[some_github_data], headers={'Link': f'{follow_link}; rel="next"'}, status=200)
-    mocked_responses.add(GET, follow_link, json=[some_extra_github_data], status=200)   
+    mocked_responses.add(GET, url, json=[some_github_data], status=200)
 
     handler(None, None)
 
@@ -62,4 +58,3 @@ def test_handler_data_content(s3_bucket, mocked_responses,test_data):
         "default_branch": "master",
     }
     assert all([data['data'][0][k] == v for k, v in expected.items()])
-

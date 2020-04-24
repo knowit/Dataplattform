@@ -1,0 +1,23 @@
+commit 7d8e9a359d59ac5bf3190a04a386e0e24c4f5ad5
+Author: HeleneSemmerud <helene.semmerud@knowit.no>
+Date:   Fri Apr 24 13:07:05 2020 +0200
+
+    Enables options to use empty partition
+
+commit 3cff5901c51a24f2be681918b3cd93435d27ad25
+Author: HeleneSemmerud <helene.semmerud@knowit.no>
+Date:   Thu Apr 23 22:16:53 2020 +0200
+
+    Refactor github poller with processing
+
+commit 222dadfcd3623f389b7e9d4dc34d39e8eb09661e
+Author: HeleneSemmerud <helene.semmerud@knowit.no>
+Date:   Thu Apr 23 22:14:34 2020 +0200
+
+    Add support for multiple partition lists
+
+commit 6e5bbf1430b791a3128610aa4c5bb83bf3c885bb
+Author: HeleneSemmerud <helene.semmerud@knowit.no>
+Date:   Tue Apr 21 15:58:01 2020 +0200
+
+    Fix in yr_poller to accommodate partitions to be dictonaries of lists

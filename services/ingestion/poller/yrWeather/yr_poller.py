@@ -49,7 +49,8 @@ def ingest(event) -> Data:
         ),
         data=np.hstack([fetch_yr_data(location) for location in locations]).tolist())
 
-@handler.process(partitions={'yr_weather':['location_name', 'time', 'time_from', 'time_to']})
+
+@handler.process(partitions={'yr_weather': ['location_name', 'time', 'time_from', 'time_to']})
 def process(data) -> Dict[str, pd.DataFrame]:
 
     def make_dataframe(d):
