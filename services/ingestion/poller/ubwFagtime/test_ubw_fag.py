@@ -1,6 +1,8 @@
 from ubw_fag import handler
 from pytest import fixture
 from json import loads
+import pandas as pd
+from pandas.testing import assert_series_equal
 
 
 @fixture(autouse=True)
@@ -58,7 +60,7 @@ def test_handler_data_length(s3_bucket):
     assert len(data['data']) == 2  # one filtered
 
 
-def test_handler_data(s3_bucket):
+def test_handler_data(s3_bucket, athena):
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
@@ -67,3 +69,29 @@ def test_handler_data(s3_bucket):
     assert data['data'][0]['tab'] == 'B' and\
         data['data'][0]['reg_period'] == '201817' and\
         data['data'][0]['used_hrs'] == '4'
+
+
+def test_process_data(mocker):
+    def on_to_parquet(df, *a, **kwa):
+        assert_series_equal(
+            df.reg_period,
+            pd.Series(['201817', '201907'], index=[0, 1]),
+            check_names=False)
+
+    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+    handler(None, None)
+
+
+def test_process_data_skip_existing(mocker, athena):
+    athena.on_query(
+        'SELECT "reg_period" FROM "dev_test_database"."ubw_fagtimer"',
+        pd.DataFrame({'reg_period': ['201817']}))
+
+    def on_to_parquet(df, *a, **kwa):
+        assert_series_equal(
+            df.reg_period,
+            pd.Series(['201907'], index=[1]),
+            check_names=False)
+
+    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+    handler(None, None)

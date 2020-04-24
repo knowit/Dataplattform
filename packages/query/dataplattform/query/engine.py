@@ -18,13 +18,18 @@ class Athena:
             access_path or environ.get('ACCESS_PATH'),
             'stage').replace(sep, '/')
 
-        self.conn = connect(
-            s3_staging_dir=staging_dir or environ.get(
-                'STAGING_DIR', f"s3://{default_staging_dir}"),
-            cursor_class=PandasCursor)
-
+        self.staging_dir = staging_dir or environ.get(
+                'STAGING_DIR', f"s3://{default_staging_dir}")
         self.default_database = Athena.database_name(
             default_database or environ.get('DEFAULT_DATABASE', None))
+        self.__connection = None
+
+    @property
+    def connection(self):
+        self.__connection = self.__connection or connect(
+            s3_staging_dir=self.staging_dir,
+            cursor_class=PandasCursor)
+        return self.__connection
 
     @property
     def table(self):
@@ -35,7 +40,6 @@ class Athena:
 
             def __getitem__(self, key):
                 key = key if '.' in key else f'{self.database}.{key}'
-                print(key)
                 schema, table_name = key.split('.')
                 self.tables[key] = self.tables.get(
                     key,
@@ -49,7 +53,7 @@ class Athena:
         return self.factory
 
     def execute(self, query: Union[QueryBuilder, AnyStr], parameters: Dict[AnyStr, Any] = None):
-        cursor = self.conn.cursor()
+        cursor = self.connection.cursor()
         if hasattr(query, 'get_sql'):
             return cursor.execute(query.get_sql())
         return cursor.execute(query, parameters=parameters)

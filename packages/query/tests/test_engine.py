@@ -5,19 +5,19 @@ from os import environ
 def test_create_default_athena_engine():
     ath = engine.Athena()
     assert ath.default_database is None and \
-        ath.conn.s3_staging_dir == 's3://testlake/data/test/stage'
+        ath.staging_dir == 's3://testlake/data/test/stage'
 
 
 def test_create_staging_dir_env_athena_engine():
     environ['STAGING_DIR'] = 's3://test/dir'
 
     ath = engine.Athena()
-    assert ath.conn.s3_staging_dir == 's3://test/dir'
+    assert ath.staging_dir == 's3://test/dir'
 
 
 def test_create_params_athena_engine():
     ath = engine.Athena(bucket='testbucket', access_path='access/path')
-    assert ath.conn.s3_staging_dir == 's3://testbucket/access/path/stage'
+    assert ath.staging_dir == 's3://testbucket/access/path/stage'
 
 
 def test_create_default_database_athena_engine():
@@ -62,7 +62,7 @@ def test_execute_query(mocker):
     cursor_mock.execute = mocker.stub()
 
     ath = engine.Athena()
-    ath.conn.cursor = mocker.MagicMock(return_value=cursor_mock)
+    ath.connection.cursor = mocker.MagicMock(return_value=cursor_mock)
 
     ath.from_('my_table').select('test1', 'test2').execute(ath)
 
