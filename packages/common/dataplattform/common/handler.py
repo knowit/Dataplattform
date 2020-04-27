@@ -58,13 +58,12 @@ class Handler:
                 for table_name, frame in tables.items():
                     assert frame is not None and callable(frame.to_parquet),\
                         'Process must return a DataFrame with a to_parquet method'
-
-                    partitions = self.wrapped_func_args['process'].get('partitions', None)
+                    partitions = self.wrapped_func_args['process'].get('partitions', {})
                     frame.to_parquet(f'structured/{table_name}',
                                      engine='fastparquet',
                                      compression='gzip',
                                      index=False,
-                                     partition_cols=partitions,
+                                     partition_cols=partitions.get(table_name, None),
                                      file_scheme='hive',
                                      mkdirs=lambda x: None,  # noop
                                      open_with=s3.fs.open,
