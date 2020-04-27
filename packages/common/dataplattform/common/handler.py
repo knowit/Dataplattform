@@ -56,6 +56,9 @@ class Handler:
             if data:
                 tables = self.wrapped_func['process'](data)
                 for table_name, frame in tables.items():
+                    if frame is None:
+                        continue
+
                     assert frame is not None and callable(frame.to_parquet),\
                         'Process must return a DataFrame with a to_parquet method'
                     partitions = self.wrapped_func_args['process'].get('partitions', {})
