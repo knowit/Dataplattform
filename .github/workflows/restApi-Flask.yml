@@ -2,6 +2,9 @@
 name: Dataplattform - restApi - flask
 
 on: 
+  push:
+    branches:
+      - master
   pull_request:
     paths:
       - 'services/restApi/**'

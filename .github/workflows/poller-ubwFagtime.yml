@@ -2,6 +2,9 @@
 name: Dataplattform - poller - ubwFagtime
 
 on: 
+  push:
+    branches:
+      - master
   pull_request:
     paths:
       - 'services/ingestion/poller/ubwFagtime/**'

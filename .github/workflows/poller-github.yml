@@ -2,9 +2,13 @@
 name: Dataplattform - poller - github
 
 on: 
+  push:
+    branches:
+      - master
   pull_request:
     paths:
       - 'services/ingestion/poller/gitHub/**'
+      - 'packages/common/**'
 
 
 jobs:

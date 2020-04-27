@@ -2,6 +2,9 @@
 name: Dataplattform - package - common
 
 on: 
+  push:
+    branches:
+      - master
   pull_request:
     paths:
       - 'packages/common/**'
