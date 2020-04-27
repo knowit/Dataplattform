@@ -42,7 +42,7 @@ def ingest(event) -> Data:
                     'default_branch': repo_list['default_branch']
                     }
 
-        return [data_point(repos[i][j]) for i in range(len(repos)) for j in range(0, len(repos[i]))]
+        return [data_point(repos[i]) for i in range(len(repos))]
 
     tmp = Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=fetch_github_data(url))
     return tmp
@@ -84,3 +84,4 @@ def process(data) -> Dict[str, pd.DataFrame]:
         'github_knowit_repos': repos_table,
         'github_knowit_repo_status': repos_status_table
     }
+

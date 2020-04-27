@@ -19,7 +19,7 @@ def serverless_environment(serverless_cli=None, serverless_file=None):
 
     p = run([
         serverless_cli, 'print', '--path', 'functions', '--format', 'json', '--config', serverless_file],
-        check=True, capture_output=True, shell=True, encoding='utf-8')
+        check=True, capture_output=True, shell=os.name != 'posix', encoding='utf-8')
 
     exports = boto3.client('cloudformation').list_exports()['Exports']
     exports = {x['Name']: x['Value'] for x in exports}

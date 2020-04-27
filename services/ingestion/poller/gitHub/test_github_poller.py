@@ -19,8 +19,8 @@ def test_data():
 
 
 def test_handler_follow_links(s3_bucket, mocked_responses, test_data):
-    some_github_data = [test_data[0]]
-    some_extra_github_data = [test_data[1]]
+    some_github_data = test_data[0]
+    some_extra_github_data = test_data[1]
     follow_link = 'http://mock.link'
     mocked_responses.add(GET, url, json=[some_github_data], headers={'Link': f'{follow_link}; rel="next"'}, status=200)
     mocked_responses.add(GET, follow_link, json=[some_extra_github_data], status=200)
@@ -35,7 +35,7 @@ def test_handler_follow_links(s3_bucket, mocked_responses, test_data):
 
 def test_handler_data_content(s3_bucket, mocked_responses, test_data):
     some_github_data = test_data
-    mocked_responses.add(GET, url, json=[some_github_data], status=200)
+    mocked_responses.add(GET, url, json=some_github_data, status=200)
 
     handler(None, None)
 
