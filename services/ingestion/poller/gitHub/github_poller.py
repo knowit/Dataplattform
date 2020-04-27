@@ -44,8 +44,8 @@ def ingest(event) -> Data:
 
         return [data_point(repos[i]) for i in range(len(repos))]
 
-    tmp = Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=fetch_github_data(url))
-    return tmp
+    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=fetch_github_data(url))
+
 
 @handler.process(partitions={'github_knowit_repos': ['language', 'default_branch'],
                              'github_knowit_repo_status': []})
