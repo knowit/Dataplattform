@@ -23,7 +23,7 @@ def ingest(event) -> Data:
             res = requests.get(res.links['next']['url'])
             repos.extend(res.json())
 
-        def convert_ISO8601_to_timestamp(time_str):   # TODO:
+        def convert_ISO8601_to_timestamp(time_str):
             return int(dateutil.parser.parse(time_str).timestamp())
 
         def data_point(repo_list):    # TODO: Move hard coding of values to another file?
@@ -84,4 +84,3 @@ def process(data) -> Dict[str, pd.DataFrame]:
         'github_knowit_repos': repos_table,
         'github_knowit_repo_status': repos_status_table
     }
-

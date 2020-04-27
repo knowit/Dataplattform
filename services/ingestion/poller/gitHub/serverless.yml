@@ -4,7 +4,7 @@ service: githubPoller
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 6
+    timeout: 12
     handlerFile: github_poller
     databaseName: github
     description: Github poller
