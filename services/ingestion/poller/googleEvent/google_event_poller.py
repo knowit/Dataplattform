@@ -1,5 +1,5 @@
 from dataplattform.common.handler import Handler
-from dataplattform.common.schema import Data
+from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 import datetime
 import googleapiclient.discovery
@@ -18,7 +18,8 @@ handler = Handler()
 
 @handler.ingest()
 def ingest(event) -> Data:
-    return Data(metadata={}, data={})
+    tmpData = poll()
+    return Data(metadata=Metadata(tmpData["timestamp"]), data=tmpData["data"])
 
 
 @handler.process(partitions={})
@@ -26,16 +27,6 @@ def process(data) -> Dict[str, pd.DataFrame]:
     df = pd.DataFrame()
     return {
         'google_calender_event': df
-    }
-
-
-def handler(event, context):
-
-    poll()
-
-    return {
-        'statusCode': 200,
-        'body': 'Success'
     }
 
 
@@ -67,7 +58,7 @@ def poll():
                               path + str(int(time.time())) + ".json")
         s3_object.put(Body=(bytes(json.dumps(events).encode('UTF-8'))))
 
-    return True
+    return events
 
 
 def get_events(credsentials_from_env, calendar_id):
