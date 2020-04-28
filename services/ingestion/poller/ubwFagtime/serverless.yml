@@ -4,9 +4,9 @@ service: ubwFagtimePoller
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 12
+    timeout: 28
     handlerFile: ubw_fag
-    databaseName: ubw_fag
+    databaseName: level_2
     description: poll fagtimer from ubw
     scheduleRate: rate(7 days)
     accessLevel: level-2
@@ -84,33 +84,6 @@ functions:
 
 resources: # The resources your functions use
   Resources:
-    GlueDatabase:
-        Type: AWS::Glue::Database
-        Properties: 
-          CatalogId: !Sub '#{AWS::AccountId}'
-          DatabaseInput: 
-            Name:  ${self:custom.stage}_${self:custom.editable.databaseName}_database
-    GlueCrawler:
-      Type: AWS::Glue::Crawler
-      Properties:
-        DatabaseName: ${self:custom.stage}_${self:custom.editable.databaseName}_database
-        Name: ${self:custom.stage}_${self:custom.editable.databaseName}_crawler
-        Role: !GetAtt S3Access.Arn
-        Schedule: 
-          ScheduleExpression: cron(0 0 * * ? *) 
-        SchemaChangePolicy: 
-          DeleteBehavior: DEPRECATE_IN_DATABASE
-          UpdateBehavior: UPDATE_IN_DATABASE 
-        Targets: 
-          S3Targets:
-            - Exclusions: 
-                - '*_metadata'
-              Path: 
-                Fn::Join:
-                  - "" 
-                  - - s3://
-                    - !ImportValue ${self:custom.stage}-datalakeName
-                    - /${self:custom.accessPath}structured/ubw_fagtimer/
     S3Access:
       Type: AWS::IAM::Role
       Properties:
@@ -122,11 +95,9 @@ resources: # The resources your functions use
               Principal:
                 Service:
                   - lambda.amazonaws.com
-                  - glue.amazonaws.com
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
@@ -142,6 +113,19 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                      - "" 
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - '*'
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
               Version: '2012-10-17'
@@ -150,6 +134,18 @@ resources: # The resources your functions use
                   Action:
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*' # Only give access to what the lambda needs
+          - PolicyName: ${self:custom.stage}-Glue-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'glue:GetTable'
+                    - 'glue:GetDatabase'
+                  Resource: 
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
           - PolicyName: ${self:custom.stage}-Athena-${self:service}
             PolicyDocument:
               Version: '2012-10-17'
