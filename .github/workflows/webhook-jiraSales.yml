@@ -2,6 +2,9 @@
 name: Dataplattform - webhook - jiraSales
 
 on: 
+  push:
+    branches:
+      - master
   pull_request:
     paths:
       - 'services/ingestion/webHooks/jiraSales/**'
