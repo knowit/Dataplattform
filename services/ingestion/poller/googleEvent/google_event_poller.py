@@ -5,8 +5,7 @@ import googleapiclient.discovery
 import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
 import json
-from datetime import datetime
-
+from datetime import datetime, timedelta
 import pandas as pd
 from typing import Dict
 
@@ -15,7 +14,14 @@ handler = Handler()
 
 @handler.ingest()
 def ingest(event) -> Data:
-    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=poll())
+    def get_event_data():
+        credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=False).get('credentials', 'calendarIds')
+        events = {}
+        for calendar_id in calendar_ids_from_ssm:
+            events.update(get_events(credentials_from_ssm, calendar_id))
+        return events
+
+    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=get_event_data())
 
 
 @handler.process(partitions={'google_calender_event': []}) # TODO: Replace with {} after rebase
@@ -33,27 +39,8 @@ def process(data) -> Dict[str, pd.DataFrame]:
     }
 
 
-# returns a dict of dicts 
-def poll():
-    credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=False).get('credentials', 'calendarIds')
-
-    events = {}
-
-    for calendar_id in calendar_ids_from_ssm:
-        events.update(get_events(credentials_from_ssm, calendar_id))
-
-    return events
-
-
-def get_events(credsentials_from_env, calendar_id):
-    """
-    :param creds: credentials
-    :param calendar_id:
-    :return: A dictionary containing (max 10) of the events in the nearest future from this
-    specific calendar_id.
-    """
-
-    credsentials_json = json.loads(credsentials_from_env)
+def get_calender_service(credentials_from_env):
+    credsentials_json = json.loads(credentials_from_env)
     credentials = ServiceAccountCredentials.from_json_keyfile_dict(credsentials_json, [
         'https://www.googleapis.com/auth/calendar.readonly'])
 
@@ -61,9 +48,21 @@ def get_events(credsentials_from_env, calendar_id):
     http = credentials.authorize(http)
     service = googleapiclient.discovery.build(
         serviceName='calendar', version='v3', http=http, cache_discovery=False)
-    now = datetime.utcnow().isoformat() + '+02:00'
-    tomorrow = datetime.utcfromtimestamp(datetime.now().timestamp() + (
-        60 * 60 * 24)).isoformat() + '+02:00'
+    return service
+
+
+def get_events(credentials_from_env, calendar_id):
+    """
+    :param creds: credentials
+    :param calendar_id:
+    :return: A dictionary containing (max 10) of the events in the nearest future from this
+    specific calendar_id.
+    """
+    service = get_calender_service(credentials_from_env)
+
+    now = datetime.now()
+    tomorrow = datetime.now() + timedelta(days=1)
+
     events_result = service.events().list(
         calendarId=calendar_id,
         timeMin=now,
@@ -75,12 +74,9 @@ def get_events(credsentials_from_env, calendar_id):
     events = events_result.get('items', [])
     info = {}
     for event in events:
-        boxes = []
-        if 'location' in event:
-            temp = event['location'].split(',')
-            for box in temp:
-                if "Enheter" in box:
-                    boxes.append(box.split('-')[-1])
+        temp = event.get('location', '').split(',')
+        boxes = [box.split('-')[-1] for box in temp if 'Enheter' in box]
+        startTime = get_timestamp(event.get(event['start']['dateTime'], None))
 
         startTime = ""
         endTime = 0
@@ -118,7 +114,10 @@ def get_events(credsentials_from_env, calendar_id):
 
 
 def get_timestamp(date):
-    return datetime.fromisoformat(date).timestamp()
+    if not (date is None):
+        return datetime.fromisoformat(date).timestamp()
+    else:
+        return ''
 
 
 if __name__ == "__main__":
