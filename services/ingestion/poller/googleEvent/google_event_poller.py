@@ -1,3 +1,6 @@
+from dataplattform.common.handler import Handler
+from dataplattform.common.schema import Data
+from dataplattform.common.aws import SSM
 import datetime
 import googleapiclient.discovery
 import httplib2
@@ -6,6 +9,24 @@ import boto3
 import os
 import json
 import time
+
+import pandas as pd
+from typing import Dict
+
+handler = Handler()
+
+
+@handler.ingest()
+def ingest(event) -> Data:
+    return Data(metadata={}, data={})
+
+
+@handler.process(partitions={})
+def process(data) -> Dict[str, pd.DataFrame]:
+    df = pd.DataFrame()
+    return {
+        'google_calender_event': df
+    }
 
 
 def handler(event, context):
