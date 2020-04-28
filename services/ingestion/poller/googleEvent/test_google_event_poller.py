@@ -29,8 +29,9 @@ def test_handler_write(s3_bucket, events_list_mock):
             },
             'end': {
                 'dateTime': datetime.utcnow().isoformat()
-            }
-        },
+            },
+            'location': 'Enheter-box1'
+         },
         {
             'id': '1235',
             'start': {
@@ -49,7 +50,6 @@ def test_handler_write(s3_bucket, events_list_mock):
 
     assert '1234' in data['data']
 
-
 def test_handler_data_content(s3_bucket, events_list_mock):
     events_list_mock.execute.return_value = {
         'items': [{
@@ -67,5 +67,6 @@ def test_handler_data_content(s3_bucket, events_list_mock):
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
     data = loads(response['Body'].read())
+    print(data['data'].json())
 
     assert '1234' in data['data']
