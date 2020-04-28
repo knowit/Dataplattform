@@ -42,7 +42,8 @@ def zeep_ubw_mock(mocker):
     yield mock
 
 
-def test_handler_metadata(s3_bucket):
+def test_handler_metadata(mocker, s3_bucket):
+    mocker.patch('pandas.DataFrame.to_parquet')
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
@@ -51,7 +52,8 @@ def test_handler_metadata(s3_bucket):
     assert 'timestamp' in data['metadata']
 
 
-def test_handler_data_length(s3_bucket):
+def test_handler_data_length(mocker, s3_bucket):
+    mocker.patch('pandas.DataFrame.to_parquet')
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
@@ -60,7 +62,8 @@ def test_handler_data_length(s3_bucket):
     assert len(data['data']) == 2  # one filtered
 
 
-def test_handler_data(s3_bucket, athena):
+def test_handler_data(mocker, s3_bucket):
+    mocker.patch('pandas.DataFrame.to_parquet')
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()

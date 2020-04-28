@@ -85,7 +85,7 @@ def ingest(event) -> Data:
     )
 
 
-@handler.process(partitions=[])
+@handler.process(partitions={})
 def process(data) -> Dict[str, pd.DataFrame]:
     data = [
         [dict(x, time=d['metadata']['timestamp']) for x in d['data']]
