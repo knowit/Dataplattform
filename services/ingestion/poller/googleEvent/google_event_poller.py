@@ -1,14 +1,11 @@
 from dataplattform.common.handler import Handler
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
-import datetime
 import googleapiclient.discovery
 import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
-import boto3
-import os
 import json
-import time
+from datetime import datetime
 
 import pandas as pd
 from typing import Dict
@@ -18,45 +15,32 @@ handler = Handler()
 
 @handler.ingest()
 def ingest(event) -> Data:
-    tmpData = poll()
-    return Data(metadata=Metadata(tmpData["timestamp"]), data=tmpData["data"])
+    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=poll())
 
 
-@handler.process(partitions={})
+@handler.process(partitions={'google_calender_event': []})
 def process(data) -> Dict[str, pd.DataFrame]:
-    df = pd.DataFrame()
+    def make_dataframe(d):
+        d = d.json()
+        metadata, payload = d['metadata'], d['data']
+        df = pd.json_normalize(payload.values())
+        df['time'] = int(metadata['timestamp'])
+        return df
+
+    df_new = pd.concat([make_dataframe(d) for d in data])
     return {
-        'google_calender_event': df
+        'google_calender_event': df_new
     }
 
 
+# returns a dict of dicts 
 def poll():
-    client = boto3.client('ssm')
-    credentials = client.get_parameter(
-        Name='/dev/poller/google/credentials',
-        WithDecryption=False)
-    credsentials_from_ssm = credentials['Parameter']['Value']
+    credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=False).get('credentials', 'calendarIds')
 
-    calendar_ids = client.get_parameter(
-        Name='/dev/poller/google/calendarIDs',
-        WithDecryption=False)
-    calendar_ids_from_ssm = calendar_ids['Parameter']['Value'].split(',')
-
-    events = {
-        "data": {},
-        "timestamp": int(time.time())
-    }
+    events = {}
 
     for calendar_id in calendar_ids_from_ssm:
-        events['data'].update(get_events(credsentials_from_ssm, calendar_id))
-
-    if bool(events['data']):
-        path = os.getenv("ACCESS_PATH")
-
-        s3 = boto3.resource('s3')
-        s3_object = s3.Object(os.getenv('DATALAKE'),
-                              path + str(int(time.time())) + ".json")
-        s3_object.put(Body=(bytes(json.dumps(events).encode('UTF-8'))))
+        events.update(get_events(credentials_from_ssm, calendar_id))
 
     return events
 
@@ -77,8 +61,8 @@ def get_events(credsentials_from_env, calendar_id):
     http = credentials.authorize(http)
     service = googleapiclient.discovery.build(
         serviceName='calendar', version='v3', http=http, cache_discovery=False)
-    now = datetime.datetime.utcnow().isoformat() + '+02:00'
-    tomorrow = datetime.datetime.utcfromtimestamp(datetime.datetime.now().timestamp() + (
+    now = datetime.utcnow().isoformat() + '+02:00'
+    tomorrow = datetime.utcfromtimestamp(datetime.now().timestamp() + (
         60 * 60 * 24)).isoformat() + '+02:00'
     events_result = service.events().list(
         calendarId=calendar_id,
@@ -104,13 +88,13 @@ def get_events(credsentials_from_env, calendar_id):
             startTime = get_timestamp(event['start']['dateTime'])
         else:
             timeObject = list(map(int, event['start']['date'].split("-")))
-            startTime = datetime.datetime.timestamp(
-                datetime.datetime(timeObject[0], timeObject[1], timeObject[2]))
+            startTime = datetime.timestamp(
+                datetime(timeObject[0], timeObject[1], timeObject[2]))
         if "dateTime" in event['end']:
             endTime = get_timestamp(event['end']['dateTime'])
         else:
             timeObject = list(map(int, event['end']['date'].split("-")))
-            endTime = datetime.datetime.timestamp(datetime.datetime(
+            endTime = datetime.timestamp(datetime(
                 timeObject[0], timeObject[1], timeObject[2]))
 
         summary = ""
@@ -122,6 +106,7 @@ def get_events(credsentials_from_env, calendar_id):
             creator = event['creator']['email']
 
         info[event['id']] = {
+            'event_id': event['id'],
             'calendar_id': calendar_id,
             'timestamp_from': startTime,
             'timestamp_to': endTime,
@@ -133,7 +118,7 @@ def get_events(credsentials_from_env, calendar_id):
 
 
 def get_timestamp(date):
-    return datetime.datetime.fromisoformat(date).timestamp()
+    return datetime.fromisoformat(date).timestamp()
 
 
 if __name__ == "__main__":
