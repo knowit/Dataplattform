@@ -18,7 +18,7 @@ def ingest(event) -> Data:
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=poll())
 
 
-@handler.process(partitions={'google_calender_event': []})
+@handler.process(partitions={'google_calender_event': []}) # TODO: Replace with {} after rebase
 def process(data) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
