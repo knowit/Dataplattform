@@ -1,3 +1,5 @@
-google-api-python-client
-oauth2client
 file:../../../../packages/common
+google-api-python-client
+pandas
+pytz
+pyrfc3339

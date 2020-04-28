@@ -46,5 +46,5 @@ jobs:
     - name: Test with pytest
       working-directory: './services/ingestion/poller/googleEvent'
       run: |
-        pip install pytest
-        pytest 
+        pip install pytest 
+        pytest
