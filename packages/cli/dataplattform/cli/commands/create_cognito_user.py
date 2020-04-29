@@ -1,12 +1,11 @@
 import boto3
 import json
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 
 levels = [None, 'level2', 'level3']
 
 
-def main():
-    parser = ArgumentParser('')
+def init(parser: ArgumentParser):
     parser.add_argument('--username', dest='username', required=True, help='Users email')
     parser.add_argument('--password', dest='password', required=False, help='Password')
     parser.add_argument('--access-level', dest='access', required=False, choices=[1, 2, 3],
@@ -15,8 +14,9 @@ def main():
                         default='default', help='aws profile name')
     parser.add_argument('--delete', dest='delete', required=False,
                         action='store_true', help='Delete user with username')
-    args = parser.parse_args()
 
+
+def run(args: Namespace, _):
     session = boto3.Session(profile_name=args.profile)
     client = session.client('cognito-idp')
 
@@ -49,7 +49,3 @@ def main():
             'PASSWORD': args.password
         })
     print(json.dumps(response, indent=4))
-
-
-if __name__ == "__main__":
-    main()
