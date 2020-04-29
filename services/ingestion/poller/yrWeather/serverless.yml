@@ -4,9 +4,9 @@ service: yrWeatherPoller
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 6
+    timeout: 12
     handlerFile: yr_poller
-    databaseName: yr_weather
+    databaseName: level_1
     description: poller for yr-data
     scheduleRate: rate(1 hour)
     accessLevel: level-1
@@ -82,33 +82,6 @@ functions:
 
 resources: # The resources your functions use
   Resources:
-    GlueDatabase:
-      Type: AWS::Glue::Database
-      Properties: 
-        CatalogId: !Sub '#{AWS::AccountId}'
-        DatabaseInput: 
-          Name:  ${self:custom.stage}_${self:custom.editable.databaseName}_database
-    GlueCrawler:
-      Type: AWS::Glue::Crawler
-      Properties:
-        DatabaseName: ${self:custom.stage}_${self:custom.editable.databaseName}_database
-        Name: ${self:custom.stage}_${self:custom.editable.databaseName}_crawler
-        Role: !GetAtt S3Access.Arn
-        Schedule: 
-          ScheduleExpression: cron(0 0 * * ? *) 
-        SchemaChangePolicy: 
-          DeleteBehavior: DEPRECATE_IN_DATABASE
-          UpdateBehavior: UPDATE_IN_DATABASE 
-        Targets: 
-          S3Targets:
-            - Exclusions: 
-                - '*_metadata'
-              Path: 
-                Fn::Join:
-                  - "" 
-                  - - s3://
-                    - !ImportValue ${self:custom.stage}-datalakeName
-                    - /${self:custom.accessPath}structured/yr_weather/
     S3Access:
       Type: AWS::IAM::Role
       Properties:
@@ -120,11 +93,9 @@ resources: # The resources your functions use
               Principal:
                 Service:
                   - lambda.amazonaws.com
-                  - glue.amazonaws.com
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:

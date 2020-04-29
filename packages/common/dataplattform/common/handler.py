@@ -63,7 +63,7 @@ class Handler:
                                      engine='fastparquet',
                                      compression='gzip',
                                      index=False,
-                                     partition_cols=partitions.get(table_name, None),
+                                     partition_cols=partitions.get(table_name, []),
                                      file_scheme='hive',
                                      mkdirs=lambda x: None,  # noop
                                      open_with=s3.fs.open,
