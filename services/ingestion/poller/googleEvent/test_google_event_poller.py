@@ -48,7 +48,8 @@ def test_handler_write(s3_bucket, events_list_mock):
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
     data = loads(response['Body'].read())
 
-    assert '1234' in data['data']
+    assert '1234' in data['data'] and '1235' in data['data']
+
 
 def test_handler_data_content(s3_bucket, events_list_mock):
     events_list_mock.execute.return_value = {
@@ -67,6 +68,9 @@ def test_handler_data_content(s3_bucket, events_list_mock):
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
     data = loads(response['Body'].read())
-    print(data['data'].json())
 
     assert '1234' in data['data']
+
+
+def test_different_date_formats_date():
+    assert True
