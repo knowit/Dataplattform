@@ -3,6 +3,8 @@ from dataplattform.common.schema import Data, Metadata
 from requests import get, post, put
 from requests.auth import HTTPBasicAuth
 from datetime import datetime
+from dateutil.parser import isoparse
+import pandas as pd
 
 
 def register_or_update_webhooks(stage: str):
@@ -65,26 +67,45 @@ def poll_old_data(stage: str):
             'issue': item['key'],
             'customer': item['fields']['labels'][0] if len(item['fields']['labels']) > 0 else '',
             'issue_status': item['fields']['status']['name'],
-            'created': item['fields']['created'],
-            'updated': item['fields']['updated']
+            'created': int(isoparse(item['fields']['created']).timestamp()),
+            'updated': int(isoparse(item['fields']['updated']).timestamp())
         }
         for item in
         res.json().get('issues', [])
     ]
 
-    S3(
-        access_path=f'data/level-2/jira/sales/',
+    timestamp = datetime.now().timestamp()
+    s3 = S3(
+        access_path=f'data/level-2/jira/sales',
         bucket=f'{stage}-datalake-datalake'  # queryable?
-    ).put(
-        Data(
-            metadata=Metadata(
-                timestamp=datetime.now().timestamp()
-            ),
-            data=data
-        )
     )
 
-    print(f'Uploaded {len(data)} old issues to {stage} S3 bucket')
+    s3.put(
+        Data(
+            metadata=Metadata(
+                timestamp=timestamp
+            ),
+            data=data
+        ),
+        'raw'
+    )
+
+    print(f'Uploaded rawdata {len(data)} old issues to {stage} S3 bucket')
+
+    df = pd.DataFrame.from_records(data)
+    table_names = ['jira_issue_created', 'jira_issue_updated']
+    for table_name in table_names:
+        df.to_parquet(f'structured/{table_name}',
+                      engine='fastparquet',
+                      compression='gzip',
+                      index=False,
+                      partition_cols=['issue_status'],
+                      file_scheme='hive',
+                      mkdirs=lambda x: None,  # noop
+                      open_with=s3.fs.open,
+                      append=s3.fs.exists(f'structured/{table_name}/_metadata'))
+
+    print(f'{", ".join(table_names)} tables updated with new parquet data')
 
 
 def setup(stage: str):
