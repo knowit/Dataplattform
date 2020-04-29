@@ -3,6 +3,12 @@ from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 from datetime import datetime
 from json import loads
+from typing import Dict, AnyStr
+import pandas as pd
+from dataclasses import dataclass
+from itertools import groupby
+from dateutil.parser import isoparse
+
 
 handler = Handler()
 
@@ -16,37 +22,39 @@ def validate(event) -> bool:
 
 @handler.ingest()
 def ingest(event) -> Data:
-    item = loads(event['body'])['issue']
+    body = loads(event['body'])
+    event_type, item = body['event'], body['issue']
+
+    @dataclass
+    class JiraMetadata(Metadata):
+        event_type: AnyStr
 
     return Data(
-        metadata=Metadata(
-            timestamp=datetime.now().timestamp()
+        metadata=JiraMetadata(
+            timestamp=datetime.now().timestamp(),
+            event_type=event_type
         ),
         data={
             'issue': item['key'],
             'customer': item['fields']['labels'][0] if len(item['fields']['labels']) > 0 else '',
             'issue_status': item['fields']['status']['name'],
-            'created': item['fields']['created'],
-            'updated': item['fields']['updated']
+            'created': int(isoparse(item['fields']['created']).timestamp()),
+            'updated': int(isoparse(item['fields']['updated']).timestamp())
         }
     )
 
 
-if __name__ == '__main__':
-    # mock event
-    handler({
-        'pathParameters': {
-            'secret': '12345'
-        },
-        'body': {
-            'issue': {
-                'key': 'TEST-1234',
-                'fields': {
-                    'created': '0000-00-00T00:00:00.000-0000',
-                    'updated': '0000-00-00T00:00:00.000-0000',
-                    'status': {'name': 'Open'},
-                    'labels': ['Test Testerson'],
-                }
-            }
-        }
-    })
+@handler.process(partitions={
+    'jira_issue_created': ['issue_status'],
+    'jira_issue_updated': ['issue_status'],
+})
+def process(data) -> Dict[str, pd.DataFrame]:
+    data = {
+        k: [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in v] for k, v in
+        groupby([d.json() for d in data], key=lambda x: x['metadata']['event_type'])
+    }
+
+    return {
+        'jira_issue_created': pd.DataFrame.from_records(data['created']) if 'created' in data else None,
+        'jira_issue_updated': pd.DataFrame.from_records(data['updated']) if 'updated' in data else None
+    }

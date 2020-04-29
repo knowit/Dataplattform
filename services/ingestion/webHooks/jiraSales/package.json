@@ -1,10 +1,10 @@
 {
-  "name": "ingest",
+  "name": "jiraSalesWebhook",
   "description": "",
   "version": "0.1.0",
   "dependencies": {},
   "devDependencies": {
-    "serverless-python-requirements": "^5.0.1",
+    "serverless-python-requirements": "knowit/serverless-python-requirements",
     "serverless-pseudo-parameters": "^2.5.0"
   }
 }

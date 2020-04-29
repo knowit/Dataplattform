@@ -15,11 +15,12 @@ def test_valid():
             'secret': 'iamsecret'
         },
         body=dumps({
+            'event': 'created',
             'issue': {
                 'key': 'TEST-1234',
                 'fields': {
-                    'created': '0000-00-00T00:00:00.000-0000',
-                    'updated': '0000-00-00T00:00:00.000-0000',
+                    'created': '2020-01-01T00:00:00.000-0000',
+                    'updated': '2020-01-01T00:00:00.000-0000',
                     'status': {'name': 'Open'},
                     'labels': ['Test Testerson'],
                 }
@@ -36,11 +37,12 @@ def test_insert_data(s3_bucket):
             'secret': 'iamsecret'
         },
         body=dumps({
+            'event': 'created',
             'issue': {
                 'key': 'TEST-1234',
                 'fields': {
-                    'created': '0000-00-00T00:00:00.000-0000',
-                    'updated': '0000-00-00T00:00:00.000-0000',
+                    'created': '2020-01-01T00:00:00.000-0000',
+                    'updated': '2020-01-01T00:00:00.000-0000',
                     'status': {'name': 'Open'},
                     'labels': ['Test Testerson'],
                 }
