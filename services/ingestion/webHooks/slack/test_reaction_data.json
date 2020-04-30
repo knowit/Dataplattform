@@ -1,0 +1,24 @@
+{
+    "token": "XXYYZZ",
+    "team_id": "TXXXXXXXX",
+    "api_app_id": "AXXXXXXXXX",
+    "event": {
+        "type": "reaction_added",
+        "user": "U024BE7LH",
+        "reaction": "thumbsup",
+        "item_user": "U0G9QF9C6",
+        "item": {
+            "type": "message",
+            "channel": "C0G9QF9GZ",
+            "ts": "1360782400.498405"
+        },
+        "event_ts": "1360782804.083113"
+    },
+    "type": "event_callback",
+    "authed_users": [
+        "UXXXXXXX1",
+        "UXXXXXXX2"
+    ],
+    "event_id": "Ev08MFMKH6",
+    "event_time": 1234567890
+}

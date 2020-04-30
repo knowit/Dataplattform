@@ -1,2 +1,4 @@
+file:../../../../packages/common
 emojis
 requests
+pandas
