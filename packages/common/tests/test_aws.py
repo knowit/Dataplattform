@@ -59,6 +59,28 @@ def test_ssm_get_paramenter(ssm_client):
     assert ssm.get('param') == 'hello world'
 
 
+def test_ssm_get_list_1_paramenter(ssm_client):
+    ssm_client.put_parameter(
+        Name='/test/param',
+        Value='hello world',
+        Type='StringList',
+        Tier='Standard')
+
+    ssm = aws.SSM(path='/test')
+    assert ssm.get('param') == ['hello world']
+
+
+def test_ssm_get_list_2_paramenter(ssm_client):
+    ssm_client.put_parameter(
+        Name='/test/param',
+        Value='hello,world',
+        Type='StringList',
+        Tier='Standard')
+
+    ssm = aws.SSM(path='/test')
+    assert ssm.get('param') == ['hello', 'world']
+
+
 def test_s3_get_data(s3_bucket):
     s3_bucket.Object('/data/test.txt').put(Body='test'.encode('utf-8'))
 
