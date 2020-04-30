@@ -5,7 +5,6 @@ custom:
   editable:
     timeout: 12
     handlerFile: jira_webhook
-    databaseName: jira_sales
     description: Endpoint for Jira webhooks
     accessLevel: level-2
     dataFolder: jira/sales

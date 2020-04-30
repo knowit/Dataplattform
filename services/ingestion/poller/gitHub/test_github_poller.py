@@ -2,7 +2,8 @@ from github_poller import handler, url
 from pytest import fixture
 from json import loads, load
 from responses import RequestsMock, GET
-
+import pandas as pd
+from pandas.testing import assert_series_equal
 from os import path
 
 
@@ -19,8 +20,8 @@ def test_data():
 
 
 def test_handler_follow_links(s3_bucket, mocked_responses, test_data):
-    some_github_data = test_data[0]
-    some_extra_github_data = test_data[1]
+    some_github_data, some_extra_github_data = test_data
+
     follow_link = 'http://mock.link'
     mocked_responses.add(GET, url, json=[some_github_data], headers={'Link': f'{follow_link}; rel="next"'}, status=200)
     mocked_responses.add(GET, follow_link, json=[some_extra_github_data], status=200)
@@ -34,8 +35,7 @@ def test_handler_follow_links(s3_bucket, mocked_responses, test_data):
 
 
 def test_handler_data_content(s3_bucket, mocked_responses, test_data):
-    some_github_data = test_data
-    mocked_responses.add(GET, url, json=some_github_data, status=200)
+    mocked_responses.add(GET, url, json=test_data, status=200)
 
     handler(None, None)
 
@@ -58,3 +58,33 @@ def test_handler_data_content(s3_bucket, mocked_responses, test_data):
         "default_branch": "master",
     }
     assert all([data['data'][0][k] == v for k, v in expected.items()])
+
+
+def test_process_data(mocker, mocked_responses, test_data):
+    mocked_responses.add(GET, url, json=test_data, status=200)
+
+    def on_to_parquet(df, *a, **kwa):
+        assert_series_equal(
+            df.id,
+            pd.Series([4672898, 4730463], index=[0, 1]),
+            check_names=False)
+
+    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+    handler(None, None)
+
+
+def test_process_data_skip_existing(mocker, athena, mocked_responses, test_data):
+    mocked_responses.add(GET, url, json=test_data, status=200)
+
+    athena.on_query(
+        'SELECT "id" FROM "github_knowit_repos"',
+        pd.DataFrame({'id': [4672898]}))
+
+    def on_to_parquet(df, *a, **kwa):
+        assert_series_equal(
+            df.id,
+            pd.Series([4730463], index=[1]),
+            check_names=False)
+
+    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+    handler(None, None)
