@@ -82,9 +82,12 @@ class SSM:
 
     def __get(self, *names):
         for name in names:
-            yield self.client.get_parameter(
+            param = self.client.get_parameter(
                 Name=path_join('/', self.path, name),
-                WithDecryption=self.with_decryption).get('Parameter', {}).get('Value', None)
+                WithDecryption=self.with_decryption).get('Parameter', {})
+            yield param.get('Value', None) \
+                if param.get('Type', '') != 'StringList' \
+                else param.get('Value', None).split(',')
 
 
 def path_join(*paths):
