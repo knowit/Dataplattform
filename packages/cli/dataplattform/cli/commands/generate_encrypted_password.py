@@ -1,5 +1,6 @@
 import boto3
-from add_secret_to_ssm import interactive
+from dataplattform.cli.commands.add_ssm import interactive
+from argparse import ArgumentParser, Namespace
 
 
 def generatePassword(length):
@@ -21,11 +22,10 @@ def generatePassword(length):
     return finalName
 
 
-def main():
+def init(parser: ArgumentParser):
+    pass
 
+
+def run(args: Namespace, _):
     name = generatePassword(64)
     print("Final name: " + name)
-
-
-if __name__ == "__main__":
-    main()

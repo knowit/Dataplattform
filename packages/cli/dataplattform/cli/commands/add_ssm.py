@@ -1,5 +1,5 @@
+from argparse import ArgumentParser, Namespace
 import boto3
-from argparse import ArgumentParser
 
 
 def interactive(value=None, type_=None):
@@ -54,8 +54,7 @@ def add_parameter(stage, service, name, value, type_, description, overwrite, ta
     return finalName
 
 
-def main():
-    parser = ArgumentParser('')
+def init(parser: ArgumentParser):
     parser.add_argument('-i --interactive', default=False, dest='interactive', action='store_true')
 
     parser.add_argument('-e', '--stage', default='dev', choices=['dev', 'test', 'prod'])
@@ -66,8 +65,8 @@ def main():
     parser.add_argument('-d', '--desc', default='')
     parser.add_argument('--overwrite', default=False, action='store_true')
 
-    args = parser.parse_args()
 
+def run(args: Namespace, parser: ArgumentParser):
     if args.interactive:
         response = interactive()
     else:
@@ -88,7 +87,3 @@ def main():
             }])
 
     print(f"Final name: {response}")
-
-
-if __name__ == "__main__":
-    main()

@@ -5,6 +5,12 @@ from json import loads
 import boto3
 
 
+def cloudformation_exports(client=None):
+    client = client or boto3.client('cloudformation')
+    exports = client.list_exports()['Exports']
+    return {x['Name']: x['Value'] for x in exports}
+
+
 def find_file(filename):
     if Path(os.path.join(os.path.dirname(__file__), filename)).exists():
         return os.path.join(os.path.dirname(__file__), filename)
@@ -16,7 +22,7 @@ def find_file(filename):
 
 def load_serverless_config(path, serverless_cli=None, serverless_file=None):
     serverless_cli = serverless_cli or 'serverless'
-    serverless_file = serverless_file or os.path.relpath(find_file('serverless.yml'), os.getcwd())
+    serverless_file = os.path.relpath(serverless_file or find_file('serverless.yml'))
 
     p = run([
         serverless_cli, 'print', '--path', path, '--format', 'json', '--config', serverless_file],
@@ -31,8 +37,7 @@ def serverless_environment(serverless_cli=None, serverless_file=None, serverless
         serverless_cli=serverless_cli,
         serverless_file=serverless_file)
 
-    exports = boto3.client('cloudformation').list_exports()['Exports']
-    exports = {x['Name']: x['Value'] for x in exports}
+    exports = cloudformation_exports()
 
     def resolve_imports(value):
         if 'Fn::ImportValue' not in value:

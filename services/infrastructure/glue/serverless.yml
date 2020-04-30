@@ -17,27 +17,6 @@ resources:
         CatalogId: !Ref AWS::AccountId
         DatabaseInput: 
           Name:  ${self:custom.stage}_level_1_database
-    Level1GlueCrawler:
-      Type: AWS::Glue::Crawler
-      Properties:
-        DatabaseName: ${self:custom.stage}_level_1_database
-        Name: ${self:custom.stage}_level_1_crawler
-        Role: !GetAtt Level1GlueAccess.Arn
-        Schedule: 
-          ScheduleExpression: cron(0 0 * * ? *) 
-        SchemaChangePolicy: 
-          DeleteBehavior: DEPRECATE_IN_DATABASE
-          UpdateBehavior: UPDATE_IN_DATABASE 
-        Targets: 
-          S3Targets:
-            - Exclusions: 
-                - '*_metadata'
-              Path: 
-                Fn::Join:
-                  - "" 
-                  - - s3://
-                    - !ImportValue ${self:custom.stage}-datalakeName
-                    - /data/level-1/yr/structured/yr_weather/
     Level1GlueAccess:
       Type: AWS::IAM::Role
       Properties:
@@ -74,43 +53,6 @@ resources:
         CatalogId: !Ref AWS::AccountId
         DatabaseInput: 
           Name:  ${self:custom.stage}_level_2_database 
-    Level2GlueCrawler:
-      Type: AWS::Glue::Crawler
-      Properties:
-        DatabaseName: ${self:custom.stage}_level_2_database
-        Name: ${self:custom.stage}_level_2_crawler
-        Role: !GetAtt Level2GlueAccess.Arn
-        Schedule: 
-          ScheduleExpression: cron(0 0 * * ? *) 
-        SchemaChangePolicy: 
-          DeleteBehavior: DEPRECATE_IN_DATABASE
-          UpdateBehavior: UPDATE_IN_DATABASE 
-        Targets: 
-          S3Targets:
-            - Exclusions: 
-                - '*_metadata'
-              Path: 
-                Fn::Join:
-                  - "" 
-                  - - s3://
-                    - !ImportValue ${self:custom.stage}-datalakeName
-                    - /data/level-2/github/repos/structured/github_knowit_repo_status/
-            - Exclusions: 
-                - '*_metadata'
-              Path: 
-                Fn::Join:
-                  - "" 
-                  - - s3://
-                    - !ImportValue ${self:custom.stage}-datalakeName
-                    - /data/level-2/github/repos/structured/github_knowit_repos/
-            - Exclusions: 
-                - '*_metadata'
-              Path: 
-                Fn::Join:
-                  - "" 
-                  - - s3://
-                    - !ImportValue ${self:custom.stage}-datalakeName
-                    - /data/level-2/ubw/fagtime/structured/ubw_fagtimer/
     Level2GlueAccess:
       Type: AWS::IAM::Role
       Properties:
@@ -141,5 +83,51 @@ resources:
                         - /data/level-2*
 
     # Level 3
-    # ..           
+    Leve3GlueDatabase:
+      Type: AWS::Glue::Database
+      Properties: 
+        CatalogId: !Ref AWS::AccountId
+        DatabaseInput: 
+          Name:  ${self:custom.stage}_level_3_database 
+    Level3GlueAccess:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-level-3-glue-access
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - glue.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-DatalakeRead-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListObjects
+                    - s3:GetObject
+                  Resource:
+                    - Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /data/level-3*
+
   Outputs:
+    Level1GlueAccessOutput:
+      Value: !GetAtt Level1GlueAccess.Arn
+      Export:
+        Name: ${self:custom.stage}-level-1-glue-access
+    Level2GlueAccessOutput:
+      Value: !GetAtt Level2GlueAccess.Arn
+      Export:
+        Name: ${self:custom.stage}-level-2-glue-access
+    Level3GlueAccessOutput:
+      Value: !GetAtt Level3GlueAccess.Arn
+      Export:
+        Name: ${self:custom.stage}-level-3-glue-access

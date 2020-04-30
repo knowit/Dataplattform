@@ -10,7 +10,7 @@ def init(parser: ArgumentParser):
     parser.add_argument('-e', '--event', dest='event', default='{}')
 
 
-def run(args: Namespace):
+def run(args: Namespace, _):
     config = load_serverless_config('functions')
     handler = next(iter(config.values()))['handler']
     handler_file, handler_func = handler.split('.')
