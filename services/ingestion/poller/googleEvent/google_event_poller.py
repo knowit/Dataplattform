@@ -60,9 +60,6 @@ def ingest(event) -> Data:
         return service
 
     def get_event_list_in_interval(service, startDate, endDate, calendar_id):
-
-        print('getting events from service: ',)
-
         events_result = service.events().list(
             calendarId=calendar_id).execute()
         events = events_result.get('items', [])
@@ -72,6 +69,7 @@ def ingest(event) -> Data:
 
         temp = event.get('location', '').split(',')
         boxes = [box.split('-')[-1] for box in temp if 'Enheter' in box]
+        creator_name = dict(event.get('creator', '')).get('email', '')
 
         event_info = {
                 'event_id': event['id'],
@@ -80,7 +78,7 @@ def ingest(event) -> Data:
                 'timestamp_to': get_time_from_event_time(event['end']),
                 'event_summary': event.get('summary', ''),
                 'event_button_names': boxes,
-                'creator': event.get(event['creator'].get('displayName', ''), ''),
+                'creator': creator_name,
             }
         return event_info
 
