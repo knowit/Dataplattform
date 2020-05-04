@@ -3,13 +3,35 @@ from dataplattform.testing.events import APIGateway
 from json import loads, dumps
 from hmac import new
 from hashlib import sha256
+from os import path
+from pytest import fixture
+from responses import RequestsMock, GET
+import pandas as pd
+from pandas.testing import assert_frame_equal
+
+
+@fixture
+def mocked_responses():
+    with RequestsMock() as reqs:
+        yield reqs
+
+
+@fixture
+def test_reaction_data():
+    with open(path.join(path.dirname(__file__), 'test_reaction_data.json'), 'r') as json_file:
+        yield json_file.read()
+
+
+@fixture
+def test_message_data():
+    with open(path.join(path.dirname(__file__), 'test_message_data.json'), 'r') as json_file:
+        yield json_file.read()
 
 
 def test_invalid_no_signature():
     res = handler(APIGateway().to_dict(), None)
 
-    assert res['statusCode'] == 403 and\
-        loads(res['body'])['reason'] == 'No signature'
+    assert res['statusCode'] == 403
 
 
 def test_invalid_bogus_signature():
@@ -18,8 +40,7 @@ def test_invalid_bogus_signature():
         'X-Slack-Request-Timestamp': '0'
         }).to_dict(), None)
 
-    assert res['statusCode'] == 403 and\
-        loads(res['body'])['reason'] == 'Invalid signature'
+    assert res['statusCode'] == 403
 
 
 def test_valid_signature():
@@ -37,27 +58,66 @@ def test_valid_signature():
     assert res['statusCode'] == 200
 
 
-def test_insert_data(s3_bucket, mocker):
-    mocker.patch('filter.get_channel_name', return_value='test')
+def test_insert_reaction_data(s3_bucket, mocked_responses, test_reaction_data):
+    sig_string = f'v0:0:{test_reaction_data}'.encode()
+    signature = new('iamsecret'.encode(), sig_string, sha256).hexdigest()
 
-    data = dumps({
-        'type': '',
-        'event': {
-            'type': '',
-            'channel': 'CSomething'
-            }
-        })
+    mocked_responses.add(GET, 'https://slack.com/api/channels.info', json={'channel': {'name': 'Test'}}, status=200)
 
-    sig_string = f'v0:0:{data}'.encode()
+    handler(APIGateway(headers={
+        'X-Slack-Signature': f'v0={signature}',
+        'X-Slack-Request-Timestamp': '0'
+        },
+        body=test_reaction_data).to_dict(), None)
+
+    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
+    data = loads(response['Body'].read())
+
+    assert data['data'][0]['emoji'] == 'thumbsup' and \
+        data['data'][0]['event_type'] == 'reaction_added'
+
+
+def test_insert_message_data(s3_bucket, mocked_responses, test_message_data):
+    sig_string = f'v0:0:{test_message_data}'.encode()
+    signature = new('iamsecret'.encode(), sig_string, sha256).hexdigest()
+
+    mocked_responses.add(GET, 'https://slack.com/api/channels.info', json={'channel': {'name': 'Test'}}, status=200)
+
+    handler(APIGateway(headers={
+        'X-Slack-Signature': f'v0={signature}',
+        'X-Slack-Request-Timestamp': '0'
+        },
+        body=test_message_data).to_dict(), None)
+
+    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
+    data = loads(response['Body'].read())
+
+    assert data['data'][0]['emoji'] == 'thumbsup' and \
+        data['data'][0]['event_type'] == 'message'
+
+
+def test_process_data(mocker, mocked_responses, test_message_data):
+    def on_to_parquet(df, *a, **kwa):
+        print(df)
+        assert_frame_equal(
+            df.drop('time', axis=1),
+            pd.DataFrame({
+                'event_type': ['message'],
+                'channel': ['C2147483705'],
+                'channel_name': ['Test'],
+                'event_ts': [1234567890],
+                'team_id': ['TXXXXXXXX'],
+                'emoji': ['thumbsup'],
+            }))
+
+    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+    mocked_responses.add(GET, 'https://slack.com/api/channels.info', json={'channel': {'name': 'Test'}}, status=200)
+
+    sig_string = f'v0:0:{test_message_data}'.encode()
     signature = new('iamsecret'.encode(), sig_string, sha256).hexdigest()
 
     handler(APIGateway(headers={
         'X-Slack-Signature': f'v0={signature}',
         'X-Slack-Request-Timestamp': '0'
         },
-        body=data).to_dict(), None)
-
-    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
-    data = loads(response['Body'].read())
-
-    assert data['data']['event']['channel'] == 'CSomething'
+        body=test_message_data).to_dict(), None)

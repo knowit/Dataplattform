@@ -3,7 +3,7 @@ service: slackWebhook
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 6
+    timeout: 12
     handlerFile: slack_webhook
     description: Endpoint for slack webhooks
     accessLevel: level-2
@@ -13,6 +13,18 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service} #this service definition includes stage
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+  pythonRequirements:
+    dockerizePip: non-linux
+    noDeploy:
+      - boto3 # Default in lambda rt
+      - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
 
 provider:
   name: aws
@@ -50,8 +62,12 @@ package:
     - "./**"
 
 functions:
-  slackIngest:
+  webhookIngest:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    layers:
+      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
@@ -63,6 +79,7 @@ functions:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
       STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
     events:
       - http:
           path: slack-webhook/
@@ -94,16 +111,17 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/dev/web-hook/slack/*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
 
-          - PolicyName: ${self:custom.stage}-DatalakeWrite-${self:service}
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
                     - s3:PutObject
-                    #- s3:ListObjects
+                    - s3:ListObjects
+                    - s3:GetObject
                   Resource:
                     - Fn::Join:
                       - "" 

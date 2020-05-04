@@ -2,10 +2,8 @@
   "name": "github-ingest",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {
-    "serverless-pseudo-parameters": "^2.5.0"
-  },
   "devDependencies": {
-    "serverless-python-requirements": "^5.1.0"
+    "serverless-python-requirements": "knowit/serverless-python-requirements",
+    "serverless-pseudo-parameters": "^2.5.0"
   }
 }
