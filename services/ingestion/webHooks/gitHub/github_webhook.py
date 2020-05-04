@@ -1,65 +1,65 @@
-import boto3
-import os
-import time
-import json
+from dataplattform.common.handler import Handler, Response
+from dataplattform.common.schema import Data, Metadata
+from dataplattform.common.aws import SSM
+from datetime import datetime
+from json import loads
+from typing import Dict, AnyStr
+import pandas as pd
+from dataclasses import dataclass
 import hmac
 import hashlib
+from dateutil.parser import isoparse
+
+handler = Handler()
 
 
-def handler(event, context):
-    body = event["body"]
+@handler.validate()
+def validate(event) -> bool:
+    def validate_signature(body, received_signature):
+        hash_type, signature = received_signature.split("=")
+        if hash_type != "sha1":
+            return False
+        shared_secret = SSM(with_decryption=True).get('github_shared_secret')
+        calculated_signature = hmac.new(shared_secret.encode(), body.encode(),
+                                        hashlib.sha1).hexdigest()
+        return hmac.compare_digest(calculated_signature, signature)
+
     headers = event["headers"]
-
     if "X-Hub-Signature" not in headers:
-        return {
-            'statusCode': 403,
-            'body': json.dumps({"reason": "No signature"})
-        }
-
-    received_signature = headers["X-Hub-Signature"]
-    if validate_payload_signature(body, received_signature):
-        data = json.loads(body)
-        if data.get('repository').get('private') is False:
-            insert_data(data, headers['X-GitHub-Event'])
-        return{
-            'statusCode': 200,
-            'body': 'Success'
-        }
-    else:
-        return{
-            'statusCode': 403,
-            'body': json.dumps({'reason': 'Invalid signature'})
-        }
-
-
-def validate_payload_signature(body, received_signature):
-    rec_sig = received_signature.split("=")
-    if rec_sig[0] != "sha1":
         return False
 
-    client = boto3.client('ssm')
-    secret = client.get_parameter(
-        Name=os.getenv('GITHUB_SECRET'),
-        WithDecryption=True)
-    shared_secret = secret['Parameter']['Value']
-
-    calculated_signature = hmac.new(shared_secret.encode(), body.encode(),
-                                    hashlib.sha1).hexdigest()
-    return hmac.compare_digest(calculated_signature, rec_sig[1])
+    return validate_signature(event["body"], headers["X-Hub-Signature"])
 
 
-def insert_data(data, event):
+@handler.ingest()
+def ingest(event) -> Data:
+    item = loads(event["body"])
+    repo = item.get('repository', None)
+    if repo is None:
+        return Response()
 
-    data = {
-        'metadata': {
-            'timestamp': time.time(),
-            'event': event
-        },
-        'data': data
+    @dataclass
+    class GithubMetadata(Metadata):
+        event: AnyStr
+
+    return Data(
+        metadata=GithubMetadata(
+            timestamp=datetime.now().timestamp(),
+            event=event['headers']['X-GitHub-Event']
+        ),
+        data={
+            'id': repo['id'],
+            'updated_at': int(isoparse(repo['updated_at']).timestamp()),
+            'pushed_at': int(isoparse(repo['pushed_at']).timestamp()),
+            'forks_count': repo['forks_count'],
+            'stargazers_count': repo['stargazers_count']
+        }
+    )
+
+
+@handler.process(partitions={})
+def process(data) -> Dict[str, pd.DataFrame]:
+    records = [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in [d.json() for d in data]]
+    return {
+        'github_knowit_repo_status': pd.DataFrame.from_records(records)
     }
-
-    path = os.getenv("ACCESS_PATH")
-
-    s3 = boto3.resource('s3')
-    s3_object = s3.Object(os.getenv('DATALAKE'), f'{path}{event}/{str(int(time.time()))}.json')
-    s3_object.put(Body=(bytes(json.dumps(data).encode('UTF-8'))))

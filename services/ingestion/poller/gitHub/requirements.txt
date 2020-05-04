@@ -1,2 +1,3 @@
 requests
-../../../../packages/common
+file:../../../../packages/common
+file:../../../../packages/query
