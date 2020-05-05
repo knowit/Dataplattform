@@ -30,13 +30,15 @@ class S3:
         self.s3 = boto3.resource('s3')
 
     def put(self, data: Data, path: str = ''):
-        key = path_join(self.access_path, path, f'{int(data.metadata.timestamp)}.json')
+        key = path_join(self.access_path, path,
+                        f'{int(data.metadata.timestamp)}.json')
         s3_object = self.s3.Object(self.bucket, key)
         s3_object.put(Body=data.to_json().encode('utf-8'))
         return key
 
     def get(self, key, catch_client_error=True) -> S3Result:
-        key = path_join(self.access_path, key) if not key.startswith(self.access_path) else key
+        key = path_join(self.access_path, key) if not key.startswith(
+            self.access_path) else key
         try:
             res = self.s3.Object(self.bucket, key).get()
             return S3Result(res)
@@ -50,27 +52,37 @@ class S3:
         if 'fs_cache' in self.__dict__:
             return self.fs_cache
 
-        s3 = S3FileSystem(anon=False)
-
         def get_key(k):
-            return path_join(self.bucket, path_join(self.access_path, k) if not k.startswith(self.access_path) else k)
+            full_access_path = path_join(self.bucket, self.access_path)
 
-        class S3FSWrapper:
-            @staticmethod
-            def open(path, *args, **kwargs):
-                return s3.open(get_key(path), *args, **kwargs)
+            if k.startswith(full_access_path):
+                return k
+            elif k.startswith(self.access_path):
+                return path_join(self.bucket, k)
+            else:
+                return path_join(full_access_path, k)
 
-            @staticmethod
-            def exists(path):
-                return s3.exists(get_key(path))
+        class S3FileSystemProxy(S3FileSystem):
+            def open(self, path, *args, **kwargs):
+                return S3FileSystem.open(self, get_key(path), *args, **kwargs)
 
-        self.fs_cache = S3FSWrapper()
+            def exists(self, path):
+                return S3FileSystem.exists(self, get_key(path))
+
+            def ls(self, path, **kwargs):
+                return S3FileSystem.ls(self, get_key(path), **kwargs)
+
+            def isdir(self, path):
+                return S3FileSystem.isdir(self, get_key(path))
+
+        self.fs_cache = S3FileSystemProxy(anon=False)
         return self.fs_cache
 
 
 class SSM:
     def __init__(self, with_decryption: bool = False, path: str = None):
-        self.path = path or path_join('/', environ.get("STAGE"), environ.get("SERVICE"))
+        self.path = path or path_join(
+            '/', environ.get("STAGE"), environ.get("SERVICE"))
         self.with_decryption = with_decryption
         self.client = boto3.client('ssm')
 

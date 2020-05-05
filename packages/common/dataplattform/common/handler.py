@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from dataclasses_json import dataclass_json, LetterCase
 from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3, S3Result
+from pyarrow import Table
+from pyarrow.parquet import ParquetDataset
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
@@ -53,24 +55,33 @@ class Handler:
                 return [s3.get(key) for key in keys if key]
 
             data = [S3Result(raw_data)] if raw_data else load_event_data(event)
+            partitions = self.wrapped_func_args.get('process', {}).get('partitions', {})
+
             if data:
                 tables = self.wrapped_func['process'](data)
+
                 for table_name, frame in tables.items():
                     if frame is None:
                         continue
 
                     assert frame is not None and callable(frame.to_parquet),\
                         'Process must return a DataFrame with a to_parquet method'
-                    partitions = self.wrapped_func_args['process'].get('partitions', {})
+
+                    if s3.fs.exists(f'structured/{table_name}'):
+                        ds = ParquetDataset(f'structured/{table_name}', filesystem=s3.fs)
+                        schema = ds.schema.to_arrow_schema()
+                        parts = ds.partitions
+                        print(list(parts.partition_names))
+                        new_schema = Table.from_pandas(frame).schema
+                        assert schema.equals(new_schema),\
+                            f'Old schema:\n{schema}\nis different form new schema:\n{new_schema}'
+
                     frame.to_parquet(f'structured/{table_name}',
-                                     engine='fastparquet',
-                                     compression='gzip',
+                                     engine='pyarrow',
+                                     compression='GZIP',
                                      index=False,
                                      partition_cols=partitions.get(table_name, []),
-                                     file_scheme='hive',
-                                     mkdirs=lambda x: None,  # noop
-                                     open_with=s3.fs.open,
-                                     append=s3.fs.exists(f'structured/{table_name}/_metadata'))
+                                     filesystem=s3.fs)
 
         return Response().to_dict()
 

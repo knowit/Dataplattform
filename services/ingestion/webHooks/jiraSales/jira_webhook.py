@@ -27,7 +27,7 @@ def ingest(event) -> Data:
 
     @dataclass
     class JiraMetadata(Metadata):
-        event_type: AnyStr
+        event_type: AnyStr = ''
 
     return Data(
         metadata=JiraMetadata(
