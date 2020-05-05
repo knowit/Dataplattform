@@ -1,6 +1,7 @@
 from dataplattform.common.handler import Handler
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
+from botocore.exceptions import ClientError
 
 import googleapiclient.discovery
 import httplib2
@@ -20,32 +21,38 @@ def ingest(event) -> Data:
     def get_event_data():
         credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=True).get('credentials', 'calendarIds')
         calendar_ids_from_ssm = calendar_ids_from_ssm.split(',')
-        print('credentials', credentials_from_ssm)
-        events = {}
+        service = get_calender_service(credentials_from_ssm)
+
+        events = []
+
         for calendar_id in calendar_ids_from_ssm:
-            events.update(get_events_from_calendar(credentials_from_ssm, calendar_id))
+            for event in get_events_from_calendar(service, calendar_id):
+                events.append(event)
         return events
 
-    def get_events_from_calendar(credentials_from_env, calendar_id):
+    def get_events_from_calendar(service, calendar_id):
         """
-        :param creds: credentials
-        :param calendar_id:
-        :return: A dictionary containing the latest events (use a refresh token?)
-        specific calendar_id.
+        :param service: google calendar
+        :param calendar_id: unique calendar id
+        :return: A dictionary containing the latest events from a specific calendar_id.
         """
-        service = get_calender_service(credentials_from_env)
 
-        # TODO: Use utcoffset her instead of +02:00?
-        now = datetime.utcnow().isoformat() + '+02:00'
-        yesterday = datetime.utcfromtimestamp(datetime.now().timestamp() - (60 * 60 * 25)).isoformat() + '+02:00'
+        sync_token_ssm_name = 'sync_token_' + calendar_id
 
-        events = get_event_list_in_interval(service, yesterday, now, calendar_id)
-        info = {}
+        try:
+            sync_token = SSM(with_decryption=True).get(sync_token_ssm_name)
+        except ClientError as e:
+            if e.response['Error']['Code'] == 'ParameterNotFound':
+                sync_token = ''
+            else:
+                raise e
 
-        for event in events:
-            info[event['id']] = get_event_info(event, calendar_id)
-
-        return info
+        events, new_sync_token = sync_events(service, calendar_id, sync_token)
+        SSM(with_decryption=True).put(name=sync_token_ssm_name,
+                                      value='',
+                                      value_type='String',
+                                      overwrite=True)
+        return events
 
     def get_calender_service(credentials_from_env):
         credsentials_json = json.loads(credentials_from_env)
@@ -59,12 +66,43 @@ def ingest(event) -> Data:
 
         return service
 
-    def get_event_list_in_interval(service, startDate, endDate, calendar_id):
-        events_result = service.events().list(
-            calendarId=calendar_id).execute()
-        events = events_result.get('items', [])
-        return events
+    def sync_events(service, calendar_id, sync_token):
 
+        request_params = {'calenderId': calendar_id,
+                          'timeZone': 'UTC+0:00',
+                          'singleEvents': True,
+                          'orderBy': 'startTime'}
+        if not sync_token:
+            request_params['timeMin'] = '2020-05-01T00:00:00+00:00'  # TODO: Which date should we start syncing from?
+
+        page_token = ''
+        new_sync_token = ''
+        events_for_current_calender = []
+
+        current_request = service.events().list(
+                syncToken=sync_token,
+                **request_params)
+
+
+        while True or current_request is not None:
+
+            current_page = service.events().list(
+                syncToken=sync_token,
+                **request_params).execute()
+            
+
+            tmp_events = current_page.get('items', [])
+            for event in tmp_events:
+                events_for_current_calender.append(get_event_info(event, calendar_id))
+
+            page_token = current_page.get('nextPageToken', '')
+            new_sync_token = current_page.get('nextSyncToken', '')
+
+            if page_token == '':
+                break
+        return events_for_current_calender, new_sync_token
+
+    # TODO: Check exception safety, can raise?
     def get_event_info(event, calendar_id):
 
         temp = event.get('location', '').split(',')
@@ -74,8 +112,8 @@ def ingest(event) -> Data:
         event_info = {
                 'event_id': event['id'],
                 'calendar_id': calendar_id,
-                'timestamp_from': get_time_from_event_time(event['start']),
-                'timestamp_to': get_time_from_event_time(event['end']),
+                'timestamp_from': get_time_from_event_time(event.get('start', '')),
+                'timestamp_to': get_time_from_event_time(event.get('end', '')),
                 'event_summary': event.get('summary', ''),
                 'event_button_names': boxes,
                 'creator': creator_name,
@@ -85,12 +123,12 @@ def ingest(event) -> Data:
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=get_event_data())
 
 
-@handler.process(partitions={})  # TODO: Replace with {} after rebase
+@handler.process(partitions={})
 def process(data) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
         metadata, payload = d['metadata'], d['data']
-        df = pd.json_normalize(payload.values())
+        df = pd.json_normalize(payload)
         df['time'] = int(metadata['timestamp'])
         return df
 
@@ -101,17 +139,17 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
 
 def get_time_from_event_time(start_or_end_time):
-    if "dateTime" in start_or_end_time:
-        new_time = get_timestamp(start_or_end_time['dateTime'])
+    if 'dateTime' in start_or_end_time:
+        return get_timestamp(start_or_end_time['dateTime'])
+    elif 'date' in start_or_end_time:
+        return get_datetime_from_date(start_or_end_time).timestamp()
     else:
-        new_time = get_datetime_from_date(start_or_end_time).timestamp()
-    return new_time
+        return None
 
 
 def get_datetime_from_date(start_or_end_date):
     timeObject = list(map(int, start_or_end_date['date'].split("-")))
-    new_time = datetime.timestamp(
-        datetime(timeObject[0], timeObject[1], timeObject[2]))
+    new_time = datetime(timeObject[0], timeObject[1], timeObject[2])
     return new_time
 
 

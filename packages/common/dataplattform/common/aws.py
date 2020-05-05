@@ -89,6 +89,14 @@ class SSM:
                 if param.get('Type', '') != 'StringList' \
                 else param.get('Value', None).split(',')
 
+    def put(self, name, value, value_type, overwrite=True):
+        self.client.put_parameter(
+            Name=path_join('/', self.path, name),
+            Value=value,
+            Type=value_type,
+            Overwrite=overwrite
+            )
+
 
 def path_join(*paths):
     return path.join(*paths).replace(sep, '/')
