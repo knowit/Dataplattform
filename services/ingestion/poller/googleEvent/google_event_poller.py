@@ -19,7 +19,7 @@ handler = Handler()
 def ingest(event) -> Data:
 
     def get_event_data():
-        credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=True).get('credentials', 'calendarIds')
+        credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=False).get('credentials', 'calendarIds')
         calendar_ids_from_ssm = calendar_ids_from_ssm.split(',')
         service = get_calender_service(credentials_from_ssm)
 
@@ -37,10 +37,10 @@ def ingest(event) -> Data:
         :return: A dictionary containing the latest events from a specific calendar_id.
         """
 
-        sync_token_ssm_name = 'sync_token_' + calendar_id
-
+        sync_token_ssm_name = ('sync_token_' + calendar_id).replace('@', '-', 1)
+        print('sync_token_name:', sync_token_ssm_name)
         try:
-            sync_token = SSM(with_decryption=True).get(sync_token_ssm_name)
+            sync_token = SSM(with_decryption=False).get(sync_token_ssm_name)
         except ClientError as e:
             if e.response['Error']['Code'] == 'ParameterNotFound':
                 sync_token = ''
@@ -68,38 +68,29 @@ def ingest(event) -> Data:
 
     def sync_events(service, calendar_id, sync_token):
 
-        request_params = {'calenderId': calendar_id,
+        request_params = {'calendarId': calendar_id,
                           'timeZone': 'UTC+0:00',
                           'singleEvents': True,
                           'orderBy': 'startTime'}
         if not sync_token:
             request_params['timeMin'] = '2020-05-01T00:00:00+00:00'  # TODO: Which date should we start syncing from?
+        else:
+            request_params['syncToken'] = sync_token
 
-        page_token = ''
         new_sync_token = ''
         events_for_current_calender = []
 
-        current_request = service.events().list(
-                syncToken=sync_token,
-                **request_params)
+        current_request = service.events().list(**request_params)
 
-
-        while True or current_request is not None:
-
-            current_page = service.events().list(
-                syncToken=sync_token,
-                **request_params).execute()
-            
-
+        while current_request is not None:
+            current_page = current_request.execute()
             tmp_events = current_page.get('items', [])
             for event in tmp_events:
                 events_for_current_calender.append(get_event_info(event, calendar_id))
 
-            page_token = current_page.get('nextPageToken', '')
             new_sync_token = current_page.get('nextSyncToken', '')
+            current_request = service.events().list_next(current_request, current_page)
 
-            if page_token == '':
-                break
         return events_for_current_calender, new_sync_token
 
     # TODO: Check exception safety, can raise?
@@ -140,7 +131,7 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
 def get_time_from_event_time(start_or_end_time):
     if 'dateTime' in start_or_end_time:
-        return get_timestamp(start_or_end_time['dateTime'])
+        return start_or_end_time['dateTime']
     elif 'date' in start_or_end_time:
         return get_datetime_from_date(start_or_end_time).timestamp()
     else:
