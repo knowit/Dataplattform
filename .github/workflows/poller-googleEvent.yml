@@ -8,6 +8,8 @@ on:
   pull_request:
     paths:
       - 'services/ingestion/poller/googleEvent/**'
+      - 'packages/common/**'
+
 
 
 jobs:
