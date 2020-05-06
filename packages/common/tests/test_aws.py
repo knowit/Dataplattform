@@ -81,6 +81,29 @@ def test_ssm_get_list_2_paramenter(ssm_client):
     assert ssm.get('param') == ['hello', 'world']
 
 
+def test_SSM_put():
+    ssm = aws.SSM()
+    ssm.put(name='/test/param',
+            value='hello world',
+            value_type='String')
+    ssm = aws.SSM(path='/test')
+    assert ssm.get('param') == 'hello world'
+
+
+def test_SSM_put_overwrite_true():
+    ssm = aws.SSM()
+    ssm.put(name='/test/param',
+            value='hello world',
+            value_type='String')
+    ssm = aws.SSM(path='/test')
+    assert ssm.get('param') == 'hello world'
+    ssm.put(name='param',
+            value='hello new world',
+            value_type='String',
+            overwrite=True)
+    assert ssm.get('param') == 'hello new world'
+
+
 def test_s3_get_data(s3_bucket):
     s3_bucket.Object('/data/test.txt').put(Body='test'.encode('utf-8'))
 
