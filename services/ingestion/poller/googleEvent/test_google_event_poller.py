@@ -14,6 +14,8 @@ def events_list_mock(mocker):
     events_list_mock = mocker.MagicMock()
 
     events_mock.list.return_value = events_list_mock
+    events_mock.list_next.return_value = None
+    
     service_mock.events.return_value = events_mock
     mock_service_builder.return_value = service_mock
 
@@ -24,7 +26,6 @@ def events_list_mock(mocker):
 
 
 def test_handler_write(s3_bucket, events_list_mock):
-    
     events_list_mock({
         'items': [{
             'id': '1234',
