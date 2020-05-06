@@ -20,7 +20,6 @@ def ingest(event) -> Data:
 
     def get_event_data():
         credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=False).get('credentials', 'calendarIds')
-        calendar_ids_from_ssm = calendar_ids_from_ssm.split(',')
         service = get_calender_service(credentials_from_ssm)
 
         all_events = []
