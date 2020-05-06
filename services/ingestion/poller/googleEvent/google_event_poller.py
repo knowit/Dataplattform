@@ -5,6 +5,7 @@ from dataplattform.common.aws import SSM
 import googleapiclient.discovery
 import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
+from botocore.exceptions import ClientError
 
 import json
 from datetime import datetime
@@ -20,13 +21,14 @@ def ingest(event) -> Data:
     def get_event_data():
         credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=False).get('credentials', 'calendarIds')
         calendar_ids_from_ssm = calendar_ids_from_ssm.split(',')
-
         service = get_calender_service(credentials_from_ssm)
 
-        events = {}
+        all_events = []
         for calendar_id in calendar_ids_from_ssm:
-            events.update(get_events_from_calendar(service, calendar_id))
-        return events
+            events_for_current_calendar = get_events_from_calendar(service, calendar_id)
+            for cal_event in events_for_current_calendar:
+                all_events.append(cal_event)
+        return all_events
 
     def get_events_from_calendar(service, calendar_id):
         """
@@ -35,18 +37,24 @@ def ingest(event) -> Data:
         :return: A dictionary containing the latest events (use a refresh token?)
         specific calendar_id.
         """
+        sync_token_ssm_name = ('sync_token_' + calendar_id).replace('@', '-', 1)
+        sync_token = None
 
-        # TODO: Use utcoffset her instead of +02:00?
-        now = datetime.utcnow().isoformat() + '+02:00'
-        yesterday = datetime.utcfromtimestamp(datetime.now().timestamp() - (60 * 60 * 25)).isoformat() + '+02:00'
+        try:
+            sync_token = SSM(with_decryption=False).get(sync_token_ssm_name)
+        except ClientError as e:
+            if (e.response['Error']['Code'] == 'ParameterNotFound'):
+                sync_token = None
+            else:
+                raise e
 
-        events = get_event_list_in_interval(service, yesterday, now, calendar_id)
-        info = {}
+        events, new_sync_token = sync_events(service, calendar_id, sync_token)
+        SSM(with_decryption=False).put(name=sync_token_ssm_name,
+                                       value=new_sync_token,
+                                       value_type='String',
+                                       overwrite=True)
 
-        for event in events:
-            info[event['id']] = get_event_info(event, calendar_id)
-
-        return info
+        return events
 
     def get_calender_service(credentials_from_env):
         credsentials_json = json.loads(credentials_from_env)
@@ -71,27 +79,23 @@ def ingest(event) -> Data:
         else:
             request_params['syncToken'] = sync_token
 
-        new_sync_token = ''
         events_for_current_calender = []
-
         current_request = service.events().list(**request_params)
 
-        while current_request is not None:
+        # TODO: Check if this is ok, should use pageToken?
+        while True:
             current_page = current_request.execute()
             tmp_events = current_page.get('items', [])
             for event in tmp_events:
                 events_for_current_calender.append(get_event_info(event, calendar_id))
 
             new_sync_token = current_page.get('nextSyncToken', '')
+            if new_sync_token != '':
+                break
+
             current_request = service.events().list_next(current_request, current_page)
 
         return events_for_current_calender, new_sync_token
-
-    def get_event_list_in_interval(service, startDate, endDate, calendar_id):
-        events_result = service.events().list(
-            calendarId=calendar_id).execute()
-        events = events_result.get('items', [])
-        return events
 
     def get_event_info(event, calendar_id):
 
@@ -110,6 +114,7 @@ def ingest(event) -> Data:
             }
         return event_info
 
+    tmp = get_event_data()
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=get_event_data())
 
 
@@ -118,7 +123,7 @@ def process(data) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
         metadata, payload = d['metadata'], d['data']
-        df = pd.json_normalize(payload.values())
+        df = pd.json_normalize(payload)
         df['time'] = int(metadata['timestamp'])
         return df
 
