@@ -86,13 +86,13 @@ class SSM:
                 Name=path_join('/', self.path, name),
                 WithDecryption=self.with_decryption).get('Parameter', {}).get('Value', None)
 
-    def put(self, name, value, value_type, overwrite=True):
+    def put(self, name, value, value_type, overwrite=False, tier='Standard'):
         self.client.put_parameter(
             Name=path_join('/', self.path, name),
             Value=value,
             Type=value_type,
-            Overwrite=overwrite
-            )
+            Overwrite=overwrite,
+            Tier=tier)
 
 
 def path_join(*paths):
