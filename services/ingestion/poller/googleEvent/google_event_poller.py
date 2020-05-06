@@ -8,7 +8,7 @@ from oauth2client.service_account import ServiceAccountCredentials
 from botocore.exceptions import ClientError
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 from typing import Dict
 
@@ -34,7 +34,7 @@ def ingest(event) -> Data:
         """
         :param creds: credentials
         :param calendar_id:
-        :return: A dictionary containing the latest events (use a refresh token?)
+        :return: A dictionary containing the latest events using the sync token
         specific calendar_id.
         """
         sync_token_ssm_name = ('sync_token_' + calendar_id).replace('@', '-', 1)
@@ -70,12 +70,13 @@ def ingest(event) -> Data:
 
     def sync_events(service, calendar_id, sync_token):
 
+        local_time = datetime.now(timezone.utc).astimezone()
+        today = local_time.isoformat()
         request_params = {'calendarId': calendar_id,
-                          'timeZone': 'UTC+0:00',
                           'singleEvents': True,
-                          'orderBy': 'startTime'}
+                          'timeMax': today}
         if not sync_token:
-            request_params['timeMin'] = '2020-05-01T00:00:00+00:00'  # TODO: Which date should we start syncing from?
+            request_params['timeMin'] = '2020-05-01T00:00:00+00:00'  # TODO: Fix to 2010-01-01T00:00:00+02:00
         else:
             request_params['syncToken'] = sync_token
 
@@ -83,16 +84,13 @@ def ingest(event) -> Data:
         current_request = service.events().list(**request_params)
 
         # TODO: Check if this is ok, should use pageToken?
-        while True:
+        while current_request is not None:
             current_page = current_request.execute()
             tmp_events = current_page.get('items', [])
             for event in tmp_events:
                 events_for_current_calender.append(get_event_info(event, calendar_id))
 
             new_sync_token = current_page.get('nextSyncToken', '')
-            if new_sync_token != '':
-                break
-
             current_request = service.events().list_next(current_request, current_page)
 
         return events_for_current_calender, new_sync_token
@@ -113,8 +111,6 @@ def ingest(event) -> Data:
                 'creator': creator_name,
             }
         return event_info
-
-    tmp = get_event_data()
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=get_event_data())
 
 
@@ -135,7 +131,7 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
 def get_time_from_event_time(start_or_end_time):
     if "dateTime" in start_or_end_time:
-        new_time = get_timestamp(start_or_end_time['dateTime'])
+        new_time = start_or_end_time['dateTime']
     else:
         new_time = get_datetime_from_date(start_or_end_time)
     return new_time
@@ -143,10 +139,4 @@ def get_time_from_event_time(start_or_end_time):
 
 def get_datetime_from_date(start_or_end_date):
     timeObject = list(map(int, start_or_end_date['date'].split("-")))
-    new_time = datetime.timestamp(
-        datetime(timeObject[0], timeObject[1], timeObject[2]))
-    return new_time
-
-
-def get_timestamp(date):
-    return datetime.fromisoformat(date).timestamp()
+    return datetime(timeObject[0], timeObject[1], timeObject[2])
