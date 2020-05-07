@@ -9,6 +9,7 @@ on:
     paths:
       - 'services/ingestion/poller/gitHub/**'
       - 'packages/common/**'
+      - 'packages/query/**'
 
 
 jobs:

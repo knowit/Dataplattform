@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from dataclasses_json import dataclass_json, LetterCase
 from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3, S3Result
+from fastparquet import ParquetFile
+from datetime import datetime
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
@@ -55,22 +57,41 @@ class Handler:
             data = [S3Result(raw_data)] if raw_data else load_event_data(event)
             if data:
                 tables = self.wrapped_func['process'](data)
+                partitions = self.wrapped_func_args.get('process', {}).get('partitions', {})
+
                 for table_name, frame in tables.items():
                     if frame is None:
                         continue
 
                     assert frame is not None and callable(frame.to_parquet),\
                         'Process must return a DataFrame with a to_parquet method'
-                    partitions = self.wrapped_func_args['process'].get('partitions', {})
+
+                    table_partitions = partitions.get(table_name, [])
+                    table_exists = s3.fs.exists(f'structured/{table_name}/_metadata')
+                    if table_exists:
+                        dataset = ParquetFile(f'structured/{table_name}', open_with=s3.fs.open)
+                        if not Handler.verify_schema(dataset, frame, table_partitions):
+                            old_files = [
+                                fn.split(f'structured/{table_name}/')[-1]
+                                for fn in s3.fs.find(f'structured/{table_name}')
+                            ]
+                            deprecation_date = datetime.now().replace(microsecond=0).isoformat()
+                            for old_file in old_files:
+                                s3.fs.copy(f'structured/{table_name}/{old_file}',
+                                           f'structured/deprecated/{deprecation_date}/{table_name}/{old_file}')
+
+                            s3.fs.rm(f'structured/{table_name}', recursive=True)
+                            table_exists = False
+
                     frame.to_parquet(f'structured/{table_name}',
                                      engine='fastparquet',
-                                     compression='gzip',
+                                     compression='GZIP',
                                      index=False,
-                                     partition_cols=partitions.get(table_name, []),
+                                     partition_cols=table_partitions,
                                      file_scheme='hive',
                                      mkdirs=lambda x: None,  # noop
                                      open_with=s3.fs.open,
-                                     append=s3.fs.exists(f'structured/{table_name}/_metadata'))
+                                     append=table_exists)
 
         return Response().to_dict()
 
@@ -92,6 +113,26 @@ class Handler:
             self.wrapped_func_args['process'] = dict(partitions=partitions)
             return self.wrapped_func['process']
         return wrap
+
+    @staticmethod
+    def verify_schema(dataset: ParquetFile, dataframe, partitions):
+        dataset_partitions = dataset.info.get('partitions', [])
+        if len(dataset_partitions) != len(partitions):
+            return False
+
+        if not all([a == b for a, b in zip(sorted(dataset_partitions), sorted(partitions))]):
+            return False
+
+        if len(dataset.columns) != len(dataframe.columns):
+            return False
+
+        if not all([a == b for a, b in zip(sorted(dataset.columns), sorted(dataframe.columns))]):
+            return False
+
+        if not all([dataset.dtypes[c] == dataframe.dtypes[c] for c in dataset.columns]):
+            return False
+
+        return True
 
     @staticmethod
     def __wrapper_func(f, *return_type):
