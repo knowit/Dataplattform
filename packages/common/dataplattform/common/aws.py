@@ -50,21 +50,42 @@ class S3:
         if 'fs_cache' in self.__dict__:
             return self.fs_cache
 
-        s3 = S3FileSystem(anon=False)
-
         def get_key(k):
-            return path_join(self.bucket, path_join(self.access_path, k) if not k.startswith(self.access_path) else k)
+            full_access_path = path_join(self.bucket, self.access_path)
 
-        class S3FSWrapper:
-            @staticmethod
-            def open(path, *args, **kwargs):
-                return s3.open(get_key(path), *args, **kwargs)
+            if k.startswith(full_access_path):
+                return k
+            elif k.startswith(self.access_path):
+                return path_join(self.bucket, k)
+            else:
+                return path_join(full_access_path, k)
 
-            @staticmethod
-            def exists(path):
-                return s3.exists(get_key(path))
+        class S3FileSystemProxy(S3FileSystem):
+            def open(self, path, *args, **kwargs):
+                return S3FileSystem.open(self, get_key(path), *args, **kwargs)
 
-        self.fs_cache = S3FSWrapper()
+            def exists(self, path):
+                return S3FileSystem.exists(self, get_key(path))
+
+            def ls(self, path, **kwargs):
+                return S3FileSystem.ls(self, get_key(path), **kwargs)
+
+            def isdir(self, path):
+                return S3FileSystem.isdir(self, get_key(path))
+
+            def walk(self, path, *args, **kwargs):
+                return S3FileSystem.walk(self, get_key(path), *args, **kwargs)
+
+            def find(self, path, *args, **kwargs):
+                return S3FileSystem.find(self, get_key(path), *args, **kwargs)
+
+            def copy(self, path1, path2, **kwargs):
+                return S3FileSystem.copy(self, get_key(path1), get_key(path2), **kwargs)
+
+            def rm(self, path, **kwargs):
+                return S3FileSystem.rm(self, get_key(path), **kwargs)
+
+        self.fs_cache = S3FileSystemProxy(anon=False)
         return self.fs_cache
 
 
