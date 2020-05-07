@@ -3,12 +3,13 @@ from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 
 import googleapiclient.discovery
+import googleapiclient.errors as errors
 import httplib2
 from oauth2client.service_account import ServiceAccountCredentials
 from botocore.exceptions import ClientError
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 import pandas as pd
 from typing import Dict
 
@@ -69,13 +70,11 @@ def ingest(event) -> Data:
 
     def sync_events(service, calendar_id, sync_token):
 
-        local_time = datetime.now(timezone.utc).astimezone()
-        today = local_time.isoformat()
+        min_date = '2020-05-01T00:00:00+00:00' # TODO: Fix to 2010-01-01T00:00:00+02:00
         request_params = {'calendarId': calendar_id,
-                          'singleEvents': True,
-                          'timeMax': today}
+                          'singleEvents': True}
         if not sync_token:
-            request_params['timeMin'] = '2020-05-01T00:00:00+00:00'  # TODO: Fix to 2010-01-01T00:00:00+02:00
+            request_params['timeMin'] = min_date
         else:
             request_params['syncToken'] = sync_token
 
@@ -83,15 +82,28 @@ def ingest(event) -> Data:
         current_request = service.events().list(**request_params)
 
         # TODO: Check if this is ok, should use pageToken?
-        while current_request is not None:
-            current_page = current_request.execute()
+        pageToken = 'firstPage'
+        while pageToken != '':
+            try:
+                current_page = current_request.execute()
+            except errors.HttpError as e:
+                error_code = e.resp.status
+                # Sync token is outdated, do full sync
+                if error_code == 410:
+                    request_params.pop('syncToken', '')
+                    request_params['timeMin'] = min_date
+                    current_request = service.events().list(**request_params)
+                    current_page = current_request.execute()
+                else:
+                    raise e
+
             tmp_events = current_page.get('items', [])
             for event in tmp_events:
                 events_for_current_calender.append(get_event_info(event, calendar_id))
 
             new_sync_token = current_page.get('nextSyncToken', '')
+            pageToken = current_page.get('nextPageToken', '')
             current_request = service.events().list_next(current_request, current_page)
-
         return events_for_current_calender, new_sync_token
 
     def get_event_info(event, calendar_id):
@@ -113,7 +125,7 @@ def ingest(event) -> Data:
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=get_event_data())
 
 
-@handler.process(partitions={})  # TODO: Replace with {} after rebase
+@handler.process(partitions={})  
 def process(data) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
