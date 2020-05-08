@@ -9,7 +9,8 @@ def main():
         'create-cognito-user',
         'generate-encrypted-password',
         'setup-datasource',
-        'register-table'
+        'register-table',
+        'database'
     ]
 
     parser = ArgumentParser('dataplattform')
