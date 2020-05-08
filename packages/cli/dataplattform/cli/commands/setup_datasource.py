@@ -4,7 +4,7 @@ from pkgutil import iter_modules
 
 
 def init(parser: ArgumentParser):
-    parser.add_argument('--datasource')
+    parser.add_argument('--datasource', required=False)
     parser.add_argument('--stage', default='dev')
 
 
@@ -14,7 +14,7 @@ def run(args: Namespace, _):
         getattr(module, 'setup')(stage)
 
     if args.datasource:
-        print(f'setup {args.module}')
+        print(f'setup {args.datasource}')
         setup(args.datasource, args.stage)
     else:
         import setup as setup_modules
