@@ -11,6 +11,7 @@ from botocore.exceptions import ClientError
 import json
 from datetime import datetime, timedelta, timezone
 from pytz import timezone as pytz_timezone
+from pyrfc3339 import generate
 import pandas as pd
 from typing import Dict
 
@@ -70,20 +71,28 @@ def ingest(event) -> Data:
 
     def sync_events(service, calendar_id, last_poll_time):
 
-        min_date = '2010-01-01T00:00:00+00:00'
-        today = datetime.now(timezone.utc)
+        oslo_timezone = pytz_timezone('Europe/Oslo')
+        min_date = datetime(2020, 5, 8)
+        min_date = oslo_timezone.localize(min_date)
+        min_date_rfc3339 = generate(min_date, utc=False)
+
+        today = datetime.now()
+        today = oslo_timezone.localize(today)
+        today_rfc3339 = generate(today, utc=False)
 
         request_params = {'calendarId': calendar_id,
                           'singleEvents': True,
                           'showDeleted': False,
                           'orderBy': 'startTime',
-                          'timeMax': today.isoformat()}
+                          'timeMax': today_rfc3339}
+        
         if not last_poll_time:  # First time poller is called
-            request_params['timeMin'] = min_date
+            request_params['timeMin'] = min_date_rfc3339
         else:
-            last_sync_date = datetime.fromtimestamp(int(last_poll_time))
-            last_sync_date_rfc3339 = last_sync_date.astimezone(pytz_timezone("Europe/Oslo"))
-            request_params['timeMin'] = last_sync_date_rfc3339.isoformat()
+            last_poll_date = datetime.fromtimestamp(int(last_poll_time))
+            last_poll_date = oslo_timezone.localize(last_poll_date)
+            last_poll_date_rfc3339 = generate(last_poll_date, utc=False)
+            request_params['timeMin'] = last_poll_date_rfc3339
 
         events_for_current_calender = []
         current_request = service.events().list(**request_params)
@@ -105,13 +114,12 @@ def ingest(event) -> Data:
         temp = event.get('location', '').split(',')
         boxes = [box.split('-')[-1] for box in temp if 'Enheter' in box]
         creator_email = dict(event.get('creator', '')).get('email', '')
-        event_timezone = event.get('timeZone', '')
 
         event_info = {
                 'event_id': event['id'],
                 'calendar_id': calendar_id,
-                'timestamp_from': get_timestamp_from_event_time(event['start'], event_timezone),
-                'timestamp_to': get_timestamp_from_event_time(event['end'], event_timezone),
+                'timestamp_from': get_timestamp_from_event_time(event['start']),
+                'timestamp_to': get_timestamp_from_event_time(event['end']),
                 'event_summary': event.get('summary', ''),
                 'event_button_names': boxes,
                 'creator': creator_email,
@@ -135,21 +143,14 @@ def process(data) -> Dict[str, pd.DataFrame]:
     }
 
 
-def get_timestamp_from_event_time(start_or_end_time, event_timezone_str):
+def get_timestamp_from_event_time(start_or_end_time):
     if 'dateTime' in start_or_end_time:
         new_time_str = start_or_end_time.get('dateTime')
         new_time = datetime.fromisoformat(new_time_str)
-        if (event_timezone_str != ''):
-            event_timezone = pytz_timezone(event_timezone_str)
-            new_time = datetime.fromisoformat(event_timezone.localize(new_time))
+        event_timezone = pytz_timezone(start_or_end_time.get('timeZone', 'Europe/Oslo'))
+        new_time = event_timezone.localize(new_time)
     elif 'date' in start_or_end_time:
-        new_time = get_datetime_from_date(start_or_end_time)
+        new_time = datetime.fromisoformat(start_or_end_time['date'])
     else:
         raise KeyError
-
     return int(new_time.timestamp())
-
-
-def get_datetime_from_date(start_or_end_date):
-    time_object = list(map(int, start_or_end_date['date'].split("-")))
-    return datetime(time_object[0], time_object[1], time_object[2])

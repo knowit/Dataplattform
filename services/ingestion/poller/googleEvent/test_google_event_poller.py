@@ -202,15 +202,16 @@ def test_handler_time_format(s3_bucket, events_list_mock):
 
 
 def test_handler_time_format_timezone(s3_bucket, events_list_mock):
-    start_time_1 = datetime(2019, 6, 15, 18, 30)
-    end_time_1 = datetime(2019, 6, 15, 19, 30)
+    start_time_1 = datetime(2019, 6, 15, 4, 0)  # GMT - 5
+    start_time_oslo_time = datetime(2019, 6, 15, 10, 0)
+    end_time_1 = datetime(2019, 6, 15, 13, 30)  # GMT + 2
 
     events_list_mock({
         'items': [{
             'id': '1234',
             'start': {
                 'dateTime': start_time_1.isoformat(),
-                'timeZone': 'Europe/Oslo',
+                'timeZone': 'US/Eastern',
             },
             'end': {
                 'dateTime': end_time_1.isoformat(),
@@ -224,7 +225,7 @@ def test_handler_time_format_timezone(s3_bucket, events_list_mock):
 
     expected = [{'event_id': '1234',
                  'calendar_id': '1',
-                 'timestamp_from': int(start_time_1.timestamp()),
+                 'timestamp_from': int(start_time_oslo_time.timestamp()),
                  'timestamp_to': int(end_time_1.timestamp()),
                  'event_summary': '',
                  'event_button_names': ['box1'],
@@ -232,7 +233,7 @@ def test_handler_time_format_timezone(s3_bucket, events_list_mock):
                  },
                 {'event_id': '1234',
                  'calendar_id': '2',
-                 'timestamp_from': int(start_time_1.timestamp()),
+                 'timestamp_from': int(start_time_oslo_time.timestamp()),
                  'timestamp_to': int(end_time_1.timestamp()),
                  'event_summary': '',
                  'event_button_names': ['box1'],
