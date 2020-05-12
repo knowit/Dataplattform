@@ -54,7 +54,7 @@ def poll_old_data(stage: str):
     environ['SERVICE'] = 'jiraSalesWebhook'
 
     handler = Handler(
-        access_path=f'data/level-2/jira/sales',
+        access_path='data/level-2/jira/sales',
         bucket=f'{stage}-datalake-datalake')
 
     @handler.ingest()
