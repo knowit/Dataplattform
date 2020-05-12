@@ -21,6 +21,8 @@ def init(parser: ArgumentParser):
     query_parser = subparsers.add_parser('query')
     query_parser.add_argument('sql')
     query_parser.add_argument('-o', '--output')
+    query_parser.add_argument('-f', '--format', default='csv',
+                              choices=['csv', 'markdown', 'excel', 'html', 'json'])
 
 
 def run(args: Namespace, parser: ArgumentParser):
@@ -98,7 +100,18 @@ def run(args: Namespace, parser: ArgumentParser):
 
         df = ath.execute(args.sql).as_pandas()
         if args.output:
-            df.to_csv(args.output)
+            format_options = {
+                'csv': {'index': False},
+                'markdown': {'showindex': False, 'tablefmt': 'github'},
+                'excel': {'index': False},
+                'html': {'index': False},
+                'json': {'orient': 'records'}
+            }
+            if args.format in ['markdown']:
+                with open(args.output, 'w', encoding='utf-8') as f:
+                    getattr(df, f'to_{args.format}')(f, **format_options[args.format])
+            else:
+                getattr(df, f'to_{args.format}')(args.output, **format_options[args.format])
         else:
             with pd.option_context('display.max_rows', None):
                 print(df)
