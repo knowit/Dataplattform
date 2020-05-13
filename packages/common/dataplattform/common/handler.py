@@ -117,16 +117,18 @@ class Handler:
     @staticmethod
     def verify_schema(dataset: ParquetFile, dataframe, partitions):
         dataset_partitions = dataset.info.get('partitions', [])
+        dataset_columns = dataset.columns + dataset_partitions
+
         if len(dataset_partitions) != len(partitions):
             return False
 
         if not all([a == b for a, b in zip(sorted(dataset_partitions), sorted(partitions))]):
             return False
 
-        if len(dataset.columns) != len(dataframe.columns):
+        if len(dataset_columns) != len(dataframe.columns):
             return False
 
-        if not all([a == b for a, b in zip(sorted(dataset.columns), sorted(dataframe.columns))]):
+        if not all([a == b for a, b in zip(sorted(dataset_columns), sorted(dataframe.columns))]):
             return False
 
         if not all([dataset.dtypes[c] == dataframe.dtypes[c] for c in dataset.columns]):
