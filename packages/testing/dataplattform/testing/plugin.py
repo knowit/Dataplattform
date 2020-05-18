@@ -95,3 +95,37 @@ def athena():
 
     with AthenaMocker() as athena_mocker:
         yield athena_mocker
+
+
+@fixture
+def create_table_mock(mocker):
+    on_to_parquet_stub = mocker.stub()
+    mocker.patch(
+        'pandas.DataFrame.to_parquet',
+        new=lambda *args, **kwargs: on_to_parquet_stub(*args, **kwargs))
+
+    def assert_table_created(*tables):
+        tables = [f'structured/{t}' for t in tables]
+        assert all([t == tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)])
+
+    def assert_table_data(table, df, **kwargs):
+        from pandas.testing import assert_frame_equal
+        table = f'structured/{table}'
+        actual_df = next(iter([df for (df, t, ), _ in on_to_parquet_stub.call_args_list if table == t]), None)
+        if actual_df is None:
+            assert False, f'no create call with {table}'
+        assert_frame_equal(actual_df, df, check_index_type=False, **kwargs)
+
+    def assert_table_data_column(table, column, ser, **kwargs):
+        from pandas.testing import assert_series_equal
+        table = f'structured/{table}'
+        actual_df = next(iter([df for (df, t, ), _ in on_to_parquet_stub.call_args_list if table == t]), None)
+        if actual_df is None:
+            assert False, f'no create call with {table}'
+        assert_series_equal(actual_df[column], ser, check_index_type=False, check_names=False, **kwargs)
+
+    on_to_parquet_stub.assert_table_created = assert_table_created
+    on_to_parquet_stub.assert_table_data = assert_table_data
+    on_to_parquet_stub.assert_table_data_column = assert_table_data_column
+
+    yield on_to_parquet_stub
