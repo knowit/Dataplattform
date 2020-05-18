@@ -120,6 +120,7 @@ def test_handler_call_process_with_s3_data(s3_bucket, mocker):
 def test_handler_call_process_to_parquet(mocker):
     df_mock = mocker.MagicMock()
     df_mock.to_parquet = mocker.stub()
+    df_mock.empty = False
 
     ingest_handler = handler.Handler()
 
@@ -140,6 +141,30 @@ def test_handler_call_process_to_parquet(mocker):
 
     df_mock.to_parquet.assert_called_once()
     assert df_mock.to_parquet.call_args[0][0] == 'structured/test'
+
+
+def test_handler_call_process_skip_empty_dataframe_to_parquet(mocker):
+    ingest_handler = handler.Handler()
+
+    empty_df = pd.DataFrame()
+    to_parquet_spy = mocker.spy(empty_df, 'to_parquet')
+
+    @ingest_handler.ingest()
+    def test_ingest(event):
+        return schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data='hello test'
+        )
+
+    @ingest_handler.process(partitions={})
+    def test_process(data):
+        return {
+            'test': empty_df
+        }
+
+    ingest_handler(None)
+
+    to_parquet_spy.assert_not_called()
 
 
 def test_handler_call_process_s3_parquet(s3_bucket):
