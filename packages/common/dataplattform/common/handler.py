@@ -66,6 +66,9 @@ class Handler:
                     assert frame is not None and callable(frame.to_parquet),\
                         'Process must return a DataFrame with a to_parquet method'
 
+                    if frame.empty:
+                        continue
+
                     table_partitions = partitions.get(table_name, [])
                     table_exists = s3.fs.exists(f'structured/{table_name}/_metadata')
                     if table_exists:
