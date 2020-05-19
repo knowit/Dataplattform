@@ -9,9 +9,7 @@ from google.oauth2.service_account import Credentials as ServiceAccountCredentia
 from botocore.exceptions import ClientError
 
 import json
-from datetime import datetime
-from pytz import timezone as pytz_timezone
-from pyrfc3339 import generate as generate_rfc3339
+from datetime import datetime, timedelta, timezone
 import pandas as pd
 from typing import Dict
 
@@ -83,30 +81,21 @@ def ingest(event) -> Data:
         :return: A dictionary containing the latest events using the latest poll date for a
         specific calendar_id and the time of this poll
         """
-        time_zone_str = 'Europe/Oslo'
-        oslo_timezone = pytz_timezone(time_zone_str)
-        min_date = datetime(2010, 1, 1)
-        min_date = oslo_timezone.localize(min_date)
-        min_date_rfc3339 = generate_rfc3339(min_date, utc=False)
-
-        today = datetime.now()
-        today = oslo_timezone.localize(today)
-        today_rfc3339 = generate_rfc3339(today, utc=False)
+        current_time_zone = timezone(timedelta(hours=2))
+        today = datetime.now(tz=current_time_zone)
 
         request_params = {'calendarId': calendar_id,
                           'singleEvents': True,
                           'showDeleted': False,
                           'orderBy': 'startTime',
-                          'timeMax': today_rfc3339,
-                          'timeZone': time_zone_str}
+                          'timeMax': today.isoformat(),
+                          'timeZone': 'Europe/Oslo'}
 
         if not last_poll_time:  # First time poller is called
-            request_params['timeMin'] = min_date_rfc3339
+            request_params['timeMin'] = datetime(2010, 1, 1, tzinfo=current_time_zone).isoformat()
         else:
-            last_poll_date = datetime.fromtimestamp(int(last_poll_time))
-            last_poll_date = oslo_timezone.localize(last_poll_date)
-            last_poll_date_rfc3339 = generate_rfc3339(last_poll_date, utc=False)
-            request_params['timeMin'] = last_poll_date_rfc3339
+            last_poll_date = datetime.fromtimestamp(int(last_poll_time), current_time_zone)
+            request_params['timeMin'] = last_poll_date.isoformat()
 
         events_for_current_calender = []
         current_request = service.events().list(**request_params)

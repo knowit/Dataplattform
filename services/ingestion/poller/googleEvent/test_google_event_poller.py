@@ -7,6 +7,7 @@ import pyrfc3339
 from pytz import timezone as pytz_timezone
 import pandas as pd
 from freezegun import freeze_time
+from time import sleep
 
 
 @fixture
@@ -25,8 +26,6 @@ def test_data(with_frozen_time):
         'end_time_1': datetime(2019, 6, 15, 19, 30),
         'end_time_2': datetime(2019, 6, 16, 19, 30)
     }
-
-
 
 
 @fixture(autouse=True)
@@ -293,3 +292,22 @@ def test_handler_time_format_timezone(s3_bucket, single_calendar_mock, with_froz
     data = loads(response['Body'].read())
 
     assert [i for i in data['data'] if i not in expected] == []
+
+
+def test_handler_set_and_get_from_ssm(single_calendar_mock, ssm_client):
+    single_calendar_mock({}, {})
+
+    handler(None, None)
+
+    last_sync_time_for_cal1 = ssm_client.get_parameter(Name='/dev/testService/last_poll_time_1',
+                                                       WithDecryption=False)['Parameter']['Value']
+
+    sleep(1)
+    handler(None, None)
+
+    new_sync_time_for_cal1 = ssm_client.get_parameter(Name='/dev/testService/last_poll_time_1',
+                                                      WithDecryption=False)['Parameter']['Value']
+
+    sync_time_is_updated = new_sync_time_for_cal1 != last_sync_time_for_cal1
+
+    assert last_sync_time_for_cal1 is not None and sync_time_is_updated
