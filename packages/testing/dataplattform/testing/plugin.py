@@ -1,8 +1,11 @@
 from pytest import fixture, hookimpl
-from moto import mock_s3, mock_ssm
-from boto3 import resource, client
+from moto import mock_s3, mock_ssm, mock_iam
+from boto3 import resource, client, setup_default_session
 from os import environ
 from unittest.mock import patch, MagicMock
+import json
+from uuid import uuid4
+from dataplattform.testing.util import ignore_policy
 
 
 def pytest_addoption(parser):
@@ -20,10 +23,10 @@ def pytest_load_initial_conftests(args, early_config, parser):
         environ['AWS_DEFAULT_REGION'] = 'eu-central-1'
 
     # Ensure mocked AWS env
-    environ['AWS_ACCESS_KEY_ID'] = 'testing'
-    environ['AWS_SECRET_ACCESS_KEY'] = 'testing'
-    environ['AWS_SECURITY_TOKEN'] = 'testing'
-    environ['AWS_SESSION_TOKEN'] = 'testing'
+    environ.pop('AWS_ACCESS_KEY_ID', None)
+    environ.pop('AWS_SECRET_ACCESS_KEY', None)
+    environ.pop('AWS_SECURITY_TOKEN', None)
+    environ.pop('AWS_SESSION_TOKEN', None)
 
     # Default test env
     default_env = [
@@ -38,29 +41,80 @@ def pytest_load_initial_conftests(args, early_config, parser):
 
 
 @fixture(autouse=True)
-def ssm_client(pytestconfig):
+def iam_user():
+    with mock_iam():
+        iam = client('iam')
+        mock_user = f'TEST_USER_{str(uuid4())}'
+
+        with ignore_policy():
+            iam.create_user(UserName=mock_user)
+            iam.attach_user_policy(
+                PolicyArn='arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole',
+                UserName=mock_user)
+            test_access_keys = iam.create_access_key(UserName=mock_user)['AccessKey']
+
+        class MockUserSetup:
+            @staticmethod
+            def ensure_mock_session():
+                setup_default_session(aws_access_key_id=test_access_keys['AccessKeyId'],
+                                      aws_secret_access_key=test_access_keys['SecretAccessKey'])
+                environ['AWS_ACCESS_KEY_ID'] = test_access_keys['AccessKeyId']
+                environ['AWS_SECRET_ACCESS_KEY'] = test_access_keys['SecretAccessKey']
+
+            @staticmethod
+            def use_policy(action, *actions, resource=['*']):
+                with ignore_policy():
+                    policy_document = json.dumps({
+                            'Version': '2012-10-17',
+                            'Statement': [{
+                                'Effect': 'Allow',
+                                'Action': [action] + list(actions),
+                                'Resource': resource
+                            }]
+                        })
+                    policy = iam.create_policy(
+                        PolicyName=f'TEST_POLICY_{str(uuid4())}',
+                        PolicyDocument=policy_document)['Policy']
+                    iam.attach_user_policy(
+                        PolicyArn=policy['Arn'],
+                        UserName=mock_user)
+
+            @staticmethod
+            def use_serverless_policy():
+                # print(pytestconfig.rootdir)
+                raise NotImplementedError
+
+        MockUserSetup.ensure_mock_session()
+        yield MockUserSetup
+
+
+@fixture(autouse=True)
+def ssm_client(iam_user, pytestconfig):
     with mock_ssm():
+        iam_user.ensure_mock_session()
         ssm = client('ssm')
         for e in pytestconfig.getini('dataplattform-aws-ssm'):
             key, _, value = e.partition('=')
 
             key = key.strip()
             type_, _, value = value.partition(':')
-
-            ssm.put_parameter(
-                Name=key,
-                Value=value.strip(),
-                Type=type_.strip(),
-                Tier='Standard')
+            with ignore_policy():
+                ssm.put_parameter(
+                    Name=key,
+                    Value=value.strip(),
+                    Type=type_.strip(),
+                    Tier='Standard')
 
         yield ssm
 
 
 @fixture(autouse=True)
-def s3_bucket():
+def s3_bucket(iam_user):
     with mock_s3():
+        iam_user.ensure_mock_session()
         s3 = resource('s3')
-        s3.create_bucket(Bucket=environ.get('DATALAKE'))
+        with ignore_policy():
+            s3.create_bucket(Bucket=environ.get('DATALAKE'))
         yield s3.Bucket(environ.get('DATALAKE'))
 
 

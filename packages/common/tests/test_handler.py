@@ -1,4 +1,5 @@
 from dataplattform.common import handler, schema
+from dataplattform.testing.util import ignore_policy
 import pandas as pd
 import re
 import pytest
@@ -22,7 +23,8 @@ def test_handler_response():
     assert res['body'] == 'hello test'
 
 
-def test_handler_data(s3_bucket):
+def test_handler_data(s3_bucket, iam_user):
+    iam_user.use_policy('s3:PutObject')
     ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
@@ -34,9 +36,10 @@ def test_handler_data(s3_bucket):
 
     ingest_handler(None)
 
-    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
-    data = schema.Data.from_json(response['Body'].read())
-    assert data.data == 'hello test'
+    with ignore_policy():
+        response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
+        data = schema.Data.from_json(response['Body'].read())
+        assert data.data == 'hello test'
 
 
 def test_handler_validate(mocker):
@@ -78,7 +81,9 @@ def test_handler_valid_call_ingest(mocker):
     ingest_handler.wrapped_func['ingest'].assert_called_once()
 
 
-def test_handler_call_process(mocker):
+def test_handler_call_process(mocker, iam_user):
+    iam_user.use_policy('s3:PutObject')
+
     ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
@@ -95,12 +100,15 @@ def test_handler_call_process(mocker):
     assert ingest_handler.wrapped_func['process'].call_args[0][0][0].json()['data'] == 'hello test'
 
 
-def test_handler_call_process_with_s3_data(s3_bucket, mocker):
-    s3_bucket.Object('/data/test.json').put(
-            Body=schema.Data(
-                metadata=schema.Metadata(timestamp=0),
-                data='hello test'
-            ).to_json().encode('utf-8'))
+def test_handler_call_process_with_s3_data(s3_bucket, mocker, iam_user):
+    iam_user.use_policy('s3:PutObject', 's3:GetObject')
+
+    with ignore_policy():
+        s3_bucket.Object('/data/test.json').put(
+                Body=schema.Data(
+                    metadata=schema.Metadata(timestamp=0),
+                    data='hello test'
+                ).to_json().encode('utf-8'))
 
     ingest_handler = handler.Handler()
 
@@ -117,7 +125,9 @@ def test_handler_call_process_with_s3_data(s3_bucket, mocker):
     assert ingest_handler.wrapped_func['process'].call_args[0][0][0].json()['data'] == 'hello test'
 
 
-def test_handler_call_process_to_parquet(mocker):
+def test_handler_call_process_to_parquet(mocker, iam_user):
+    iam_user.use_policy('s3:PutObject')
+
     df_mock = mocker.MagicMock()
     df_mock.to_parquet = mocker.stub()
     df_mock.empty = False
@@ -143,7 +153,9 @@ def test_handler_call_process_to_parquet(mocker):
     assert df_mock.to_parquet.call_args[0][0] == 'structured/test'
 
 
-def test_handler_call_process_skip_empty_dataframe_to_parquet(mocker):
+def test_handler_call_process_skip_empty_dataframe_to_parquet(mocker, iam_user):
+    iam_user.use_policy('s3:PutObject')
+
     ingest_handler = handler.Handler()
 
     empty_df = pd.DataFrame()
@@ -167,7 +179,9 @@ def test_handler_call_process_skip_empty_dataframe_to_parquet(mocker):
     to_parquet_spy.assert_not_called()
 
 
-def test_handler_call_process_s3_parquet(s3_bucket):
+def test_handler_call_process_s3_parquet(s3_bucket, iam_user):
+    iam_user.use_policy('s3:PutObject')
+
     ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
@@ -182,7 +196,8 @@ def test_handler_call_process_s3_parquet(s3_bucket):
 
     ingest_handler(None)
 
-    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    with ignore_policy():
+        keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
         'data/test/structured/test/_common_metadata',
         'data/test/structured/test/_metadata',
@@ -192,7 +207,9 @@ def test_handler_call_process_s3_parquet(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_append(s3_bucket):
+def test_handler_call_process_s3_parquet_append(s3_bucket, iam_user):
+    iam_user.use_policy('s3:PutObject', 's3:GetObject', 's3:ListObjects', 's3:ListObjectsV2')
+
     ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
@@ -208,7 +225,8 @@ def test_handler_call_process_s3_parquet_append(s3_bucket):
     ingest_handler(None)
     ingest_handler(None)  # Called twice
 
-    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    with ignore_policy():
+        keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
         'data/test/structured/test/_common_metadata',
         'data/test/structured/test/_metadata',
@@ -219,7 +237,9 @@ def test_handler_call_process_s3_parquet_append(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_partitioned(s3_bucket):
+def test_handler_call_process_s3_parquet_partitioned(s3_bucket, iam_user):
+    iam_user.use_policy('s3:PutObject', 's3:ListObjectsV2')
+
     ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
@@ -233,8 +253,8 @@ def test_handler_call_process_s3_parquet_partitioned(s3_bucket):
         }
 
     ingest_handler(None)
-
-    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    with ignore_policy():
+        keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
         'data/test/structured/test/_common_metadata',
         'data/test/structured/test/_metadata',
@@ -245,7 +265,9 @@ def test_handler_call_process_s3_parquet_partitioned(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket):
+def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket, iam_user):
+    iam_user.use_policy('s3:PutObject')
+
     ingest_handler = handler.Handler()
 
     @ingest_handler.ingest()
@@ -261,7 +283,8 @@ def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket):
     ingest_handler(None)
     ingest_handler(None)  # Called twice
 
-    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    with ignore_policy():
+        keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
         'data/test/structured/test/_common_metadata',
         'data/test/structured/test/_metadata',
@@ -274,7 +297,9 @@ def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_schema_upgrade(s3_bucket):
+def test_handler_call_process_s3_parquet_schema_upgrade(s3_bucket, iam_user):
+    iam_user.use_policy('s3:PutObject')
+
     old_ingest_handler = handler.Handler()
     new_ingest_handler = handler.Handler()
 
@@ -298,8 +323,9 @@ def test_handler_call_process_s3_parquet_schema_upgrade(s3_bucket):
     old_ingest_handler(None)
     new_ingest_handler(None)
 
-    dep_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured/deprecated' in x.key]
-    new_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key and 'deprecated' not in x.key]
+    with ignore_policy():
+        dep_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured/deprecated' in x.key]
+        new_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key and 'deprecated' not in x.key]
 
     expected_dep_keys = [
         r'data\/test\/structured\/deprecated\/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\/test\/_common_metadata',
@@ -349,10 +375,13 @@ def test_handler_call_process_s3_parquet_schema_upgrade(s3_bucket):
         )
     ])
 def test_handler_call_process_s3_parquet_schema_partition_change(s3_bucket,
+                                                                 iam_user,
                                                                  old_partitions,
                                                                  new_partitions,
                                                                  expected_dep_keys,
                                                                  expected_new_keys):
+    iam_user.use_policy('s3:PutObject')
+
     old_ingest_handler = handler.Handler()
     new_ingest_handler = handler.Handler()
 
@@ -376,8 +405,9 @@ def test_handler_call_process_s3_parquet_schema_partition_change(s3_bucket,
     old_ingest_handler(None)
     new_ingest_handler(None)
 
-    dep_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured/deprecated' in x.key]
-    new_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key and 'deprecated' not in x.key]
+    with ignore_policy():
+        dep_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured/deprecated' in x.key]
+        new_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key and 'deprecated' not in x.key]
 
     expected_dep_keys = [
         'data\\/test\\/structured\\/deprecated\\/\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\/test\\/' + x
