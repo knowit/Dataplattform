@@ -1,4 +1,5 @@
 from dataplattform.common.handler import Handler
+from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.query.engine import Athena
 from typing import Dict
@@ -15,7 +16,8 @@ ath = Athena()
 
 @handler.ingest()
 def ingest(event) -> Data:
-    res = requests.get(url)
+    api_token = SSM(with_decryption=True).get('github_api_token')
+    res = requests.get(url, headers={'Authorization': f'Bearer{api_token}'})
     repos = res.json()
     while 'next' in res.links.keys():
         res = requests.get(res.links['next']['url'])
