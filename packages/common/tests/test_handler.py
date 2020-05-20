@@ -245,6 +245,61 @@ def test_handler_call_process_s3_parquet_partitioned(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
+def test_handler_call_process_s3_parquet_partitioned_with_None_content(s3_bucket):
+    ingest_handler = handler.Handler()
+
+    @ingest_handler.ingest()
+    def test_ingest(event):
+        return schema.Data(metadata=schema.Metadata(timestamp=0), data='')
+
+    @ingest_handler.process(partitions={'test': ['a']})
+    def test_process(data):
+        return {
+            'test': pd.DataFrame({'a': [1, 2, None], 'b': [1, 2, 3]})
+        }
+
+    ingest_handler(None)
+
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+
+    expected_keys = [
+        'data/test/structured/test/_common_metadata',
+        'data/test/structured/test/_metadata',
+        'data/test/structured/test/a=-1.0/part.0.parquet',
+        'data/test/structured/test/a=1.0/part.0.parquet',
+        'data/test/structured/test/a=2.0/part.0.parquet'
+    ]
+
+    assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+
+
+def test_handler_call_process_s3_parquet_partitioned_with_None_content_string(s3_bucket):
+    ingest_handler = handler.Handler()
+
+    @ingest_handler.ingest()
+    def test_ingest(event):
+        return schema.Data(metadata=schema.Metadata(timestamp=0), data='')
+
+    @ingest_handler.process(partitions={'test': ['a']})
+    def test_process(data):
+        return {
+            'test': pd.DataFrame({'a': ['name0', 'name0', None], 'b': [1, 2, 3]})
+        }
+
+
+    ingest_handler(None)
+
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    expected_keys = [
+        'data/test/structured/test/_common_metadata',
+        'data/test/structured/test/_metadata',
+        'data/test/structured/test/a=name0/part.0.parquet',
+        'data/test/structured/test/a=undefined/part.0.parquet'
+    ]
+
+    assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+
+
 def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket):
     ingest_handler = handler.Handler()
 

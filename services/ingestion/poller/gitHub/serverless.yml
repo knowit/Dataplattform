@@ -4,7 +4,7 @@ service: githubPoller
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 12
+    timeout: 15
     handlerFile: github_poller
     databaseName: level_2
     description: Github poller
@@ -73,6 +73,7 @@ functions:
       ACCESS_PATH: ${self:custom.accessPath}
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
+      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
     tags: # Tag for this function. Every function are tagged with stage by default
     events: # How to trigger the lambda
       - schedule:
@@ -125,6 +126,14 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - '*'
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
           - PolicyName: ${self:custom.stage}-Glue-${self:service}
             PolicyDocument:
               Version: '2012-10-17'
@@ -133,6 +142,7 @@ resources: # The resources your functions use
                   Action:
                     - 'glue:GetTable'
                     - 'glue:GetDatabase'
+                    - 'glue:GetPartitions'
                   Resource: 
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'

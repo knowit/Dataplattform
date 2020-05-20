@@ -4,6 +4,7 @@ from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3, S3Result
 from fastparquet import ParquetFile
 from datetime import datetime
+import numpy as np
 
 
 @dataclass_json(letter_case=LetterCase.CAMEL)
@@ -70,6 +71,13 @@ class Handler:
                         continue
 
                     table_partitions = partitions.get(table_name, [])
+
+                    for partition in table_partitions:
+                        if np.issubdtype(frame[partition].dtype, np.number):
+                            frame.loc[frame[partition].isnull(), partition] = -1
+                        else:
+                            frame.loc[frame[partition].isnull(), partition] = 'undefined'
+
                     table_exists = s3.fs.exists(f'structured/{table_name}/_metadata')
                     if table_exists:
                         dataset = ParquetFile(f'structured/{table_name}', open_with=s3.fs.open)
