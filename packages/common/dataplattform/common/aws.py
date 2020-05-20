@@ -110,6 +110,16 @@ class SSM:
                 if param.get('Type', '') != 'StringList' \
                 else param.get('Value', None).split(',')
 
+    def put(self, name, value, overwrite=True, tier='Standard'):
+
+        self.client.put_parameter(
+            Name=path_join('/', self.path, name),
+            Value=value,
+            Type='String' if (self.with_decryption is False)
+                 else 'SecureString',
+            Overwrite=overwrite,
+            Tier=tier)
+
 
 def path_join(*paths):
     return path.join(*paths).replace(sep, '/')
