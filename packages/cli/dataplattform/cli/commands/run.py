@@ -1,5 +1,9 @@
 from argparse import ArgumentParser, Namespace
-from dataplattform.cli.helper import load_serverless_config, find_file, serverless_environment
+from dataplattform.cli.helper import (
+    load_serverless_config,
+    find_file,
+    serverless_environment,
+    assume_serverless_role)
 from os import environ
 from importlib.util import spec_from_file_location, module_from_spec
 from json import loads
@@ -28,18 +32,20 @@ def run(args: Namespace, _):
     handler_module = module_from_spec(spec)
     spec.loader.exec_module(handler_module)
 
-    if args.profile:
-        tracemalloc.start()
-        start_time = time()
+    with assume_serverless_role():
 
-        getattr(handler_module, handler_func)(loads(args.event), None)
+        if args.profile:
+            tracemalloc.start()
+            start_time = time()
 
-        complete_time = time() - start_time
-        _, peak_memory_usage = tracemalloc.get_traced_memory()
-        tracemalloc.stop()
+            getattr(handler_module, handler_func)(loads(args.event), None)
 
-        print('PROFILE DATA')
-        print(f'Execution time: {round(complete_time, 2)} seconds')
-        print(f'Memory usage: \t{round(peak_memory_usage/(1024**2), 2)} megabytes')
-    else:
-        getattr(handler_module, handler_func)(loads(args.event), None)
+            complete_time = time() - start_time
+            _, peak_memory_usage = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+
+            print('PROFILE DATA')
+            print(f'Execution time: {round(complete_time, 2)} seconds')
+            print(f'Memory usage: \t{round(peak_memory_usage/(1024**2), 2)} megabytes')
+        else:
+            getattr(handler_module, handler_func)(loads(args.event), None)
