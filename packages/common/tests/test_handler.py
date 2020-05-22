@@ -286,7 +286,6 @@ def test_handler_call_process_s3_parquet_partitioned_with_None_content_string(s3
             'test': pd.DataFrame({'a': ['name0', 'name0', None], 'b': [1, 2, 3]})
         }
 
-
     ingest_handler(None)
 
     keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
