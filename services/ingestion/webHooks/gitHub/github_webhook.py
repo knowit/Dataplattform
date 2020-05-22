@@ -42,6 +42,9 @@ def ingest(event) -> Data:
     class GithubMetadata(Metadata):
         event: AnyStr
 
+    def to_timestamp(date):
+        return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
+
     return Data(
         metadata=GithubMetadata(
             timestamp=datetime.now().timestamp(),
@@ -49,8 +52,8 @@ def ingest(event) -> Data:
         ),
         data={
             'id': repo['id'],
-            'updated_at': int(isoparse(repo['updated_at']).timestamp()),
-            'pushed_at': int(isoparse(repo['pushed_at']).timestamp()),
+            'updated_at': to_timestamp(repo['updated_at']),
+            'pushed_at': to_timestamp(repo['pushed_at']),
             'forks_count': repo['forks_count'],
             'stargazers_count': repo['stargazers_count']
         }
