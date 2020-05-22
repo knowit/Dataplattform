@@ -17,7 +17,7 @@ def run(args: Namespace, _):
         print(f'setup {args.datasource}')
         setup(args.datasource, args.stage)
     else:
-        import setup as setup_modules
-        for setup_module in iter_modules(setup_modules.__path__):
-            print(f'setup {setup_module.name}')
-            setup(setup_module.name, args.stage)
+        import dataplattform.cli.datasource as datasource_modules
+        for datasource_module in iter_modules(datasource_modules.__path__):
+            print(f'setup {datasource_module.name}')
+            setup(datasource_module.name, args.stage)

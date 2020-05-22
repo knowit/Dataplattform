@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 from importlib import import_module
+from boto3 import setup_default_session
 
 
 def main():
@@ -14,6 +15,8 @@ def main():
     ]
 
     parser = ArgumentParser('dataplattform')
+    parser.add_argument('--profile', dest='profile', required=False,
+                        default=None, help='aws profile name')
     subparsers = parser.add_subparsers(dest='command')
 
     command_modules = {
@@ -25,6 +28,9 @@ def main():
         cmd.init(subparsers.add_parser(name))
 
     args = parser.parse_args()
+    if args.profile:
+        setup_default_session(profile_name=args.profile)
+
     if args.command:
         command_modules[args.command].run(args, parser)
     else:

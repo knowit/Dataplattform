@@ -4,8 +4,7 @@ from argparse import ArgumentParser, Namespace
 
 
 def generatePassword(length):
-    session = boto3.Session(profile_name="new")
-    client = session.client('secretsmanager')
+    client = boto3.client('secretsmanager')
 
     response = client.get_random_password(
         PasswordLength=length,
