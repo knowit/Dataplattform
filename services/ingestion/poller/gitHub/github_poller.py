@@ -17,7 +17,7 @@ ath = Athena()
 @handler.ingest()
 def ingest(event) -> Data:
     api_token = SSM(with_decryption=True).get('github_api_token')
-    res = requests.get(url, headers={'Authorization': f'Bearer{api_token}'})
+    res = requests.get(url, headers={'Authorization': f'Bearer {api_token}'})
 
     repos = res.json()
     while 'next' in res.links.keys():
