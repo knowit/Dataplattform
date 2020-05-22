@@ -23,7 +23,7 @@ def validate(event) -> bool:
 @handler.ingest()
 def ingest(event) -> Data:
     body = loads(event['body'])
-    event_type, item = body['event'], body['issue']
+    event_type, item = body['webhookEvent'].split(':')[-1], body['issue']
 
     @dataclass
     class JiraMetadata(Metadata):
@@ -55,6 +55,6 @@ def process(data) -> Dict[str, pd.DataFrame]:
     }
 
     return {
-        'jira_issue_created': pd.DataFrame.from_records(data['created']) if 'created' in data else None,
-        'jira_issue_updated': pd.DataFrame.from_records(data['updated']) if 'updated' in data else None
+        'jira_issue_created': pd.DataFrame.from_records(data['issue_created']) if 'issue_created' in data else None,
+        'jira_issue_updated': pd.DataFrame.from_records(data['issue_updated']) if 'issue_updated' in data else None
     }

@@ -15,7 +15,7 @@ def test_valid():
             'secret': 'iamsecret'
         },
         body=dumps({
-            'event': 'created',
+            'webhookEvent': 'jira:issue_created',
             'issue': {
                 'key': 'TEST-1234',
                 'fields': {
@@ -37,7 +37,7 @@ def test_insert_data(s3_bucket):
             'secret': 'iamsecret'
         },
         body=dumps({
-            'event': 'created',
+            'webhookEvent': 'jira:issue_created',
             'issue': {
                 'key': 'TEST-1234',
                 'fields': {
