@@ -111,8 +111,10 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - s3:PutObject
-                    - s3:ListObjects
+                    - s3:ListObjects*
                     - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
                       - "" 
