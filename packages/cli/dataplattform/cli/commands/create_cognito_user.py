@@ -10,15 +10,12 @@ def init(parser: ArgumentParser):
     parser.add_argument('--password', dest='password', required=False, help='Password')
     parser.add_argument('--access-level', dest='access', required=False, choices=[1, 2, 3],
                         default=1, type=int, help='Users access level')
-    parser.add_argument('--profile', dest='profile', required=False,
-                        default='default', help='aws profile name')
     parser.add_argument('--delete', dest='delete', required=False,
                         action='store_true', help='Delete user with username')
 
 
 def run(args: Namespace, _):
-    session = boto3.Session(profile_name=args.profile)
-    client = session.client('cognito-idp')
+    client = boto3.client('cognito-idp')
 
     user_pools = client.list_user_pools(MaxResults=1)
     user_pool = user_pools['UserPools'][0]['Id']
