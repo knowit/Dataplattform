@@ -97,7 +97,7 @@ def poll_old_data(stage: str):
     })
     def process(data):
         data = [
-            [dict(x, time=d['metadata']['timestamp']) for x in d['data']]
+            [dict(x, time=int(d['metadata']['timestamp'])) for x in d['data']]
             for d in [d.json() for d in data]
         ]
         data = np.hstack(data)
