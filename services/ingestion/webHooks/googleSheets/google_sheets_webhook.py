@@ -1,20 +1,20 @@
 from dataplattform.common.handler import Handler
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
-from json import loads
 from typing import Dict, AnyStr
-import pandas as pd
 from dataclasses import dataclass
 from dateutil.parser import isoparse
+import pandas as pd
+
 
 handler = Handler()
 
 
+
 @handler.ingest()
 def ingest(event) -> Data:
-
     @dataclass
-    class GoogleSheetMetaData(Metadata):
+    class GoogleSheetsMetaData(Metadata):
         event: AnyStr
 
     # TODO: find time format 
@@ -22,16 +22,16 @@ def ingest(event) -> Data:
         return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
 
     return Data(
-        metadata=GoogleSheetMetaData(
+        metadata=GoogleSheetsMetaData(
             timestamp=datetime.now().timestamp(),
             event={}),
-        data={}
+        data=event['body']
     )
 
 
 @handler.process(partitions={})
 def process(data) -> Dict[str, pd.DataFrame]:
-    records = [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in [d.json() for d in data]]
+    # records = [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in [d.json() for d in data]]
     return {
-        'custom_table_name': pd.DataFrame.from_records(records)
+        # 'custom_table_name': pd.DataFrame.from_records(records)
     }
