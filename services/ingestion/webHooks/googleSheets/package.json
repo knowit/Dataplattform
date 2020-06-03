@@ -1,5 +1,5 @@
 {
-  "name": "githubWebhook",
+  "name": "googleSheetsWebhook",
   "description": "",
   "version": "0.1.0",
   "devDependencies": {

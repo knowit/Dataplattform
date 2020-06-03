@@ -14,9 +14,7 @@ handler = Handler()
 def ingest(event) -> Data:
     # TODO: What is the "body" of the event?
 
-    item = loads(event["body"])
-    info = item.get('TODO', None)
-
+    
     @dataclass
     class GoogleSheetMetaData(Metadata):
         event: AnyStr
@@ -27,12 +25,8 @@ def ingest(event) -> Data:
 
     return Data(
         metadata=GoogleSheetMetaData(
-            timestamp=datetime.now().timestamp(),
-            event=event['headers']['X-GoogleSheet-Event']
-        ),
-        data={
-            'id': info['id']
-            }
+            timestamp=datetime.now().timestamp()),
+        data={}
     )
 
 

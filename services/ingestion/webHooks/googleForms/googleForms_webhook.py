@@ -16,21 +16,17 @@ handler = Handler()
 
 @handler.ingest()
 def ingest(event) -> Data:
-    body = loads(event['body'])
-    event_type, item = body['webhookEvent'].split(':')[-1], body['issue']
 
     @dataclass
     class GoogleFormsMetadata(Metadata):
         event_type: AnyStr
 
     return Data(
-        metadata=GoogleFormsMetadata(
-            timestamp=datetime.now().timestamp(),
-            event_type=event_type
-        ),
-        data={
+            metadata=GoogleFormsMetadata(timestamp=datetime.now().timestamp(),
+            data={
         }
     )
+
 
 @handler.process(partitions={})
 def process(data) -> Dict[str, pd.DataFrame]:
