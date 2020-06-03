@@ -12,9 +12,7 @@ handler = Handler()
 
 @handler.ingest()
 def ingest(event) -> Data:
-    # TODO: What is the "body" of the event?
 
-    
     @dataclass
     class GoogleSheetMetaData(Metadata):
         event: AnyStr
@@ -25,7 +23,8 @@ def ingest(event) -> Data:
 
     return Data(
         metadata=GoogleSheetMetaData(
-            timestamp=datetime.now().timestamp()),
+            timestamp=datetime.now().timestamp(),
+            event={}),
         data={}
     )
 

@@ -4,7 +4,7 @@ custom:
   #Edit these variables###########################
   editable:
     timeout: 12
-    handlerFile: googleSheets_webhook
+    handlerFile: google_sheets_webhook
     description: Endpoint for Google Sheet webhooks
     accessLevel: level-3
     dataFolder: googleSheets/sheets

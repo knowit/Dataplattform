@@ -1,13 +1,10 @@
 from dataplattform.common.handler import Handler
 from dataplattform.common.schema import Data, Metadata
-from dataplattform.common.aws import SSM
 from datetime import datetime
-from json import loads
 from typing import Dict, AnyStr
-import pandas as pd
 from dataclasses import dataclass
-from itertools import groupby
 from dateutil.parser import isoparse
+import pandas as pd
 
 
 handler = Handler()
@@ -18,13 +15,18 @@ handler = Handler()
 def ingest(event) -> Data:
 
     @dataclass
-    class GoogleFormsMetadata(Metadata):
-        event_type: AnyStr
+    class GoogleFormsMetaData(Metadata):
+        event: AnyStr
+
+    # TODO: find time format 
+    def to_timestamp(date):
+        return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
 
     return Data(
-            metadata=GoogleFormsMetadata(timestamp=datetime.now().timestamp(),
-            data={
-        }
+        metadata=GoogleFormsMetaData(
+            timestamp=datetime.now().timestamp(),
+            event={}),
+        data={}
     )
 
 
@@ -34,5 +36,3 @@ def process(data) -> Dict[str, pd.DataFrame]:
     return {
         'custom_table_name': pd.DataFrame.from_records(records)
     }
-
-    return {}
