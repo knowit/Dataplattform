@@ -26,13 +26,13 @@ def ingest(event) -> Data:
         metadata=GoogleFormsMetaData(
             timestamp=datetime.now().timestamp(),
             event={}),
-        data={}
+        data=event['body']
     )
 
 
 @handler.process(partitions={})
 def process(data) -> Dict[str, pd.DataFrame]:
-    records = [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in [d.json() for d in data]]
+    # records = [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in [d.json() for d in data]]
     return {
-        'custom_table_name': pd.DataFrame.from_records(records)
+       #  'custom_table_name': pd.DataFrame.from_records(records)
     }
