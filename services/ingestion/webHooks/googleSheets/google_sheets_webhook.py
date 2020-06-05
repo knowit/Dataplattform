@@ -3,6 +3,7 @@ from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import pandas as pd
 import json
+import numpy as np
 from typing import Dict
 
 handler = Handler()
@@ -19,17 +20,22 @@ def ingest(event) -> Data:
 
 @handler.process(partitions={})
 def process(data) -> Dict[str, pd.DataFrame]:
+
     def make_dataframes(d):
         d = d.json()
         metadata, payload = d['metadata'], d['data']
-        timestamp = metadata['timestamp']
-        table_name = payload.get('tableName', 'untitled' + str(timestamp))  # TODO: Add warning?
-        table_content = payload.get('values', None)
+        table_name = payload['tableName']
+        table = payload.get('values', None)
         data_df = pd.DataFrame()
-
-        if table_content:
-            data_df = pd.DataFrame(table_content[1:], columns=table_content[0])
-            table_name = table_name.replace(" ", "_")  # TODO: other not allowed chars?
+        if table:
+            tmp_array = np.array(table, dtype=np.object_)
+            mask = tmp_array == ''
+            rows = np.flatnonzero((~mask).sum(axis=1))
+            cols = np.flatnonzero((~mask).sum(axis=0))
+            cropped_table = tmp_array[rows.min():rows.max()+1, cols.min():cols.max()+1]
+            content = cropped_table[1:, :]
+            column_names = cropped_table[0, :]
+            data_df = pd.DataFrame(content.tolist(), columns=column_names.tolist(), dtype=None)
 
         metadata_df = pd.DataFrame({'author': [payload.get('email', 'undefined')],
                                     'time_added_to_dataplattform': [metadata['timestamp']],
