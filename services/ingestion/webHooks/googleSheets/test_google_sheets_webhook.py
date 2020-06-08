@@ -42,17 +42,17 @@ def test_insert_data(s3_bucket, test_data1, create_table_mock):
     create_table_mock.assert_table_data_column(
         'enkel_test_ark 1',
         'a',
-        pd.Series([1, 5, 1] ))
+        pd.Series([1, 5, 1]))
 
     create_table_mock.assert_table_data_column(
         'enkel_test_ark 1',
         'b',
-        pd.Series([4, 8, 4] ))
+        pd.Series([4, 8, 4]))
 
     create_table_mock.assert_table_data_column(
         'enkel_test_ark 1',
         'c',
-        pd.Series([5, 13, 5] ))
+        pd.Series([5, 13, 5]))
 
 
 def test_process_clean_data(s3_bucket, test_data2, create_table_mock):

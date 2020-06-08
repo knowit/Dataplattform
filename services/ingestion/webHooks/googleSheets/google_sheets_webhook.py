@@ -37,7 +37,7 @@ def process(data) -> Dict[str, pd.DataFrame]:
             column_names = cropped_table[0, :]
             data_df = pd.DataFrame(content.tolist(), columns=column_names.tolist(), dtype=None)
 
-        metadata_df = pd.DataFrame({'author': [payload.get('email', 'undefined')],
+        metadata_df = pd.DataFrame({'author': [payload.get('user', 'undefined')],
                                     'time_added_to_dataplattform': [metadata['timestamp']],
                                     'inserted_tables': [table_name]})
         return table_name, metadata_df, data_df
