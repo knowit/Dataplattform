@@ -1,5 +1,5 @@
 
-name: Dataplattform - webhook - github
+name: Dataplattform - webhook - googleSheets
 
 on: 
   push:
