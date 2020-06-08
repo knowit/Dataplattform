@@ -5,6 +5,7 @@ import pandas as pd
 import json
 import numpy as np
 from typing import Dict
+import re
 
 handler = Handler()
 
@@ -12,9 +13,12 @@ handler = Handler()
 @handler.ingest()
 def ingest(event) -> Data:
 
+    event_body = event['body']
+    body_json = json.loads(event_body)
+
     return Data(
         Metadata(timestamp=int(datetime.now().timestamp())),
-        data=json.loads(event.get('body', "{}"))
+        data=body_json
     )
 
 
@@ -24,8 +28,14 @@ def process(data) -> Dict[str, pd.DataFrame]:
     def make_dataframes(d):
         d = d.json()
         metadata, payload = d['metadata'], d['data']
+        user = payload.get('user', 'undefined')
+
         table_name = payload['tableName']
+        table_name = user + '-' + table_name  # avoid overwrite
+        table_name = re.sub('[^A-Za-z0-9]+', '-', table_name)
+
         table = payload.get('values', None)
+
         data_df = pd.DataFrame()
         if table:
             tmp_array = np.array(table, dtype=np.object_)
@@ -37,8 +47,8 @@ def process(data) -> Dict[str, pd.DataFrame]:
             column_names = cropped_table[0, :]
             data_df = pd.DataFrame(content.tolist(), columns=column_names.tolist(), dtype=None)
 
-        metadata_df = pd.DataFrame({'author': [payload.get('user', 'undefined')],
-                                    'time_added_to_dataplattform': [metadata['timestamp']],
+        metadata_df = pd.DataFrame({'uploaded_by_user': user,
+                                    'time_added': [metadata['timestamp']],
                                     'inserted_tables': [table_name]})
         return table_name, metadata_df, data_df
 
