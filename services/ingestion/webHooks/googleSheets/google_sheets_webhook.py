@@ -32,7 +32,7 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
         table_name = payload['tableName']
         table_name = user + '-' + table_name  # avoid overwrite
-        table_name = re.sub('[^A-Za-z0-9]+', '-', table_name)
+        table_name = re.sub('[^A-Za-z0-9]+', '_', table_name)
 
         table = payload.get('values', None)
 
@@ -50,11 +50,16 @@ def process(data) -> Dict[str, pd.DataFrame]:
         metadata_df = pd.DataFrame({'uploaded_by_user': user,
                                     'time_added': [metadata['timestamp']],
                                     'inserted_tables': [table_name]})
-        return table_name, metadata_df, data_df
+        return table_name, data_df, metadata_df
 
-    table_name, metadata_df, data_df = make_dataframes(data[0])
+    data_tables, metadata_tables = list(zip(*[
+        (
+            (table_name, data_df),
+            metadata_df
+        ) for table_name, data_df, metadata_df in [make_dataframes(d) for d in data]
+    ]))
 
     return {
-            table_name: data_df,
-            'google_sheets_metadata': metadata_df
+            **dict(data_tables),
+            'google_sheets_metadata': pd.concat(metadata_tables)
     }
