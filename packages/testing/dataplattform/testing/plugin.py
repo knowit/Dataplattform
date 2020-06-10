@@ -113,7 +113,7 @@ def create_table_mock(mocker):
         actual_df_list = [df for (df, t, ), _ in on_to_parquet_stub.call_args_list if table == t]
         if not actual_df_list:
             assert False, f'no create call with {table}'
-        return concat(actual_df_list).reset_index()
+        return concat(actual_df_list)
 
     def assert_table_data(table, df, **kwargs):
         from pandas.testing import assert_frame_equal
@@ -126,7 +126,7 @@ def create_table_mock(mocker):
     def assert_table_data_column(table, column, ser, **kwargs):
         from pandas.testing import assert_series_equal
         assert_series_equal(
-            df_from_calls(f'structured/{table}')[column],
+            df_from_calls(f'structured/{table}').reset_index()[column],
             ser,
             check_index_type=False,
             check_names=False,

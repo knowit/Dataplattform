@@ -320,4 +320,4 @@ def test_process_parquet_search_data_skip_existing(athena, mock_twitter_data, cr
     create_table_mock.assert_table_data_column(
         'twitter_tweets',
         'tweet_id',
-        pd.Series([4321], index=[1]))
+        pd.Series([4321]))
