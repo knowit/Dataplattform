@@ -32,56 +32,85 @@ def process(data) -> Dict[str, pd.DataFrame]:
         metadata, payload = d['metadata'], d['data']
         user = payload.get('user', 'undefined')
 
-        form_name = payload['formName']
-        form_name = user + '-' + form_name  # avoid overwrite
+        form_name = payload['tableName']
+        form_name.replace(',', '_')
+        form_name = user + '_' + form_name  # avoid overwrite
         form_name = re.sub('[^A-Za-z0-9]+', '_', form_name)
         questions_form_name = form_name + '_' + 'questions'
-        answers_form_name = form_name + '_' + 'answers'
-        
-        def to_timestamp(date):
-            return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
+
+        special_questions_list = ['GRID', 'CHECKBOX_GRID']
+        other_questions_list = ['MULTIPLE_CHOICE', 'CHECKBOX', 'LIST', 'FILE_UPLOAD', 'TEXT', 'PARAGRAPH_TEXT', 'DATE', 'TIME', 'SCALE']
 
         responses = payload.get('responses', None)  # list
 
         def create_questions_dataframe(responses):
-            questions_dict = {}
 
+            def create_individual_question_dataframe(question, responder):
+                question_data = {}
+                question_data['question_title'] = question['title']
+                question_data['type'] = question['type']
+                question_data['helpText'] = question['helpText']
+                question_data['responder'] = responder
+
+                sub_question_list = []
+                sub_answers_list = []
+
+                new_sub_questions_list = []
+                new_sub_answers_list = []
+
+                if question_data['type'] in special_questions_list:
+                    sub_question_list = question['typeData']['rows']
+                    tmp_answers_list = question['answer']
+                    if (tmp_answers_list is not None):
+                        sub_answers_list = tmp_answers_list['response']
+                    
+                    i = 0
+                    for elem in sub_answers_list:
+                        if type(elem) == list:
+                            for sub_elem in elem:
+                                new_sub_questions_list.append(sub_question_list[i])
+                                new_sub_answers_list.append(sub_elem)
+                        i = i + 1
+
+                elif question_data['type'] in other_questions_list:
+                    tmp_answers_list = question['answer']
+                    if (tmp_answers_list is not None):
+                        sub_answers_list = tmp_answers_list['response']
+                    if (type(sub_answers_list) == str):
+                        sub_answers_list = [sub_answers_list]
+                    new_sub_answers_list = sub_answers_list
+                    new_sub_questions_list = ['']*len(new_sub_answers_list)
+
+                questions_list = [[*question_data.values(), sub_q, sub_a] for (sub_q, sub_a) in zip(new_sub_questions_list, new_sub_answers_list)]
+                questions_dataframe_coloumns = [*question_data.keys()]
+                questions_dataframe_coloumns.append('Subquestions title')
+                questions_dataframe_coloumns.append('Answer')
+
+                return pd.DataFrame(questions_list, columns=questions_dataframe_coloumns)
+                
+            result_frame = pd.DataFrame()
             for repsons in responses:
-                answers = repsons['answers']
-                for answer in answers:
-                    questions_dict[answer['questionId']] = answer['questionsTitle']
-
-            questions_dataframe = pd.DataFrame({'question id': list(questions_dict.keys()),
-                                                'question title': list(questions_dict.values())})
-
-            respondents = []
-            for repsons in responses:
-                respondents_answers = defaultdict(list, {k: [] for k in questions_dict.keys()})
-                respondents_answers['respondent'] = repsons['respondent']
-                respondents_answers['timestamp'] = to_timestamp(repsons['timestamp'])
-                answers = repsons['answers']
-                for answer in answers:
-                    respondents_answers[answer['questionId']] = answer['response']
-                respondents.append(respondents_answers)
-
-            answers_dataframe = pd.DataFrame(r for r in respondents)
-            return questions_dataframe, answers_dataframe
-
-        questions_dataframe, answers_dataframe = create_questions_dataframe(responses)
+                questions = repsons['questions']
+                responder = repsons['id']
+                ind_dfs = [create_individual_question_dataframe(question, responder) for question in questions]
+                result_frame = pd.concat(ind_dfs, ignore_index=True)
+            print("")
+            print(result_frame)
+            return result_frame
+        
+        questions_dataframe = create_questions_dataframe(responses)
         metadata_df = pd.DataFrame({'uploaded_by_user': user,
                                     'time_added': [metadata['timestamp']]})
-        return questions_form_name, questions_dataframe, answers_form_name, answers_dataframe, metadata_df
+        return questions_form_name, questions_dataframe, metadata_df
 
-    question_tables, answers_tables, metadata_tables = list(zip(*[
+    question_tables, metadata_tables = list(zip(*[
         (
             (q_form_name, questions_df),
-            (a_form_name, answers_df),
             metadata_df
-        ) for q_form_name, questions_df, a_form_name, answers_df, metadata_df in [make_dataframes(d) for d in data]
+        ) for q_form_name, questions_df, metadata_df in [make_dataframes(d) for d in data]
     ]))
 
     return {
             **dict(question_tables),
-            **dict(answers_tables),
             'google_forms_metadata': pd.concat(metadata_tables)
     }
