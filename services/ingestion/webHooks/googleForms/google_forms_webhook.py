@@ -3,10 +3,8 @@ from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import pandas as pd
 import json
-import numpy as np
 from typing import Dict
 import re
-from collections import defaultdict
 from dateutil.parser import isoparse
 
 handler = Handler()
@@ -36,72 +34,123 @@ def process(data) -> Dict[str, pd.DataFrame]:
         form_name.replace(',', '_')
         form_name = user + '_' + form_name  # avoid overwrite
         form_name = re.sub('[^A-Za-z0-9]+', '_', form_name)
-        questions_form_name = form_name + '_' + 'questions'
 
         special_questions_list = ['GRID', 'CHECKBOX_GRID']
-        other_questions_list = ['MULTIPLE_CHOICE', 'CHECKBOX', 'LIST', 'FILE_UPLOAD', 'TEXT', 'PARAGRAPH_TEXT', 'DATE', 'TIME', 'SCALE']
+        multiple_choice = ['MULTIPLE_CHOICE', 'CHECKBOX', 'LIST']
+        other_questions_list = ['FILE_UPLOAD',
+                                'TEXT', 'PARAGRAPH_TEXT', 'DATE', 'TIME', 'SCALE']
 
         responses = payload.get('responses', None)  # list
 
+        def to_timestamp(date):
+            return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
+
         def create_questions_dataframe(responses):
 
-            def create_individual_question_dataframe(question, responder):
-                question_data = {}
-                question_data['question_title'] = question['title']
-                question_data['type'] = question['type']
-                question_data['helpText'] = question['helpText']
-                question_data['responder'] = responder
-
-                sub_question_list = []
-                sub_answers_list = []
+            def create_individual_dataframe(question, responde, timestamp, isQuiz):
+                data = {}
+                data['question_title'] = question['title']
+                data['type'] = question['type']
+                data['helpText'] = question['helpText']
+                data['responder'] = responder
+                data['timestamp'] = to_timestamp(timestamp)
+                data['isQuiz'] = isQuiz
 
                 new_sub_questions_list = []
                 new_sub_answers_list = []
+                answer_check_list = []
 
-                if question_data['type'] in special_questions_list:
-                    sub_question_list = question['typeData']['rows']
+                def get_response(question):
                     tmp_answers_list = question['answer']
+                    sub_answers_list = ['']
                     if (tmp_answers_list is not None):
                         sub_answers_list = tmp_answers_list['response']
-                    
+                    return sub_answers_list
+
+                def string_to_list(sub_answers):
+                    if (type(sub_answers) == str):
+                        sub_answers = [sub_answers]
+                    return sub_answers
+
+                question_type = data['type']
+
+                if question_type in special_questions_list:
+                    sub_question_list = question['typeData']['rows']
+                    sub_answers_list = get_response(question)
                     i = 0
-                    for elem in sub_answers_list:
+                    for elem in sub_answers_list:  # list of lists
                         if type(elem) == list:
                             for sub_elem in elem:
                                 new_sub_questions_list.append(sub_question_list[i])
                                 new_sub_answers_list.append(sub_elem)
+                        else:
+                            new_sub_questions_list.append(sub_question_list[i])
+                            new_sub_answers_list.append(elem)
                         i = i + 1
-
-                elif question_data['type'] in other_questions_list:
-                    tmp_answers_list = question['answer']
-                    if (tmp_answers_list is not None):
-                        sub_answers_list = tmp_answers_list['response']
-                    if (type(sub_answers_list) == str):
-                        sub_answers_list = [sub_answers_list]
-                    new_sub_answers_list = sub_answers_list
+                elif question_type in other_questions_list:
+                    new_sub_answers_list = string_to_list(get_response(question))
                     new_sub_questions_list = ['']*len(new_sub_answers_list)
+                elif question_type in multiple_choice:
+                    new_sub_answers_list = string_to_list(get_response(question))
+                    new_sub_questions_list = ['']*len(new_sub_answers_list)
+                    if (isQuiz):
+                        choices = question['typeData']['choices']
+                        c_keys = [choice['value'] for choice in choices]
+                        c_values = [choice['isCorrect'] for choice in choices]
+                        d = dict(zip(c_keys, c_values))
+                        answer_check_list = [d[elem] for elem in new_sub_answers_list]
+                else:
+                    print('Question type: ' + question_type + ' is not supported')
+                    return
 
-                questions_list = [[*question_data.values(), sub_q, sub_a] for (sub_q, sub_a) in zip(new_sub_questions_list, new_sub_answers_list)]
-                questions_dataframe_coloumns = [*question_data.keys()]
-                questions_dataframe_coloumns.append('Subquestions title')
-                questions_dataframe_coloumns.append('Answer')
+                if (len(answer_check_list) == 0):
+                    answer_check_list = [pd.NA]*len(new_sub_answers_list)
 
-                return pd.DataFrame(questions_list, columns=questions_dataframe_coloumns)
-                
-            result_frame = pd.DataFrame()
+                f_c = question['typeData'].get('feedbackCorrect', '')
+                f_ic = question['typeData'].get('feedbackIncorrect', '')
+
+                feedback_correct = [f_c]*len(new_sub_answers_list)
+                feedback_incorrect = [f_ic]*len(new_sub_answers_list)
+
+                points = question['typeData'].get('points', 0)
+                points_list = [0]*len(new_sub_answers_list)
+                points_list[0] = points
+
+                zipped_list = zip(new_sub_questions_list,
+                                  new_sub_answers_list,
+                                  answer_check_list,
+                                  feedback_correct,
+                                  feedback_incorrect,
+                                  points_list)
+
+                questions_list = [[*data.values(), c1, c2, c3, c4, c5, c6] for (c1, c2, c3, c4, c5, c6) in zipped_list]
+                df_columns = [*data.keys()]
+                df_columns.append('Sub question text')
+                df_columns.append('Answer')
+                df_columns.append('Is correct')
+                df_columns.append('Feedback correct')
+                df_columns.append('Feedback incorrect')
+                df_columns.append('Available points')
+
+                return pd.DataFrame(questions_list, columns=df_columns)
+
+            result_frame_list = []
             for repsons in responses:
+
                 questions = repsons['questions']
                 responder = repsons['id']
-                ind_dfs = [create_individual_question_dataframe(question, responder) for question in questions]
-                result_frame = pd.concat(ind_dfs, ignore_index=True)
-            print("")
-            print(result_frame)
+                timestamp = repsons['timestamp']
+                isQuiz = repsons['isQuiz']
+                ind_dfs = [create_individual_dataframe(q, responder, timestamp, isQuiz) for q in questions]
+                result_frame_list.append(pd.concat(ind_dfs, ignore_index=True))
+
+            result_frame = pd.concat(result_frame_list, ignore_index=True)
             return result_frame
-        
+
         questions_dataframe = create_questions_dataframe(responses)
         metadata_df = pd.DataFrame({'uploaded_by_user': user,
                                     'time_added': [metadata['timestamp']]})
-        return questions_form_name, questions_dataframe, metadata_df
+        return form_name, questions_dataframe, metadata_df
 
     question_tables, metadata_tables = list(zip(*[
         (
