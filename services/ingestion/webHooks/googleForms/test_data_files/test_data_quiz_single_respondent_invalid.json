@@ -1,0 +1,33 @@
+{
+    "tableName": "test_quiz",
+    "responses": [
+        {
+            "respondent": "",
+            "timestamp": "2020-06-19T13:34:49.407Z",
+            "id": "test_id",
+            "isQuiz": true,
+            "questions": [
+                {
+                    "title": "Skala",
+                    "helpText": "",
+                    "id": 837637592,
+                    "type": "SCAL",
+                    "answer": {
+                        "response": "3",
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {
+                        "leftLabel": "Lite",
+                        "rightLavel": "Mye",
+                        "lowerBound": 1,
+                        "upperBound": 5,
+                        "points": 1,
+                        "feedback": "test"
+                    }
+                }
+            ]
+        }
+    ],
+    "user": "test"
+}

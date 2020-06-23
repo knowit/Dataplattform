@@ -40,21 +40,19 @@ def process(data) -> Dict[str, pd.DataFrame]:
         other_questions_list = ['FILE_UPLOAD',
                                 'TEXT', 'PARAGRAPH_TEXT', 'DATE', 'TIME', 'SCALE']
 
-        responses = payload.get('responses', None)  # list
-
         def to_timestamp(date):
             return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
 
         def create_questions_dataframe(responses):
 
-            def create_individual_dataframe(question, responde, timestamp, isQuiz):
-                data = {}
-                data['question_title'] = question['title']
-                data['type'] = question['type']
-                data['helpText'] = question['helpText']
-                data['responder'] = responder
-                data['timestamp'] = to_timestamp(timestamp)
-                data['isQuiz'] = isQuiz
+            def create_individual_dataframe(question, responder, timestamp, isQuiz):
+                data = {'question_title': question['title'],
+                        'type': question['type'],
+                        'helpText': question['helpText'],
+                        'responder': responder,
+                        'timestamp': to_timestamp(timestamp),
+                        'isQuiz': isQuiz
+                        }
 
                 new_sub_questions_list = []
                 new_sub_answers_list = []
@@ -68,25 +66,22 @@ def process(data) -> Dict[str, pd.DataFrame]:
                     return sub_answers_list
 
                 def string_to_list(sub_answers):
-                    if (type(sub_answers) == str):
-                        sub_answers = [sub_answers]
-                    return sub_answers
+                    return [sub_answers] if not isinstance(sub_answers, list) else sub_answers
 
                 question_type = data['type']
 
                 if question_type in special_questions_list:
                     sub_question_list = question['typeData']['rows']
                     sub_answers_list = get_response(question)
-                    i = 0
-                    for elem in sub_answers_list:  # list of lists
-                        if type(elem) == list:
+                    for i, elem in enumerate(sub_answers_list):  # list of lists
+                        if isinstance(elem, list):
                             for sub_elem in elem:
                                 new_sub_questions_list.append(sub_question_list[i])
                                 new_sub_answers_list.append(sub_elem)
                         else:
                             new_sub_questions_list.append(sub_question_list[i])
                             new_sub_answers_list.append(elem)
-                        i = i + 1
+
                 elif question_type in other_questions_list:
                     new_sub_answers_list = string_to_list(get_response(question))
                     new_sub_questions_list = ['']*len(new_sub_answers_list)
@@ -100,8 +95,7 @@ def process(data) -> Dict[str, pd.DataFrame]:
                         d = dict(zip(c_keys, c_values))
                         answer_check_list = [d[elem] for elem in new_sub_answers_list]
                 else:
-                    print('Question type: ' + question_type + ' is not supported')
-                    return
+                    raise KeyError('Question type: ' + question_type + ' is not supported')
 
                 if (len(answer_check_list) == 0):
                     answer_check_list = [pd.NA]*len(new_sub_answers_list)
@@ -123,31 +117,24 @@ def process(data) -> Dict[str, pd.DataFrame]:
                                   feedback_incorrect,
                                   points_list)
 
-                questions_list = [[*data.values(), c1, c2, c3, c4, c5, c6] for (c1, c2, c3, c4, c5, c6) in zipped_list]
-                df_columns = [*data.keys()]
-                df_columns.append('Sub question text')
-                df_columns.append('Answer')
-                df_columns.append('Is correct')
-                df_columns.append('Feedback correct')
-                df_columns.append('Feedback incorrect')
-                df_columns.append('Available points')
+                questions_list = [[*data.values(), *vals] for vals in zipped_list]
+                df_columns = [*data.keys(), 'Sub question text', 'Answer',
+                              'Is correct', 'Feedback correct', 'Feedback incorrect',
+                              'Available points']
 
                 return pd.DataFrame(questions_list, columns=df_columns)
 
             result_frame_list = []
             for repsons in responses:
-
-                questions = repsons['questions']
-                responder = repsons['id']
-                timestamp = repsons['timestamp']
-                isQuiz = repsons['isQuiz']
-                ind_dfs = [create_individual_dataframe(q, responder, timestamp, isQuiz) for q in questions]
+                ind_dfs = [create_individual_dataframe(q, repsons['id'],
+                                                       repsons['timestamp'],
+                                                       repsons['isQuiz']) for q in repsons['questions']]
                 result_frame_list.append(pd.concat(ind_dfs, ignore_index=True))
 
             result_frame = pd.concat(result_frame_list, ignore_index=True)
             return result_frame
 
-        questions_dataframe = create_questions_dataframe(responses)
+        questions_dataframe = create_questions_dataframe(payload.get('responses', None))
         metadata_df = pd.DataFrame({'uploaded_by_user': user,
                                     'time_added': [metadata['timestamp']]})
         return form_name, questions_dataframe, metadata_df

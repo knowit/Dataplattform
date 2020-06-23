@@ -1,38 +1,42 @@
 from google_forms_webhook import handler
 from dataplattform.testing.events import APIGateway
 from json import loads
-from os import path
+import os
 from pytest import fixture
 import pandas as pd
+import pytest
 
 
 @fixture
 def test_data_quiz():
-    with open(path.join(path.dirname(__file__), 'test_data_quiz_single_respondent_valid_types.json'), 'r') as json_file:
+    with open(os.path.join(os.path.dirname(__file__),
+              'test_data_files/test_data_quiz_single_respondent_valid_types.json'), 'r') as json_file:
         yield json_file.read()
 
 
 @fixture
 def test_data_quiz_invalid():
-    with open(path.join(path.dirname(__file__), 'test_data_quiz_single_respondent_invalid.json'), 'r') as json_file:
+    with open(os.path.join(os.path.dirname(__file__),
+              'test_data_files/test_data_quiz_single_respondent_invalid.json'), 'r') as json_file:
         yield json_file.read()
 
 
 @fixture
 def test_data_form():
-    with open(path.join(path.dirname(__file__), 'test_data_form.json'), 'r') as json_file:
+    with open(os.path.join(os.path.dirname(__file__), 'test_data_files/test_data_form.json'), 'r') as json_file:
         yield json_file.read()
 
 
 @fixture
 def test_data_form2():
-    with open(path.join(path.dirname(__file__), 'test_data_form2.json'), 'r') as json_file:
+    with open(os.path.join(os.path.dirname(__file__), 'test_data_files/test_data_form2.json'), 'r') as json_file:
         yield json_file.read()
 
 
 @fixture
 def test_data_form_multiple_respondents():
-    with open(path.join(path.dirname(__file__), 'test_data_multiple_respondents.json'), 'r') as json_file:
+    with open(os.path.join(os.path.dirname(__file__),
+              'test_data_files/test_data_multiple_respondents.json'), 'r') as json_file:
         yield json_file.read()
 
 
@@ -144,24 +148,10 @@ def test_insert_data_two_respondents(s3_bucket, test_data_form, test_data_form2,
 
 
 def test_insert_data_invalid_type(s3_bucket, test_data_quiz_invalid, create_table_mock):
-    handler(APIGateway(
-        headers={},
-        body=test_data_quiz_invalid).to_dict(), None)
-
-    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
-    data = loads(response['Body'].read())
-    assert data['data']['tableName'] == 'test_quiz'
-
-    create_table_mock.assert_table_data_column(
-        'test_test_quiz',
-        'type',
-        pd.Series(['MULTIPLE_CHOICE',
-                   'TEXT',
-                   'CHECKBOX',
-                   'MULTIPLE_CHOICE',
-                   'LIST',
-                   'DATE',
-                   'TIME']))
+    with pytest.raises(KeyError):
+        handler(APIGateway(
+                headers={},
+                body=test_data_quiz_invalid).to_dict(), None)
 
 
 def test_insert_data_multiple_respondents(s3_bucket, test_data_form_multiple_respondents, create_table_mock):
