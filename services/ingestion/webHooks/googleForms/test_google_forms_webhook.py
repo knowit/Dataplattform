@@ -50,7 +50,7 @@ def test_insert_data_quiz(s3_bucket, test_data_quiz, create_table_mock):
     assert data['data']['tableName'] == 'test_quiz'
 
     create_table_mock.assert_table_data_column(
-        'test_test_quiz',
+        'google_forms_data',
         'type',
         pd.Series(['SCALE',
                    'MULTIPLE_CHOICE',
@@ -62,7 +62,19 @@ def test_insert_data_quiz(s3_bucket, test_data_quiz, create_table_mock):
                    'TIME']))
 
     create_table_mock.assert_table_data_column(
-        'test_test_quiz',
+        'google_forms_data',
+        'Form name',
+        pd.Series(['test_test_quiz',
+                   'test_test_quiz',
+                   'test_test_quiz',
+                   'test_test_quiz',
+                   'test_test_quiz',
+                   'test_test_quiz',
+                   'test_test_quiz',
+                   'test_test_quiz']))
+
+    create_table_mock.assert_table_data_column(
+        'google_forms_data',
         'isQuiz',
         pd.Series([True,
                    True,
@@ -84,7 +96,7 @@ def test_insert_data_form(s3_bucket, test_data_form, create_table_mock):
     assert data['data']['tableName'] == 'test_form'
 
     create_table_mock.assert_table_data_column(
-        'test_test_form',
+        'google_forms_data',
         'type',
         pd.Series(['PARAGRAPH_TEXT',
                    'TEXT',
@@ -116,7 +128,7 @@ def test_insert_data_two_respondents(s3_bucket, test_data_form, test_data_form2,
     assert data['data']['tableName'] == 'test_form'
 
     create_table_mock.assert_table_data_column(
-        'test_test_form',
+        'google_forms_data',
         'type',
         pd.Series(['PARAGRAPH_TEXT',
                    'TEXT',
@@ -164,7 +176,7 @@ def test_insert_data_multiple_respondents(s3_bucket, test_data_form_multiple_res
     assert data['data']['tableName'] == 'test_form'
 
     create_table_mock.assert_table_data_column(
-        'test_user_test_form',
+        'google_forms_data',
         'type',
         pd.Series(['TEXT',
                    'PARAGRAPH_TEXT',
@@ -173,7 +185,7 @@ def test_insert_data_multiple_respondents(s3_bucket, test_data_form_multiple_res
                    ]))
 
     create_table_mock.assert_table_data_column(
-        'test_user_test_form',
+        'google_forms_data',
         'responder',
         pd.Series(['test_user1',
                    'test_user1',
@@ -181,7 +193,7 @@ def test_insert_data_multiple_respondents(s3_bucket, test_data_form_multiple_res
                    'test_user2',
                    ]))
     create_table_mock.assert_table_data_column(
-        'test_user_test_form',
+        'google_forms_data',
         'isQuiz',
         pd.Series([False,
                    False,

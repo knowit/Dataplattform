@@ -129,24 +129,26 @@ def process(data) -> Dict[str, pd.DataFrame]:
                 ind_dfs = [create_individual_dataframe(q, repsons['id'],
                                                        repsons['timestamp'],
                                                        repsons['isQuiz']) for q in repsons['questions']]
+
                 result_frame_list.append(pd.concat(ind_dfs, ignore_index=True))
 
             result_frame = pd.concat(result_frame_list, ignore_index=True)
+            result_frame['Form name'] = pd.Series([form_name]*result_frame.shape[0], index=result_frame.index)
             return result_frame
 
         questions_dataframe = create_questions_dataframe(payload.get('responses', None))
         metadata_df = pd.DataFrame({'uploaded_by_user': user,
                                     'time_added': [metadata['timestamp']]})
-        return form_name, questions_dataframe, metadata_df
+        return questions_dataframe, metadata_df
 
     question_tables, metadata_tables = list(zip(*[
         (
-            (q_form_name, questions_df),
+            questions_df,
             metadata_df
-        ) for q_form_name, questions_df, metadata_df in [make_dataframes(d) for d in data]
+        ) for questions_df, metadata_df in [make_dataframes(d) for d in data]
     ]))
 
     return {
-            **dict(question_tables),
+            'google_forms_data': pd.concat(question_tables),
             'google_forms_metadata': pd.concat(metadata_tables)
     }
