@@ -99,7 +99,7 @@ def test_process_missing_data(s3_bucket, test_data4, create_table_mock):
     create_table_mock.assert_table_data_column(
         'test_test_b_enkel_test_ark_4',
         'c',
-        pd.Series([5, '', 5]))
+        pd.Series([5, pd.NA, 5]))
 
 
 def test_process_parquet_get_data(mocker, create_table_mock, test_data1):
