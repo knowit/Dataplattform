@@ -3,7 +3,6 @@ from pytest import fixture
 from json import loads, load
 from responses import RequestsMock, GET
 import pandas as pd
-from pandas.testing import assert_series_equal
 from os import path
 
 
@@ -60,31 +59,26 @@ def test_handler_data_content(s3_bucket, mocked_responses, test_data):
     assert all([data['data'][0][k] == v for k, v in expected.items()])
 
 
-def test_process_data(mocker, mocked_responses, test_data):
+def test_process_data(mocker, mocked_responses, test_data, create_table_mock):
     mocked_responses.add(GET, url, json=test_data, status=200)
 
-    def on_to_parquet(df, *a, **kwa):
-        assert_series_equal(
-            df.id,
-            pd.Series([4672898, 4730463], index=[0, 1]),
-            check_names=False)
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
     handler(None, None)
 
+    create_table_mock.assert_table_data_column(
+        'github_knowit_repos',
+        'id',
+        pd.Series([4672898, 4730463]))
 
-def test_process_data_skip_existing(mocker, athena, mocked_responses, test_data):
+
+def test_process_data_skip_existing(mocker, athena, mocked_responses, test_data, create_table_mock):
     mocked_responses.add(GET, url, json=test_data, status=200)
 
     athena.on_query(
         'SELECT "id" FROM "github_knowit_repos"',
         pd.DataFrame({'id': [4672898]}))
 
-    def on_to_parquet(df, *a, **kwa):
-        assert_series_equal(
-            df.id,
-            pd.Series([4730463], index=[1]),
-            check_names=False)
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
     handler(None, None)
+    create_table_mock.assert_table_data_column(
+        'github_knowit_repos',
+        'id',
+        pd.Series([4730463]))

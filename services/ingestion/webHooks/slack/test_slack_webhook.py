@@ -7,7 +7,6 @@ from os import path
 from pytest import fixture
 from responses import RequestsMock, GET
 import pandas as pd
-from pandas.testing import assert_frame_equal
 
 
 @fixture
@@ -96,21 +95,7 @@ def test_insert_message_data(s3_bucket, mocked_responses, test_message_data):
         data['data'][0]['event_type'] == 'message'
 
 
-def test_process_data(mocker, mocked_responses, test_message_data):
-    def on_to_parquet(df, *a, **kwa):
-        print(df)
-        assert_frame_equal(
-            df.drop('time', axis=1),
-            pd.DataFrame({
-                'event_type': ['message'],
-                'channel': ['C2147483705'],
-                'channel_name': ['Test'],
-                'event_ts': [1234567890],
-                'team_id': ['TXXXXXXXX'],
-                'emoji': ['thumbsup'],
-            }))
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+def test_process_data(mocker, mocked_responses, test_message_data, create_table_mock):
     mocked_responses.add(GET, 'https://slack.com/api/channels.info', json={'channel': {'name': 'Test'}}, status=200)
 
     sig_string = f'v0:0:{test_message_data}'.encode()
@@ -121,3 +106,14 @@ def test_process_data(mocker, mocked_responses, test_message_data):
         'X-Slack-Request-Timestamp': '0'
         },
         body=test_message_data).to_dict(), None)
+
+    expected_df = pd.DataFrame({
+                'event_type': ['message'],
+                'channel': ['C2147483705'],
+                'channel_name': ['Test'],
+                'event_ts': [1234567890],
+                'team_id': ['TXXXXXXXX'],
+                'emoji': ['thumbsup'],
+            })
+
+    create_table_mock.assert_table_data_contains_df('slack_emoji', expected_df)

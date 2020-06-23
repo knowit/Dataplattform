@@ -6,7 +6,6 @@ from hashlib import sha1
 from os import path
 from pytest import fixture
 import pandas as pd
-from pandas.testing import assert_frame_equal
 
 
 @fixture
@@ -58,19 +57,7 @@ def test_insert_data(s3_bucket, test_data):
         data['data']['id'] == 186853002
 
 
-def test_process_data(mocker, test_data):
-    def on_to_parquet(df, *a, **kwa):
-        assert_frame_equal(
-            df.drop('time', axis=1),
-            pd.DataFrame({
-                'id': [186853002],
-                'updated_at': [1557933641],
-                'pushed_at': [1557933652],
-                'forks_count': [1],
-                'stargazers_count': [0]
-            }))
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+def test_process_data(mocker, test_data, create_table_mock):
 
     signature = new('iamsecret'.encode(), test_data.encode(), sha1).hexdigest()
     handler(APIGateway(
@@ -79,3 +66,12 @@ def test_process_data(mocker, test_data):
             'X-GitHub-Event': 'test'
             },
         body=test_data).to_dict(), None)
+
+    create_table_mock.assert_table_data_contains_df(
+        'github_knowit_repo_status', pd.DataFrame({
+                'id': [186853002],
+                'updated_at': [1557933641],
+                'pushed_at': [1557933652],
+                'forks_count': [1],
+                'stargazers_count': [0]
+            }))
