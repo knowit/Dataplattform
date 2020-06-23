@@ -132,8 +132,13 @@ def create_table_mock(mocker):
             check_names=False,
             **kwargs)
 
+    def assert_table_data_contains_df(table, df, **kwargs):
+        tmp_df = df.isin(df_from_calls(f'structured/{table}'))
+        assert tmp_df.eq(True).all().all() 
+
     on_to_parquet_stub.assert_table_created = assert_table_created
     on_to_parquet_stub.assert_table_data = assert_table_data
     on_to_parquet_stub.assert_table_data_column = assert_table_data_column
+    on_to_parquet_stub.assert_table_data_contains_df = assert_table_data_contains_df
 
     yield on_to_parquet_stub
