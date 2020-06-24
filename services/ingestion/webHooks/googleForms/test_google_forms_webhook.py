@@ -34,6 +34,12 @@ def test_data_form2():
 
 
 @fixture
+def test_data_empty():
+    with open(os.path.join(os.path.dirname(__file__), 'test_data_files/test_data_empty.json'), 'r') as json_file:
+        yield json_file.read()
+
+
+@fixture
 def test_data_form_multiple_respondents():
     with open(os.path.join(os.path.dirname(__file__),
               'test_data_files/test_data_multiple_respondents.json'), 'r') as json_file:
@@ -222,3 +228,28 @@ def test_process_get_metadata(mocker, create_table_mock, test_data_form):
         'google_forms_metadata',
         'uploaded_by_user',
         pd.Series(['test']))
+
+
+def test_process_no_responses(mocker, test_data_empty, create_table_mock):
+    handler(APIGateway(
+        headers={},
+        body=test_data_empty).to_dict(), None)
+
+    create_table_mock.assert_table_data_column(
+        'google_forms_metadata',
+        'uploaded_by_user',
+        pd.Series(['test_person_empty_test']))
+
+    create_table_mock.assert_table_data_column(
+        'google_forms_metadata',
+        'number_of_responses',
+        pd.Series([0]))
+
+
+def test_process_no_responses_no_data_added(mocker, test_data_empty, create_table_mock):
+    with pytest.raises(AssertionError):
+        handler(APIGateway(
+            headers={},
+            body=test_data_empty).to_dict(), None)
+
+        create_table_mock.assert_table_created('google_forms_data')

@@ -137,9 +137,14 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
             return result_frame
 
-        questions_dataframe = create_questions_dataframe(payload.get('responses', None))
+        responses = payload.get('responses')
+        questions_dataframe = pd.DataFrame()
+        if len(responses) > 0:
+            questions_dataframe = create_questions_dataframe(responses)
+
         metadata_df = pd.DataFrame({'uploaded_by_user': user,
-                                    'time_added': [metadata['timestamp']]})
+                                    'time_added': [metadata['timestamp']],
+                                    'number_of_responses': len(responses)})
         return questions_dataframe, metadata_df
 
     question_tables, metadata_tables = list(zip(*[
