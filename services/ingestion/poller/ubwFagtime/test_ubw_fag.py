@@ -2,7 +2,6 @@ from ubw_fag import handler
 from pytest import fixture
 from json import loads
 import pandas as pd
-from pandas.testing import assert_series_equal
 
 
 @fixture(autouse=True)
@@ -43,7 +42,6 @@ def zeep_ubw_mock(mocker):
 
 
 def test_handler_metadata(mocker, s3_bucket):
-    mocker.patch('pandas.DataFrame.to_parquet')
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
@@ -53,7 +51,6 @@ def test_handler_metadata(mocker, s3_bucket):
 
 
 def test_handler_data_length(mocker, s3_bucket):
-    mocker.patch('pandas.DataFrame.to_parquet')
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
@@ -63,7 +60,6 @@ def test_handler_data_length(mocker, s3_bucket):
 
 
 def test_handler_data(mocker, s3_bucket):
-    mocker.patch('pandas.DataFrame.to_parquet')
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
@@ -74,27 +70,23 @@ def test_handler_data(mocker, s3_bucket):
         data['data'][0]['used_hrs'] == '4'
 
 
-def test_process_data(mocker):
-    def on_to_parquet(df, *a, **kwa):
-        assert_series_equal(
-            df.reg_period,
-            pd.Series(['201817', '201907'], index=[0, 1]),
-            check_names=False)
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+def test_process_data(mocker, create_table_mock):
     handler(None, None)
 
+    create_table_mock.assert_table_data_column(
+        'ubw_fagtimer',
+        'reg_period',
+        pd.Series(['201817', '201907']))
 
-def test_process_data_skip_existing(mocker, athena):
+
+def test_process_data_skip_existing(mocker, athena, create_table_mock):
     athena.on_query(
         'SELECT "reg_period" FROM "dev_test_database"."ubw_fagtimer"',
         pd.DataFrame({'reg_period': ['201817']}))
 
-    def on_to_parquet(df, *a, **kwa):
-        assert_series_equal(
-            df.reg_period,
-            pd.Series(['201907'], index=[1]),
-            check_names=False)
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
     handler(None, None)
+
+    create_table_mock.assert_table_data_column(
+        'ubw_fagtimer',
+        'reg_period',
+        pd.Series(['201907']))

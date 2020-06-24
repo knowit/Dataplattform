@@ -3,7 +3,6 @@ from responses import RequestsMock, GET
 from pytest import fixture
 from json import loads, dumps
 import pandas as pd
-from pandas.testing import assert_series_equal
 
 
 @fixture
@@ -105,33 +104,29 @@ def test_handler_data(mocker, s3_bucket):
     assert all([expected[k] == v for k, v, in data['data'][0].items()])
 
 
-def test_process_data(mocker):
-    def on_to_parquet(df, *a, **kwa):
-        assert_series_equal(
-            df.medium_id,
-            pd.Series(['asdf', '1234'], index=[0, 1]),
-            check_names=False)
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
+def test_process_data(mocker, create_table_mock):
     handler(None, None)
 
+    create_table_mock.assert_table_data_column(
+        'blog_posts',
+        'medium_id',
+        pd.Series(['asdf', '1234']))
 
-def test_process_data_skip_existing(mocker, athena):
+
+def test_process_data_skip_existing(mocker, athena, create_table_mock):
+
     athena.on_query(
         'SELECT "medium_id" FROM "dev_test_database"."blog_posts"',
         pd.DataFrame({'medium_id': ['asdf']}))
 
-    def on_to_parquet(df, path, **kwa):
-        if path == 'structured/blog_posts':
-            assert_series_equal(
-                df.medium_id,
-                pd.Series(['1234'], index=[1]),
-                check_names=False)
-        else:
-            assert_series_equal(
-                df.medium_id,
-                pd.Series(['asdf', '1234'], index=[0, 1]),
-                check_names=False)
-
-    mocker.patch('pandas.DataFrame.to_parquet', new=on_to_parquet)
     handler(None, None)
+
+    create_table_mock.assert_table_data_column(
+        'blog_posts',
+        'medium_id',
+        pd.Series(['1234']))
+
+    create_table_mock.assert_table_data_column(
+        'blog_updates',
+        'medium_id',
+        pd.Series(['asdf', '1234']))

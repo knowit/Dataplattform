@@ -3,6 +3,7 @@ from pytest import fixture
 from responses import RequestsMock, GET
 from json import loads
 from os import path
+import pandas as pd
 
 location = 'Norway/Oslo/Oslo/Lakkegata'
 url = f'https://www.yr.no/place/{location}/varsel_time_for_time.xml'
@@ -58,3 +59,13 @@ def test_handler_data(s3_bucket, mocked_responses, test_data):
     }
 
     assert all([data['data'][0][k] == v for k, v in expected.items()])
+
+
+def test_hander_process_data(s3_bucket, mocked_responses, test_data, create_table_mock):
+    mocked_responses.add(GET, url, body=test_data, status=200)
+
+    handler(None, None)
+    create_table_mock.assert_table_data_column(
+        'yr_weather',
+        'location',
+        pd.Series(['Norway/Oslo/Oslo/Lakkegata']*24))
