@@ -64,14 +64,26 @@ def test_insert_data_quiz(s3_bucket, test_data_quiz, create_table_mock):
     create_table_mock.assert_table_data_column(
         'google_forms_data',
         'Form name',
-        pd.Series(['test_test_quiz',
-                   'test_test_quiz',
-                   'test_test_quiz',
-                   'test_test_quiz',
-                   'test_test_quiz',
-                   'test_test_quiz',
-                   'test_test_quiz',
-                   'test_test_quiz']))
+        pd.Series(['test_quiz',
+                   'test_quiz',
+                   'test_quiz',
+                   'test_quiz',
+                   'test_quiz',
+                   'test_quiz',
+                   'test_quiz',
+                   'test_quiz']))
+
+    create_table_mock.assert_table_data_column(
+        'google_forms_data',
+        'Uploaded by user',
+        pd.Series(['test_person',
+                   'test_person',
+                   'test_person',
+                   'test_person',
+                   'test_person',
+                   'test_person',
+                   'test_person',
+                   'test_person']))
 
     create_table_mock.assert_table_data_column(
         'google_forms_data',

@@ -22,7 +22,7 @@ def ingest(event) -> Data:
     )
 
 
-@handler.process(partitions={})
+@handler.process(partitions={'google_forms_data': ['Form name', 'Uploaded by user']})
 def process(data) -> Dict[str, pd.DataFrame]:
 
     def make_dataframes(d):
@@ -32,7 +32,6 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
         form_name = payload['tableName']
         form_name.replace(',', '_')
-        form_name = user + '_' + form_name  # avoid overwrite
         form_name = re.sub('[^A-Za-z0-9]+', '_', form_name)
 
         special_questions_list = ['GRID', 'CHECKBOX_GRID']
@@ -134,6 +133,8 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
             result_frame = pd.concat(result_frame_list, ignore_index=True)
             result_frame['Form name'] = pd.Series([form_name]*result_frame.shape[0], index=result_frame.index)
+            result_frame['Uploaded by user'] = pd.Series([user]*result_frame.shape[0], index=result_frame.index)
+
             return result_frame
 
         questions_dataframe = create_questions_dataframe(payload.get('responses', None))
