@@ -69,7 +69,7 @@ def test_insert_data_quiz(s3_bucket, test_data_quiz, create_table_mock):
 
     create_table_mock.assert_table_data_column(
         'google_forms_data',
-        'Form name',
+        'form_name',
         pd.Series(['test_quiz',
                    'test_quiz',
                    'test_quiz',
@@ -81,7 +81,7 @@ def test_insert_data_quiz(s3_bucket, test_data_quiz, create_table_mock):
 
     create_table_mock.assert_table_data_column(
         'google_forms_data',
-        'Uploaded by user',
+        'uploaded_by_user',
         pd.Series(['test_person',
                    'test_person',
                    'test_person',
@@ -93,7 +93,7 @@ def test_insert_data_quiz(s3_bucket, test_data_quiz, create_table_mock):
 
     create_table_mock.assert_table_data_column(
         'google_forms_data',
-        'isQuiz',
+        'is_quiz',
         pd.Series([True,
                    True,
                    True,
@@ -212,44 +212,16 @@ def test_insert_data_multiple_respondents(s3_bucket, test_data_form_multiple_res
                    ]))
     create_table_mock.assert_table_data_column(
         'google_forms_data',
-        'isQuiz',
+        'is_quiz',
         pd.Series([False,
                    False,
                    False,
                    False]))
 
 
-def test_process_get_metadata(mocker, create_table_mock, test_data_form):
-    handler(APIGateway(
-        headers={},
-        body=test_data_form).to_dict(), None)
-
-    create_table_mock.assert_table_data_column(
-        'google_forms_metadata',
-        'uploaded_by_user',
-        pd.Series(['test']))
-
-
-def test_process_no_responses(mocker, test_data_empty, create_table_mock):
-    handler(APIGateway(
-        headers={},
-        body=test_data_empty).to_dict(), None)
-
-    create_table_mock.assert_table_data_column(
-        'google_forms_metadata',
-        'uploaded_by_user',
-        pd.Series(['test_person_empty_test']))
-
-    create_table_mock.assert_table_data_column(
-        'google_forms_metadata',
-        'number_of_responses',
-        pd.Series([0]))
-
-
 def test_process_no_responses_no_data_added(mocker, test_data_empty, create_table_mock):
-    with pytest.raises(AssertionError):
-        handler(APIGateway(
+    handler(APIGateway(
             headers={},
             body=test_data_empty).to_dict(), None)
 
-        create_table_mock.assert_table_created('google_forms_data')
+    create_table_mock.assert_table_not_created('google_forms_data')

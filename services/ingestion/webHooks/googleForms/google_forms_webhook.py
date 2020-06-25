@@ -22,7 +22,7 @@ def ingest(event) -> Data:
     )
 
 
-@handler.process(partitions={'google_forms_data': ['Form name', 'Uploaded by user']})
+@handler.process(partitions={'google_forms_data': ['form_name', 'uploaded_by_user']})
 def process(data) -> Dict[str, pd.DataFrame]:
 
     def make_dataframes(d):
@@ -47,10 +47,10 @@ def process(data) -> Dict[str, pd.DataFrame]:
             def create_individual_dataframe(question, responder, timestamp, isQuiz):
                 data = {'question_title': question['title'],
                         'type': question['type'],
-                        'helpText': question['helpText'],
+                        'help_text': question['helpText'],
                         'responder': responder,
                         'timestamp': to_timestamp(timestamp),
-                        'isQuiz': isQuiz
+                        'is_quiz': isQuiz
                         }
 
                 new_sub_questions_list = []
@@ -117,9 +117,9 @@ def process(data) -> Dict[str, pd.DataFrame]:
                                   points_list)
 
                 questions_list = [[*data.values(), *vals] for vals in zipped_list]
-                df_columns = [*data.keys(), 'Sub question text', 'Answer',
-                              'Is correct', 'Feedback correct', 'Feedback incorrect',
-                              'Available points']
+                df_columns = [*data.keys(), 'sub_question text', 'answer',
+                              'is_correct', 'feedback_correct', 'feedback_incorrect',
+                              'available_points']
 
                 return pd.DataFrame(questions_list, columns=df_columns)
 
@@ -132,8 +132,10 @@ def process(data) -> Dict[str, pd.DataFrame]:
                 result_frame_list.append(pd.concat(ind_dfs, ignore_index=True))
 
             result_frame = pd.concat(result_frame_list, ignore_index=True)
-            result_frame['Form name'] = pd.Series([form_name]*result_frame.shape[0], index=result_frame.index)
-            result_frame['Uploaded by user'] = pd.Series([user]*result_frame.shape[0], index=result_frame.index)
+            result_frame['form_name'] = pd.Series([form_name]*result_frame.shape[0], index=result_frame.index)
+            result_frame['uploaded_by_user'] = pd.Series([user]*result_frame.shape[0], index=result_frame.index)
+            result_frame['time_uploaded'] = pd.Series([metadata['timestamp']]*result_frame.shape[0],
+                                                      index=result_frame.index)
 
             return result_frame
 
@@ -142,19 +144,10 @@ def process(data) -> Dict[str, pd.DataFrame]:
         if len(responses) > 0:
             questions_dataframe = create_questions_dataframe(responses)
 
-        metadata_df = pd.DataFrame({'uploaded_by_user': user,
-                                    'time_added': [metadata['timestamp']],
-                                    'number_of_responses': len(responses)})
-        return questions_dataframe, metadata_df
+        return questions_dataframe
 
-    question_tables, metadata_tables = list(zip(*[
-        (
-            questions_df,
-            metadata_df
-        ) for questions_df, metadata_df in [make_dataframes(d) for d in data]
-    ]))
+    question_tables = [make_dataframes(d) for d in data]
 
     return {
-            'google_forms_data': pd.concat(question_tables),
-            'google_forms_metadata': pd.concat(metadata_tables)
+            'google_forms_data': pd.concat(question_tables)
     }

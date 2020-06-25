@@ -106,7 +106,15 @@ def create_table_mock(mocker):
 
     def assert_table_created(*tables):
         tables = [f'structured/{t}' for t in tables]
+        if len(on_to_parquet_stub.call_args_list) == 0:
+            assert False
         assert all([t == tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)])
+
+    def assert_table_not_created(*tables):
+        tables = [f'structured/{t}' for t in tables]
+        if len(on_to_parquet_stub.call_args_list) == 0:
+            assert True
+        assert all([t != tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)])
 
     def df_from_calls(table):
         from pandas import concat
@@ -133,6 +141,7 @@ def create_table_mock(mocker):
             **kwargs)
 
     on_to_parquet_stub.assert_table_created = assert_table_created
+    on_to_parquet_stub.assert_table_not_created = assert_table_not_created
     on_to_parquet_stub.assert_table_data = assert_table_data
     on_to_parquet_stub.assert_table_data_column = assert_table_data_column
 
