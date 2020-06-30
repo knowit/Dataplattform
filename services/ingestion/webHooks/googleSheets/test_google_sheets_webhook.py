@@ -113,7 +113,6 @@ def test_process_parquet_get_data(mocker, create_table_mock, test_data1):
         pd.Series(['test@test.b']))
 
 
-""" TODO: Uncomment after fix in plugin.py to acc. for checking append to table
 def test_process_parquet_add_twice(mocker, create_table_mock, test_data1, test_data2):
     handler(APIGateway(
         headers={},
@@ -127,4 +126,3 @@ def test_process_parquet_add_twice(mocker, create_table_mock, test_data1, test_d
         'google_sheets_metadata',
         'uploaded_by_user',
         pd.Series(['test@test.b', 'test2@test.b']))
-"""

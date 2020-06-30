@@ -1,0 +1,62 @@
+{
+    "tableName": "test_form",
+    "responses": [
+        {
+            "respondent": "",
+            "timestamp": "2020-06-22T08:02:15.951Z",
+            "id": "test_user1",
+            "isQuiz": false,
+            "questions": [
+                {
+                    "title": "Skriv et kort svar.",
+                    "helpText": "",
+                    "id": 421677050,
+                    "type": "TEXT",
+                    "answer": {
+                        "response": "svar 1"
+                    },
+                    "typeData": {}
+                },
+                {
+                    "title": "Skriv et litt lengere svar",
+                    "helpText": "",
+                    "id": 419441128,
+                    "type": "PARAGRAPH_TEXT",
+                    "answer": {
+                        "response": "et lengere svar 1"
+                    },
+                    "typeData": {}
+                }
+            ]
+        },
+        {
+            "respondent": "",
+            "timestamp": "2020-06-22T10:24:16.103Z",
+            "id": "test_user2",
+            "isQuiz": false,
+            "questions": [
+                {
+                    "title": "Skriv et kort svar.",
+                    "helpText": "",
+                    "id": 421677050,
+                    "type": "TEXT",
+                    "answer": {
+                        "response": "test svar 2"
+                    },
+                    "typeData": {}
+                },
+                {
+                    "title": "Skriv et litt lengere svar",
+                    "helpText": "",
+                    "id": 419441128,
+                    "type": "PARAGRAPH_TEXT",
+                    "answer": {
+                        "response": "long test svar 2"
+                    },
+                    "typeData": {}
+                }
+            ]
+        }
+    ],
+    "user": "test_user"
+}

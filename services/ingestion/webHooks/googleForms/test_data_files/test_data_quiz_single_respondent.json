@@ -1,0 +1,247 @@
+{
+    "tableName": "test_quiz_m_poeng",
+    "responses": [
+        {
+            "respondent": "",
+            "timestamp": "2020-06-19T12:49:20.855Z",
+            "id": "test_user1",
+            "isQuiz": true,
+            "questions": [
+                {
+                    "title": "Skala",
+                    "helpText": "",
+                    "id": 837637592,
+                    "type": "SCALE",
+                    "answer": {
+                        "response": "2",
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {
+                        "leftLabel": "Lite",
+                        "rightLavel": "Mye",
+                        "lowerBound": 1,
+                        "upperBound": 5,
+                        "points": 1,
+                        "feedback": "test"
+                    }
+                },
+                {
+                    "title": "Hva heter onkelen til Donald Duck",
+                    "helpText": "",
+                    "id": 279588284,
+                    "type": "MULTIPLE_CHOICE",
+                    "answer": {
+                        "response": "Onkel Due"
+                    },
+                    "typeData": {
+                        "choices": [
+                            {
+                                "value": "Onkel Skrue",
+                                "isCorrect": true
+                            },
+                            {
+                                "value": "Onkel Due",
+                                "isCorrect": false
+                            },
+                            {
+                                "value": "Onkel Lue",
+                                "isCorrect": false
+                            }
+                        ],
+                        "points": 1,
+                        "feedbackCorrect": "Du er kjempeflink!",
+                        "feedbackIncorrect": null
+                    }
+                },
+                {
+                    "title": "Hvor gammel er Ane Brun i 2020",
+                    "helpText": "",
+                    "id": 1668788625,
+                    "type": "TEXT",
+                    "answer": {
+                        "response": "143",
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {
+                        "points": 1,
+                        "feedback": "Du hadde rett"
+                    }
+                },
+                {
+                    "title": "Hva er rett av A og B eller begge?",
+                    "helpText": "",
+                    "id": 1442187323,
+                    "type": "CHECKBOX",
+                    "answer": {
+                        "response": [
+                            "B"
+                        ],
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {
+                        "choices": [
+                            {
+                                "value": "A",
+                                "isCorrect": true
+                            },
+                            {
+                                "value": "B",
+                                "isCorrect": false
+                            }
+                        ],
+                        "points": 1,
+                        "feedbackCorrect": "Du hadde rett",
+                        "feedbackIncorrect": "Du hadde ikke rett"
+                    }
+                },
+                {
+                    "title": "Hvor hoey er Galdu00f8piggen?",
+                    "helpText": "",
+                    "id": 724295289,
+                    "type": "MULTIPLE_CHOICE",
+                    "answer": {
+                        "response": "2469"
+                    },
+                    "typeData": {
+                        "choices": [
+                            {
+                                "value": "2469",
+                                "isCorrect": true
+                            },
+                            {
+                                "value": "2488",
+                                "isCorrect": false
+                            }
+                        ],
+                        "points": 1,
+                        "feedbackCorrect": "Du har rett",
+                        "feedbackIncorrect": "Du har feil"
+                    }
+                },
+                {
+                    "title": "Hva er rett av A og B",
+                    "helpText": "",
+                    "id": 1012324751,
+                    "type": "LIST",
+                    "answer": {
+                        "response": "A",
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {
+                        "choices": [
+                            {
+                                "value": "A",
+                                "isCorrect": true
+                            },
+                            {
+                                "value": "B",
+                                "isCorrect": false
+                            }
+                        ],
+                        "points": 1,
+                        "feedbackCorrect": "Rett",
+                        "feedbackIncorrect": "Feil"
+                    }
+                },
+                {
+                    "title": "Last opp riktig fil",
+                    "helpText": "",
+                    "id": 1410779325,
+                    "type": "FILE_UPLOAD",
+                    "answer": {
+                        "response": [
+                            "1NPbP2Hw_iYBUSOKtjo2x-a14H9O4waI6"
+                        ],
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {}
+                },
+                {
+                    "title": "Hva er favorittfargen min paa ...?",
+                    "helpText": "",
+                    "id": 1993544469,
+                    "type": "GRID",
+                    "answer": {
+                        "response": [
+                            "groenn",
+                            "gul"
+                        ]
+                    },
+                    "typeData": {
+                        "columns": [
+                            "groenn",
+                            "gul"
+                        ],
+                        "rows": [
+                            "bil",
+                            "genser"
+                        ]
+                    }
+                },
+                {
+                    "title": "Hva har vi i ...?",
+                    "helpText": "",
+                    "id": 1223003906,
+                    "type": "CHECKBOX_GRID",
+                    "answer": {
+                        "response": [
+                            [
+                                "Begge"
+                            ],
+                            [
+                                "Begge"
+                            ]
+                        ]
+                    },
+                    "typeData": {
+                        "columns": [
+                            "Vann",
+                            "Brus",
+                            "Begge"
+                        ],
+                        "rows": [
+                            "huset",
+                            "bilen"
+                        ]
+                    }
+                },
+                {
+                    "title": "Naar Ane Brun foedt? ",
+                    "helpText": "",
+                    "id": 111652686,
+                    "type": "DATE",
+                    "answer": {
+                        "response": "2020-06-25",
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {
+                        "points": 1,
+                        "feedback": "Tilbakemelding"
+                    }
+                },
+                {
+                    "title": "Hva var klokka?",
+                    "helpText": "",
+                    "id": 1803513619,
+                    "type": "TIME",
+                    "answer": {
+                        "response": "12:33",
+                        "feedback": null,
+                        "score": null
+                    },
+                    "typeData": {
+                        "points": 1,
+                        "feedback": null
+                    }
+                }
+            ]
+        }
+    ],
+    "user": "test_user"
+}

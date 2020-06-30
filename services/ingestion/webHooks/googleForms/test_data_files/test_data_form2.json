@@ -1,0 +1,189 @@
+{
+    "tableName": "test_form",
+    "responses": [
+        {
+            "respondent": "",
+            "timestamp": "2020-06-22T10:24:16.103Z",
+            "id": "test_id_1",
+            "isQuiz": false,
+            "questions": [
+                {
+                    "title": "Skriv et litt lengere svar",
+                    "helpText": "",
+                    "id": 419441128,
+                    "type": "PARAGRAPH_TEXT",
+                    "answer": {
+                        "response": "long test svar 2"
+                    },
+                    "typeData": {}
+                },
+                {
+                    "title": "Skriv et kort svar.",
+                    "helpText": "",
+                    "id": 421677050,
+                    "type": "TEXT",
+                    "answer": {
+                        "response": "test svar 2"
+                    },
+                    "typeData": {}
+                },
+                {
+                    "title": "Velg 1 av 2, ev. annet, radiobutton",
+                    "helpText": "",
+                    "id": 587894165,
+                    "type": "MULTIPLE_CHOICE",
+                    "answer": {
+                        "response": "Alternativ 2"
+                    },
+                    "typeData": {
+                        "choices": [
+                            {
+                                "value": "Alternativ 1"
+                            },
+                            {
+                                "value": "Alternativ 2"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "title": "Velg 1 og/eller 2, checkboxes",
+                    "helpText": "",
+                    "id": 198929398,
+                    "type": "CHECKBOX",
+                    "answer": {
+                        "response": [
+                            "Alternativ 2"
+                        ]
+                    },
+                    "typeData": {
+                        "choices": [
+                            {
+                                "value": "Alternativ 1"
+                            },
+                            {
+                                "value": "Alternativ 2"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "title": "Vel 1 eller 2",
+                    "helpText": "",
+                    "id": 418998160,
+                    "type": "LIST",
+                    "answer": {
+                        "response": "Alternativ 2"
+                    },
+                    "typeData": {
+                        "choices": [
+                            {
+                                "value": "Alternativ 1"
+                            },
+                            {
+                                "value": "Alternativ 2"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "title": "Skala 1 til 5",
+                    "helpText": "",
+                    "id": 1019477252,
+                    "type": "SCALE",
+                    "answer": {
+                        "response": "3"
+                    },
+                    "typeData": {
+                        "leftLabel": "Lite",
+                        "rightLavel": "Mye",
+                        "lowerBound": 1,
+                        "upperBound": 5
+                    }
+                },
+                {
+                    "title": "Favorittfarge paa ...",
+                    "helpText": "",
+                    "id": 192414462,
+                    "type": "GRID",
+                    "answer": {
+                        "response": [
+                            "Ru00f8d",
+                            "Blu00e5"
+                        ]
+                    },
+                    "typeData": {
+                        "columns": [
+                            "Ru00f8d",
+                            "Blu00e5"
+                        ],
+                        "rows": [
+                            "bil",
+                            "genser"
+                        ]
+                    }
+                },
+                {
+                    "title": "Hva vil du ha til ...",
+                    "helpText": "",
+                    "id": 846721239,
+                    "type": "CHECKBOX_GRID",
+                    "answer": {
+                        "response": [
+                            [
+                                "Pizza"
+                            ],
+                            [
+                                "Pasta"
+                            ]
+                        ]
+                    },
+                    "typeData": {
+                        "columns": [
+                            "Pizza",
+                            "Pasta",
+                            "Wraps"
+                        ],
+                        "rows": [
+                            "Middag",
+                            "Kvelds"
+                        ]
+                    }
+                },
+                {
+                    "title": "Hvilken dato fikk du din foerste bil",
+                    "helpText": "",
+                    "id": 279727118,
+                    "type": "DATE",
+                    "answer": {
+                        "response": "2020-06-10"
+                    },
+                    "typeData": {}
+                },
+                {
+                    "title": "Hva var klokka?",
+                    "helpText": "",
+                    "id": 1880423110,
+                    "type": "TIME",
+                    "answer": {
+                        "response": "12:33"
+                    },
+                    "typeData": {}
+                },
+                {
+                    "title": "Legg til en fil",
+                    "helpText": "",
+                    "id": 1078576350,
+                    "type": "FILE_UPLOAD",
+                    "answer": {
+                        "response": [
+                            "test_file_2"
+                        ]
+                    },
+                    "typeData": {}
+                }
+            ]
+        }
+    ],
+    "user": "test"
+}
