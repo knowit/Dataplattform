@@ -39,6 +39,13 @@ resources:
         ExplicitAuthFlows:
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
+        PreventUserExistenceErrors: ENABLED 
+
+    UserPoolDomain: 
+      Type: AWS::Cognito::UserPoolDomain 
+      Properties:
+        UserPoolId: !Ref CognitoUserPool
+        Domain: ${self:custom.stage}-dataplattform-users
 
     CognitoUserPoolGroupLevel2:
       Type: AWS::Cognito::UserPoolGroup
