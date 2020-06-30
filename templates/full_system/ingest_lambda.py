@@ -19,6 +19,9 @@ def ingest(event) -> Data:
     sqs_url = response['QueueUrl']
     timestamp_now = int(datetime.now().timestamp())
     message_response = sqs_client.send_message(QueueUrl=sqs_url, MessageBody=str(timestamp_now) + '.json',
+                                               MessageAttributes={'s3FileName': {
+                                                                   'StringValue': str(timestamp_now) + '.json',
+                                                                   'DataType': 'String'}},
                                                MessageGroupId="messageGroup1")
 
     d = [{'test': 'This is a test message', 'id': 1}, {'test': 'This is also a test message', 'id': 2}]

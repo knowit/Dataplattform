@@ -11,26 +11,24 @@ handler = Handler()
 
 
 @handler.ingest()
-def ingest(event):
-    return None
-
+def ingest(event) -> Data:
+    return Data(
+        metadata=Metadata(timestamp=int(datetime.now().timestamp())),
+        data=event["Records"])
 
 @handler.process(partitions={})
 def process(data) -> Dict[str, pd.DataFrame]:
     print('---------------------- In process lambda ----------------------\n')
-    print(event)
-    
-    filename = 'raw/' + event['Records'][0]['body'] + '.json'
-    s3 = S3(environ['ACCESS_PATH'])
-    print(environ['ACCESS_PATH'])
+    print(data[0])
 
-    test_text = s3.get(filename).json()
-    print(test_text)
-    data = test_text
+    def get_s3_key(d):
+        d = d.json()
+        return d['data'][0]['messageAttributes']['s3FileName']
 
-    def make_dataframe(d, timestamp):
-        df = pd.json_normalize(d)
-        df['time'] = int(timestamp)
-        return df
+    s3_keys = [get_s3_key(d) for d in data]
+    print(s3_keys)
 
-    return pd.concat([make_dataframe(d, data['metadata']['timestamp']) for d in data['data']])
+    # fetch files from s3
+    # do processing on files
+
+    return {'some_structured_data': pd.DataFrame()}
