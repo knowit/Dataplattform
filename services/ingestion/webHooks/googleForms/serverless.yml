@@ -5,7 +5,7 @@ custom:
   editable:
     timeout: 12
     handlerFile: google_forms_webhook
-    description: Endpoint for Google Sheet webhooks
+    description: Endpoint for Google Forms webhooks
     accessLevel: level-3
     dataFolder: googleForms/forms
   ################################################
@@ -122,15 +122,7 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
-
+          
 plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
