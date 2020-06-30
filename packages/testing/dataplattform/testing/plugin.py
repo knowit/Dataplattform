@@ -1,5 +1,5 @@
 from pytest import fixture, hookimpl
-from moto import mock_s3, mock_ssm
+from moto import mock_s3, mock_ssm, mock_sqs
 from boto3 import resource, client
 from os import environ
 from unittest.mock import patch, MagicMock
@@ -30,7 +30,9 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('DATALAKE', 'testlake'),
         ('ACCESS_PATH', 'data/test/'),
         ('STAGE', 'dev'),
-        ('SERVICE', 'testService')
+        ('SERVICE', 'testService'),
+        ('SQS_QUEUE_NAME', 'test.fifo'),
+        ('SQS_MESSAGE_GROUP_ID', 'test_groud_id')
     ]
     for key, value in default_env:
         if key not in environ:
@@ -62,6 +64,14 @@ def s3_bucket():
         s3 = resource('s3')
         s3.create_bucket(Bucket=environ.get('DATALAKE'))
         yield s3.Bucket(environ.get('DATALAKE'))
+
+
+@fixture(autouse=True)
+def sqs_queue():
+    with mock_sqs():
+        sqs = resource('sqs')
+        sqs.create_queue(QueueName=environ.get('SQS_QUEUE_NAME'))
+        yield sqs
 
 
 @fixture(autouse=True)

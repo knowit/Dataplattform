@@ -78,6 +78,7 @@ functions:
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
     tags: # Tag for this function. Every function are tagged with stage by default
     
     events: # The Events that trigger this Function

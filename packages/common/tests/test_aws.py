@@ -154,3 +154,14 @@ def test_s3fs_exists(s3_bucket):
 
     s3 = aws.S3(access_path='data')
     assert s3.fs.exists('test.txt') is True
+
+
+def test_sqs(sqs_queue):
+    sqs = aws.SQS()
+    assert sqs is not None
+
+
+def test_sqs_send_message(sqs_queue):
+    sqs = aws.SQS()
+    reponse = sqs.send_message('file_name')
+    assert reponse.get('Failed') is None

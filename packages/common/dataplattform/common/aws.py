@@ -121,5 +121,20 @@ class SSM:
             Tier=tier)
 
 
+class SQS:
+    def __init__(self, path: str = None):
+        self.path = path or path_join('/', environ.get("STAGE"), environ.get("SERVICE"))
+        self.client = boto3.client('sqs')
+
+    def send_message(self, file_name: str = None):
+        response = self.client.get_queue_url(QueueName=environ.get("SQS_QUEUE_NAME"))
+        sqs_url = response['QueueUrl']
+        return self.client.send_message(QueueUrl=sqs_url, MessageBody=file_name,
+                                        MessageAttributes={'s3FileName': {
+                                                           'StringValue': file_name,
+                                                           'DataType': 'String'}},
+                                        MessageGroupId=environ.get("SQS_MESSAGE_GROUP_ID"))
+
+
 def path_join(*paths):
     return path.join(*paths).replace(sep, '/')
