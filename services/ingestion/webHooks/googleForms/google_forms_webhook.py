@@ -92,7 +92,7 @@ def process(data) -> Dict[str, pd.DataFrame]:
                         c_keys = [choice['value'] for choice in choices]
                         c_values = [choice['isCorrect'] for choice in choices]
                         d = dict(zip(c_keys, c_values))
-                        answer_check_list = [d[elem] for elem in new_sub_answers_list]
+                        answer_check_list = [d.get(elem, pd.NA) for elem in new_sub_answers_list]
                 else:
                     raise KeyError('Question type: ' + question_type + ' is not supported')
 
