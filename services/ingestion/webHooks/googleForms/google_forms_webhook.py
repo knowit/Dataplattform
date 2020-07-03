@@ -111,17 +111,17 @@ def process(data) -> Dict[str, pd.DataFrame]:
 
                 zipped_list = zip(new_sub_questions_list,
                                   new_sub_answers_list,
-                                  answer_check_list,
                                   feedback_correct,
                                   feedback_incorrect,
                                   points_list)
 
                 questions_list = [[*data.values(), *vals] for vals in zipped_list]
                 df_columns = [*data.keys(), 'sub_question text', 'answer',
-                              'is_correct', 'feedback_correct', 'feedback_incorrect',
+                              'feedback_correct', 'feedback_incorrect',
                               'available_points']
-
-                return pd.DataFrame(questions_list, columns=df_columns)
+                df = pd.DataFrame(questions_list, columns=df_columns)
+                df['is_correct'] = pd.Series(answer_check_list, dtype=object)
+                return df
 
             result_frame_list = []
             for repsons in responses:
