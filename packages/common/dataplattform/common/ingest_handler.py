@@ -44,7 +44,7 @@ class Handler:
 
             if result:
                 raw_data = result
-                response = sqs.send_message(s3.put(raw_data, 'raw'))
+                response = sqs.send_custom_filename_message(s3.put(raw_data, 'raw'))
                 assert response.get('Failed') is None
 
         return Response().to_dict()

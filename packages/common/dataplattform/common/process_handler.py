@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from dataclasses_json import dataclass_json, LetterCase
 from dataplattform.common.schema import Data
-from dataplattform.common.aws import S3, S3Result
+from dataplattform.common.aws import S3
 from fastparquet import ParquetFile
 from datetime import datetime
 import numpy as np
@@ -39,15 +39,21 @@ class Handler:
 
         if 'process' in self.wrapped_func:
             def load_event_data(event):
-                print(event)
-                keys = [
-                    record.get('messageAttributes', {}).get('s3FileName', {}).get('stringValue', '')
-                    for record in event.get('Records', [])
-                ]
-                return [s3.get(key) for key in keys if key]
+                keys = [record.get('messageAttributes', {}).get('s3FileName', {}).get('stringValue', '')
+                        for record in event.get('Records', [])
+                        ]
+                sent_time_list = [record.get('attributes', {}).get('SentTimestamp', 0)
+                                  for record in event.get('Records', [])
+                                  ]
+
+                recieved_time_list = [record.get('attributes', {}).get('ApproximateFirstReceiveTimestamp', 0)
+                                      for record in event.get('Records', [])
+                                      ]
+
+                keylist = [s3.get(key) for key in keys if key]
+                return [keylist, sent_time_list, recieved_time_list]  # TODO: Fix
 
             data = load_event_data(event)
-            print(data)
             if data:
                 tables = self.wrapped_func['process'](data)
                 partitions = self.wrapped_func_args.get('process', {}).get('partitions', {})

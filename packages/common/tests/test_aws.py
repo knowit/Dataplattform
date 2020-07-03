@@ -163,5 +163,5 @@ def test_sqs(sqs_queue):
 
 def test_sqs_send_message(sqs_queue):
     sqs = aws.SQS()
-    reponse = sqs.send_message('file_name')
+    reponse = sqs.send_file_message('file_name')
     assert reponse.get('Failed') is None
