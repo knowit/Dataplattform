@@ -1,22 +1,15 @@
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json, LetterCase
 from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3, SQS
+from dataplattform.common.handlers import Response
+from typing import Dict, Any, Callable
 
 
-@dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass
-class Response:
-    status_code: int = 200
-    body: str = ''
-
-
-class Handler:
+class IngestHandler:
     def __init__(self, access_path: str = None, bucket: str = None):
         self.access_path = access_path
         self.bucket = bucket
-        self.wrapped_func = {}
-        self.wrapped_func_args = {}
+        self.wrapped_func: Dict[str, Callable]  = {}
+        self.wrapped_func_args: Dict[str, Any] = {}
 
     def __call__(self, event, context=None):
         if 'validate' in self.wrapped_func:
@@ -51,13 +44,13 @@ class Handler:
 
     def validate(self):
         def wrap(f):
-            self.wrapped_func['validate'] = Handler.__wrapper_func(f, bool, str, Response)
+            self.wrapped_func['validate'] = IngestHandler.__wrapper_func(f, bool, str, Response)
             return self.wrapped_func['validate']
         return wrap
 
     def ingest(self):
         def wrap(f):
-            self.wrapped_func['ingest'] = Handler.__wrapper_func(f, Data, Response)
+            self.wrapped_func['ingest'] = IngestHandler.__wrapper_func(f, Data, Response)
             return self.wrapped_func['ingest']
         return wrap
 

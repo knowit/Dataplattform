@@ -5,7 +5,7 @@ from dataplattform.common.schema import Data
 from s3fs import S3FileSystem
 from json import loads
 from datetime import datetime
-from uuid import uuid1
+from uuid import uuid4
 
 class S3Result:
     def __init__(self, res, error=None):
@@ -31,7 +31,7 @@ class S3:
         self.s3 = boto3.resource('s3')
 
     def put(self, data: Data, path: str = ''):
-        key = path_join(self.access_path, path, f'{uuid1()}.json')
+        key = path_join(self.access_path, path, f'{uuid4()}.json')
         s3_object = self.s3.Object(self.bucket, key)
         s3_object.put(Body=data.to_json().encode('utf-8'))
         return key
@@ -127,15 +127,14 @@ class SQS:
         self.path = path or path_join('/', environ.get("STAGE"), environ.get("SERVICE"))
         self.client = boto3.client('sqs')
 
-    def send_custom_filename_message(self, file_name: str = None):
-        print(file_name)
-        response = self.client.get_queue_url(QueueName=environ.get("SQS_QUEUE_NAME"))
+    def send_custom_filename_message(self, file_name: str = None, queue_name: str = None, group_id: str = None):
+        response = self.client.get_queue_url(QueueName=queue_name or environ.get("SQS_QUEUE_NAME"))
         sqs_url = response['QueueUrl']
         return self.client.send_message(QueueUrl=sqs_url, MessageBody=file_name,
                                         MessageAttributes={'s3FileName': {
                                                            'StringValue': file_name,
                                                            'DataType': 'String'}},
-                                        MessageGroupId=environ.get("SQS_MESSAGE_GROUP_ID"))
+                                        MessageGroupId=group_id or environ.get("SQS_MESSAGE_GROUP_ID"))
 
 
 def path_join(*paths):

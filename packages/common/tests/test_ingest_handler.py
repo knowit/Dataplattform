@@ -1,19 +1,16 @@
 from dataplattform.common import schema
-from dataplattform.common import ingest_handler as handler
-import pandas as pd
-import re
-import pytest
+from dataplattform.common.handlers import ingest as handler
 
 
 def test_empty_handler():
-    ingest_handler = handler.Handler()
+    ingest_handler = handler.IngestHandler()
     res = ingest_handler(None)
 
     assert res['statusCode'] == 200 and res['body'] == ''
 
 
 def test_handler_response():
-    ingest_handler = handler.Handler()
+    ingest_handler = handler.IngestHandler()
 
     @ingest_handler.ingest()
     def test(event):
@@ -24,7 +21,7 @@ def test_handler_response():
 
 
 def test_handler_data(s3_bucket):
-    ingest_handler = handler.Handler()
+    ingest_handler = handler.IngestHandler()
 
     @ingest_handler.ingest()
     def test(event):
@@ -41,7 +38,7 @@ def test_handler_data(s3_bucket):
 
 
 def test_handler_validate(mocker):
-    ingest_handler = handler.Handler()
+    ingest_handler = handler.IngestHandler()
 
     @ingest_handler.validate()
     def test_validate(event):
@@ -52,7 +49,7 @@ def test_handler_validate(mocker):
 
 
 def test_handler_invalid_skip_ingest(mocker):
-    ingest_handler = handler.Handler()
+    ingest_handler = handler.IngestHandler()
 
     @ingest_handler.validate()
     def test_validate(event):
@@ -66,7 +63,7 @@ def test_handler_invalid_skip_ingest(mocker):
 
 
 def test_handler_valid_call_ingest(mocker):
-    ingest_handler = handler.Handler()
+    ingest_handler = handler.IngestHandler()
 
     @ingest_handler.validate()
     def test_validate(event):

@@ -1,25 +1,21 @@
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json, LetterCase
 from dataplattform.common.schema import Data
-from dataplattform.common.aws import S3
+from dataplattform.common.aws import S3, S3Result
+from dataplattform.common.handlers import Response
 from fastparquet import ParquetFile
 from datetime import datetime
 import numpy as np
+from typing import Dict, Any, Callable
+from warnings import warn
 
 
-@dataclass_json(letter_case=LetterCase.CAMEL)
-@dataclass
-class Response:
-    status_code: int = 200
-    body: str = ''
-
-
-class Handler:
+class MixedHandler:
     def __init__(self, access_path: str = None, bucket: str = None):
+        warn('MixedHandler is deprecated: use separate ingest and process handlers', DeprecationWarning)
+
         self.access_path = access_path
         self.bucket = bucket
-        self.wrapped_func = {}
-        self.wrapped_func_args = {}
+        self.wrapped_func: Dict[str, Callable] = {}
+        self.wrapped_func_args: Dict[str, Any] = {}
 
     def __call__(self, event, context=None):
         if 'validate' in self.wrapped_func:
@@ -36,24 +32,26 @@ class Handler:
         s3 = S3(
             access_path=self.access_path,
             bucket=self.bucket)
+        raw_data = None
+
+        if 'ingest' in self.wrapped_func:
+            result = self.wrapped_func['ingest'](event)
+            if result and isinstance(result, Response):
+                return result.to_dict()
+
+            if result:
+                raw_data = result
+                s3.put(raw_data, 'raw')
 
         if 'process' in self.wrapped_func:
             def load_event_data(event):
-                keys = [record.get('messageAttributes', {}).get('s3FileName', {}).get('stringValue', '')
-                        for record in event.get('Records', [])
-                        ]
-                sent_time_list = [record.get('attributes', {}).get('SentTimestamp', 0)
-                                  for record in event.get('Records', [])
-                                  ]
+                keys = [
+                    r.get('s3', {}).get('object', {}).get('key', None)
+                    for r in event.get('Records', [])
+                ]
+                return [s3.get(key) for key in keys if key]
 
-                recieved_time_list = [record.get('attributes', {}).get('ApproximateFirstReceiveTimestamp', 0)
-                                      for record in event.get('Records', [])
-                                      ]
-
-                keylist = [s3.get(key) for key in keys if key]
-                return [keylist, sent_time_list, recieved_time_list]  # TODO: Fix
-
-            data = load_event_data(event)
+            data = [S3Result(raw_data)] if raw_data else load_event_data(event)
             if data:
                 tables = self.wrapped_func['process'](data)
                 partitions = self.wrapped_func_args.get('process', {}).get('partitions', {})
@@ -79,7 +77,7 @@ class Handler:
                     table_exists = s3.fs.exists(f'structured/{table_name}/_metadata')
                     if table_exists:
                         dataset = ParquetFile(f'structured/{table_name}', open_with=s3.fs.open)
-                        if not Handler.verify_schema(dataset, frame, table_partitions):
+                        if not MixedHandler.verify_schema(dataset, frame, table_partitions):
                             old_files = [
                                 fn.split(f'structured/{table_name}/')[-1]
                                 for fn in s3.fs.find(f'structured/{table_name}')
@@ -106,19 +104,19 @@ class Handler:
 
     def validate(self):
         def wrap(f):
-            self.wrapped_func['validate'] = Handler.__wrapper_func(f, bool, str, Response)
+            self.wrapped_func['validate'] = MixedHandler.__wrapper_func(f, bool, str, Response)
             return self.wrapped_func['validate']
         return wrap
 
     def ingest(self):
         def wrap(f):
-            self.wrapped_func['ingest'] = Handler.__wrapper_func(f, Data, Response)
+            self.wrapped_func['ingest'] = MixedHandler.__wrapper_func(f, Data, Response)
             return self.wrapped_func['ingest']
         return wrap
 
     def process(self, partitions):
         def wrap(f):
-            self.wrapped_func['process'] = Handler.__wrapper_func(f, dict)
+            self.wrapped_func['process'] = MixedHandler.__wrapper_func(f, dict)
             self.wrapped_func_args['process'] = dict(partitions=partitions)
             return self.wrapped_func['process']
         return wrap

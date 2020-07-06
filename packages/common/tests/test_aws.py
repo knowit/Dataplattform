@@ -1,6 +1,9 @@
 from dataplattform.common import aws, schema
 from os import environ
 from pytest import mark
+import re
+
+uuid_regex = r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}'
 
 
 def test_s3_default():
@@ -15,19 +18,20 @@ def test_s3_default_overrides():
         s3.bucket == 'myBucket'
 
 
-@mark.parametrize('path, expected_key', [
-    ('', 'abc/123/1234.json'),
-    ('test', 'abc/123/test/1234.json'),
-    ('test/', 'abc/123/test/1234.json')
+@mark.parametrize('path, expected_key_pattern', [
+    ('', f'abc/123/{uuid_regex}.json'),
+    ('test', f'abc/123/test/{uuid_regex}.json'),
+    ('test/', f'abc/123/test/{uuid_regex}.json')
 ])
-def test_s3_key(path, expected_key):
+def test_s3_key(path, expected_key_pattern):
     s3 = aws.S3(access_path='abc/123')
     key = s3.put(
         schema.Data(
             metadata=schema.Metadata(timestamp=1234),
             data=''),
         path=path)
-    assert key == expected_key
+
+    assert re.fullmatch(expected_key_pattern, key)
 
 
 def test_s3_put_data(s3_bucket):
@@ -163,5 +167,5 @@ def test_sqs(sqs_queue):
 
 def test_sqs_send_message(sqs_queue):
     sqs = aws.SQS()
-    reponse = sqs.send_file_message('file_name')
+    reponse = sqs.send_custom_filename_message('file_name')
     assert reponse.get('Failed') is None
