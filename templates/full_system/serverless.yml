@@ -93,7 +93,7 @@ functions:
       - sqs: 
           arn:
             Fn::GetAtt:
-              - MyQueue
+              - EventQueue
               - Arn
           batchSize: 1
   
@@ -157,7 +157,7 @@ resources: # The resources your functions use
                    - sqs:GetQueueUrl
                    - sqs:SendMessageBatch
                    - sqs:SendMessage
-                  Resource: !GetAtt MyQueue.Arn
+                  Resource: !GetAtt EventQueue.Arn
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -189,17 +189,17 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-    MyQueue:
+    EventQueue:
       Type: AWS::SQS::Queue
       Properties: 
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, , by design given as an uuid1
         RedrivePolicy: 
-          deadLetterTargetArn : !GetAtt MyQueueDL.Arn
+          deadLetterTargetArn : !GetAtt EventQueueDL.Arn
           maxReceiveCount : 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
 
-    MyQueueDL: #Messages that fail are put here
+    EventQueueDL: #Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties: 
         FifoQueue: true

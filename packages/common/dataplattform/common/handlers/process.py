@@ -1,4 +1,3 @@
-from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3
 from dataplattform.common.handlers import Response, verify_schema, make_wrapper_func
 from datetime import datetime
@@ -6,7 +5,6 @@ import numpy as np
 import pandas as pd
 from typing import Dict, Any, Callable, List, AnyStr
 from warnings import catch_warnings, filterwarnings
-from inspect import signature
 
 with catch_warnings():
     filterwarnings("ignore")
@@ -60,12 +58,9 @@ class ProcessHandler:
             return [
                 s3.get(key) for key in
                 [
-                    record.get('messageAttributes', {}).get(
-                        's3FileName', {}).get('stringValue', '')
-                    for record in event.get('Records', [])
+                    record.get('body', None) for record in event.get('Records', [])
                 ] if key
             ]
-
 
         tables = self.wrapped_func['process'](load_event_data(event), event.get('Records', []))
         partitions = self.wrapped_func_args.get(
@@ -88,14 +83,14 @@ class ProcessHandler:
                 s3, frame, table_name, table_partitions)
 
             frame.to_parquet(f'structured/{table_name}',
-                                engine='fastparquet',
-                                compression='GZIP',
-                                index=False,
-                                partition_cols=table_partitions,
-                                file_scheme='hive',
-                                mkdirs=lambda x: None,  # noop
-                                open_with=s3.fs.open,
-                                append=table_exists)
+                             engine='fastparquet',
+                             compression='GZIP',
+                             index=False,
+                             partition_cols=table_partitions,
+                             file_scheme='hive',
+                             mkdirs=lambda x: None,  # noop
+                             open_with=s3.fs.open,
+                             append=table_exists)
 
         return Response().to_dict()
 

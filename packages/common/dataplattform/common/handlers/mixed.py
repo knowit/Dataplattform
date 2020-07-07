@@ -67,7 +67,7 @@ class MixedHandler:
                     table_partitions = partitions.get(table_name, [])
                     frame = ensure_partitions_has_values(frame, table_partitions)
 
-                    table_exists = check_exists(s3, frame, table_name, table_partitions)   
+                    table_exists = check_exists(s3, frame, table_name, table_partitions)
 
                     frame.to_parquet(f'structured/{table_name}',
                                      engine='fastparquet',

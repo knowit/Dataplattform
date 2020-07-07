@@ -1,9 +1,9 @@
-from dataplattform.common.ingest_handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 
 
-handler = Handler()
+handler = IngestHandler()
 
 
 @handler.ingest()

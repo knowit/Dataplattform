@@ -139,7 +139,7 @@ class SQS:
                 }
             },
             MessageGroupId=group_id or environ.get("SQS_MESSAGE_GROUP_ID"))
-        return res['MessageId']            
+        return res['MessageId']
 
 
 def path_join(*paths):

@@ -13,6 +13,7 @@ def setup_queue_event(s3_bucket):
             Body=data.to_json().encode('utf-8'))
         return {
             'Records': [{
+                'body': '/data/test.json',
                 'messageAttributes': {
                     's3FileName': {
                         'stringValue': '/data/test.json'
@@ -324,7 +325,7 @@ def test_handler_call_process_s3_parquet_schema_partition_change(s3_bucket,
                                                                  old_partitions,
                                                                  new_partitions,
                                                                  expected_dep_keys,
-                                                                 expected_new_keys, 
+                                                                 expected_new_keys,
                                                                  setup_queue_event):
     event = setup_queue_event(
         schema.Data(
