@@ -3,86 +3,103 @@ from dataplattform.common.handlers import process as handler
 import re
 import pytest
 import pandas as pd
+from pytest import fixture
 
 
-def test_handler_call_process(mocker):
+@fixture
+def setup_queue_event(s3_bucket):
+    def make_queue_event(data: schema.Data):
+        s3_bucket.Object('/data/test.json').put(
+            Body=data.to_json().encode('utf-8'))
+        return {
+            'Records': [{
+                'messageAttributes': {
+                    's3FileName': {
+                        'stringValue': '/data/test.json'
+                    }
+                }
+            }]
+        }
+    yield make_queue_event
+
+
+def test_handler_call_process(mocker, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data='hello test'))
+
     ingest_handler = handler.ProcessHandler()
 
     ingest_handler.wrapped_func['process'] = mocker.MagicMock(return_value={})
-    ingest_handler(None)
+    ingest_handler(event)
 
     ingest_handler.wrapped_func['process'].assert_called_once()
     assert ingest_handler.wrapped_func['process'].call_args[0][0][0].json()['data'] == 'hello test'
 
 
-def test_handler_call_process_with_s3_data(s3_bucket, mocker):
-    s3_bucket.Object('/data/test.json').put(
-            Body=schema.Data(
-                metadata=schema.Metadata(timestamp=0),
-                data='hello test'
-            ).to_json().encode('utf-8'))
+def test_handler_call_process_to_parquet(mocker, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
 
-    ingest_handler = handler.ProcessHandler()
-
-    ingest_handler.wrapped_func['process'] = mocker.MagicMock(return_value={})
-    ingest_handler({
-        'Records': [{
-            's3': {
-                'object': {'key': '/data/test.json'}
-            }
-        }]
-    })
-
-    ingest_handler.wrapped_func['process'].assert_called_once()
-    assert ingest_handler.wrapped_func['process'].call_args[0][0][0].json()['data'] == 'hello test'
-
-
-def test_handler_call_process_to_parquet(mocker):
     df_mock = mocker.MagicMock()
+    df_mock.__class__ = pd.DataFrame
     df_mock.to_parquet = mocker.stub()
     df_mock.empty = False
 
     ingest_handler = handler.ProcessHandler()
 
     @ingest_handler.process(partitions={})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': df_mock
         }
 
-    ingest_handler(None)
+    ingest_handler(event)
 
     df_mock.to_parquet.assert_called_once()
     assert df_mock.to_parquet.call_args[0][0] == 'structured/test'
 
 
-def test_handler_call_process_skip_empty_dataframe_to_parquet(mocker):
+def test_handler_call_process_skip_empty_dataframe_to_parquet(mocker, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
+
     ingest_handler = handler.ProcessHandler()
 
     empty_df = pd.DataFrame()
     to_parquet_spy = mocker.spy(empty_df, 'to_parquet')
 
     @ingest_handler.process(partitions={})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': empty_df
         }
 
-    ingest_handler(None)
+    ingest_handler(event)
 
     to_parquet_spy.assert_not_called()
 
 
-def test_handler_call_process_s3_parquet(s3_bucket):
+def test_handler_call_process_s3_parquet(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
+
     ingest_handler = handler.ProcessHandler()
 
     @ingest_handler.process(partitions={})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 1], 'b': [1, 2, 3]})
         }
 
-    ingest_handler(None)
+    ingest_handler(event)
 
     keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
@@ -94,17 +111,21 @@ def test_handler_call_process_s3_parquet(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_append(s3_bucket):
+def test_handler_call_process_s3_parquet_append(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
     ingest_handler = handler.ProcessHandler()
 
     @ingest_handler.process(partitions={})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 1], 'b': [1, 2, 3]})
         }
 
-    ingest_handler(None)
-    ingest_handler(None)  # Called twice
+    ingest_handler(event)
+    ingest_handler(event)  # Called twice
 
     keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
@@ -117,16 +138,20 @@ def test_handler_call_process_s3_parquet_append(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_partitioned(s3_bucket):
+def test_handler_call_process_s3_parquet_partitioned(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
     ingest_handler = handler.ProcessHandler()
 
     @ingest_handler.process(partitions={'test': ['a']})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 2], 'b': [1, 2, 3]})
         }
 
-    ingest_handler(None)
+    ingest_handler(event)
 
     keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
@@ -139,16 +164,20 @@ def test_handler_call_process_s3_parquet_partitioned(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_partitioned_with_None_content(s3_bucket):
+def test_handler_call_process_s3_parquet_partitioned_with_None_content(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
     ingest_handler = handler.ProcessHandler()
 
     @ingest_handler.process(partitions={'test': ['a']})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 2, None], 'b': [1, 2, 3]})
         }
 
-    ingest_handler(None)
+    ingest_handler(event)
 
     keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
 
@@ -163,16 +192,20 @@ def test_handler_call_process_s3_parquet_partitioned_with_None_content(s3_bucket
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_partitioned_with_None_content_string(s3_bucket):
+def test_handler_call_process_s3_parquet_partitioned_with_None_content_string(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
     ingest_handler = handler.ProcessHandler()
 
     @ingest_handler.process(partitions={'test': ['a']})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': pd.DataFrame({'a': ['name0', 'name0', None], 'b': [1, 2, 3]})
         }
 
-    ingest_handler(None)
+    ingest_handler(event)
 
     keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
@@ -185,17 +218,21 @@ def test_handler_call_process_s3_parquet_partitioned_with_None_content_string(s3
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket):
+def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
     ingest_handler = handler.ProcessHandler()
 
     @ingest_handler.process(partitions={'test': ['a']})
-    def test_process(data):
+    def test_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 2], 'b': [1, 2, 3]})
         }
 
-    ingest_handler(None)
-    ingest_handler(None)  # Called twice
+    ingest_handler(event)
+    ingest_handler(event)  # Called twice
 
     keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     expected_keys = [
@@ -210,24 +247,28 @@ def test_handler_call_process_s3_parquet_append_partitioned(s3_bucket):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
-def test_handler_call_process_s3_parquet_schema_upgrade(s3_bucket):
+def test_handler_call_process_s3_parquet_schema_upgrade(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
     old_ingest_handler = handler.ProcessHandler()
     new_ingest_handler = handler.ProcessHandler()
 
     @old_ingest_handler.process(partitions={})
-    def test_old_process(data):
+    def test_old_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 2], 'b': [1, 2, 3]})
         }
 
     @new_ingest_handler.process(partitions={})
-    def test_new_process(data):
+    def test_new_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 2], 'b': ['1', '2', '3']})  # New datatype
         }
 
-    old_ingest_handler(None)
-    new_ingest_handler(None)
+    old_ingest_handler(event)
+    new_ingest_handler(event)
 
     dep_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured/deprecated' in x.key]
     new_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key and 'deprecated' not in x.key]
@@ -283,24 +324,29 @@ def test_handler_call_process_s3_parquet_schema_partition_change(s3_bucket,
                                                                  old_partitions,
                                                                  new_partitions,
                                                                  expected_dep_keys,
-                                                                 expected_new_keys):
+                                                                 expected_new_keys, 
+                                                                 setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
     old_ingest_handler = handler.ProcessHandler()
     new_ingest_handler = handler.ProcessHandler()
 
     @old_ingest_handler.process(partitions={'test': old_partitions})
-    def test_old_process(data):
+    def test_old_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 2], 'b': [2, 2, 3], 'c': [1, 2, 3]})
         }
 
     @new_ingest_handler.process(partitions={'test': new_partitions})
-    def test_new_process(data):
+    def test_new_process(data, events):
         return {
             'test': pd.DataFrame({'a': [1, 1, 2], 'b': [2, 2, 3], 'c': [1, 2, 3]})
         }
 
-    old_ingest_handler(None)
-    new_ingest_handler(None)
+    old_ingest_handler(event)
+    new_ingest_handler(event)
 
     dep_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured/deprecated' in x.key]
     new_keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key and 'deprecated' not in x.key]

@@ -10,8 +10,8 @@ class Response:
 
 
 def make_wrapper_func(f, *return_type):
-    def func(event, *args, **kwargs):
-        result = f(event, *args, **kwargs)
+    def func(*args, **kwargs):
+        result = f(*args, **kwargs)
         assert result is None or any([isinstance(result, t) for t in return_type]),\
             f'Return type {type(result).__name__} must be None or\
                 any {", ".join([t.__name__ for t in return_type])}'

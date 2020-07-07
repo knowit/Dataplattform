@@ -1,15 +1,9 @@
 from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3, S3Result
-from dataplattform.common.handlers import Response, verify_schema, make_wrapper_func
+from dataplattform.common.handlers import Response, make_wrapper_func
 from dataplattform.common.handlers.process import check_exists, ensure_partitions_has_values
-from datetime import datetime
-import numpy as np
 from typing import Dict, Any, Callable
-from warnings import warn, catch_warnings, filterwarnings
-
-with catch_warnings():
-    filterwarnings("ignore")
-    from fastparquet import ParquetFile
+from warnings import warn
 
 
 class MixedHandler:

@@ -6,11 +6,11 @@ import numpy as np
 import pandas as pd
 from typing import Dict, Any, Callable, List, AnyStr
 from warnings import catch_warnings, filterwarnings
+from inspect import signature
 
 with catch_warnings():
     filterwarnings("ignore")
     from fastparquet import ParquetFile
-
 
 
 def ensure_partitions_has_values(frame: pd.DataFrame, table_partitions: List[AnyStr]):
@@ -34,7 +34,7 @@ def check_exists(s3: S3, frame: pd.DataFrame, table_name: str, table_partitions:
             deprecation_date = datetime.now().replace(microsecond=0).isoformat()
             for old_file in old_files:
                 s3.fs.copy(f'structured/{table_name}/{old_file}',
-                            f'structured/deprecated/{deprecation_date}/{table_name}/{old_file}')
+                           f'structured/deprecated/{deprecation_date}/{table_name}/{old_file}')
 
             s3.fs.rm(f'structured/{table_name}', recursive=True)
             table_exists = False
@@ -58,43 +58,44 @@ class ProcessHandler:
 
         def load_event_data(event):
             return [
+                s3.get(key) for key in
                 [
-                    s3.get(key) for key in [
-                        record.get('messageAttributes', {}).get('s3FileName', {}).get('stringValue', '')
-                        for record in event.get('Records', [])
-                    ] if key
-                ]
+                    record.get('messageAttributes', {}).get(
+                        's3FileName', {}).get('stringValue', '')
+                    for record in event.get('Records', [])
+                ] if key
             ]
 
-        data = load_event_data(event)
-        if data:
-            tables = self.wrapped_func['process'](data, event)
-            partitions = self.wrapped_func_args.get('process', {}).get('partitions', {})
 
-            for table_name, frame in tables.items():
-                if frame is None:
-                    continue
+        tables = self.wrapped_func['process'](load_event_data(event), event.get('Records', []))
+        partitions = self.wrapped_func_args.get(
+            'process', {}).get('partitions', {})
 
-                assert isinstance(frame, pd.DataFrame),\
-                    'Process must return a DataFrame'
+        for table_name, frame in tables.items():
+            if frame is None:
+                continue
 
-                if frame.empty:
-                    continue
+            assert isinstance(frame, pd.DataFrame),\
+                'Process must return a DataFrame'
 
-                table_partitions = partitions.get(table_name, [])
-                frame = ensure_partitions_has_values(frame, table_partitions)
+            if frame.empty:
+                continue
 
-                table_exists = check_exists(s3, frame, table_name, table_partitions)        
+            table_partitions = partitions.get(table_name, [])
+            frame = ensure_partitions_has_values(frame, table_partitions)
 
-                frame.to_parquet(f'structured/{table_name}',
-                                    engine='fastparquet',
-                                    compression='GZIP',
-                                    index=False,
-                                    partition_cols=table_partitions,
-                                    file_scheme='hive',
-                                    mkdirs=lambda x: None,  # noop
-                                    open_with=s3.fs.open,
-                                    append=table_exists)
+            table_exists = check_exists(
+                s3, frame, table_name, table_partitions)
+
+            frame.to_parquet(f'structured/{table_name}',
+                                engine='fastparquet',
+                                compression='GZIP',
+                                index=False,
+                                partition_cols=table_partitions,
+                                file_scheme='hive',
+                                mkdirs=lambda x: None,  # noop
+                                open_with=s3.fs.open,
+                                append=table_exists)
 
         return Response().to_dict()
 

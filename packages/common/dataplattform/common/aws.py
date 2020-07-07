@@ -4,8 +4,8 @@ from botocore.exceptions import ClientError
 from dataplattform.common.schema import Data
 from s3fs import S3FileSystem
 from json import loads
-from datetime import datetime
 from uuid import uuid4
+
 
 class S3Result:
     def __init__(self, res, error=None):
@@ -130,8 +130,8 @@ class SQS:
         response = self.client.get_queue_url(QueueName=queue_name or environ.get("SQS_QUEUE_NAME"))
         sqs_url = response['QueueUrl']
         res = self.client.send_message(
-            QueueUrl=sqs_url, 
-            MessageBody=file_name,              
+            QueueUrl=sqs_url,
+            MessageBody=file_name,
             MessageAttributes={
                 's3FileName': {
                     'StringValue': file_name,
@@ -139,8 +139,7 @@ class SQS:
                 }
             },
             MessageGroupId=group_id or environ.get("SQS_MESSAGE_GROUP_ID"))
-        return res['MessageId']
-            
+        return res['MessageId']            
 
 
 def path_join(*paths):
