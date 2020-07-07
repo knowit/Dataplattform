@@ -1,12 +1,7 @@
 from dataplattform.common.ingest_handler import Handler
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
-import pandas as pd
-from typing import Dict
-import boto3
-from os import environ
-import json
-from time import sleep
+
 
 handler = Handler()
 

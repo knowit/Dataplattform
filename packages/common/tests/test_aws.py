@@ -160,12 +160,25 @@ def test_s3fs_exists(s3_bucket):
     assert s3.fs.exists('test.txt') is True
 
 
-def test_sqs(sqs_queue):
-    sqs = aws.SQS()
-    assert sqs is not None
-
-
 def test_sqs_send_message(sqs_queue):
     sqs = aws.SQS()
-    reponse = sqs.send_custom_filename_message('file_name')
-    assert reponse.get('Failed') is None
+    msg_id = sqs.send_custom_filename_message('file_name')
+
+    message = next(iter(sqs_queue.receive_messages()))
+    assert msg_id == message.message_id
+
+
+def test_sqs_send_message_body(sqs_queue):
+    sqs = aws.SQS()
+    sqs.send_custom_filename_message('file_name')
+
+    message = next(iter(sqs_queue.receive_messages()))
+    assert message.body == 'file_name'
+
+
+def test_sqs_send_message_attributes(sqs_queue):
+    sqs = aws.SQS()
+    sqs.send_custom_filename_message('file_name')
+
+    message = next(iter(sqs_queue.receive_messages()))
+    assert message.message_attributes['s3FileName']['StringValue'] == 'file_name'

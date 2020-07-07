@@ -1,6 +1,6 @@
 from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3, SQS
-from dataplattform.common.handlers import Response
+from dataplattform.common.handlers import Response, make_wrapper_func
 from typing import Dict, Any, Callable
 
 
@@ -26,40 +26,29 @@ class IngestHandler:
         s3 = S3(
             access_path=self.access_path,
             bucket=self.bucket)
-        raw_data = None
 
-        sqs = SQS()
+        assert 'ingest' in self.wrapped_func, \
+            'IngestHandler must wrap and ingest function'
 
-        if 'ingest' in self.wrapped_func:
-            result = self.wrapped_func['ingest'](event)
-            if result and isinstance(result, Response):
-                return result.to_dict()
+        result = self.wrapped_func['ingest'](event)
+        if result and isinstance(result, Response):
+            return result.to_dict()
 
-            if result:
-                raw_data = result
-                response = sqs.send_custom_filename_message(s3.put(raw_data, 'raw'))
-                assert response.get('Failed') is None
+        if result:
+            SQS().send_custom_filename_message(
+                s3.put(result, 'raw'))
 
         return Response().to_dict()
 
     def validate(self):
         def wrap(f):
-            self.wrapped_func['validate'] = IngestHandler.__wrapper_func(f, bool, str, Response)
+            self.wrapped_func['validate'] = make_wrapper_func(f, bool, str, Response)
             return self.wrapped_func['validate']
         return wrap
 
     def ingest(self):
         def wrap(f):
-            self.wrapped_func['ingest'] = IngestHandler.__wrapper_func(f, Data, Response)
+            self.wrapped_func['ingest'] = make_wrapper_func(f, Data, Response)
             return self.wrapped_func['ingest']
         return wrap
-
-    @staticmethod
-    def __wrapper_func(f, *return_type):
-        def func(event):
-            result = f(event)
-            assert result is None or any([isinstance(result, t) for t in return_type]),\
-                f'Return type {type(result).__name__} must be None or\
-                    any {", ".join([t.__name__ for t in return_type])}'
-            return result
-        return func
+    

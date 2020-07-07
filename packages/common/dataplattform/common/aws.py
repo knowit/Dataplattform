@@ -123,18 +123,24 @@ class SSM:
 
 
 class SQS:
-    def __init__(self, path: str = None):
-        self.path = path or path_join('/', environ.get("STAGE"), environ.get("SERVICE"))
+    def __init__(self):
         self.client = boto3.client('sqs')
 
     def send_custom_filename_message(self, file_name: str = None, queue_name: str = None, group_id: str = None):
         response = self.client.get_queue_url(QueueName=queue_name or environ.get("SQS_QUEUE_NAME"))
         sqs_url = response['QueueUrl']
-        return self.client.send_message(QueueUrl=sqs_url, MessageBody=file_name,
-                                        MessageAttributes={'s3FileName': {
-                                                           'StringValue': file_name,
-                                                           'DataType': 'String'}},
-                                        MessageGroupId=group_id or environ.get("SQS_MESSAGE_GROUP_ID"))
+        res = self.client.send_message(
+            QueueUrl=sqs_url, 
+            MessageBody=file_name,              
+            MessageAttributes={
+                's3FileName': {
+                    'StringValue': file_name,
+                    'DataType': 'String'
+                }
+            },
+            MessageGroupId=group_id or environ.get("SQS_MESSAGE_GROUP_ID"))
+        return res['MessageId']
+            
 
 
 def path_join(*paths):

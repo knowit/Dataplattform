@@ -71,7 +71,7 @@ def sqs_queue():
     with mock_sqs():
         sqs = resource('sqs')
         sqs.create_queue(QueueName=environ.get('SQS_QUEUE_NAME'))
-        yield sqs
+        yield sqs.get_queue_by_name(QueueName=environ.get('SQS_QUEUE_NAME'))
 
 
 @fixture(autouse=True)

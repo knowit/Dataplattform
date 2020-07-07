@@ -1,11 +1,15 @@
 from dataplattform.common.schema import Data
 from dataplattform.common.aws import S3, S3Result
-from dataplattform.common.handlers import Response
-from fastparquet import ParquetFile
+from dataplattform.common.handlers import Response, verify_schema, make_wrapper_func
+from dataplattform.common.handlers.process import check_exists, ensure_partitions_has_values
 from datetime import datetime
 import numpy as np
 from typing import Dict, Any, Callable
-from warnings import warn
+from warnings import warn, catch_warnings, filterwarnings
+
+with catch_warnings():
+    filterwarnings("ignore")
+    from fastparquet import ParquetFile
 
 
 class MixedHandler:
@@ -67,28 +71,9 @@ class MixedHandler:
                         continue
 
                     table_partitions = partitions.get(table_name, [])
+                    frame = ensure_partitions_has_values(frame, table_partitions)
 
-                    for partition in table_partitions:
-                        if np.issubdtype(frame[partition].dtype, np.number):
-                            frame.loc[frame[partition].isnull(), partition] = -1
-                        else:
-                            frame.loc[frame[partition].isnull(), partition] = 'undefined'
-
-                    table_exists = s3.fs.exists(f'structured/{table_name}/_metadata')
-                    if table_exists:
-                        dataset = ParquetFile(f'structured/{table_name}', open_with=s3.fs.open)
-                        if not MixedHandler.verify_schema(dataset, frame, table_partitions):
-                            old_files = [
-                                fn.split(f'structured/{table_name}/')[-1]
-                                for fn in s3.fs.find(f'structured/{table_name}')
-                            ]
-                            deprecation_date = datetime.now().replace(microsecond=0).isoformat()
-                            for old_file in old_files:
-                                s3.fs.copy(f'structured/{table_name}/{old_file}',
-                                           f'structured/deprecated/{deprecation_date}/{table_name}/{old_file}')
-
-                            s3.fs.rm(f'structured/{table_name}', recursive=True)
-                            table_exists = False
+                    table_exists = check_exists(s3, frame, table_name, table_partitions)   
 
                     frame.to_parquet(f'structured/{table_name}',
                                      engine='fastparquet',
@@ -104,51 +89,19 @@ class MixedHandler:
 
     def validate(self):
         def wrap(f):
-            self.wrapped_func['validate'] = MixedHandler.__wrapper_func(f, bool, str, Response)
+            self.wrapped_func['validate'] = make_wrapper_func(f, bool, str, Response)
             return self.wrapped_func['validate']
         return wrap
 
     def ingest(self):
         def wrap(f):
-            self.wrapped_func['ingest'] = MixedHandler.__wrapper_func(f, Data, Response)
+            self.wrapped_func['ingest'] = make_wrapper_func(f, Data, Response)
             return self.wrapped_func['ingest']
         return wrap
 
     def process(self, partitions):
         def wrap(f):
-            self.wrapped_func['process'] = MixedHandler.__wrapper_func(f, dict)
+            self.wrapped_func['process'] = make_wrapper_func(f, dict)
             self.wrapped_func_args['process'] = dict(partitions=partitions)
             return self.wrapped_func['process']
         return wrap
-
-    @staticmethod
-    def verify_schema(dataset: ParquetFile, dataframe, partitions):
-        dataset_partitions = dataset.info.get('partitions', [])
-        dataset_columns = dataset.columns + dataset_partitions
-
-        if len(dataset_partitions) != len(partitions):
-            return False
-
-        if not all([a == b for a, b in zip(sorted(dataset_partitions), sorted(partitions))]):
-            return False
-
-        if len(dataset_columns) != len(dataframe.columns):
-            return False
-
-        if not all([a == b for a, b in zip(sorted(dataset_columns), sorted(dataframe.columns))]):
-            return False
-
-        if not all([dataset.dtypes[c] == dataframe.dtypes[c] for c in dataset.columns]):
-            return False
-
-        return True
-
-    @staticmethod
-    def __wrapper_func(f, *return_type):
-        def func(event):
-            result = f(event)
-            assert result is None or any([isinstance(result, t) for t in return_type]),\
-                f'Return type {type(result).__name__} must be None or\
-                    any {", ".join([t.__name__ for t in return_type])}'
-            return result
-        return func
