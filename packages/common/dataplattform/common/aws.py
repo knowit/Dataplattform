@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 from dataplattform.common.schema import Data
 from s3fs import S3FileSystem
 from json import loads
+from uuid import uuid4
 
 
 class S3Result:
@@ -30,7 +31,7 @@ class S3:
         self.s3 = boto3.resource('s3')
 
     def put(self, data: Data, path: str = ''):
-        key = path_join(self.access_path, path, f'{int(data.metadata.timestamp)}.json')
+        key = path_join(self.access_path, path, f'{uuid4()}.json')
         s3_object = self.s3.Object(self.bucket, key)
         s3_object.put(Body=data.to_json().encode('utf-8'))
         return key
@@ -119,6 +120,26 @@ class SSM:
                  else 'SecureString',
             Overwrite=overwrite,
             Tier=tier)
+
+
+class SQS:
+    def __init__(self):
+        self.client = boto3.client('sqs')
+
+    def send_custom_filename_message(self, file_name: str = None, queue_name: str = None, group_id: str = None):
+        response = self.client.get_queue_url(QueueName=queue_name or environ.get("SQS_QUEUE_NAME"))
+        sqs_url = response['QueueUrl']
+        res = self.client.send_message(
+            QueueUrl=sqs_url,
+            MessageBody=file_name,
+            MessageAttributes={
+                's3FileName': {
+                    'StringValue': file_name,
+                    'DataType': 'String'
+                }
+            },
+            MessageGroupId=group_id or environ.get("SQS_MESSAGE_GROUP_ID"))
+        return res['MessageId']
 
 
 def path_join(*paths):

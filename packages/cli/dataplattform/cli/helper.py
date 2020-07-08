@@ -37,14 +37,18 @@ def serverless_environment(serverless_cli=None, serverless_file=None, serverless
         serverless_cli=serverless_cli,
         serverless_file=serverless_file)
 
-    exports = cloudformation_exports()
+    return resovle_cloudformation_imports(next(iter(config.values()))['environment'])
+
+
+def resovle_cloudformation_imports(environment, exports=None):
+    exports = exports or cloudformation_exports()
 
     def resolve_imports(value):
         if 'Fn::ImportValue' not in value:
             return value
         return exports[value['Fn::ImportValue']]
 
-    return {k: resolve_imports(v) for k, v in next(iter(config.values()))['environment'].items()}
+    return {k: resolve_imports(v) for k, v in environment.items()}
 
 
 def load_serverless_environment(serverless_cli=None, serverless_file=None, verbose=True):
