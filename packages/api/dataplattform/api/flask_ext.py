@@ -6,7 +6,7 @@ from flask import Flask, request
 import re
 
 
-def create_session(role_arn: str, base_session = None):
+def create_session(role_arn: str, base_session=None):
     base_session = base_session or boto3.session.Session()._session
     fetcher = botocore.credentials.AssumeRoleCredentialFetcher(
         client_creator=base_session.create_client,
@@ -48,6 +48,3 @@ class UserSession(object):
 
     def assume_role(self):
         boto3.setup_default_session(botocore_session=self.boto_session()._session)
-
-
-            
