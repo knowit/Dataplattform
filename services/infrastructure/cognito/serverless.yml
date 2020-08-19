@@ -85,6 +85,14 @@ resources:
                   Action:
                     - 'sts:AssumeRole'
                   Resource: "*"
+          - PolicyName: CanListCognitoGroups
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'cognito-idp:GetGroup'
+                  Resource: !GetAtt CognitoUserPool.Arn
 
     Level2:
       Type: AWS::IAM::Role
