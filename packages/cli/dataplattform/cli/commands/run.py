@@ -58,10 +58,6 @@ def run(args: Namespace, _):
 def prepare_runner(handler: str, environment: Dict[str, str], args: Namespace):
     handler_file, handler_func = handler.split('.')
 
-    spec = spec_from_file_location(handler_file, find_file(f'{handler_file}.py'))
-    handler_module = module_from_spec(spec)
-    spec.loader.exec_module(handler_module)
-
     def setup_env():
         env = resovle_cloudformation_imports(environment)
         for k, v in env.items():
@@ -72,6 +68,10 @@ def prepare_runner(handler: str, environment: Dict[str, str], args: Namespace):
     def runner(event):
         if args.verbose:
             print(f'START: {handler}')
+
+        spec = spec_from_file_location(handler_file, find_file(f'{handler_file}.py'))
+        handler_module = module_from_spec(spec)
+        spec.loader.exec_module(handler_module)
 
         if args.profile:
             tracemalloc.start()
