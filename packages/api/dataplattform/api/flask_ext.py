@@ -31,7 +31,7 @@ class UserSession(object):
         app.before_request(self.assume_role)
 
     def user_claims(self):
-        event = request.environ.get('serverless.event')
+        event = request.environ.get('serverless.event', {})
         return event.get('requestContext', {}).get('authorizer', {}).get('claims', None)
 
     def cognito_group(self):
@@ -41,10 +41,11 @@ class UserSession(object):
             response = cognito_client.get_group(GroupName=re.sub(r"[\[\]]", "", claims['cognito:groups']),
                                                 UserPoolId=claims['iss'].split('/')[-1])
             return response['Group']
-        return {}
+        return None
 
     def boto_session(self):
-        return create_session(self.cognito_group()['RoleArn'])
+        group = self.cognito_group()
+        return create_session(group['RoleArn']) if group else boto3._get_default_session()
 
     def assume_role(self):
         boto3.setup_default_session(botocore_session=self.boto_session()._session)
