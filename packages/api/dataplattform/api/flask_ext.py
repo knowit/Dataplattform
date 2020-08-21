@@ -18,7 +18,7 @@ class UserSession(object):
             app.before_request(self.assume_role)
 
     def assume_role(self):
-        boto3.setup_default_session(botocore_session=self.boto_session._session)
+        boto3.DEFAULT_SESSION = self.boto_session
 
     @property
     def user_claims(self):
