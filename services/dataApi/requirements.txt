@@ -1,0 +1,6 @@
+flask
+flask-swagger
+werkzeug
+sqlparse
+pandas
+file:../../packages/api
