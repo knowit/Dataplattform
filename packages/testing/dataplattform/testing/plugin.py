@@ -1,17 +1,12 @@
 from pytest import fixture, hookimpl
-from moto import mock_s3, mock_ssm, mock_sqs
+from moto import mock_s3, mock_ssm, mock_sqs, mock_glue
 from boto3 import resource, client
 from os import environ
 from unittest.mock import patch, MagicMock
 
 
 def pytest_addoption(parser):
-    parser.addini(
-        'dataplattform-aws-ssm',
-        type='linelist',
-        help='',
-        default=[]
-        )
+    parser.addini('dataplattform-aws-ssm', type='linelist', help='', default=[])
 
 
 @hookimpl(tryfirst=True)
@@ -32,7 +27,7 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('STAGE', 'dev'),
         ('SERVICE', 'testService'),
         ('SQS_QUEUE_NAME', 'test.fifo'),
-        ('SQS_MESSAGE_GROUP_ID', 'test_groud_id')
+        ('SQS_MESSAGE_GROUP_ID', 'test_groud_id'),
     ]
     for key, value in default_env:
         if key not in environ:
@@ -50,10 +45,8 @@ def ssm_client(pytestconfig):
             type_, _, value = value.partition(':')
 
             ssm.put_parameter(
-                Name=key,
-                Value=value.strip(),
-                Type=type_.strip(),
-                Tier='Standard')
+                Name=key, Value=value.strip(), Type=type_.strip(), Tier='Standard'
+            )
 
         yield ssm
 
@@ -93,7 +86,9 @@ def athena():
                 else:
                     raise Exception(f'No mock for query: {sql}')
 
-            self.patcher = patch('pyathena.pandas_cursor.PandasCursor.execute', new=on_execute)
+            self.patcher = patch(
+                'pyathena.pandas_cursor.PandasCursor.execute', new=on_execute
+            )
             self.patcher.start()
             self.result_table = {}
             self.mock_all = True
@@ -112,47 +107,62 @@ def create_table_mock(mocker):
     on_to_parquet_stub = mocker.stub()
     mocker.patch(
         'pandas.DataFrame.to_parquet',
-        new=lambda *args, **kwargs: on_to_parquet_stub(*args, **kwargs))
+        new=lambda *args, **kwargs: on_to_parquet_stub(*args, **kwargs),
+    )
 
     def assert_table_created(*tables):
         tables = [f'structured/{t}' for t in tables]
         if len(on_to_parquet_stub.call_args_list) == 0:
             assert False
-        assert all([t == tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)])
+        assert all(
+            [
+                t == tables[i]
+                for i, ((_, t,), _) in enumerate(on_to_parquet_stub.call_args_list)
+            ]
+        )
 
     def assert_table_not_created(*tables):
         tables = [f'structured/{t}' for t in tables]
         if len(on_to_parquet_stub.call_args_list) == 0:
             assert True
-        assert all([t != tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)])
+        assert all(
+            [
+                t != tables[i]
+                for i, ((_, t,), _) in enumerate(on_to_parquet_stub.call_args_list)
+            ]
+        )
 
     def df_from_calls(table):
         from pandas import concat
-        actual_df_list = [df for (df, t, ), _ in on_to_parquet_stub.call_args_list if table == t]
+
+        actual_df_list = [
+            df for (df, t,), _ in on_to_parquet_stub.call_args_list if table == t
+        ]
         if not actual_df_list:
             assert False, f'no create call with {table}'
         return concat(actual_df_list)
 
     def assert_table_data(table, df, **kwargs):
         from pandas.testing import assert_frame_equal
+
         assert_frame_equal(
-            df_from_calls(f'structured/{table}'),
-            df,
-            check_index_type=False,
-            **kwargs)
+            df_from_calls(f'structured/{table}'), df, check_index_type=False, **kwargs
+        )
 
     def assert_table_data_column(table, column, ser, **kwargs):
         from pandas.testing import assert_series_equal
+
         assert_series_equal(
             df_from_calls(f'structured/{table}').reset_index()[column],
             ser,
             check_index_type=False,
             check_names=False,
-            **kwargs)
+            **kwargs,
+        )
 
     def assert_table_data_contains_df(table, df, **kwargs):
         tmp_df = df.isin(df_from_calls(f'structured/{table}'))
-        assert tmp_df.eq(True).all().all() 
+        assert tmp_df.eq(True).all().all()
 
     on_to_parquet_stub.assert_table_created = assert_table_created
     on_to_parquet_stub.assert_table_not_created = assert_table_not_created
@@ -161,3 +171,26 @@ def create_table_mock(mocker):
     on_to_parquet_stub.assert_table_data_contains_df = assert_table_data_contains_df
 
     yield on_to_parquet_stub
+
+
+@fixture(autouse=True)
+def glue(mocker):
+    with mock_glue():
+        glue_client = client('glue')
+        glue_client.create_database(DatabaseInput={'Name': 'test_database'})
+        glue_client.create_database(DatabaseInput={'Name': 'default'})
+        glue_client.create_table(
+            DatabaseName='test_database',
+            TableInput={
+                'Name': 'test_table',
+                'StorageDescriptor': {'Columns': [{'Name': 'col1', 'Type': 'type1'}]},
+            },
+        )
+        glue_client.create_table(
+            DatabaseName='default',
+            TableInput={
+                'Name': 'test_table',
+                'StorageDescriptor': {'Columns': [{'Name': 'col2', 'Type': 'type2'}]},
+            },
+        )
+        yield glue_client
