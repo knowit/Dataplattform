@@ -2,6 +2,7 @@ service: cognito
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  policies: ${file(./policies.js)}
 
 provider:
   name: aws
@@ -46,6 +47,14 @@ resources:
       Properties:
         UserPoolId: !Ref CognitoUserPool
         Domain: ${self:custom.stage}-dataplattform-users
+
+    CognitoUserPoolGroupLevel1:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        Description: level-1 access
+        GroupName: level1
+        RoleArn: !GetAtt Level1.Arn
+        UserPoolId: !Ref CognitoUserPool
 
     CognitoUserPoolGroupLevel2:
       Type: AWS::Cognito::UserPoolGroup
@@ -94,6 +103,21 @@ resources:
                     - 'cognito-idp:GetGroup'
                   Resource: !GetAtt CognitoUserPool.Arn
 
+    Level1:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-level1
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+                AWS: !GetAtt AssumeRole.Arn
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies: ${self:custom.policies.level1}
     Level2:
       Type: AWS::IAM::Role
       Properties:
@@ -108,19 +132,7 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-ReadLevel2-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:GetObject
-                  Resource:
-                    - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /data/level-2/*
+        Policies: ${self:custom.policies.level2}
     Level3:
       Type: AWS::IAM::Role
       Properties:
@@ -135,19 +147,7 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-ReadLevel3-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:GetObject
-                  Resource:
-                    - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /data/level-3/*
+        Policies: ${self:custom.policies.level3}
 
   Outputs:
     CognitoUserPoolOutput:
