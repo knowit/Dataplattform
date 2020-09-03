@@ -1,5 +1,29 @@
 import pytest
 import app
+import boto3
+import datetime
+
+
+@pytest.fixture(autouse=True)
+def mocked_glue_services(glue, mocker):
+    d = datetime.datetime(2015, 1, 1).isoformat()
+    glue.get_databases = mocker.MagicMock(
+        return_value={
+            'DatabaseList': [
+                {
+                    'Name': 'test_database',
+                    'CreateTime': d,
+                },
+                {
+                    'Name': 'default',
+                    'CreateTime': d,
+                }
+            ],
+        })
+
+    mocker.patch(
+        'boto3.client',
+        side_effect=lambda service: glue if service == 'glue' else boto3.client(service))
 
 
 @pytest.fixture
@@ -61,8 +85,6 @@ def test_database_table_content(client, glue):
     assert res['columns'][0]['name'] == 'col1'
 
 
-""" not able to test, get_databases() not implemented in moto
-
 def test_table_route_404(client, glue):
     response = client.get('/table/test_table1')
     assert response.status == '404 NOT FOUND'
@@ -79,8 +101,7 @@ def test_table_content(client, glue):
     assert res['columns'] is not None
     assert res['columns'][0]['name'] == 'col1'
 
+
 def test_databases_route(client, glue):
     response = client.get('/database/')
     assert response.status == '200 OK'
-
-"""
