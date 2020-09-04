@@ -30,7 +30,7 @@ module.exports = serverless => {
         },
         {
             'Effect': 'Allow',
-            'Action': ['glue:GetTable', 'glue:GetTables', 'glue:GetDatabase', 'glue:GetPartitions'],
+            'Action': ['glue:GetTable', 'glue:GetTables', 'glue:GetDatabase', 'glue:GetDatabases' ,'glue:GetPartitions'],
             'Resource': [
                 {'Fn::Join': [':', ['arn:aws:glue', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, 'catalog']]},
                 {'Fn::Join': [':', ['arn:aws:glue', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, `database/${stage}_${database}`]]},

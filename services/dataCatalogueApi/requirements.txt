@@ -1,0 +1,4 @@
+file:../../packages/api
+flask
+flask_restx
+werkzeug
