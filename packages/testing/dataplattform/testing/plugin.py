@@ -112,25 +112,24 @@ def create_table_mock(mocker):
 
     def assert_table_created(*tables):
         tables = [f'structured/{t}' for t in tables]
+        if len(tables) == 0:
+            assert False, 'No tables provided'
+
         if len(on_to_parquet_stub.call_args_list) == 0:
-            assert False
-        assert all(
-            [
-                t == tables[i]
-                for i, ((_, t,), _) in enumerate(on_to_parquet_stub.call_args_list)
-            ]
-        )
+            assert False, 'on_to_parquet not called'
+        if len(on_to_parquet_stub.call_args_list) != len(tables):
+            assert False, 'Number of tables provided does not equal number of on_to_parquet calls'
+
+        error_msg = 'No tables created, or wrong naming of tables provided'
+        assert all([t == tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)]), error_msg
 
     def assert_table_not_created(*tables):
         tables = [f'structured/{t}' for t in tables]
         if len(on_to_parquet_stub.call_args_list) == 0:
-            assert True
-        assert all(
-            [
-                t != tables[i]
-                for i, ((_, t,), _) in enumerate(on_to_parquet_stub.call_args_list)
-            ]
-        )
+            assert True, 'No tables are created'
+
+        error_msg = 'One or more tables are created'
+        assert all([t != tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)]), error_msg
 
     def df_from_calls(table):
         from pandas import concat
@@ -161,8 +160,14 @@ def create_table_mock(mocker):
         )
 
     def assert_table_data_contains_df(table, df, **kwargs):
-        tmp_df = df.isin(df_from_calls(f'structured/{table}'))
-        assert tmp_df.eq(True).all().all()
+        import string
+        import random
+        fill_value = ''.join(random.choices(string.ascii_uppercase +
+                                            string.digits, k=7))
+        input_df = df.fillna(fill_value)
+        df_from_calls_object = df_from_calls(f'structured/{table}').fillna(fill_value)
+        tmp_df = input_df.isin(df_from_calls_object)
+        assert tmp_df.eq(True).all().all(), "Dataframe is contained in table"
 
     on_to_parquet_stub.assert_table_created = assert_table_created
     on_to_parquet_stub.assert_table_not_created = assert_table_not_created
