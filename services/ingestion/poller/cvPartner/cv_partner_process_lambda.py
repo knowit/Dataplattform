@@ -99,34 +99,30 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     ....
     sub_category : { tag1: val1, tag2: val2},
     ....
-    and the desired output value is "norwegian translation of sub_cat value"
+    and the desired output value is tag1.val1
 
     @param: df - original dataframe
     @param: col_name: name of the coloumn to normalize
     """
 
-    def normalize_coloums(df, col_name, tag1, tag2):
+    def normalize_coloums(df, col_name, tag):
         tmp_col = df[col_name].copy()
         tmp_col = tmp_col.apply(lambda x: {} if pd.isna(x) else x)
         tmp = pd.json_normalize(tmp_col.copy())
-        col1 = tmp[tag1].to_numpy()
-        col2 = tmp[tag2].to_numpy()
+        col1 = tmp[tag].to_numpy()
         col1_series = pd.Series(col1, name=col_name)
         col1_series_out = col1_series.replace(np.nan, '', regex=True)
-        col2_series = pd.Series(col2, name=col_name+tag2)
-        col2_series_out = col2_series.replace(np.nan, '', regex=True)
-        return col1_series_out, col2_series_out
+        return col1_series_out
 
     def create_df(df, sub_cat, cols, normalizable_cols):
         cat_dict = df['cv.' + sub_cat].copy()
         user_ids = df['user_id'].copy()
-        tmp_df = create_from_topic('user_id', user_ids, cat_dict)
-        tmp = tmp_df[cols].copy()
+        tmp_df = create_from_topic('user_id', user_ids, cat_dict)[cols].copy()
         for col in normalizable_cols:
-            tmp[col], _ = normalize_coloums(tmp, col, 'no', 'int')
+            tmp_df[col] = normalize_coloums(tmp_df, col, 'no')
 
-        tmp.fillna(pd.NA, inplace=True)
-        return tmp
+        tmp_df.fillna(pd.NA, inplace=True)
+        return tmp_df
 
     """
     Create a semi-colon seperated string list of values from a list of nested dictonaries

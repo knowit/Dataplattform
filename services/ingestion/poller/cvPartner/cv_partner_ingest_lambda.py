@@ -18,8 +18,7 @@ def ingest(event) -> Data:
     sor_id = SSM(with_decryption=False).get('cv_partner_sor_id')
     api_token = SSM(with_decryption=True).get('cv_partner_api_token')
 
-    res = requests.get(url +
-                       f'/search?office_ids[]={objectnet_id}&office_ids[]={sor_id}&offset=0&size={offset_size}',
+    res = requests.get(f'{url}/search?office_ids[]={objectnet_id}&office_ids[]={sor_id}&offset=0&size={offset_size}',
                        headers={'Authorization': f'Bearer {api_token}'})
 
     data_json = res.json()
