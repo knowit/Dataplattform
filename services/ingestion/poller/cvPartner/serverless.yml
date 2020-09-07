@@ -204,6 +204,7 @@ resources: # The resources your functions use
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
+        VisibilityTimeout: ${self:custom.editable.timeout}
         RedrivePolicy:
           deadLetterTargetArn : !GetAtt EventQueueDL.Arn
           maxReceiveCount : 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
