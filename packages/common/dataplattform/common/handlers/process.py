@@ -39,6 +39,12 @@ def check_exists(s3: S3, frame: pd.DataFrame, table_name: str, table_partitions:
     return table_exists
 
 
+def delete_table(s3: S3, table_name: str):
+    table_exists = s3.fs.exists(f'structured/{table_name}/_metadata')
+    if table_exists:
+        s3.fs.rm(f'structured/{table_name}', recursive=True)
+
+
 class ProcessHandler:
     def __init__(self, access_path: str = None, bucket: str = None):
         self.access_path = access_path
@@ -46,7 +52,7 @@ class ProcessHandler:
         self.wrapped_func: Dict[str, Callable] = {}
         self.wrapped_func_args: Dict[str, Any] = {}
 
-    def __call__(self, event, context=None):
+    def __call__(self, event, context=None, overwrite=False):
         assert 'process' in self.wrapped_func, \
             'ProcessHandler must wrap a process function'
 
@@ -81,6 +87,10 @@ class ProcessHandler:
 
             table_exists = check_exists(
                 s3, frame, table_name, table_partitions)
+
+            if overwrite:
+                delete_table(s3, table_name)
+                table_exists = False
 
             frame.to_parquet(f'structured/{table_name}',
                              engine='fastparquet',
