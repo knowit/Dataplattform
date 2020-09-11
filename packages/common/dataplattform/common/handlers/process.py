@@ -52,7 +52,7 @@ class ProcessHandler:
         self.wrapped_func: Dict[str, Callable] = {}
         self.wrapped_func_args: Dict[str, Any] = {}
 
-    def __call__(self, event, context=None, overwrite=False):
+    def __call__(self, event, context=None):
         assert 'process' in self.wrapped_func, \
             'ProcessHandler must wrap a process function'
 
@@ -72,6 +72,9 @@ class ProcessHandler:
         partitions = self.wrapped_func_args.get(
             'process', {}).get('partitions', {})
 
+        overwrite = self.wrapped_func_args.get(
+            'process', {}).get('overwrite', False)
+
         for table_name, frame in tables.items():
             if frame is None:
                 continue
@@ -85,12 +88,12 @@ class ProcessHandler:
             table_partitions = partitions.get(table_name, [])
             frame = ensure_partitions_has_values(frame, table_partitions)
 
-            table_exists = check_exists(
-                s3, frame, table_name, table_partitions)
-
             if overwrite:
                 delete_table(s3, table_name)
                 table_exists = False
+            else:
+                table_exists = check_exists(
+                    s3, frame, table_name, table_partitions)
 
             frame.to_parquet(f'structured/{table_name}',
                              engine='fastparquet',
@@ -104,9 +107,9 @@ class ProcessHandler:
 
         return Response().to_dict()
 
-    def process(self, partitions):
+    def process(self, partitions, overwrite=False):
         def wrap(f):
             self.wrapped_func['process'] = make_wrapper_func(f, dict)
-            self.wrapped_func_args['process'] = dict(partitions=partitions)
+            self.wrapped_func_args['process'] = dict(partitions=partitions, overwrite=overwrite)
             return self.wrapped_func['process']
         return wrap

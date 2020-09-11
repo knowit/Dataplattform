@@ -155,7 +155,7 @@ def test_handler_call_process_s3_parquet_overwrite(s3_bucket, setup_queue_event)
                    'test': pd.DataFrame({'a': [1, 1, 1], 'c': [1, 2, 3]})
                 }
         else:
-            @process_handler.process(partitions={'test': ['a']})
+            @process_handler.process(partitions={'test': ['a']}, overwrite=True)
             def test_process(data, events):
                 return {
                     'test': pd.DataFrame({'a': [2, 2, 2], 'c': [1, 2, 3]})
@@ -173,7 +173,7 @@ def test_handler_call_process_s3_parquet_overwrite(s3_bucket, setup_queue_event)
     assert all([keys_in_s3_first_time[i] == expected_keys[i] for i in range(len(keys_in_s3_first_time))])
 
     decorate_process_function(1)
-    process_handler(event, overwrite=True)
+    process_handler(event)
 
     keys_in_s3_second_time = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
     print(keys_in_s3_second_time)
