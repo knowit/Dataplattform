@@ -1,4 +1,4 @@
-from google_event_poller import handler
+from google_event_process_lambda import handler
 from pytest import fixture
 from json import loads
 from datetime import datetime
@@ -30,8 +30,8 @@ def test_data(with_frozen_time):
 
 @fixture(autouse=True)
 def events_list_mock(mocker):
-    mock_service_builder = mocker.patch('google_event_poller.googleapiclient.discovery.build')
-    mocker.patch('google_event_poller.ServiceAccountCredentials')
+    mock_service_builder = mocker.patch('google_event_ingest_lambda.googleapiclient.discovery.build')
+    mocker.patch('google_event_ingest_lambda.ServiceAccountCredentials')
 
     events_mock = mocker.MagicMock()
     mock_service_builder.return_value.events.return_value = events_mock
