@@ -1,9 +1,9 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.process import ProcessHandler
 
 import pandas as pd
 from typing import Dict
 
-handler = Handler()
+handler = ProcessHandler()
 
 
 @handler.process(partitions={})

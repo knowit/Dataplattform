@@ -1,4 +1,4 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 
@@ -12,7 +12,7 @@ import json
 from datetime import datetime, timedelta, timezone
 
 
-handler = Handler()
+handler = IngestHandler()
 
 
 @handler.ingest()
