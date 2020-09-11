@@ -1,5 +1,5 @@
 from pytest import fixture, hookimpl
-from moto import mock_s3, mock_ssm, mock_sqs, mock_glue
+from moto import mock_s3, mock_ssm, mock_sqs
 from boto3 import resource, client
 from os import environ
 from unittest.mock import patch, MagicMock
@@ -180,26 +180,3 @@ def create_table_mock(mocker):
     on_to_parquet_stub.assert_table_data_contains_df = assert_table_data_contains_df
 
     yield on_to_parquet_stub
-
-
-@fixture(autouse=True)
-def glue(mocker):
-    with mock_glue():
-        glue_client = client('glue')
-        glue_client.create_database(DatabaseInput={'Name': 'test_database'})
-        glue_client.create_database(DatabaseInput={'Name': 'default'})
-        glue_client.create_table(
-            DatabaseName='test_database',
-            TableInput={
-                'Name': 'test_table',
-                'StorageDescriptor': {'Columns': [{'Name': 'col1', 'Type': 'type1'}]},
-            },
-        )
-        glue_client.create_table(
-            DatabaseName='default',
-            TableInput={
-                'Name': 'test_table',
-                'StorageDescriptor': {'Columns': [{'Name': 'col2', 'Type': 'type2'}]},
-            },
-        )
-        yield glue_client
