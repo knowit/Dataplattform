@@ -1,4 +1,4 @@
-from google_forms_process_lambda import handler as processHandler
+from google_forms_webhook_process_lambda import handler as processHandler
 from dataplattform.common import schema
 import os
 from json import load

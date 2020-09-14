@@ -1,4 +1,4 @@
-from google_forms_ingest_lambda import handler as ingestHandler
+from google_forms_webhook_ingest_lambda import handler as ingestHandler
 from dataplattform.testing.events import APIGateway
 import os
 from json import loads
@@ -13,6 +13,7 @@ def test_data_quiz():
 
 
 def test_insert_data_quiz_ingest(s3_bucket, test_data_quiz):
+    print(type(test_data_quiz))
     ingestHandler(APIGateway(
         headers={},
         body=test_data_quiz).to_dict(), None)

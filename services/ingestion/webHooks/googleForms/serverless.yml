@@ -6,6 +6,7 @@ custom:
     timeout: 12
     ingestHandlerFile: google_forms_webhook_ingest_lambda
     processHandlerFile: google_forms_webhook_process_lambda
+    databaseName: level_3
     description: Endpoint for Google Forms webhooks
     accessLevel: level-3
     dataFolder: googleForms/forms
@@ -68,7 +69,7 @@ package:
     - "./**"
 
 
-unctions:
+functions:
   ingest: # A Function
     handler: ${self:custom.editable.ingestHandlerFile}.handler
     layers:
@@ -90,12 +91,12 @@ unctions:
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
     tags: # Tag for this function. Every function are tagged with stage by default
 
-    events: # The Events that trigger this Function
-      - schedule:
-          name: ${self:custom.stage}-${self:service}-timer
-          description: ${self:custom.editable.description}
-          rate: ${self:custom.editable.scheduleRate}
-          enabled: true
+    events:
+      - http:
+          path: forms-data-callback
+          method: post
+          private: true #if true API key is needed
+
   process: # A Function
     handler: ${self:custom.editable.processHandlerFile}.handler
     events: # The Events that trigger this Function

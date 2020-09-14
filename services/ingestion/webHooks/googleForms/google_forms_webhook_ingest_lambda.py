@@ -8,7 +8,6 @@ handler = IngestHandler()
 
 @handler.ingest()
 def ingest(event) -> Data:
-
     event_body = event['body']
     body_json = json.loads(event_body)
 

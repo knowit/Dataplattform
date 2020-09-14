@@ -5,6 +5,7 @@ from dataplattform.cli.helper import (
     resovle_cloudformation_imports
 )
 from os import environ
+from dataplattform.testing.events import APIGateway
 from importlib.util import spec_from_file_location, module_from_spec
 from json import loads
 from time import time
@@ -17,10 +18,22 @@ from boto3 import resource
 def init(parser: ArgumentParser):
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     parser.add_argument('-p', '--profile', dest='profile', action='store_true')
-    parser.add_argument('-e', '--event', dest='event', default='{}')
+    parser.add_argument('-e', '--event', dest='event', default=None)
+    parser.add_argument('--event-type', dest='eventType', default='Schedule', choices=['APIGateway', "Schedule"])
+    parser.add_argument('--event-file', dest='eventFile')
 
 
 def run(args: Namespace, _):
+    if (args.eventFile):
+        with open(args.eventFile) as json_file:
+            args.event = json_file.read()
+    elif (args.eventType):
+        if args.eventType == 'APIGateway':
+            api_gw = APIGateway(headers="{}", body="{}").to_json()
+            args.event = api_gw
+        else:
+            args.event = None
+
     config = load_serverless_config('functions')
     handlers = [(c['handler'], c['environment']) for c in config.values()]
     runners = [prepare_runner(handler, env, args) for handler, env in handlers]
