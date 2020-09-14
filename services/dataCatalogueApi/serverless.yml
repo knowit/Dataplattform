@@ -46,6 +46,8 @@ functions:
     name: ${self:custom.stage}-${self:service}
     description: Dataplattform Data Catalogue API
     role: !ImportValue ${self:custom.stage}-assumeRole
+    environment:
+      STAGE: ${self:custom.stage}
     package:
       include:
         - '*.py'
