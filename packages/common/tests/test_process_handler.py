@@ -139,6 +139,53 @@ def test_handler_call_process_s3_parquet_append(s3_bucket, setup_queue_event):
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
 
+def test_handler_call_process_s3_parquet_overwrite(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
+
+    process_handler = handler.ProcessHandler()
+
+    def decorate_process_function(count):
+        if (count == 0):
+            @process_handler.process(partitions={'test': ['a']})
+            def test_process(data, events):
+                return {
+                   'test': pd.DataFrame({'a': [1, 1, 1], 'c': [1, 2, 3]})
+                }
+        else:
+            @process_handler.process(partitions={'test': ['a']}, overwrite=True)
+            def test_process(data, events):
+                return {
+                    'test': pd.DataFrame({'a': [2, 2, 2], 'c': [1, 2, 3]})
+                }
+
+    decorate_process_function(0)
+    process_handler(event)
+    keys_in_s3_first_time = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    expected_keys = [
+        'data/test/structured/test/_common_metadata',
+        'data/test/structured/test/_metadata',
+        'data/test/structured/test/a=1/part.0.parquet',
+    ]
+
+    assert all([keys_in_s3_first_time[i] == expected_keys[i] for i in range(len(keys_in_s3_first_time))])
+
+    decorate_process_function(1)
+    process_handler(event)
+
+    keys_in_s3_second_time = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    print(keys_in_s3_second_time)
+    expected_keys = [
+        'data/test/structured/test/_common_metadata',
+        'data/test/structured/test/_metadata',
+        'data/test/structured/test/a=2/part.0.parquet',
+    ]
+
+    assert all([keys_in_s3_second_time[i] == expected_keys[i] for i in range(len(keys_in_s3_second_time))])
+
+
 def test_handler_call_process_s3_parquet_partitioned(s3_bucket, setup_queue_event):
     event = setup_queue_event(
         schema.Data(
