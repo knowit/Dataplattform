@@ -1,5 +1,8 @@
 import pytest
-import app
+import os
+
+os.environ.pop('STAGE')
+import app  # noqa: E402
 
 
 @pytest.fixture
