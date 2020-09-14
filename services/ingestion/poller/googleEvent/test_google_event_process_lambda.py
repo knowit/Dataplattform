@@ -1,4 +1,4 @@
-from google_event_ingest_lambda import handler
+from google_event_process_lambda import handler
 from pytest import fixture
 from json import loads
 from datetime import datetime
@@ -121,6 +121,7 @@ def test_events_multiple_calendars(s3_bucket, multi_calendar_mock, with_frozen_t
     expected_new = [expected[0], expected2[0]]
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
     data = loads(response['Body'].read())
+    print(data)
     assert [i for i in data['data'] if i not in expected_new] == []
 
 

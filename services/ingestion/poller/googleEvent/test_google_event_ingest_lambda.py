@@ -1,4 +1,4 @@
-from google_event_process_lambda import handler
+from google_event_ingest_lambda import handler
 from pytest import fixture
 from json import loads
 from datetime import datetime
