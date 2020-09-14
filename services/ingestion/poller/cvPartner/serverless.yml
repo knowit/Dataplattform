@@ -14,6 +14,7 @@ custom:
     dataFolder: cvpartner
 
   ################################################
+  project: dataplattform
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
@@ -41,18 +42,15 @@ provider:
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
-  tags: # Tags that will be added to each of the deployment resources.
-    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    Layer: Ingestion # ingestion, processing, restApi, infrastructure
-    Ingestion: Pollers #webHooks, Pollers, iot
-    #processing: linkedIn
-    #restApi: linkedIn
-    #infrastructure: s3
-    # key: value
-  stackTags: # Tags for cloud formation
-    # key: value
-  environment: # Environment variables, often stored in SSM
-
+  
+  tags:
+    project: ${self:custom.project}
+    layer: ingestion
+    ingestion: poller
+  stackTags:
+    project: ${self:custom.project}
+    layer: ingestion
+    ingestion: poller
 
 package:
   individually: true
