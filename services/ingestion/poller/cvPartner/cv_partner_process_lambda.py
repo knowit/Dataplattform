@@ -7,13 +7,21 @@ import numpy as np
 handler = ProcessHandler()
 
 
-@handler.process(partitions={})
+@handler.process(partitions={}, overwrite=True)
 def process(data, events) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
         payload = d['data']
         df = pd.json_normalize(payload)
         return df
+
+    """
+    Workaround for known pandas issue with conversion to int.
+    """
+    def column_to_object(col):
+        col = pd.to_numeric(col, errors='coerce')
+        col = col.astype(dtype=pd.Int64Dtype()).astype(dtype=np.object)
+        return col
 
     employee_table = [
         'user_id',
@@ -43,6 +51,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv.place_of_residence.int': 'place_of_residence',
         'cv.twitter': 'twitter',
         'cv.title.no': 'title'}, inplace=True)
+    employee_df['born_year'] = column_to_object(employee_df['born_year'])
 
     """
     Transforms:
@@ -118,6 +127,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         cat_dict = df['cv.' + sub_cat].copy()
         user_ids = df['user_id'].copy()
         tmp_df = create_from_topic('user_id', user_ids, cat_dict)[cols].copy()
+        tmp_df.replace(to_replace="", value=pd.NA, inplace=True)
         for col in normalizable_cols:
             tmp_df[col] = normalize_coloums(tmp_df, col, 'no')
 
@@ -152,7 +162,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         new_col = []
         for col_list in df_col:
             if not isinstance(col_list, list):
-                new_col.append("")
+                new_col.append(pd.NA)
                 continue
             tmp_string = ""
             for elem in col_list:
@@ -161,16 +171,16 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         out_tmp[new_col_name] = new_col
         return out_tmp
 
-    def create_month_year_string(month, year):
-        return month + "/" + year
-
     def create_education_df(df):
         education_df_coloums = ['user_id', 'degree', 'description', 'month_from',
                                 'month_to', 'school', 'year_from', 'year_to']
         edu_normalizable_cols = ['degree', 'description', 'school']
         tmp = create_df(df, 'educations', education_df_coloums, edu_normalizable_cols)
-        tmp['time_from'] = create_month_year_string(tmp['month_from'], tmp['year_from'])
-        tmp['time_to'] = create_month_year_string(tmp['month_to'], tmp['year_to'])
+        tmp.replace(to_replace="", value=pd.NA, inplace=True)
+        tmp['month_to'] = column_to_object(tmp['month_to'])
+        tmp['year_to'] = column_to_object(tmp['year_to'])
+        tmp['month_from'] = column_to_object(tmp['month_from'])
+        tmp['year_from'] = column_to_object(tmp['year_from'])
 
         return tmp
 
@@ -178,7 +188,9 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         blogs_df_columns = ['user_id', 'long_description', 'month', 'name', 'url', 'year']
         normalizable_cols = ['long_description', 'name']
         tmp = create_df(df, 'blogs', blogs_df_columns, normalizable_cols)
-        tmp['time'] = create_month_year_string(tmp['month'], tmp['year'])
+        tmp.replace(to_replace="", value=pd.NA, inplace=True)
+        tmp['month'] = column_to_object(tmp['month'])
+        tmp['year'] = column_to_object(tmp['year'])
         return tmp
 
     def create_courses_df(df):
@@ -206,12 +218,13 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         normalizable_cols = ['customer', 'long_description', 'description', 'industry']
 
         tmp = create_df(df, 'project_experiences', df_columns, normalizable_cols)
-
+        tmp['month_to'] = column_to_object(tmp['month_to'])
+        tmp['year_to'] = column_to_object(tmp['year_to'])
+        tmp['month_from'] = column_to_object(tmp['month_from'])
+        tmp['year_from'] = column_to_object(tmp['year_from'])
+        tmp['percent_allocated'] = column_to_object(tmp['percent_allocated'])
         tmp = make_custom_lists(tmp, tmp['project_experience_skills'], 'project_experience_skills', 'tags', 'no')
         tmp = make_custom_lists(tmp, tmp['roles'], 'roles', 'name', 'no')
-        tmp['time_from'] = create_month_year_string(tmp['month_from'], tmp['year_from'])
-        tmp['time_to'] = create_month_year_string(tmp['month_to'], tmp['year_to'])
-
         return tmp
 
     def create_technologies_df(df):
@@ -226,8 +239,11 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                       'year_to', 'long_description']
         work_normalizable_cols = ['description', 'employer', 'long_description']
         tmp = create_df(df, 'work_experiences', df_columns, work_normalizable_cols)
-        tmp['time_from'] = create_month_year_string(tmp['month_from'], tmp['year_from'])
-        tmp['time_to'] = create_month_year_string(tmp['month_to'], tmp['year_to'])
+        tmp['month_to'] = column_to_object(tmp['month_to'])
+        tmp['month_from'] = column_to_object(tmp['month_from'])
+        tmp['year_to'] = column_to_object(tmp['year_to'])
+        tmp['year_from'] = column_to_object(tmp['year_from'])
+
         return tmp
 
     return {

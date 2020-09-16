@@ -113,13 +113,11 @@ def test_process_education_table_content(setup_queue_event, test_data, create_ta
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
             'degree': ['Bachelor1', 'Master1', 'Bachelor2', 'Master2'],
-            'month_from': ["08", "08", "08", "08"],
-            'month_to': ["05", "06", "05", "06"],
-            'year_from': ["2014", "2017", "2014", "2017"],
-            'year_to': ["2019", "2019", "2019", "2019"],
-            'time_from': ["08/2014", "08/2017", "08/2014", "08/2017"],
-            'time_to': ["05/2019", "06/2019", "05/2019", "06/2019"]
-            }))
+            'month_from': [8, 8, 8, 8],
+            'month_to': [5, 6, 5, 6],
+            'year_from': [2014, 2017, 2014, 2017],
+            'year_to': [2019, 2019, 2019, 2019]
+        }))
 
 
 """
@@ -144,10 +142,10 @@ def test_process_education_table_content_missing(setup_queue_event, test_data,
         pd.DataFrame({
             'user_id': ['user_id_2', 'user_id_2'],
             'degree': ['Bachelor2', 'Master2'],
-            'month_from': ["08", "08"],
-            'month_to': ["05", "06"],
-            'year_from': ["2014", "2017"],
-            'year_to': ["2019", "2019"]
+            'month_from': [8, 8],
+            'month_to': [5, 6],
+            'year_from': [2014, 2017],
+            'year_to': [2019, 2019]
             }))
 
 
@@ -163,8 +161,8 @@ def test_project_experiences_df(setup_queue_event, test_data, create_table_mock)
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
             'customer': ['costumer1', 'costumer2', 'costumer3', 'Knowit Objectnet'],
-            'month_from': ["01", "06", "08", "12"],
-            'year_from': ["2015", "2017", "2019", "2019"],
+            'month_from': [1, 6, 8, 12],
+            'year_from': [2015, 2017, 2019, 2019],
             'project_experience_skills': ["HTML/CSS;Github", "Angular;npm", "Yarn;VS Code", "AWS DynamoDB;Github"],
             'roles': ["Fullstackutvikler",
                       "Frontendutvikler",
@@ -193,9 +191,9 @@ def test_project_experiences_df_project_skills_missing(setup_queue_event, test_d
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
             'customer': ['costumer1', 'costumer2', 'costumer3', 'Knowit Objectnet'],
-            'month_from': ["01", "06", "08", "12"],
-            'year_from': ["2015", "2017", "2019", "2019"],
-            'project_experience_skills': ["HTML/CSS;Github", "", "Yarn;VS Code", "AWS DynamoDB;Github"],
+            'month_from': [1, 6, 8, 12],
+            'year_from': [2015, 2017, 2019, 2019],
+            'project_experience_skills': ["HTML/CSS;Github", pd.NA, "Yarn;VS Code", "AWS DynamoDB;Github"],
             'roles': ["Fullstackutvikler",
                       "Frontendutvikler",
                       "Frontendutvikler;Brukeranalyse;DevOps-utvikler",
@@ -222,9 +220,9 @@ def test_project_experiences_df_costumer_missing(setup_queue_event, test_data, c
         'project_experience_data',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
-            'customer': ['', 'costumer2', 'costumer3', 'Knowit Objectnet'],
-            'month_from': ["01", "06", "08", "12"],
-            'year_from': ["2015", "2017", "2019", "2019"],
+            'customer': ["", 'costumer2', 'costumer3', 'Knowit Objectnet'],
+            'month_from': [1, 6, 8, 12],
+            'year_from': [2015, 2017, 2019, 2019],
             'project_experience_skills': ["HTML/CSS;Github", "Angular;npm", "Yarn;VS Code", "AWS DynamoDB;Github"],
             'roles': ["Fullstackutvikler",
                       "Frontendutvikler",
@@ -249,10 +247,12 @@ def test_work_experiences_df_missing(setup_queue_event, test_data,
             metadata=schema.Metadata(timestamp=0),
             data=tmp_data))
 
+    exp_df = pd.DataFrame({
+            'user_id': ['user_id_1', 'user_id_1', 'user_id_1', 'user_id_2', 'user_id_2', 'user_id_2'],
+            'month_from': [6, 6, 8, pd.NA, 6, 8]
+            })
+
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'work_experience_data',
-        pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_1', 'user_id_1', 'user_id_2', 'user_id_2', 'user_id_2'],
-            'month_from': ["06", "06", "08", pd.NA, "06", "08"],
-            }))
+        'work_experience_data', exp_df
+        )
