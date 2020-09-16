@@ -50,5 +50,5 @@ def test_initial_ingest(s3_bucket):
     assert data['data'][0]['user_id'] == user_id
     assert data['data'][0]['default_cv_id'] == cv_id
     assert data['data'][0]['image'] is not None
-    cv_link_correct = url_v1 + f'/cvs/download/{user_id}/{cv_id}/no/pdf/'
+    cv_link_correct = url_v1 + f'/cvs/download/{user_id}/{cv_id}/{{LANG}}/{{FORMAT}}/'
     assert data['data'][0]['cv_link'] == cv_link_correct

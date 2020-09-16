@@ -38,15 +38,16 @@ def test_initial_process(setup_queue_event, test_data, create_table_mock):
 
     handler(event, None)
     create_table_mock.assert_table_created(
-        'employee_data',
-        'education_data',
-        'blogs_data',
-        'courses_data',
-        'key_qualification_data',
-        'languages_data',
-        'project_experience_data',
-        'technology_skills_data',
-        'work_experience_data')
+        'cv_partner_employees',
+        'cv_partner_education',
+        'cv_partner_blogs',
+        'cv_partner_courses',
+        'cv_partner_key_qualification',
+        'cv_partner_languages',
+        'cv_partner_project_experience',
+        'cv_partner_technology_skills',
+        'cv_partner_work_experience',
+        'cv_partner_employee_images')
 
 
 def test_process_table_content(setup_queue_event, test_data, create_table_mock):
@@ -57,11 +58,10 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock):
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'employee_data',
+        'cv_partner_employees',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_2'],
             'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
-            'image': ["image1", "image2"],
             'link': ["link1", "link2"],
             'navn': ['Test Testerson', 'Test Testerson 2'],
             'email': ["test@test.no", "test@test2.no"],
@@ -69,8 +69,23 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock):
             'born_year': [1995, 1985],
             'nationality': ["Norwegian", "Swedish"],
             'place_of_residence': ['Oslo', 'Oslo'],
-            'twitter': [pd.NA, "twitter2"]
+            'twitter': ["", "twitter2"]
         }))
+
+
+def test_process_image_table_content(setup_queue_event, test_data, create_table_mock):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=test_data['data']))
+
+    handler(event, None)
+    create_table_mock.assert_table_data_contains_df(
+        'cv_partner_employee_images',
+        pd.DataFrame({
+            'user_id': ['user_id_1', 'user_id_2'],
+            'image': ["image1", "image2"],
+            }))
 
 
 def test_process_table_content_missing_born_date(setup_queue_event, test_data, create_table_mock):
@@ -85,19 +100,18 @@ def test_process_table_content_missing_born_date(setup_queue_event, test_data, c
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'employee_data',
+        'cv_partner_employees',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_2'],
             'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
-            'image': ["image1", "image2"],
             'link': ["link1", "link2"],
             'navn': ['Test Testerson', 'Test Testerson 2'],
             'email': ["test@test.no", "test@test2.no"],
             'telefon': ['+123456', '+123456'],
-            'born_year': [pd.NA, 1985],
+            'born_year': [-1, 1985],
             'nationality': ["Norwegian", "Swedish"],
             'place_of_residence': ['Oslo', 'Oslo'],
-            'twitter': [pd.NA, "twitter2"]
+            'twitter': ["", "twitter2"]
         }))
 
 
@@ -109,7 +123,7 @@ def test_process_education_table_content(setup_queue_event, test_data, create_ta
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'education_data',
+        'cv_partner_education',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
             'degree': ['Bachelor1', 'Master1', 'Bachelor2', 'Master2'],
@@ -138,7 +152,7 @@ def test_process_education_table_content_missing(setup_queue_event, test_data,
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'education_data',
+        'cv_partner_education',
         pd.DataFrame({
             'user_id': ['user_id_2', 'user_id_2'],
             'degree': ['Bachelor2', 'Master2'],
@@ -157,7 +171,7 @@ def test_project_experiences_df(setup_queue_event, test_data, create_table_mock)
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'project_experience_data',
+        'cv_partner_project_experience',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
             'customer': ['costumer1', 'costumer2', 'costumer3', 'Knowit Objectnet'],
@@ -187,13 +201,13 @@ def test_project_experiences_df_project_skills_missing(setup_queue_event, test_d
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'project_experience_data',
+        'cv_partner_project_experience',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
             'customer': ['costumer1', 'costumer2', 'costumer3', 'Knowit Objectnet'],
             'month_from': [1, 6, 8, 12],
             'year_from': [2015, 2017, 2019, 2019],
-            'project_experience_skills': ["HTML/CSS;Github", pd.NA, "Yarn;VS Code", "AWS DynamoDB;Github"],
+            'project_experience_skills': ["HTML/CSS;Github", "", "Yarn;VS Code", "AWS DynamoDB;Github"],
             'roles': ["Fullstackutvikler",
                       "Frontendutvikler",
                       "Frontendutvikler;Brukeranalyse;DevOps-utvikler",
@@ -217,7 +231,7 @@ def test_project_experiences_df_costumer_missing(setup_queue_event, test_data, c
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'project_experience_data',
+        'cv_partner_project_experience',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
             'customer': ["", 'costumer2', 'costumer3', 'Knowit Objectnet'],
@@ -249,10 +263,10 @@ def test_work_experiences_df_missing(setup_queue_event, test_data,
 
     exp_df = pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_1', 'user_id_1', 'user_id_2', 'user_id_2', 'user_id_2'],
-            'month_from': [6, 6, 8, pd.NA, 6, 8]
+            'month_from': [6, 6, 8, -1, 6, 8]
             })
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'work_experience_data', exp_df
+        'cv_partner_work_experience', exp_df
         )

@@ -35,7 +35,7 @@ def ingest(event) -> Data:
             'user_id': person['cv']['user_id'],
             'default_cv_id': person['cv']['id'],
             'image': get_base64_encoded_image(person['cv']['image']['thumb']),
-            'cv_link': url_v1 + f"/cvs/download/{person['cv']['user_id']}/{person['cv']['id']}/no/pdf/"
+            'cv_link': url_v1 + f"/cvs/download/{person['cv']['user_id']}/{person['cv']['id']}/{{LANG}}/{{FORMAT}}/"
         }
 
     def get_cv(user_id, cv_id):
