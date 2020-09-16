@@ -7,7 +7,7 @@ handler = ProcessHandler()
 
 
 @handler.process(partitions={})
-def process(data) -> Dict[str, pd.DataFrame]:
+def process(data, events) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
         metadata, payload = d['metadata'], d['data']

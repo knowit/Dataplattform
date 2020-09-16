@@ -1,0 +1,28 @@
+{
+    "metadata": {
+        "timestamp": 1560556800.0
+    },
+    "data": [
+        {
+            "event_id": "1235",
+            "calendar_id": "1",
+            "timestamp_from": 1560616200,
+            "timestamp_to": 1560619800,
+            "event_summary": "",
+            "event_button_names": [
+                "box1"
+            ],
+            "creator": ""
+        },
+        {
+            "event_id": "1236",
+            "calendar_id": "2",
+            "timestamp_from": 1560702600,
+            "timestamp_to": 1560706200,
+            "event_summary": "",
+            "event_button_names": [
+                "box2"
+            ],
+            "creator": ""}
+    ]
+}
