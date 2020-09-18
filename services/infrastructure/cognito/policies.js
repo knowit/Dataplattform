@@ -6,9 +6,16 @@ module.exports = serverless => {
     const commonStatement = [
         {
             'Effect': 'Allow',
-            'Action': ['s3:GetObject'],
+            'Action': ['s3:GetBucketLocation', 's3:ListBucket', 's3:ListBucketMultipartUploads'],
             'Resource': [
-                {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, '/query/*']]}
+                {'Fn::ImportValue': `${stage}-datalakeArn`}
+            ]
+        },
+        {
+            'Effect': 'Allow',
+            'Action': ['s3:GetObject', 's3:PutObject', 's3:ListMultipartUploadParts', 's3:AbortMultipartUpload', 's3:DeleteObject'],
+            'Resource': [
+                {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, '/query*']]}
             ]
         },
         {
@@ -16,6 +23,18 @@ module.exports = serverless => {
             'Action': ['athena:StartQueryExecution', 'athena:GetQueryExecution'],
             'Resource': [
                 {'Fn::Join': [':', ['arn:aws:athena', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, 'workgroup/primary']]}
+            ]
+        },
+        {
+            'Effect': 'Allow',
+            'Action': ['athena:ListDataCatalogs'],
+            'Resource': ['*']
+        },
+        {
+            'Effect': 'Allow',
+            'Action': ['athena:ListTableMetadata', 'athena:ListDatabases'],
+            'Resource': [
+                {'Fn::Join': [':', ['arn:aws:athena', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, 'datacatalog/AwsDataCatalog']]},
             ]
         }
     ]
