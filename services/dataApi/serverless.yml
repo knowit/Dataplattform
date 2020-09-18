@@ -31,7 +31,7 @@ provider:
     name: dataplattform-v2-deploymentbucket
   runtime: python3.7
   memorySize: 1024
-  timeout: 10
+  timeout: 28
 
   tags:
     project: ${self:custom.project}
