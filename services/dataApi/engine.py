@@ -1,9 +1,40 @@
 import boto3
+from botocore.exceptions import ClientError
 import sqlparse
 from time import sleep
 import pandas as pd
 from io import BytesIO
 from os import environ
+from cachetools import cached, TTLCache
+
+
+@cached(cache=TTLCache(1, 60))
+def table_map():
+    athena = boto3.client('athena')
+
+    list_catalogs = athena.get_paginator('list_data_catalogs')
+    list_databases = athena.get_paginator('list_databases')
+    list_tables = athena.get_paginator('list_table_metadata')
+
+    try:
+        return [
+            (catalog, db, table['Name'])
+            for (catalog, db) in [
+                (catalog, db['Name'])
+                for catalog in [
+                    catalog['CatalogName']
+                    for resp in list_catalogs.paginate()
+                    for catalog in resp['DataCatalogsSummary']
+                ]
+                for resp in list_databases.paginate(CatalogName=catalog)
+                for db in resp['DatabaseList']
+            ]
+            for resp in list_tables.paginate(CatalogName=catalog, DatabaseName=db)
+            for table in resp['TableMetadataList']
+        ]
+
+    except ClientError as error:
+        raise Exception(error.response['Error']['Message'])
 
 
 def query_complete(athena, query_id: str):
@@ -12,12 +43,16 @@ def query_complete(athena, query_id: str):
     if status == 'SUCCEEDED':
         return response['QueryExecution']['ResultConfiguration']['OutputLocation']
     elif status == 'FAILED' or status == 'CANCELLED':
-        raise Exception('Athena exection failed')
+        raise Exception(f'Athena exection failed: {response["QueryExecution"]["Status"]["StateChangeReason"]}')
     else:
         return None
 
 
 def execute(sql: str, output_format: str):
+    for (_, database, table) in table_map():
+        if table in sql:
+            sql = sql.replace(table, f'{database}.{table}')
+
     statement = sqlparse.parse(sql)[0]
     if statement.get_type() != 'SELECT':
         raise Exception('Illegal SQL statement')

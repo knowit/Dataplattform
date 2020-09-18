@@ -8,8 +8,8 @@ app = Flask(__name__)
 session = flask_ext.UserSession(app)
 
 
-@app.route('/')
-@app.route('/spec')
+@app.route('/data/')
+@app.route('/data/spec')
 def spec():
     doc = swagger(app)
     doc['info']['version'] = "1.0"
@@ -17,7 +17,7 @@ def spec():
     return doc
 
 
-@app.route('/query', methods=['GET', 'POST'])
+@app.route('/data/query', methods=['GET', 'POST'])
 def query():
     """
     Query dataplattform data
