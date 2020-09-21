@@ -1,16 +1,14 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 from datetime import datetime
 from json import loads
-from typing import Dict, AnyStr
-import pandas as pd
+from typing import AnyStr
 from dataclasses import dataclass
-from itertools import groupby
 from dateutil.parser import isoparse
 
 
-handler = Handler()
+handler = IngestHandler()
 
 
 @handler.validate()
@@ -28,6 +26,7 @@ def ingest(event) -> Data:
     @dataclass
     class JiraMetadata(Metadata):
         event_type: AnyStr
+
     return Data(
         metadata=JiraMetadata(
             timestamp=datetime.now().timestamp(),
@@ -41,22 +40,3 @@ def ingest(event) -> Data:
             'updated': int(isoparse(item['fields']['updated']).timestamp())
         }
     )
-
-
-@handler.process(partitions={
-    'jira_issue_created': ['issue_status'],
-    'jira_issue_updated': ['issue_status'],
-})
-def process(data) -> Dict[str, pd.DataFrame]:
-    print('data')
-    print(data[0].json())
-
-    data = {
-        k: [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in v] for k, v in
-        groupby([d.json() for d in data], key=lambda x: x['metadata']['event_type'])
-    }
-
-    return {
-        'jira_issue_created': pd.DataFrame.from_records(data['issue_created']) if 'issue_created' in data else None,
-        'jira_issue_updated': pd.DataFrame.from_records(data['issue_updated']) if 'issue_updated' in data else None
-    }

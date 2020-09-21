@@ -1,0 +1,13 @@
+{
+    "metadata": {
+        "timestamp": 1600625288.583991,
+        "event_type": "issue_created"
+    },
+    "data": {
+        "issue": "TEST-1234",
+        "customer": "Test Testerson",
+        "issue_status": "Open",
+        "created": 1577836800,
+        "updated": 1577836800
+    }
+}

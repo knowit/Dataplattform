@@ -200,6 +200,19 @@ resources: # The resources your functions use
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                      - "" 
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - '*'
     
     EventQueue:
       Type: AWS::SQS::Queue
