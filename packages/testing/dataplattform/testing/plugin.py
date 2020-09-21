@@ -3,7 +3,6 @@ from moto import mock_s3, mock_ssm, mock_sqs
 from boto3 import resource, client
 from os import environ
 from unittest.mock import patch, MagicMock
-import numpy as np
 
 
 def pytest_addoption(parser):
@@ -163,6 +162,7 @@ def create_table_mock(mocker):
     def assert_table_data_contains_df(table, df, **kwargs):
         import string
         import random
+        import numpy as np
         # pandas.isin() does not support comparing dataframes with null/nullable values.
         # Comparing two dataframes containing null at the same locations will not work.
         # Therefor all nullable values in both dataframes are assigned to the same random value.
