@@ -215,8 +215,6 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - '*'
-          - 
-
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:

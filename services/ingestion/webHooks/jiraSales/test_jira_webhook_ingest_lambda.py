@@ -1,7 +1,6 @@
 from jira_webhook_ingest_lambda import handler
 from dataplattform.testing.events import APIGateway
 from json import dumps, loads
-import pandas as pd
 
 
 def test_invalid():
