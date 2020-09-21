@@ -1,6 +1,6 @@
 from jira_webhook_process_lambda import handler
 from dataplattform.common import schema
-from json import dumps, load
+from json import load
 import pandas as pd
 from pytest import fixture
 from os import path
