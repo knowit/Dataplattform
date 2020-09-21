@@ -149,7 +149,7 @@ def test_handler_call_process_s3_parquet_overwrite(s3_bucket, setup_queue_event)
 
     def decorate_process_function(count):
         if (count == 0):
-            @process_handler.process(partitions={'test': ['a']})
+            @process_handler.process(partitions={'test': ['a']}, overwrite=True)
             def test_process(data, events):
                 return {
                    'test': pd.DataFrame({'a': [1, 1, 1], 'c': [1, 2, 3]})

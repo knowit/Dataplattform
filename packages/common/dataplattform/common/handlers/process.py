@@ -88,12 +88,11 @@ class ProcessHandler:
             table_partitions = partitions.get(table_name, [])
             frame = ensure_partitions_has_values(frame, table_partitions)
 
-            if overwrite:
+            table_exists = check_exists(s3, frame, table_name, table_partitions)
+
+            if overwrite and table_exists:
                 delete_table(s3, table_name)
                 table_exists = False
-            else:
-                table_exists = check_exists(
-                    s3, frame, table_name, table_partitions)
 
             frame.to_parquet(f'structured/{table_name}',
                              engine='fastparquet',

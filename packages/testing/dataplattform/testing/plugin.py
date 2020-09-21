@@ -3,6 +3,7 @@ from moto import mock_s3, mock_ssm, mock_sqs
 from boto3 import resource, client
 from os import environ
 from unittest.mock import patch, MagicMock
+import numpy as np
 
 
 def pytest_addoption(parser):
@@ -162,16 +163,19 @@ def create_table_mock(mocker):
     def assert_table_data_contains_df(table, df, **kwargs):
         import string
         import random
-
         # pandas.isin() does not support comparing dataframes with null/nullable values.
         # Comparing two dataframes containing null at the same locations will not work.
         # Therefor all nullable values in both dataframes are assigned to the same random value.
+
+        df = df.astype(np.object)
+        df_from_calls_object = df_from_calls(f'structured/{table}').astype(np.object)
+
         fill_value = ''.join(random.choices(string.ascii_uppercase +
                                             string.digits, k=7))
         input_df = df.fillna(fill_value)
-        df_from_calls_object = df_from_calls(f'structured/{table}').fillna(fill_value)
+        df_from_calls_object = df_from_calls_object.fillna(fill_value)
         tmp_df = input_df.isin(df_from_calls_object)
-        assert tmp_df.eq(True).all().all(), "Dataframe is contained in table"
+        assert tmp_df.eq(True).all().all(), "Dataframe is not contained in table, values differ"
 
     on_to_parquet_stub.assert_table_created = assert_table_created
     on_to_parquet_stub.assert_table_not_created = assert_table_not_created

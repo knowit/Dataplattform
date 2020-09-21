@@ -7,7 +7,7 @@ import numpy as np
 handler = ProcessHandler()
 
 
-@handler.process(partitions={})
+@handler.process(partitions={}, overwrite=True)
 def process(data, events) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
@@ -15,10 +15,19 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         df = pd.json_normalize(payload)
         return df
 
+    """
+    Workaround for known pandas issue with conversion to int in
+    the presence of nullable integers.
+    """
+    def column_type_to_int(col):
+        col = pd.to_numeric(col, errors='coerce')
+        col = col.fillna(value=-1)
+        col = col.astype(dtype='int32')
+        return col
+
     employee_table = [
         'user_id',
         'default_cv_id',
-        'image',
         'cv_link',
         'cv.navn',
         'cv.email',
@@ -30,9 +39,13 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv.title.no'
         ]
 
+    image_table = [
+        'user_id',
+        'image'
+        ]
+
     df = pd.concat([make_dataframe(d) for d in data])
     employee_df = df[employee_table].copy()
-    employee_df.fillna(pd.NA, inplace=True)
     employee_df.rename(columns={
         'cv_link': 'link',
         'cv.navn': 'navn',
@@ -43,6 +56,9 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv.place_of_residence.int': 'place_of_residence',
         'cv.twitter': 'twitter',
         'cv.title.no': 'title'}, inplace=True)
+    employee_df['born_year'] = column_type_to_int(employee_df['born_year'])
+    employee_df = employee_df.fillna("")
+    image_df = df[image_table].copy()
 
     """
     Transforms:
@@ -111,8 +127,8 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         tmp = pd.json_normalize(tmp_col.copy())
         col1 = tmp[tag].to_numpy()
         col1_series = pd.Series(col1, name=col_name)
-        col1_series_out = col1_series.replace(np.nan, '', regex=True)
-        return col1_series_out
+        col1_series.replace(np.nan, '', regex=True, inplace=True)
+        return col1_series
 
     def create_df(df, sub_cat, cols, normalizable_cols):
         cat_dict = df['cv.' + sub_cat].copy()
@@ -121,7 +137,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         for col in normalizable_cols:
             tmp_df[col] = normalize_coloums(tmp_df, col, 'no')
 
-        tmp_df.fillna(pd.NA, inplace=True)
         return tmp_df
 
     """
@@ -161,16 +176,15 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         out_tmp[new_col_name] = new_col
         return out_tmp
 
-    def create_month_year_string(month, year):
-        return month + "/" + year
-
     def create_education_df(df):
         education_df_coloums = ['user_id', 'degree', 'description', 'month_from',
                                 'month_to', 'school', 'year_from', 'year_to']
         edu_normalizable_cols = ['degree', 'description', 'school']
         tmp = create_df(df, 'educations', education_df_coloums, edu_normalizable_cols)
-        tmp['time_from'] = create_month_year_string(tmp['month_from'], tmp['year_from'])
-        tmp['time_to'] = create_month_year_string(tmp['month_to'], tmp['year_to'])
+        tmp['month_to'] = column_type_to_int(tmp['month_to'])
+        tmp['year_to'] = column_type_to_int(tmp['year_to'])
+        tmp['month_from'] = column_type_to_int(tmp['month_from'])
+        tmp['year_from'] = column_type_to_int(tmp['year_from'])
 
         return tmp
 
@@ -178,7 +192,8 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         blogs_df_columns = ['user_id', 'long_description', 'month', 'name', 'url', 'year']
         normalizable_cols = ['long_description', 'name']
         tmp = create_df(df, 'blogs', blogs_df_columns, normalizable_cols)
-        tmp['time'] = create_month_year_string(tmp['month'], tmp['year'])
+        tmp['month'] = column_type_to_int(tmp['month'])
+        tmp['year'] = column_type_to_int(tmp['year'])
         return tmp
 
     def create_courses_df(df):
@@ -206,12 +221,13 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         normalizable_cols = ['customer', 'long_description', 'description', 'industry']
 
         tmp = create_df(df, 'project_experiences', df_columns, normalizable_cols)
-
+        tmp['month_to'] = column_type_to_int(tmp['month_to'])
+        tmp['year_to'] = column_type_to_int(tmp['year_to'])
+        tmp['month_from'] = column_type_to_int(tmp['month_from'])
+        tmp['year_from'] = column_type_to_int(tmp['year_from'])
+        tmp['percent_allocated'] = column_type_to_int(tmp['percent_allocated'])
         tmp = make_custom_lists(tmp, tmp['project_experience_skills'], 'project_experience_skills', 'tags', 'no')
         tmp = make_custom_lists(tmp, tmp['roles'], 'roles', 'name', 'no')
-        tmp['time_from'] = create_month_year_string(tmp['month_from'], tmp['year_from'])
-        tmp['time_to'] = create_month_year_string(tmp['month_to'], tmp['year_to'])
-
         return tmp
 
     def create_technologies_df(df):
@@ -226,18 +242,22 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                       'year_to', 'long_description']
         work_normalizable_cols = ['description', 'employer', 'long_description']
         tmp = create_df(df, 'work_experiences', df_columns, work_normalizable_cols)
-        tmp['time_from'] = create_month_year_string(tmp['month_from'], tmp['year_from'])
-        tmp['time_to'] = create_month_year_string(tmp['month_to'], tmp['year_to'])
+        tmp['month_to'] = column_type_to_int(tmp['month_to'])
+        tmp['month_from'] = column_type_to_int(tmp['month_from'])
+        tmp['year_to'] = column_type_to_int(tmp['year_to'])
+        tmp['year_from'] = column_type_to_int(tmp['year_from'])
+
         return tmp
 
     return {
-        'employee_data': employee_df,
-        'education_data': create_education_df(df),
-        'blogs_data': create_blogs_df(df),
-        'courses_data': create_courses_df(df),
-        'key_qualification_data': create_key_qualification_df(df),
-        'languages_data': create_languages_df(df),
-        'project_experience_data': create_project_experiences_df(df),
-        'technology_skills_data': create_technologies_df(df),
-        'work_experience_data': create_work_experiences_df(df)
+        'cv_partner_employees': employee_df,
+        'cv_partner_education': create_education_df(df),
+        'cv_partner_blogs': create_blogs_df(df),
+        'cv_partner_courses': create_courses_df(df),
+        'cv_partner_key_qualification': create_key_qualification_df(df),
+        'cv_partner_languages': create_languages_df(df),
+        'cv_partner_project_experience': create_project_experiences_df(df),
+        'cv_partner_technology_skills': create_technologies_df(df),
+        'cv_partner_work_experience': create_work_experiences_df(df),
+        'cv_partner_employee_images': image_df
     }
