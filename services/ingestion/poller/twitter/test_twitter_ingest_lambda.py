@@ -1,9 +1,8 @@
-from twitter_poller import handler
+from twitter_ingest_lambda import handler
 from pytest import fixture
 from json import loads
 from datetime import datetime, timezone
 from unittest.mock import Mock
-import pandas as pd
 
 
 def mock_twitter_model(data):
@@ -14,7 +13,7 @@ def mock_twitter_model(data):
 
 @fixture(autouse=True)
 def mock_twitter_api(mocker):
-    api = mocker.patch('twitter_poller.API')
+    api = mocker.patch('twitter_ingest_lambda.API')
     yield api.return_value
 
 
@@ -228,96 +227,3 @@ def test_handler_user_timeline_data(s3_bucket, mock_twitter_data):
         }]
 
     assert len(data) == 2 and all([d == expected[i] for i, d in enumerate(data)])
-
-
-def test_process_data(mock_twitter_data, create_table_mock):
-    mock_twitter_data('get_user', user_data)
-    mock_twitter_data('search', search_data, pageable=True)
-    mock_twitter_data('user_timeline', timeline_data, pageable=True)
-
-    handler(None, None)
-
-    create_table_mock.assert_table_created(
-        'twitter_tweets',
-        'twitter_timeline',
-        'twitter_account_status_update')
-
-
-def test_process_parquet_get_user_data(mock_twitter_data, create_table_mock):
-    mock_twitter_data('get_user', user_data)
-    mock_twitter_data('search', search_data, pageable=True)
-    mock_twitter_data('user_timeline', timeline_data, pageable=True)
-
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'twitter_account_status_update',
-        'user_id',
-        pd.Series([1234, 1234, 1234, 1234]))
-
-
-def test_process_parquet_search_data(mock_twitter_data, create_table_mock):
-    mock_twitter_data('get_user', user_data)
-    mock_twitter_data('search', search_data, pageable=True)
-    mock_twitter_data('user_timeline', timeline_data, pageable=True)
-
-    handler(None, None)
-
-    create_table_mock.assert_table_data(
-        'twitter_tweets',
-        pd.DataFrame({
-            'tweet_id': [1234],
-            'created_at': [1577836800],
-            'text': ['asdf'],
-            'is_retweet': [False],
-            'favorite_count': [1],
-            'retweet_count': [1],
-            'language': ['no'],
-            'hashtags': [None],
-            'place': [None],
-            'reply_to': [None]
-        }))
-
-
-def test_process_parquet_user_timeline_data(mock_twitter_data, create_table_mock):
-    mock_twitter_data('get_user', user_data)
-    mock_twitter_data('search', search_data, pageable=True)
-    mock_twitter_data('user_timeline', timeline_data, pageable=True)
-
-    handler(None, None)
-
-    create_table_mock.assert_table_data(
-        'twitter_timeline',
-        pd.DataFrame({
-            'tweet_id': [1234],
-            'created_at': [1577836800],
-            'user_screen_name': ['asdf'],
-            'text': ['asdf'],
-            'is_retweet': [False],
-            'favorite_count': [1],
-            'retweet_count': [1],
-            'language': ['no'],
-            'hashtags': [None],
-            'mentions': [None],
-            'user_name': ['sdf'],
-        }))
-
-
-def test_process_parquet_search_data_skip_existing(athena, mock_twitter_data, create_table_mock):
-    athena.on_query(
-        'SELECT "tweet_id" FROM "dev_test_database"."twitter_tweets"',
-        pd.DataFrame({'tweet_id': [1234]}))
-    athena.on_query(
-        'SELECT "tweet_id" FROM "dev_test_database"."twitter_timeline"',
-        pd.DataFrame({'tweet_id': [1234]}))
-
-    mock_twitter_data('get_user', user_data)
-    mock_twitter_data('search', search_data, {**search_data, 'id': 4321}, pageable=True)
-    mock_twitter_data('user_timeline', timeline_data, pageable=True)
-
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'twitter_tweets',
-        'tweet_id',
-        pd.Series([4321]))

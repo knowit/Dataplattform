@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "timestamp": 1600758667.001838
+  },
+  "data": {
+    "search": [
+      {
+        "tweet_id": 1234,
+        "created_at": 1577836800,
+        "text": "asdf",
+        "is_retweet": false,
+        "favorite_count": 1,
+        "retweet_count": 1,
+        "language": "no",
+        "hashtags": null,
+        "place": null,
+        "reply_to": null
+      },
+      {
+        "tweet_id": 4321,
+        "created_at": 1577836800,
+        "text": "asdf",
+        "is_retweet": false,
+        "favorite_count": 1,
+        "retweet_count": 1,
+        "language": "no",
+        "hashtags": null,
+        "place": null,
+        "reply_to": null
+      }
+    ],
+    "timeline": [
+      {
+        "tweet_id": 1234,
+        "created_at": 1577836800,
+        "user_screen_name": "asdf",
+        "text": "asdf",
+        "is_retweet": false,
+        "favorite_count": 1,
+        "retweet_count": 1,
+        "language": "no",
+        "hashtags": null,
+        "mentions": null,
+        "user_name": "sdf"
+      }
+    ],
+    "accounts": [
+      {
+        "user_id": 1234,
+        "screen_name": "test_testerson",
+        "name": "Test Testerson",
+        "statuses_count": 1,
+        "followers_count": 1,
+        "favourites_count": 1,
+        "friends_count": 1,
+        "listed_count": 1
+      },
+      {
+        "user_id": 1234,
+        "screen_name": "test_testerson",
+        "name": "Test Testerson",
+        "statuses_count": 1,
+        "followers_count": 1,
+        "favourites_count": 1,
+        "friends_count": 1,
+        "listed_count": 1
+      },
+      {
+        "user_id": 1234,
+        "screen_name": "test_testerson",
+        "name": "Test Testerson",
+        "statuses_count": 1,
+        "followers_count": 1,
+        "favourites_count": 1,
+        "friends_count": 1,
+        "listed_count": 1
+      },
+      {
+        "user_id": 1234,
+        "screen_name": "test_testerson",
+        "name": "Test Testerson",
+        "statuses_count": 1,
+        "followers_count": 1,
+        "favourites_count": 1,
+        "friends_count": 1,
+        "listed_count": 1
+      }
+    ]
+  }
+}
