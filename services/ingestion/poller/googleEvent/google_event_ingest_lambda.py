@@ -1,4 +1,4 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 
@@ -10,10 +10,9 @@ from botocore.exceptions import ClientError
 
 import json
 from datetime import datetime, timedelta, timezone
-import pandas as pd
-from typing import Dict
 
-handler = Handler()
+
+handler = IngestHandler()
 
 
 @handler.ingest()
@@ -134,21 +133,6 @@ def ingest(event) -> Data:
         return event_info
 
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=get_event_data())
-
-
-@handler.process(partitions={})
-def process(data) -> Dict[str, pd.DataFrame]:
-    def make_dataframe(d):
-        d = d.json()
-        metadata, payload = d['metadata'], d['data']
-        df = pd.json_normalize(payload)
-        df['time'] = int(metadata['timestamp'])
-        return df
-
-    df_new = pd.concat([make_dataframe(d) for d in data])
-    return {
-        'google_calendar_events': df_new
-    }
 
 
 def get_timestamp_from_event_time(start_or_end_time):

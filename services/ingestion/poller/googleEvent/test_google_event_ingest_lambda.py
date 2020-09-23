@@ -1,11 +1,10 @@
-from google_event_poller import handler
+from google_event_ingest_lambda import handler
 from pytest import fixture
 from json import loads
 from datetime import datetime
 import copy
 import pyrfc3339
 from pytz import timezone as pytz_timezone
-import pandas as pd
 from freezegun import freeze_time
 from time import sleep
 
@@ -30,8 +29,8 @@ def test_data(with_frozen_time):
 
 @fixture(autouse=True)
 def events_list_mock(mocker):
-    mock_service_builder = mocker.patch('google_event_poller.googleapiclient.discovery.build')
-    mocker.patch('google_event_poller.ServiceAccountCredentials')
+    mock_service_builder = mocker.patch('google_event_ingest_lambda.googleapiclient.discovery.build')
+    mocker.patch('google_event_ingest_lambda.ServiceAccountCredentials')
 
     events_mock = mocker.MagicMock()
     mock_service_builder.return_value.events.return_value = events_mock
@@ -225,22 +224,6 @@ def test_handler_time_format(s3_bucket, single_calendar_mock):
     data = loads(response['Body'].read())
 
     assert [i for i in data['data'] if i not in expected] == []
-
-
-def test_process_data_table_created(mocker, multi_calendar_mock, with_frozen_time, create_table_mock):
-    multi_calendar_mock(generate_cal_events)
-    handler(None, None)
-    create_table_mock.assert_table_created('google_calendar_events')
-
-
-def test_process_parquet_get_data(mocker, multi_calendar_mock, with_frozen_time, create_table_mock):
-    multi_calendar_mock(generate_cal_events)
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'google_calendar_events',
-        'event_id',
-        pd.Series(['1235', '1236']))
 
 
 def test_handler_time_format_timezone(s3_bucket, single_calendar_mock, with_frozen_time):
