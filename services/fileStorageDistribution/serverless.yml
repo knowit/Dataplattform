@@ -44,6 +44,8 @@ resources:
       Type: AWS::CloudFront::Distribution
       Properties:
         DistributionConfig:
+          Aliases:
+            - ${self:custom.stage}-storage.dataplattform.knowit.no
           Origins: 
             - ${self:custom.cloudFrontOrigin}
           DefaultCacheBehavior:
@@ -57,8 +59,14 @@ resources:
             ViewerProtocolPolicy: https-only
           Enabled: true
           ViewerCertificate:
-            CloudFrontDefaultCertificate: 'true'
-
+            AcmCertificateArn: 
+              Fn::Join: 
+                - ':'
+                - - 'arn:aws:acm:us-east-1'
+                  - !Ref 'AWS::AccountId'
+                  - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+            MinimumProtocolVersion: TLSv1.2_2019
+            SslSupportMethod: sni-only
   Outputs:
     PublicRawStorageBucketName:
       Value:
