@@ -1,7 +1,6 @@
-from ubw_fag import handler
+from ubw_fag_ingest_lambda import handler
 from pytest import fixture
 from json import loads
-import pandas as pd
 
 
 @fixture(autouse=True)
@@ -36,7 +35,7 @@ def zeep_ubw_mock(mocker):
             </Agresso>
         """
     }
-    mocker.patch('ubw_fag.Client', return_value=mock)
+    mocker.patch('ubw_fag_ingest_lambda.Client', return_value=mock)
 
     yield mock
 
@@ -68,25 +67,3 @@ def test_handler_data(mocker, s3_bucket):
     assert data['data'][0]['tab'] == 'B' and\
         data['data'][0]['reg_period'] == '201817' and\
         data['data'][0]['used_hrs'] == '4'
-
-
-def test_process_data(mocker, create_table_mock):
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'ubw_fagtimer',
-        'reg_period',
-        pd.Series(['201817', '201907']))
-
-
-def test_process_data_skip_existing(mocker, athena, create_table_mock):
-    athena.on_query(
-        'SELECT "reg_period" FROM "dev_test_database"."ubw_fagtimer"',
-        pd.DataFrame({'reg_period': ['201817']}))
-
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'ubw_fagtimer',
-        'reg_period',
-        pd.Series(['201907']))

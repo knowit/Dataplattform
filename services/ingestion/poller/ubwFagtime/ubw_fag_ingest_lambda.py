@@ -1,16 +1,13 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.query.engine import Athena
 from datetime import datetime
-from typing import Dict
 from xmltodict import parse
 from zeep import Client
-import pandas as pd
-import numpy as np
 
 
-handler = Handler()
+handler = IngestHandler()
 ath = Athena()
 
 
@@ -83,24 +80,3 @@ def ingest(event) -> Data:
         metadata=Metadata(timestamp=datetime.now().timestamp()),
         data=[rec for rec in ubw_data if ubw_record_filter(rec)]
     )
-
-
-@handler.process(partitions={})
-def process(data) -> Dict[str, pd.DataFrame]:
-    data = [
-        [dict(x, time=d['metadata']['timestamp']) for x in d['data']]
-        for d in [d.json() for d in data]
-    ]
-
-    data = np.hstack(data)
-    df = pd.DataFrame.from_records(data)
-
-    # Get unique reg_periods where used_hrs are largest
-    df = df[['time', 'reg_period', 'used_hrs']].sort_values(['used_hrs']).groupby('reg_period').first().reset_index()
-
-    reg_period_df = ath.from_('ubw_fagtimer').select('reg_period').execute(ath).as_pandas()
-    df = df[~df.reg_period.isin(reg_period_df.reg_period)]
-
-    return {
-        'ubw_fagtimer': df
-    }
