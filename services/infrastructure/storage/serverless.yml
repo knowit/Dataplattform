@@ -1,0 +1,81 @@
+service: raw-storage-for-dataplattform
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  publicBucketName: public-raw-storage-bucket
+  privateBucketName: private-raw-storage-bucket
+  stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName} 
+  stagePrivateBucketName: ${self:custom.stage}-${self:custom.privateBucketName} 
+  service: ${self:custom.stage}-${self:service}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.service}
+
+resources:
+  Resources:
+    PrivateRawStorageBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.stagePrivateBucketName}
+        AccessControl: Private
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+  
+    PublicRawStorageBucket:
+     Type: AWS::S3::Bucket
+     Properties:
+        BucketName: ${self:custom.stagePublicBucketName}
+        AccessControl: PublicRead
+
+    PrivateCloudFrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: "CloudFront OAI"
+  
+    PrivateRawStorageBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: 
+          Ref: PrivateRawStorageBucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Action:
+                - "s3:GetObject"
+              Effect: "Allow"
+              Resource: arn:aws:s3:::${self:custom.stagePrivateBucketName}/*
+              Principal:
+                CanonicalUser: !GetAtt PrivateCloudFrontOriginAccessIdentity.S3CanonicalUserId
+            - Action:
+                - "s3:ListBucket"
+              Effect: "Allow"
+              Resource: !GetAtt PrivateRawStorageBucket.Arn
+              Principal:
+                CanonicalUser: !GetAtt PrivateCloudFrontOriginAccessIdentity.S3CanonicalUserId
+    
+    PublicRawStorageBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: PublicRawStorageBucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: '*'
+              Action:
+                - s3:GetObject
+              Resource: arn:aws:s3:::${self:custom.stagePublicBucketName}/*
+  Outputs:
+    PublicRawStorageBucketName:
+      Value: !Ref PublicRawStorageBucket
+    PrivateRawStorageBucketName:
+      Value: !Ref PrivateRawStorageBucket
+    

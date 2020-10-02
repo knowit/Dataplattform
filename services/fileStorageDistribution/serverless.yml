@@ -1,45 +1,102 @@
-service: cloudfront-public-raw-storage
+service: cloudfront-raw-storage
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  bucketName: ${self:custom.stage}-public-raw-storage-bucket
-  domainName: ${self:custom.bucketName}.s3.amazonaws.com
-  domainId: custom/${self:custom.domainName}
+  stage: ${opt:stage, self:provider.stage} #todo: fix ref to eu-central-1
+  publicBucketName: ${cf.eu-central-1:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
+  privateBucketName: ${cf.eu-central-1:${self:custom.stage}-raw-storage-for-dataplattform.PrivateRawStorageBucketName}
+  
+  publicDomainName: ${self:custom.publicBucketName}.s3.amazonaws.com
+  privateDomainName: ${self:custom.privateBucketName}.s3.amazonaws.com
+  publicDomainId: custom/${self:custom.publicDomainName}
+  privateDomainId: custom/${self:custom.privateDomainName}
   service: ${self:custom.stage}-${self:service}
-  cloudFrontOrigin:
-    DomainName: ${self:custom.domainName}
-    Id: ${self:custom.domainId}
+  publicFrontOrigin:
+    DomainName: ${self:custom.publicDomainName}
+    Id: ${self:custom.publicDomainId}
     CustomOriginConfig:
       HTTPSPort: 443
       OriginProtocolPolicy: https-only
+  privateFrontOrigin:
+    DomainName: ${self:custom.privateDomainName}
+    Id: ${self:custom.privateDomainId}
+    CustomOriginConfig:
+      HTTPSPort: 443
+      OriginProtocolPolicy: https-only
+
+package:
+  individually: true
+  exclude:
+    - "./**" # Exclude everything and include what you need in the functions below
+
+pythonRequirements:
+    dockerizePip: non-linux
+    noDeploy:
+      - boto3 # Default in lambda rt
+      - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
 
 provider:
   name: aws
   stage: dev
   region: us-east-1
-  runtime: python3.7
   stackName: ${self:custom.service}
+  runtime: python3.7
 
+
+functions:
+  edgeLambdaJwtAuthenticator:
+    handler: jwtAuthenticator.handler
+    name: ${self:custom.stage}-${self:service}-jwt-authenticator
+    events:
+      - cloudFront:
+          eventType: origin-request
+          origin: ${self:custom.privateFrontOrigin}
+    role: !GetAtt EdgeLambdaRole.Arn
+    package:
+      include:
+        - '*.py' # Files to include in deployment
+    
 resources:
   Resources:
-    PublicRawStorageBucket:
-      Type: AWS::S3::Bucket
+    EdgeLambdaRole:
+      Type: AWS::IAM::Role
       Properties:
-        BucketName: ${self:custom.bucketName}
-        AccessControl: PublicRead
-    PublicRawStorageBucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        Bucket:
-          Ref: PublicRawStorageBucket
-        PolicyDocument:
+        RoleName: ${self:custom.stage}-${self:service}-edgelambda-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
           Statement:
-            - Sid: PublicReadGetObject
-              Effect: Allow
-              Principal: '*'
-              Action:
-                - s3:GetObject
-              Resource: arn:aws:s3:::${self:custom.bucketName}/*
+          - Effect: Allow
+            Principal:
+              Service:
+                - edgelambda.amazonaws.com
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: 
+                    - 'Fn::Join':
+                      - ':'
+                      -
+                        - 'arn:aws:ssm'
+                        - 'eu-central-1'
+                        - Ref: 'AWS::AccountId'
+                        - 'parameter/${self:custom.stage}/${self:service}/*'
+
     CloudFrontDistribution:
       Type: AWS::CloudFront::Distribution
       Properties:
@@ -47,19 +104,39 @@ resources:
           Aliases:
             - ${self:custom.stage}-storage.dataplattform.knowit.no
           Origins: 
-            - ${self:custom.cloudFrontOrigin}
+            - ${self:custom.publicFrontOrigin}
+            - ${self:custom.privateFrontOrigin}
+          CacheBehaviors:
+            - TargetOriginId: ${self:custom.publicDomainId}
+              ForwardedValues:
+                Cookies:
+                  Forward: all
+                QueryString: true
+              PathPattern: '/public/*'
+              ViewerProtocolPolicy: https-only
+            - TargetOriginId: ${self:custom.privateDomainId}
+              ForwardedValues:
+                Cookies:
+                  Forward: all
+                QueryString: true
+                Headers:
+                  - Accept
+                  - Content-Type
+                  - Authorization
+                  - Origin
+                  - Referer
+              PathPattern: '/private/*'
+              ViewerProtocolPolicy: https-only
           DefaultCacheBehavior:
-            CachePolicyId: b2884449-e4de-46a7-ac36-70bc7f1ddd6d 
-            # Name: Managed-CachingOptimizedForUncompressedObjects
-            # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#attaching-managed-cache-policies
-            AllowedMethods:
-              - HEAD
-              - GET
-            TargetOriginId:  ${self:custom.domainId}
-            ViewerProtocolPolicy: https-only
+            ViewerProtocolPolicy: redirect-to-https
+            TargetOriginId: ${self:custom.publicDomainId}  
+            ForwardedValues:
+                Cookies:
+                  Forward: all
+                QueryString: false
           Enabled: true
           ViewerCertificate:
-            AcmCertificateArn: 
+            AcmCertificateArn:
               Fn::Join: 
                 - ':'
                 - - 'arn:aws:acm:us-east-1'
@@ -67,10 +144,14 @@ resources:
                   - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
+
   Outputs:
-    PublicRawStorageBucketName:
-      Value:
-        'Ref': PublicRawStorageBucket
     CloudFrontDistributionOutput:
       Value:
         'Fn::GetAtt': [CloudFrontDistribution, DomainName]
+    CloudFrontDistributionId:
+      Value: 
+        'Ref': CloudFrontDistribution
+
+plugins:
+  - serverless-python-requirements
