@@ -38,6 +38,12 @@ resources:
       Properties:
         CloudFrontOriginAccessIdentityConfig:
           Comment: "CloudFront OAI"
+    
+    PublicCloudFrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: "CloudFront OAI"
   
     PrivateRawStorageBucketPolicy:
       Type: AWS::S3::BucketPolicy
@@ -66,16 +72,27 @@ resources:
         Bucket:
           Ref: PublicRawStorageBucket
         PolicyDocument:
+          Version: "2012-10-17"
           Statement:
-            - Sid: PublicReadGetObject
-              Effect: Allow
-              Principal: '*'
-              Action:
-                - s3:GetObject
+            - Action:
+                - "s3:GetObject"
+              Effect: "Allow"
               Resource: arn:aws:s3:::${self:custom.stagePublicBucketName}/*
+              Principal:
+                CanonicalUser: !GetAtt PublicCloudFrontOriginAccessIdentity.S3CanonicalUserId
+            - Action:
+                - "s3:ListBucket"
+              Effect: "Allow"
+              Resource: !GetAtt PublicRawStorageBucket.Arn
+              Principal:
+                CanonicalUser: !GetAtt PublicCloudFrontOriginAccessIdentity.S3CanonicalUserId
+  
   Outputs:
     PublicRawStorageBucketName:
       Value: !Ref PublicRawStorageBucket
     PrivateRawStorageBucketName:
       Value: !Ref PrivateRawStorageBucket
-    
+    S3PrivateOriginAccessIdentity:
+      Value: !Ref PrivateCloudFrontOriginAccessIdentity
+    S3PublicOriginAccessIdentity:
+      Value: !Ref PublicCloudFrontOriginAccessIdentity

@@ -1,10 +1,11 @@
 service: cloudfront-raw-storage
 
 custom:
-  stage: ${opt:stage, self:provider.stage} #todo: fix ref to eu-central-1
+  stage: ${opt:stage, self:provider.stage} # todo: fix ref to eu-central-1
   publicBucketName: ${cf.eu-central-1:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
   privateBucketName: ${cf.eu-central-1:${self:custom.stage}-raw-storage-for-dataplattform.PrivateRawStorageBucketName}
-  
+  S3PrivateOriginAccessIdentity: ${cf.eu-central-1:${self:custom.stage}-raw-storage-for-dataplattform.S3PrivateOriginAccessIdentity}
+  S3PublicOriginAccessIdentity: ${cf.eu-central-1:${self:custom.stage}-raw-storage-for-dataplattform.S3PublicOriginAccessIdentity}
   publicDomainName: ${self:custom.publicBucketName}.s3.amazonaws.com
   privateDomainName: ${self:custom.privateBucketName}.s3.amazonaws.com
   publicDomainId: custom/${self:custom.publicDomainName}
@@ -13,16 +14,13 @@ custom:
   publicFrontOrigin:
     DomainName: ${self:custom.publicDomainName}
     Id: ${self:custom.publicDomainId}
-    CustomOriginConfig:
-      HTTPSPort: 443
-      OriginProtocolPolicy: https-only
-  privateFrontOrigin:
+    S3OriginConfig: 
+      OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PublicOriginAccessIdentity}
+  privateFrontOrigin: 
     DomainName: ${self:custom.privateDomainName}
     Id: ${self:custom.privateDomainId}
-    CustomOriginConfig:
-      HTTPSPort: 443
-      OriginProtocolPolicy: https-only
-
+    S3OriginConfig: 
+      OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PrivateOriginAccessIdentity}
 package:
   individually: true
   exclude:
@@ -55,13 +53,14 @@ functions:
     name: ${self:custom.stage}-${self:service}-jwt-authenticator
     events:
       - cloudFront:
-          eventType: origin-request
+          eventType: viewer-request
+          isDefaultOrigin: false
+          pathPattern: '/private/*'
           origin: ${self:custom.privateFrontOrigin}
     role: !GetAtt EdgeLambdaRole.Arn
     package:
       include:
         - '*.py' # Files to include in deployment
-    
 resources:
   Resources:
     EdgeLambdaRole:
@@ -80,22 +79,6 @@ resources:
               - sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'ssm:GetParameter*'
-                  Resource: 
-                    - 'Fn::Join':
-                      - ':'
-                      -
-                        - 'arn:aws:ssm'
-                        - 'eu-central-1'
-                        - Ref: 'AWS::AccountId'
-                        - 'parameter/${self:custom.stage}/${self:service}/*'
 
     CloudFrontDistribution:
       Type: AWS::CloudFront::Distribution
@@ -107,32 +90,23 @@ resources:
             - ${self:custom.publicFrontOrigin}
             - ${self:custom.privateFrontOrigin}
           CacheBehaviors:
-            - TargetOriginId: ${self:custom.publicDomainId}
-              ForwardedValues:
-                Cookies:
-                  Forward: all
-                QueryString: true
-              PathPattern: '/public/*'
-              ViewerProtocolPolicy: https-only
             - TargetOriginId: ${self:custom.privateDomainId}
+              AllowedMethods: 
+                - HEAD
+                - GET
               ForwardedValues:
-                Cookies:
-                  Forward: all
-                QueryString: true
+                QueryString: false
                 Headers:
-                  - Accept
-                  - Content-Type
                   - Authorization
-                  - Origin
-                  - Referer
               PathPattern: '/private/*'
-              ViewerProtocolPolicy: https-only
+              ViewerProtocolPolicy: redirect-to-https
           DefaultCacheBehavior:
+            AllowedMethods:
+                - HEAD
+                - GET
             ViewerProtocolPolicy: redirect-to-https
-            TargetOriginId: ${self:custom.publicDomainId}  
+            TargetOriginId: ${self:custom.publicDomainId}
             ForwardedValues:
-                Cookies:
-                  Forward: all
                 QueryString: false
           Enabled: true
           ViewerCertificate:
