@@ -18,7 +18,7 @@ def mock_twitter_api(mocker):
 
 
 @fixture
-def mock_twitter_data(mocker, mock_twitter_api):
+def mock_twitter_data(mock_twitter_api):
     def mock_data(method, mock_data, *_mock_data, pageable=False):
         if not pageable:
             getattr(mock_twitter_api, method).return_value = mock_twitter_model(mock_data)
