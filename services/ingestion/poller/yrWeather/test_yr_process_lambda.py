@@ -1,7 +1,7 @@
 from yr_process_lambda import handler
 from dataplattform.common import schema
 from pytest import fixture
-from responses import RequestsMock, GET
+from responses import RequestsMock
 from os import path
 from json import load
 import pandas as pd
@@ -40,7 +40,7 @@ def mocked_responses():
         yield reqs
 
 
-def test_hander_process_data(s3_bucket, mocked_responses, create_table_mock, setup_queue_event, test_data2):
+def test_hander_process_data(s3_bucket, create_table_mock, setup_queue_event, test_data2):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
