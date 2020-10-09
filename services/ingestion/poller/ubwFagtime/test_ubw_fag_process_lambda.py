@@ -30,7 +30,7 @@ def setup_queue_event(s3_bucket):
     yield make_queue_event
 
 
-def test_process_data(mocker, create_table_mock, setup_queue_event, test_data):
+def test_process_data(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -44,7 +44,7 @@ def test_process_data(mocker, create_table_mock, setup_queue_event, test_data):
         pd.Series(['201817', '201907']))
 
 
-def test_process_data_skip_existing(mocker, athena, create_table_mock, setup_queue_event, test_data):
+def test_process_data_skip_existing(athena, create_table_mock, setup_queue_event, test_data):
     athena.on_query(
         'SELECT "reg_period" FROM "dev_test_database"."ubw_fagtimer"',
         pd.DataFrame({'reg_period': ['201817']}))
