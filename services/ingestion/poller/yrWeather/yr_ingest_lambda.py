@@ -4,8 +4,6 @@ from datetime import datetime
 import requests
 import xmltodict
 import numpy as np
-import pandas as pd
-from typing import Dict
 
 
 handler = IngestHandler()
