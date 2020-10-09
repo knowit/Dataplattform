@@ -1,0 +1,3 @@
+fastparquet
+thrift
+file:./common_lib

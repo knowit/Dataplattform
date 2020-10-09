@@ -1,6 +1,5 @@
 flask
-flask-swagger
+flask_restx
 werkzeug
-sqlparse
-pandas
+file:./common_lib
 file:../../packages/api
