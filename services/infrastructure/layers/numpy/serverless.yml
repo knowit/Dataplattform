@@ -5,6 +5,7 @@ custom:
   project: dataplattform-${self:custom.stage}
   pythonRequirements:
     dockerizePip: non-linux
+    slim: true
     layer:
       name: ${self:custom.stage}-${self:service}
       description: Python requirements lambda layer for numpy
