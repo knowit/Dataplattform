@@ -96,3 +96,11 @@ resources:
       Value: !Ref PrivateCloudFrontOriginAccessIdentity
     S3PublicOriginAccessIdentity:
       Value: !Ref PublicCloudFrontOriginAccessIdentity
+    PublicBucketName:
+      Value: ${self:resources.Resources.PublicRawStorageBucket.Properties.BucketName}
+      Export:
+        Name: ${self:custom.stage}-publicBucketName
+    PrivateBucketName:
+      Value: ${self:resources.Resources.PrivateRawStorageBucket.Properties.BucketName}
+      Export:
+        Name: ${self:custom.stage}-privateBucketName
