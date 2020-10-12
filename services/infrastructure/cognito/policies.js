@@ -36,6 +36,18 @@ module.exports = serverless => {
             'Resource': [
                 {'Fn::Join': [':', ['arn:aws:athena', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, 'datacatalog/AwsDataCatalog']]},
             ]
+        },
+        {
+            'Effect': 'Allow',
+            'Action': ['dynamodb:Scan', 'dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:DeleteItem'],
+            'Resource': [
+                {'Fn::Join': [':', ['arn:aws:dynamodb', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, `table/${stage}_*`]]},
+            ]
+        },
+        {
+            'Effect': 'Allow',
+            'Action': ['sns:Publish'],
+            "Resource": ["*"],
         }
     ]
 
@@ -45,6 +57,13 @@ module.exports = serverless => {
             'Action': ['s3:GetObject'],
             'Resource': [
                 {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, `/data/${path}/*`]]}
+            ]
+        },
+        {
+            'Effect': 'Allow',
+            'Action': ['s3:GetObject', 's3:SelectObjectContent'],
+            'Resource': [
+                {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, `/reports/${path}/*`]]}
             ]
         },
         {
