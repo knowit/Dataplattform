@@ -1,0 +1,60 @@
+service: events
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+
+resources:
+  Resources:
+    NewReportTopic:
+      Type: AWS::SNS::Topic
+      Properties: 
+        DisplayName: NewReport
+        TopicName: ${self:custom.stage}-NewReport
+
+    DataUpdateTopic:
+      Type: AWS::SNS::Topic
+      Properties: 
+        DisplayName: DataUpdated
+        TopicName: ${self:custom.stage}-DataUpdate
+
+    TopicPolicy:
+      Type: AWS::SNS::TopicPolicy
+      Properties: 
+        PolicyDocument:
+          Id: ${self:custom.stage}-SystemTopicPolicy
+          Version: '2012-10-17'
+          Statement:
+            - Sid: ${self:custom.stage}-LambdaTopicAccess
+              Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+              Action: 
+                - sns:Publish
+                - sns:Subscribe
+                - sns:Receive
+              Resource: '*'
+              Condition:
+                StringEquals:
+                  AWS:SourceAccount: !Ref 'AWS::AccountId'
+        
+        Topics: 
+          - !Ref NewReportTopic
+          - !Ref DataUpdateTopic
+
+  Outputs:
+    NewReportTopicOutput:
+      Value:
+        Ref: NewReportTopic
+      Export:
+        Name: ${self:custom.stage}-new-report-topic-arn
+
+    DataUpdateTopicOutput:
+      Value:
+        Ref: DataUpdateTopic
+      Export:
+        Name: ${self:custom.stage}-data-update-topic-arn
