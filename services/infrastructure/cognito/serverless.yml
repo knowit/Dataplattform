@@ -158,3 +158,8 @@ resources:
       Value: !GetAtt AssumeRole.Arn
       Export:
         Name: ${self:custom.stage}-assumeRole
+    CognitoUserPoolId:
+      Value: !Ref CognitoUserPool
+      Export:
+        Name: ${self:custom.stage}-cognito-userPoolId
+    
