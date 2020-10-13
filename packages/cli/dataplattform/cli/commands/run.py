@@ -5,6 +5,7 @@ from dataplattform.cli.helper import (
     resovle_cloudformation_imports
 )
 from os import environ
+from dataplattform.testing.events import APIGateway
 from importlib.util import spec_from_file_location, module_from_spec
 from json import loads
 from time import time
@@ -18,22 +19,29 @@ def init(parser: ArgumentParser):
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     parser.add_argument('-p', '--profile', dest='profile', action='store_true')
     parser.add_argument('-e', '--event', dest='event', default='{}')
+    parser.add_argument('--event-type', dest='eventType', default='Schedule', choices=['APIGateway', "Schedule"])
+    parser.add_argument('--event-file', dest='eventFile')
 
 
 def run(args: Namespace, _):
+    if (args.eventFile):
+        with open(args.eventFile) as json_file:
+            args.event = json_file.read()
+            args.eventType = 'APIGateway'
+    elif (args.eventType):
+        if args.eventType == 'APIGateway':
+            api_gw = APIGateway(headers="{}", body="{}").to_json()
+            args.event = api_gw
+        else:
+            args.event = '{}'
+
     config = load_serverless_config('functions')
     handlers = [(c['handler'], c['environment']) for c in config.values()]
     runners = [prepare_runner(handler, env, args) for handler, env in handlers]
 
-    if len(runners) == 1:
-        runner, setup_env = runners[0]
-        setup_env()
-        runner(loads(args.event))
-    else:
-        ingest, process = runners
+    def run_lambdas_with_queue(ingest, process):
         ingest_run, ingest_env = ingest
         process_run, process_env = process
-
         ingest_env()
 
         with mock_sqs():
@@ -53,6 +61,25 @@ def run(args: Namespace, _):
                 } for msg in messages
             ]
         })
+
+    len_runners = len(runners)
+    if len_runners == 1:
+        runner, setup_env = runners[0]
+        setup_env()
+        runner(loads(args.event))
+    elif len_runners == 2:
+        ingest, process = runners
+        run_lambdas_with_queue(ingest, process)
+    elif len_runners == 3:
+        ingest_1, ingest_2, process = runners
+        #  Always assume that the poller ingest lambda is the first function in the serverless-file
+        if (args.eventType == 'APIGateway'):
+            run_lambdas_with_queue(ingest_2, process)
+        else:
+            run_lambdas_with_queue(ingest_1, process)
+    else:
+        print('Number of runners not supported')
+        return
 
 
 def prepare_runner(handler: str, environment: Dict[str, str], args: Namespace):

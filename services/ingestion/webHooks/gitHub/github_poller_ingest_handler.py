@@ -1,7 +1,6 @@
 from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
-from dataplattform.query.engine import Athena
 from datetime import datetime
 import requests
 from dateutil.parser import isoparse
@@ -9,7 +8,6 @@ from dateutil.parser import isoparse
 url = 'https://api.github.com/orgs/knowit/repos'
 
 handler = IngestHandler()
-ath = Athena()
 
 
 @handler.ingest()

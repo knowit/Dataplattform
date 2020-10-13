@@ -1,3 +1,4 @@
+pandas
+requests
 file:../../../../packages/common
 file:../../../../packages/query
-pandas

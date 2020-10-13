@@ -8,7 +8,7 @@ custom:
     webhookIngestHandlerFile: github_webhook_ingest_handler
     pollerIngestHandlerFile: github_poller_ingest_handler
     processHandlerFile: github_process_handler    
-    databaseName: level_3
+    databaseName: level_2
     description: Endpoint for github webhooks and scheduled events
     accessLevel: level-2
     dataFolder: github/repos
@@ -72,9 +72,9 @@ functions:
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-poller-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
-    role: !GetAtt IngestLambdaRole.Arn
+    role: !GetAtt PollerIngestLambdaRole.Arn
     package:
       include:
         - '*.py' # Files to include in deployment
@@ -94,14 +94,15 @@ functions:
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
+
   webhookIngest: # A Function
     handler: ${self:custom.editable.webhookIngestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-webhook-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
-    role: !GetAtt IngestLambdaRole.Arn
+    role: !GetAtt WebhookIngestLambdaRole.Arn
     package:
       include:
         - '*.py' # Files to include in deployment
@@ -148,10 +149,10 @@ functions:
 
 resources: # The resources your functions use
   Resources:
-    IngestLambdaRole:
+    PollerIngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-ingest-role
+        RoleName: ${self:custom.stage}-${self:service}-poller-ingest-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -179,7 +180,7 @@ resources: # The resources your functions use
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-test-${self:service}-ingest-sqsRole
+          - PolicyName: ${self:custom.stage}-${self:service}-poller-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -197,6 +198,56 @@ resources: # The resources your functions use
                   Action:
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+    WebhookIngestLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-webhook-ingest-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                  Resource:
+                    - Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+    
+          - PolicyName: ${self:custom.stage}-${self:service}-webhook-ingest-sqsRole
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                   - sqs:GetQueueUrl
+                   - sqs:SendMessageBatch
+                   - sqs:SendMessage
+                  Resource: !GetAtt EventQueue.Arn
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -228,7 +279,29 @@ resources: # The resources your functions use
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-    
+          - PolicyName: ${self:custom.stage}-Glue-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'glue:GetTable'
+                    - 'glue:GetDatabase'
+                    - 'glue:GetPartitions'
+                  Resource: 
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+          - PolicyName: ${self:custom.stage}-Athena-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'athena:StartQueryExecution'
+                    - 'athena:GetQueryExecution'
+                    - 'athena:GetQueryResults'
+                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary' 
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:
