@@ -1,4 +1,5 @@
-from slack_webhook import handler
+from slack_webhook_ingest_lambda import handler
+
 from dataplattform.testing.events import APIGateway
 from json import loads, dumps
 from hmac import new
@@ -6,7 +7,6 @@ from hashlib import sha256
 from os import path
 from pytest import fixture
 from responses import RequestsMock, GET
-import pandas as pd
 
 
 @fixture
@@ -90,30 +90,5 @@ def test_insert_message_data(s3_bucket, mocked_responses, test_message_data):
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
     data = loads(response['Body'].read())
-
     assert data['data'][0]['emoji'] == 'thumbsup' and \
         data['data'][0]['event_type'] == 'message'
-
-
-def test_process_data(mocker, mocked_responses, test_message_data, create_table_mock):
-    mocked_responses.add(GET, 'https://slack.com/api/channels.info', json={'channel': {'name': 'Test'}}, status=200)
-
-    sig_string = f'v0:0:{test_message_data}'.encode()
-    signature = new('iamsecret'.encode(), sig_string, sha256).hexdigest()
-
-    handler(APIGateway(headers={
-        'X-Slack-Signature': f'v0={signature}',
-        'X-Slack-Request-Timestamp': '0'
-        },
-        body=test_message_data).to_dict(), None)
-
-    expected_df = pd.DataFrame({
-                'event_type': ['message'],
-                'channel': ['C2147483705'],
-                'channel_name': ['Test'],
-                'event_ts': [1234567890],
-                'team_id': ['TXXXXXXXX'],
-                'emoji': ['thumbsup'],
-            })
-
-    create_table_mock.assert_table_data_contains_df('slack_emoji', expected_df)

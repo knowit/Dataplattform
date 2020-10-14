@@ -1,0 +1,12 @@
+{"data": 
+    [
+        {
+        "event_type": "message", 
+        "channel": "C2147483705", 
+        "channel_name": "Test", 
+        "event_ts": 1234567890, 
+        "team_id": "TXXXXXXXX", 
+        "emoji": "thumbsup"
+        }
+    ]
+}
