@@ -1,29 +1,14 @@
-from dataplattform.common.handler import Handler
-from dataplattform.common.schema import Data, Metadata
-from datetime import datetime
+from dataplattform.common.handlers.process import ProcessHandler
 import pandas as pd
-import json
 import numpy as np
 from typing import Dict
 import re
 
-handler = Handler()
-
-
-@handler.ingest()
-def ingest(event) -> Data:
-
-    event_body = event['body']
-    body_json = json.loads(event_body)
-
-    return Data(
-        Metadata(timestamp=int(datetime.now().timestamp())),
-        data=body_json
-    )
+handler = ProcessHandler()
 
 
 @handler.process(partitions={})
-def process(data) -> Dict[str, pd.DataFrame]:
+def process(data, events) -> Dict[str, pd.DataFrame]:
 
     def make_dataframes(d):
         d = d.json()
