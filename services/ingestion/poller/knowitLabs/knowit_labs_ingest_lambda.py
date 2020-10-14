@@ -1,18 +1,14 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.schema import Data, Metadata
-from dataplattform.query.engine import Athena
 from datetime import datetime
 from bs4 import BeautifulSoup
 import requests
 import json
-import pandas as pd
 import numpy as np
-from typing import Dict
 import re
 
 
-handler = Handler()
-ath = Athena()
+handler = IngestHandler()
 
 
 @handler.ingest()
@@ -69,46 +65,3 @@ def ingest(event) -> Data:
     return Data(
         metadata=Metadata(timestamp=datetime.now().timestamp()),
         data=np.hstack([scrape_article_data(url) for url in scrape_archive_urls()]))
-
-
-@handler.process(partitions={})
-def process(data) -> Dict[str, pd.DataFrame]:
-    def make_dataframe(d):
-        d = d.json()
-        metadata, payload = d['metadata'], d['data']
-        df = pd.json_normalize(payload)
-        df['time'] = int(metadata['timestamp'])
-        return df
-
-    blog_coloumns = [
-        'medium_id',
-        'author_name',
-        'author_username',
-        'title',
-        'created_at',
-        'first_published_at',
-        'word_count',
-        'reading_time',
-        'url',
-        'language']
-
-    blog_update_coloumns = [
-        'medium_id',
-        'updated_at',
-        'latest_published_at',
-        'total_claps',
-        'total_unique_claps',
-        'comments_count',
-        'time']
-
-    df = pd.concat([make_dataframe(d) for d in data])
-    posts_df = df[blog_coloumns].copy()
-    updates_df = df[blog_update_coloumns].copy()
-
-    reg_ids_df = ath.from_('blog_posts').select('medium_id').execute(ath).as_pandas()
-    posts_df = posts_df[~posts_df.medium_id.isin(reg_ids_df.medium_id)]
-
-    return {
-        'blog_posts': posts_df,
-        'blog_updates': updates_df
-    }

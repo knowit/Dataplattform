@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "timestamp": 1600410768.906223
+  },
+  "data": [
+    {
+      "medium_id": "asdf",
+      "author_name": "Test Testerson",
+      "author_username": "test.tester",
+      "title": "Test blog 3000",
+      "created_at": 1577833200,
+      "updated_at": 1577833200,
+      "first_published_at": 1577833200,
+      "latest_published_at": 1577833200,
+      "word_count": 1000,
+      "reading_time": 1.0,
+      "total_claps": 10,
+      "total_unique_claps": 5,
+      "language": "en",
+      "url": "https://knowitlabs.no/test-blog-3000-asdf",
+      "comments_count": 2
+    },
+    {
+      "medium_id": "1234",
+      "author_name": "Test Testerson",
+      "author_username": "test.tester",
+      "title": "Test blog 3000",
+      "created_at": 1577833200,
+      "updated_at": 1577833200,
+      "first_published_at": 1577833200,
+      "latest_published_at": 1577833200,
+      "word_count": 1000,
+      "reading_time": 1.0,
+      "total_claps": 10,
+      "total_unique_claps": 5,
+      "language": "en",
+      "url": "https://knowitlabs.no/test-blog-3000-1234",
+      "comments_count": 2
+    }
+  ]
+}

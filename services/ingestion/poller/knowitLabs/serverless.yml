@@ -5,15 +5,19 @@ custom:
   #Edit these variables###########################
   editable:
     timeout: 128
-    handlerFile: knowit_labs_poller
+    ingestHandlerFile: knowit_labs_ingest_lambda
+    processHandlerFile: knowit_labs_process_lambda
     databaseName: level_1
     description: fetch updates from knowit labs
     scheduleRate: rate(1 day)
     accessLevel: level-1
     dataFolder: knowitLabs
+
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+  sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
+  sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
@@ -48,7 +52,7 @@ provider:
   stackTags: # Tags for cloud formation
     # key: value
   environment: # Service wide environment variables
-    #ENVIRONMENT_VARIABLE_NAME: 123456789
+
 
 package:
   individually: true
@@ -56,15 +60,50 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  poller:
-    handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+  ingest: # A Function
+    handler: ${self:custom.editable.ingestHandlerFile}.handler
+    layers:
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    description: ${self:custom.editable.description}
+    role: !GetAtt IngestLambdaRole.Arn
+    package:
+      include:
+        - '*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      ACCESS_PATH: ${self:custom.accessPath}
+      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+      SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+    tags: # Tag for this function. Every function are tagged with stage by default
+
+    events: # The Events that trigger this Function
+      - schedule:
+          name: ${self:custom.stage}-${self:service}-timer
+          description: ${self:custom.editable.description}
+          rate: ${self:custom.editable.scheduleRate}
+          enabled: true
+  process: # A Function
+    handler: ${self:custom.editable.processHandlerFile}.handler
+    events: # The Events that trigger this Function
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - EventQueue
+              - Arn
+          batchSize: 1
+
     layers:
       - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service} # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
     description: ${self:custom.editable.description}
-    role: !GetAtt S3Access.Arn
+    role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
         - '*.py' # Files to include in deployment
@@ -75,19 +114,13 @@ functions:
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
     tags: # Tag for this function. Every function are tagged with stage by default
-    events: # How to trigger the lambda
-      - schedule:
-          name: ${self:custom.stage}-${self:service}-timer
-          description: ${self:custom.editable.description}
-          rate: ${self:custom.editable.scheduleRate}
-          enabled: true
 
 resources: # The resources your functions use
   Resources:
-    S3Access:
+    IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}
+        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -112,9 +145,58 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-sqsRole
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:GetQueueUrl
+                    - sqs:SendMessageBatch
+                    - sqs:SendMessage
+                  Resource: !GetAtt EventQueue.Arn
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+    ProcessLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.processHandlerFile}-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -125,9 +207,9 @@ resources: # The resources your functions use
                     - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - '*'
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - '*'
           - PolicyName: ${self:custom.stage}-Glue-${self:service}
             PolicyDocument:
               Version: '2012-10-17'
@@ -149,7 +231,27 @@ resources: # The resources your functions use
                     - 'athena:StartQueryExecution'
                     - 'athena:GetQueryExecution'
                     - 'athena:GetQueryResults'
-                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary' # TODO: dedicated work groups?
+                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary' 
+
+    EventQueue:
+      Type: AWS::SQS::Queue
+      Properties:
+        FifoQueue: true
+        QueueName: ${self:custom.sqsQueueName}
+        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
+        VisibilityTimeout: ${self:custom.editable.timeout}
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt EventQueueDL.Arn
+          maxReceiveCount: 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
+
+    EventQueueDL: #Messages that fail are put here
+      Type: AWS::SQS::Queue
+      Properties:
+        FifoQueue: true
+        QueueName: ${self:custom.sqsQueueDLName}
+        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
+
+
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
