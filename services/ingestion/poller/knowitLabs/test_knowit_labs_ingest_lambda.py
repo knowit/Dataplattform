@@ -1,8 +1,7 @@
-from knowit_labs_poller import handler
+from knowit_labs_ingest_lambda import handler
 from responses import RequestsMock, GET
 from pytest import fixture
 from json import loads, dumps
-import pandas as pd
 
 
 @fixture
@@ -77,7 +76,7 @@ def setup_test_data(mocked_responses, knowit_labs_test_data):
     yield None
 
 
-def test_handler_data(mocker, s3_bucket):
+def test_handler_data(s3_bucket):
     handler(None, None)
 
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
@@ -102,31 +101,3 @@ def test_handler_data(mocker, s3_bucket):
     }
 
     assert all([expected[k] == v for k, v, in data['data'][0].items()])
-
-
-def test_process_data(mocker, create_table_mock):
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'blog_posts',
-        'medium_id',
-        pd.Series(['asdf', '1234']))
-
-
-def test_process_data_skip_existing(mocker, athena, create_table_mock):
-
-    athena.on_query(
-        'SELECT "medium_id" FROM "dev_test_database"."blog_posts"',
-        pd.DataFrame({'medium_id': ['asdf']}))
-
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'blog_posts',
-        'medium_id',
-        pd.Series(['1234']))
-
-    create_table_mock.assert_table_data_column(
-        'blog_updates',
-        'medium_id',
-        pd.Series(['asdf', '1234']))
