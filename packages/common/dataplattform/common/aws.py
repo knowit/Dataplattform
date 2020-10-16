@@ -31,9 +31,13 @@ class S3:
         self.s3 = boto3.resource('s3')
 
     def put(self, data: Data, path: str = ''):
-        key = path_join(self.access_path, path, f'{uuid4()}.json')
+        data_json = data.to_json().encode('utf-8')
+        return self.put_raw(data_json, ext='json', path=path)
+
+    def put_raw(self, data: bytes, ext: str, path: str = ''):
+        key = path_join(self.access_path, path, f'{uuid4()}.{ext}')
         s3_object = self.s3.Object(self.bucket, key)
-        s3_object.put(Body=data.to_json().encode('utf-8'))
+        s3_object.put(Body=data)
         return key
 
     def get(self, key, catch_client_error=True) -> S3Result:
