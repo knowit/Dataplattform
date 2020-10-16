@@ -148,7 +148,7 @@ resources: # The resources your functions use
                         - ""
                         - - !ImportValue ${self:custom.stage}-datalakeArn
                           - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-sqsRole
+          - PolicyName: ${self:custom.editable.ingestHandlerFile}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
