@@ -46,22 +46,14 @@ def test_s3_put_data(s3_bucket):
 
 
 def test_s3_put_raw_data(s3_bucket):
-    from PIL import Image
-    import numpy
-    import io
-
     s3 = aws.S3()
-    imarray = numpy.random.rand(100, 100, 3) * 255
-    im = Image.fromarray(imarray.astype('uint8')).convert('RGBA')
-    input_image_stream = io.BytesIO()
-    im.save(input_image_stream, format='PNG')
+    input_bytes = 'some bytes'
+    ext = '.txt'
+    key = s3.put_raw(input_bytes, path='', ext=ext)
+    res = s3_bucket.Object(key).get()['Body'].read().decode('utf-8')
 
-    key = s3.put_raw(input_image_stream, path='', ext='png')
-    im_object = s3_bucket.Object(key)
-
-    outout_image_stream = io.BytesIO()
-    im_object.download_fileobj(outout_image_stream)
-    assert outout_image_stream.read().decode('utf-8') == input_image_stream.read().decode('utf-8')
+    assert res == input_bytes
+    assert ext in key
 
 
 def test_ssm_default():
