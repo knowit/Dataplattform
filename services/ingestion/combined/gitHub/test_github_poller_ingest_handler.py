@@ -1,8 +1,7 @@
-from github_poller import handler, url
+from github_poller_ingest_handler import handler, url
 from pytest import fixture
 from json import loads, load
 from responses import RequestsMock, GET
-import pandas as pd
 from os import path
 
 
@@ -14,7 +13,7 @@ def mocked_responses():
 
 @fixture
 def test_data():
-    with open(path.join(path.dirname(__file__), 'test.json'), 'r') as json_file:
+    with open(path.join(path.dirname(__file__), 'test_data/test_data_poller.json'), 'r') as json_file:
         yield load(json_file)
 
 
@@ -57,28 +56,3 @@ def test_handler_data_content(s3_bucket, mocked_responses, test_data):
         "default_branch": "master",
     }
     assert all([data['data'][0][k] == v for k, v in expected.items()])
-
-
-def test_process_data(mocker, mocked_responses, test_data, create_table_mock):
-    mocked_responses.add(GET, url, json=test_data, status=200)
-
-    handler(None, None)
-
-    create_table_mock.assert_table_data_column(
-        'github_knowit_repos',
-        'id',
-        pd.Series([4672898, 4730463]))
-
-
-def test_process_data_skip_existing(mocker, athena, mocked_responses, test_data, create_table_mock):
-    mocked_responses.add(GET, url, json=test_data, status=200)
-
-    athena.on_query(
-        'SELECT "id" FROM "github_knowit_repos"',
-        pd.DataFrame({'id': [4672898]}))
-
-    handler(None, None)
-    create_table_mock.assert_table_data_column(
-        'github_knowit_repos',
-        'id',
-        pd.Series([4730463]))

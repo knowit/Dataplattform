@@ -1,5 +1,5 @@
 
-name: Dataplattform - poller - github
+name: Dataplattform - webhook - github
 
 on: 
   push:
@@ -7,9 +7,8 @@ on:
       - master
   pull_request:
     paths:
-      - 'services/ingestion/poller/gitHub/**'
+      - 'services/ingestion/combined/gitHub/**'
       - 'packages/common/**'
-      - 'packages/query/**'
 
 
 jobs:
@@ -28,24 +27,24 @@ jobs:
       run: |
         pip install flake8
         # stop the build if there are Python syntax errors or undefined names
-        flake8 ./services/ingestion/poller/gitHub --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 ./services/ingestion/poller/gitHub --count --max-line-length=120 --statistics
+        flake8 ./services/ingestion/combined/gitHub --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 ./services/ingestion/combined/gitHub --count --max-line-length=120 --statistics
   
   test:
     runs-on: ubuntu-latest
     container:
       image: lambci/lambda:build-python3.7
-      
+
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
-      working-directory: './services/ingestion/poller/gitHub'
+      working-directory: './services/ingestion/combined/gitHub'
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -r requirements-test.txt
     - name: Test with pytest
-      working-directory: './services/ingestion/poller/gitHub'
+      working-directory: './services/ingestion/combined/gitHub'
       run: |
         pip install pytest
         pytest 

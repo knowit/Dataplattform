@@ -1,16 +1,15 @@
-from dataplattform.common.handler import Handler, Response
+from dataplattform.common.handlers.ingest import IngestHandler, Response
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 from datetime import datetime
 from json import loads
-from typing import Dict, AnyStr
-import pandas as pd
+from typing import AnyStr
 from dataclasses import dataclass
 import hmac
 import hashlib
 from dateutil.parser import isoparse
 
-handler = Handler()
+handler = IngestHandler()
 
 
 @handler.validate()
@@ -51,18 +50,18 @@ def ingest(event) -> Data:
             event=event['headers']['X-GitHub-Event']
         ),
         data={
-            'id': repo['id'],
-            'updated_at': to_timestamp(repo['updated_at']),
-            'pushed_at': to_timestamp(repo['pushed_at']),
-            'forks_count': repo['forks_count'],
-            'stargazers_count': repo['stargazers_count']
+            'id': repo.get('id', ''),
+            'name': repo.get('name', ''),
+            'description': repo.get('description', ''),
+            'url': repo.get('url', ''),
+            'html_url': repo.get('html_url', ''),
+            'owner': repo.get('owner', {}).get('login', ''),
+            'created_at': to_timestamp(repo.get('created_at', '')),
+            'updated_at': to_timestamp(repo.get('updated_at', '')),
+            'pushed_at': to_timestamp(repo.get('pushed_at', '')),
+            'language': repo.get('language', ''),
+            'forks_count': repo.get('forks_count', ''),
+            'stargazers_count': repo.get('stargazers_count', ''),
+            'default_branch': repo.get('default_branch', '')
         }
     )
-
-
-@handler.process(partitions={})
-def process(data) -> Dict[str, pd.DataFrame]:
-    records = [dict(x['data'], time=int(x['metadata']['timestamp'])) for x in [d.json() for d in data]]
-    return {
-        'github_knowit_repo_status': pd.DataFrame.from_records(records)
-    }
