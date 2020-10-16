@@ -217,6 +217,19 @@ resources: # The resources your functions use
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+          - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - '*'
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
