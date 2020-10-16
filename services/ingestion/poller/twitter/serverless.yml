@@ -120,7 +120,7 @@ resources: # The resources your functions use
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
+        RoleName: ${self:custom.stage}-${self:service}-ingest-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -182,7 +182,7 @@ resources: # The resources your functions use
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.processHandlerFile}-role
+        RoleName: ${self:custom.stage}-${self:service}-process-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
