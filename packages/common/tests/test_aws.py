@@ -45,6 +45,17 @@ def test_s3_put_data(s3_bucket):
     assert res.data == 'test'
 
 
+def test_s3_put_raw_data(s3_bucket):
+    s3 = aws.S3()
+    input_bytes = 'some bytes'
+    ext = '.txt'
+    key = s3.put_raw(input_bytes, path='', ext=ext)
+    res = s3_bucket.Object(key).get()['Body'].read().decode('utf-8')
+
+    assert res == input_bytes
+    assert ext in key
+
+
 def test_ssm_default():
     ssm = aws.SSM()
     assert ssm.path.startswith('/') and\

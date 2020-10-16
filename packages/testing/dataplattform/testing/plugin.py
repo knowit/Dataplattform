@@ -28,6 +28,8 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('SERVICE', 'testService'),
         ('SQS_QUEUE_NAME', 'test.fifo'),
         ('SQS_MESSAGE_GROUP_ID', 'test_groud_id'),
+        ('PRIVATE_BUCKET', 'private_test_bucket'),
+        ('PUBLIC_BUCKET', 'public_test_bucket')
     ]
     for key, value in default_env:
         if key not in environ:
@@ -57,6 +59,22 @@ def s3_bucket():
         s3 = resource('s3')
         s3.create_bucket(Bucket=environ.get('DATALAKE'))
         yield s3.Bucket(environ.get('DATALAKE'))
+
+
+@fixture
+def s3_private_bucket():
+    with mock_s3():
+        s3 = resource('s3')
+        s3.create_bucket(Bucket=environ.get('PRIVATE_BUCKET'))
+        yield s3.Bucket(environ.get('PRIVATE_BUCKET'))
+
+
+@fixture
+def s3_public_bucket():
+    with mock_s3():
+        s3 = resource('s3')
+        s3.create_bucket(Bucket=environ.get('PUBLIC_BUCKET'))
+        yield s3.Bucket(environ.get('PUBLIC_BUCKET'))
 
 
 @fixture(autouse=True)
