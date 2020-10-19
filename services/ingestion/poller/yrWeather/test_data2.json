@@ -1,0 +1,247 @@
+{
+  "metadata": {
+    "timestamp": 1601451695.892407
+  },
+  "data": [
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585764000,
+      "time_to": 1585767600,
+      "precipitation": 0.0,
+      "wind_speed": 4.9,
+      "temperature": 9,
+      "air_pressure": 997.0
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585767600,
+      "time_to": 1585771200,
+      "precipitation": 0.0,
+      "wind_speed": 3.1,
+      "temperature": 8,
+      "air_pressure": 997.1
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585771200,
+      "time_to": 1585774800,
+      "precipitation": 0.0,
+      "wind_speed": 1.6,
+      "temperature": 7,
+      "air_pressure": 997.1
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585774800,
+      "time_to": 1585778400,
+      "precipitation": 0.0,
+      "wind_speed": 1.7,
+      "temperature": 6,
+      "air_pressure": 997.1
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585778400,
+      "time_to": 1585782000,
+      "precipitation": 0.0,
+      "wind_speed": 1.4,
+      "temperature": 5,
+      "air_pressure": 996.9
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585782000,
+      "time_to": 1585785600,
+      "precipitation": 0.0,
+      "wind_speed": 2.3,
+      "temperature": 5,
+      "air_pressure": 996.8
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585785600,
+      "time_to": 1585789200,
+      "precipitation": 0.0,
+      "wind_speed": 2.6,
+      "temperature": 4,
+      "air_pressure": 996.4
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585789200,
+      "time_to": 1585792800,
+      "precipitation": 0.0,
+      "wind_speed": 2.1,
+      "temperature": 4,
+      "air_pressure": 995.7
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585792800,
+      "time_to": 1585796400,
+      "precipitation": 0.0,
+      "wind_speed": 1.1,
+      "temperature": 3,
+      "air_pressure": 994.5
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585796400,
+      "time_to": 1585800000,
+      "precipitation": 0.0,
+      "wind_speed": 0.6,
+      "temperature": 2,
+      "air_pressure": 993.2
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585800000,
+      "time_to": 1585803600,
+      "precipitation": 0.0,
+      "wind_speed": 3.8,
+      "temperature": 3,
+      "air_pressure": 991.3
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585803600,
+      "time_to": 1585807200,
+      "precipitation": 0.0,
+      "wind_speed": 7.5,
+      "temperature": 4,
+      "air_pressure": 989.6
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585807200,
+      "time_to": 1585810800,
+      "precipitation": 0.0,
+      "wind_speed": 7.6,
+      "temperature": 4,
+      "air_pressure": 988.3
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585810800,
+      "time_to": 1585814400,
+      "precipitation": 0.0,
+      "wind_speed": 7.5,
+      "temperature": 5,
+      "air_pressure": 986.7
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585814400,
+      "time_to": 1585818000,
+      "precipitation": 0.0,
+      "wind_speed": 6.9,
+      "temperature": 6,
+      "air_pressure": 984.6
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585818000,
+      "time_to": 1585821600,
+      "precipitation": 0.0,
+      "wind_speed": 8.9,
+      "temperature": 7,
+      "air_pressure": 982.5
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585821600,
+      "time_to": 1585825200,
+      "precipitation": 0.3,
+      "wind_speed": 11.9,
+      "temperature": 8,
+      "air_pressure": 981.9
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585825200,
+      "time_to": 1585828800,
+      "precipitation": 0.0,
+      "wind_speed": 7.5,
+      "temperature": 5,
+      "air_pressure": 981.3
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585828800,
+      "time_to": 1585832400,
+      "precipitation": 0.0,
+      "wind_speed": 11.0,
+      "temperature": 7,
+      "air_pressure": 981.1
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585832400,
+      "time_to": 1585836000,
+      "precipitation": 0.0,
+      "wind_speed": 10.1,
+      "temperature": 6,
+      "air_pressure": 981.0
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585836000,
+      "time_to": 1585839600,
+      "precipitation": 0.0,
+      "wind_speed": 8.9,
+      "temperature": 6,
+      "air_pressure": 980.7
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585839600,
+      "time_to": 1585843200,
+      "precipitation": 0.0,
+      "wind_speed": 9.6,
+      "temperature": 5,
+      "air_pressure": 980.1
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585843200,
+      "time_to": 1585846800,
+      "precipitation": 0.0,
+      "wind_speed": 9.3,
+      "temperature": 5,
+      "air_pressure": 979.0
+    },
+    {
+      "location": "Norway/Oslo/Oslo/Lakkegata",
+      "location_name": "Lakkegata",
+      "time_from": 1585846800,
+      "time_to": 1585850400,
+      "precipitation": 0.0,
+      "wind_speed": 9.5,
+      "temperature": 4,
+      "air_pressure": 978.0
+    }
+  ]
+}

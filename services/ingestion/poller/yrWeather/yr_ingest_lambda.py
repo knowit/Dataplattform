@@ -1,14 +1,12 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import requests
 import xmltodict
 import numpy as np
-import pandas as pd
-from typing import Dict
 
 
-handler = Handler()
+handler = IngestHandler()
 
 
 @handler.ingest()
@@ -48,21 +46,3 @@ def ingest(event) -> Data:
             timestamp=datetime.now().timestamp()
         ),
         data=np.hstack([fetch_yr_data(location) for location in locations]).tolist())
-
-
-@handler.process(partitions={'yr_weather': ['location_name']})
-def process(data) -> Dict[str, pd.DataFrame]:
-
-    def make_dataframe(d):
-        d = d.json()
-        metadata, payload = d['metadata'], d['data']
-        df = pd.json_normalize(payload)
-        df['time'] = int(metadata['timestamp'])
-        return df
-
-    df = pd.concat([make_dataframe(d) for d in data])
-
-    # TODO: Check for duplicates?
-    return {
-        'yr_weather': df
-    }
