@@ -54,27 +54,32 @@ def ssm_client(pytestconfig):
 
 
 @fixture(autouse=True)
-def s3_bucket():
+def s3_buckets():
     with mock_s3():
         s3 = resource('s3')
         s3.create_bucket(Bucket=environ.get('DATALAKE'))
-        yield s3.Bucket(environ.get('DATALAKE'))
-
-
-@fixture
-def s3_private_bucket():
-    with mock_s3():
-        s3 = resource('s3')
         s3.create_bucket(Bucket=environ.get('PRIVATE_BUCKET'))
-        yield s3.Bucket(environ.get('PRIVATE_BUCKET'))
+        s3.create_bucket(Bucket=environ.get('PUBLIC_BUCKET'))
+        yield {
+                "datalake": s3.Bucket(environ.get('DATALAKE')),
+                "private_bucket": s3.Bucket(environ.get('PRIVATE_BUCKET')),
+                "public_bucket": s3.Bucket(environ.get('PUBLIC_BUCKET'))
+              }
 
 
 @fixture
-def s3_public_bucket():
-    with mock_s3():
-        s3 = resource('s3')
-        s3.create_bucket(Bucket=environ.get('PUBLIC_BUCKET'))
-        yield s3.Bucket(environ.get('PUBLIC_BUCKET'))
+def s3_bucket(s3_buckets):
+    yield s3_buckets['datalake']
+
+
+@fixture
+def s3_public_bucket(s3_buckets):
+    yield s3_buckets['public_bucket']
+
+
+@fixture
+def s3_private_bucket(s3_buckets):
+    yield s3_buckets['private_bucket']
 
 
 @fixture(autouse=True)
