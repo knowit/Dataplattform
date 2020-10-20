@@ -35,10 +35,12 @@ class S3:
         return self.put_raw(data_json, ext='json', path=path)
 
     def put_raw(self, data: bytes, ext: str, path: str = ''):
-        key = path_join(self.access_path, path, f'{uuid4()}.{ext}')
-        s3_object = self.s3.Object(self.bucket, key)
-        s3_object.put(Body=data)
-        return key
+        if data is not None:
+            key = path_join(self.access_path, path, f'{uuid4()}.{ext}')
+            s3_object = self.s3.Object(self.bucket, key)
+            s3_object.put(Body=data)
+            return key
+        return None
 
     def get(self, key, catch_client_error=True) -> S3Result:
         key = path_join(self.access_path, key) if not key.startswith(self.access_path) else key

@@ -84,7 +84,7 @@ def test_process_image_table_content(setup_queue_event, test_data, create_table_
         'cv_partner_employee_images',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_2'],
-            'image': ["image1", "image2"],
+            'image_key': ["image_key1", "image_key2"],
             }))
 
 

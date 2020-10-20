@@ -1,9 +1,10 @@
 from dataplattform.common.handlers.ingest import IngestHandler
+from dataplattform.common.raw_storage import RawStorage
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import requests
-import base64
+import urllib.request as request
 
 url = 'https://knowit.cvpartner.com/api/v3'
 url_v1 = 'https://knowit.cvpartner.com/api/v1'
@@ -23,18 +24,19 @@ def ingest(event) -> Data:
 
     data_json = res.json()
 
-    def get_base64_encoded_image(image_path):
+    def get_jpg(image_path):
         if image_path['url'] is None:
             return
-
-        safe_encoded_bytes = base64.urlsafe_b64encode(requests.get(image_path['url']).content)
-        return str(safe_encoded_bytes, "utf-8")
+        image_res = request.urlopen(image_path['url'])
+        if (image_res.status != 200):
+            return
+        return image_res.read()
 
     def get_person(person):
         return {
             'user_id': person['cv']['user_id'],
             'default_cv_id': person['cv']['id'],
-            'image': get_base64_encoded_image(person['cv']['image']['thumb']),
+            'image_key': RawStorage().write_to_public_bucket(get_jpg(person['cv']['image']['thumb']), 'jpg'),
             'cv_link': url_v1 + f"/cvs/download/{person['cv']['user_id']}/{person['cv']['id']}/{{LANG}}/{{FORMAT}}/"
         }
 

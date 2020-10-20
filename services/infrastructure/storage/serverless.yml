@@ -100,7 +100,16 @@ resources:
       Value: ${self:resources.Resources.PublicRawStorageBucket.Properties.BucketName}
       Export:
         Name: ${self:custom.stage}-publicBucketName
+    PublicBucketArn:
+      Value: !GetAtt PublicRawStorageBucket.Arn
+      Export:
+        Name: ${self:custom.stage}-publicBucketArn
     PrivateBucketName:
       Value: ${self:resources.Resources.PrivateRawStorageBucket.Properties.BucketName}
       Export:
         Name: ${self:custom.stage}-privateBucketName
+    PrivateBucketArn:
+      Value: !GetAtt PrivateRawStorageBucket.Arn
+      Export:
+        Name: ${self:custom.stage}-privateBucketArn
+    

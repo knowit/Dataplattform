@@ -41,7 +41,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     image_table = [
         'user_id',
-        'image'
+        'image_key'
         ]
 
     df = pd.concat([make_dataframe(d) for d in data])
