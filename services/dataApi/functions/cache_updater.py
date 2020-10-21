@@ -1,0 +1,38 @@
+import json
+from common.repositories.reports import ReportsRepository
+from common.services.athena_engine import execute as execute_query
+import common.services.cache_table_service as cache_table_service
+
+
+def handler(event, context):
+    records = event['Records']
+
+    def load_message(record):
+        rec = record.get('Sns')
+        return (rec.get('Subject', None), rec.get('Message', None))
+
+    messages = [(topic, json.loads(msg)) for topic, msg in [
+        load_message(record) for record in records
+    ] if topic]
+
+    def load_reports(topic: str, message, repo: ReportsRepository):
+        if topic == 'NewReport':
+            return [repo.get(message['report'])]
+        elif topic == 'DataUpdate':
+            pass  # TODO: Load all reports with data in source
+
+    with ReportsRepository() as repo:
+        report_sets = [load_reports(topic, message, repo)
+                       for topic, message in messages]
+    reports = [report for reports in report_sets for report in reports]
+
+    for report in reports:
+        updateCache = cache_table_service.cache_table(
+            report['dataProtection'], report['name'])
+
+        updateCache(
+            execute_query(report['queryString'], preprocess_sql=False)
+        )
+
+        # TODO: update report table with cache update timestamp
+    return {}

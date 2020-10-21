@@ -6,6 +6,7 @@ import pandas as pd
 from io import BytesIO
 from os import environ
 from cachetools import cached, TTLCache
+from typing import Tuple, List
 
 
 @cached(cache=TTLCache(1, 60))
@@ -37,6 +38,20 @@ def table_map():
         raise Exception(error.response['Error']['Message'])
 
 
+def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
+    used_tables = []
+    for (_, database, table) in table_map():
+        if table in sql:
+            used_tables.append((database, table))
+            sql = sql.replace(table, f'{database}.{table}')
+
+    statement = sqlparse.parse(sql)[0]
+    if statement.get_type() != 'SELECT':
+        raise Exception('Illegal SQL statement')
+
+    return str(statement), used_tables
+
+
 def query_complete(athena, query_id: str):
     response = athena.get_query_execution(QueryExecutionId=query_id)
     status = response['QueryExecution']['Status']['State']
@@ -48,25 +63,17 @@ def query_complete(athena, query_id: str):
         return None
 
 
-def execute(sql: str, output_format: str):
-    for (_, database, table) in table_map():
-        if table in sql:
-            sql = sql.replace(table, f'{database}.{table}')
-
-    statement = sqlparse.parse(sql)[0]
-    if statement.get_type() != 'SELECT':
-        raise Exception('Illegal SQL statement')
-
-    if output_format not in ['json', 'csv']:
-        raise Exception('Unknown output format')
+def execute(sql: str, preprocess_sql=True) -> pd.DataFrame:
+    if preprocess_sql:
+        sql, _ = process_sql(sql)
 
     s3 = boto3.resource('s3')
     athena = boto3.client('athena')
 
     begin_query_response = athena.start_query_execution(
-        QueryString=str(statement),
+        QueryString=sql,
         ResultConfiguration={
-            'OutputLocation': f's3://{environ.get("DATALAKE")}/query/',
+            'OutputLocation': f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}/query/',
             'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'}
         }
     )
@@ -82,11 +89,7 @@ def execute(sql: str, output_format: str):
     bucket, *path = output_location.lstrip('s3://').split('/')
     data = s3.Object(bucket, '/'.join(path)).get()
 
-    df = pd.read_csv(BytesIO(data['Body'].read()))
+    # TODO store in s3 and return presigned download url
+    # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-presigned-urls.html
 
-    if output_format == 'json':
-        return df.to_json(orient='records')
-    elif output_format == 'csv':
-        return df.to_csv(index=False)
-
-    return None
+    return pd.read_csv(BytesIO(data['Body'].read()))

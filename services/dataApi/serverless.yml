@@ -10,11 +10,21 @@ custom:
     pythonBin: python
   pythonRequirements:
     dockerizePip: true
+    slim: true
+    slimPatternsAppendDefaults: false
+    slimPatterns:
+      - '**/*.py[c|o]'
+      - '**/__pycache__*'
     noDeploy:
       - boto3 # Default in lambda rt
       - botocore
-      - numpy # Layer
+      - numpy
       - numpy.libs
+      - pandas
+      - pytz
+      - fastparquet
+      - numba
+      - llvmlite
   authorizer:
     type: COGNITO_USER_POOLS
     name: authorizer
@@ -50,14 +60,18 @@ functions:
     handler: wsgi_handler.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-    name: ${self:custom.stage}-${self:service}
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.service}
     description: Dataplattform Data API
     role: !ImportValue ${self:custom.stage}-assumeRole
     package:
       include:
-        - '*.py'
+        - 'app.py'
+        - 'apis/**/*.py'
     environment: 
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      STAGE: ${self:custom.stage}
+      NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
     events:
       - http:
           method: ANY
@@ -67,7 +81,33 @@ functions:
           method: ANY
           path: /
           authorizer: ${self:custom.authorizer}
-            
+
+  CacheUpdater:
+    handler: cache_updater.handler
+    module: functions
+    layers:
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
+    name: ${self:custom.service}-CacheUpdater
+    description: Dataplattform API Cache updater
+    role:  !GetAtt CacheUpdaterRole.Arn
+    package:
+      include:
+        - 'functions/cache_updater.py'
+    # destinations: # TODO
+    #   onSuccess: xxx:xxx:target 
+    #   onFailure: xxx:xxx:target
+    environment: 
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      STAGE: ${self:custom.stage}
+    events:
+      - sns: 
+          arn: !ImportValue ${self:custom.stage}-new-report-topic-arn
+          topicName: ${self:custom.stage}-NewReport
+      - sns: 
+          arn: !ImportValue ${self:custom.stage}-data-update-topic-arn
+          topicName: ${self:custom.stage}-DataUpdate
 
 resources:
   Resources:
@@ -80,6 +120,105 @@ resources:
           - !ImportValue ${self:custom.stage}-cognito-userPool
         RestApiId: !Ref ApiGatewayRestApi
         Type: COGNITO_USER_POOLS
+    
+    ReportsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.stage}_reports_table
+        AttributeDefinitions:
+          - AttributeName: name
+            AttributeType: S
+        KeySchema:
+          - AttributeName: name
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+    CacheUpdaterRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.service}-CacheUpdater-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.service}-CacheUpdater-policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - dynamodb:Scan
+                    - dynamodb:GetItem
+                  Resource: !Sub 'arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                    - s3:PutObject
+                    - s3:ListMultipartUploadParts
+                    - s3:AbortMultipartUpload
+                    - s3:DeleteObject
+                  Resource:
+                    - Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /query/*
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                  Resource:
+                    - Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /reports/*
+                - Effect: Allow
+                  Action:
+                    - s3:GetObject
+                  Resource:
+                    - Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /data/*
+                - Effect: Allow
+                  Action:
+                    - s3:GetBucketLocation
+                    - s3:ListBucket
+                    - s3:ListBucketMultipartUploads
+                  Resource: 
+                    - !ImportValue ${self:custom.stage}-datalakeArn
+                - Effect: Allow
+                  Action:
+                    - athena:ListTableMetadata
+                    - athena:ListDatabases
+                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:datacatalog/AwsDataCatalog'
+                - Effect: Allow
+                  Action:
+                    - athena:ListDataCatalogs
+                  Resource: '*'
+                - Effect: Allow
+                  Action:
+                    - athena:StartQueryExecution
+                    - athena:GetQueryExecution
+                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary'
+                - Effect: Allow
+                  Action:
+                    - glue:GetTable
+                    - glue:GetDatabase
+                  Resource: 
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
+
+
+
 
 plugins:
   - serverless-python-requirements

@@ -35,19 +35,9 @@ def client():
         yield client
 
 
-def test_root_spec(client):
-    response = client.get('/data/')
-    assert response.json['info']['title'] == "Dataplattform Data API"
-
-
-def test_spec_spec(client):
-    response = client.get('/data/spec')
-    assert response.json['info']['title'] == "Dataplattform Data API"
-
-
 def test_query_missing_args(client):
     response = client.get('/data/query')
-    assert 'error' in response.json and '500' in response.status
+    assert 'errors' in response.json and '400' in response.status
 
 
 def test_query_get_json(client):
@@ -74,14 +64,14 @@ def test_query_post_csv(client):
 
 def test_query_bad_sql_insert(client):
     response = client.get(f'/data/query?sql={urllib.parse.quote("insert into test (col0) values (1)")}')
-    assert 'error' in response.json and '500' in response.status
+    assert 'Illegal SQL' in response.json['message'] and '500' in response.status
 
 
 def test_query_bad_sql_delete(client):
     response = client.get(f'/data/query?sql={urllib.parse.quote("delete from test where col0 = 1")}')
-    assert 'error' in response.json and '500' in response.status
+    assert 'Illegal SQL' in response.json['message'] and '500' in response.status
 
 
 def test_query_bad_sql_update(client):
     response = client.get(f'/data/query?sql={urllib.parse.quote("update test set col0 = 1")}')
-    assert 'error' in response.json and '500' in response.status
+    assert 'Illegal SQL' in response.json['message'] and '500' in response.status
