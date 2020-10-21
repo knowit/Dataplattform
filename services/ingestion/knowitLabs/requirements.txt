@@ -1,0 +1,5 @@
+file:../../../packages/common
+file:../../../packages/query
+requests
+beautifulsoup4
+lxml

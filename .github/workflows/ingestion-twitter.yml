@@ -1,0 +1,51 @@
+
+name: Dataplattform - ingestion - twitter
+
+on: 
+  push:
+    branches:
+      - master
+  pull_request:
+    paths:
+      - 'services/ingestion/twitter/**'
+      - 'packages/common/**'
+      - 'packages/query/**'
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+    - name: Lint with flake8
+      run: |
+        pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 ./services/ingestion/twitter --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 ./services/ingestion/twitter --count --max-line-length=120 --statistics
+  
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: lambci/lambda:build-python3.7
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      working-directory: './services/ingestion/twitter'
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+    - name: Test with pytest
+      working-directory: './services/ingestion/twitter'
+      run: |
+        pip install pytest
+        pytest 

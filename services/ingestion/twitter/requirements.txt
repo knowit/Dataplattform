@@ -1,0 +1,3 @@
+file:../../../packages/common
+file:../../../packages/query
+tweepy

@@ -1,0 +1,3 @@
+file:../../../packages/common
+google-api-python-client
+pandas
