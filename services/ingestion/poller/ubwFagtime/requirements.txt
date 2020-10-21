@@ -1,5 +1,0 @@
-file:../../../../packages/common
-file:../../../../packages/query
-zeep
-xmltodict
-pandas
