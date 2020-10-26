@@ -7,6 +7,10 @@
             "user_id": "user_id_1",
             "default_cv_id": "user_id_1_cv_id",
             "image_key": "image_key1",
+            "cv_no_pdf": "cv_no_pdf_key1",
+            "cv_int_pdf": "cv_int_pdf_key1",
+            "cv_no_docx": "cv_no_docx_key1",
+            "cv_int_docx": "cv_int_docx_key1",
             "cv_link": "link1",
             "cv": {
                 "_id": "user_id_1_cv_id",
@@ -729,6 +733,10 @@
             "user_id": "user_id_2",
             "default_cv_id": "user_id_2_cv_id",
             "image_key": "image_key2",
+            "cv_no_pdf": "cv_no_pdf_key2",
+            "cv_int_pdf": "cv_int_pdf_key2",
+            "cv_no_docx": "cv_no_docx_key2",
+            "cv_int_docx": "cv_int_docx_key2",
             "cv_link": "link2",
             "cv": {
                 "_id": "user_id_2_cv_id",

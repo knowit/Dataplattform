@@ -81,6 +81,8 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+      DOWNLOAD_PRIVATE_LAMBDA: !ImportValue ${self:custom.stage}-downloadToPrivateBucketArn
+      DOWNLOAD_PUBLIC_LAMBDA: !ImportValue ${self:custom.stage}-downloadToPublicBucketArn
     tags: # Tag for this function. Every function are tagged with stage by default
 
     events: # The Events that trigger this Function
@@ -134,6 +136,22 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
+          - PolicyName: ${self:custom.stage}-InvokePrivateDownloadLambda-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - lambda:invokeFunction
+                  Resource: !ImportValue ${self:custom.stage}-downloadToPrivateBucketArn
+          - PolicyName: ${self:custom.stage}-InvokePublicDownloadLambda-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - lambda:invokeFunction
+                  Resource: !ImportValue ${self:custom.stage}-downloadToPublicBucketArn
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
