@@ -1,13 +1,12 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: downloadToPublicBucket
+service: downloadToBucket
 
 custom:
   #Edit these variables###########################
   editable:
     timeout: 900
-    handlerFile: downloadToPublicBucket
-    description: Downloads documents to the specific bucket
-    bucketname: 
+    handlerFile: downloadToBucket
+    description: Downloads documents to a specific bucket
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   pythonRequirements:
@@ -37,10 +36,10 @@ provider:
 package:
   individually: true
   exclude:
-    - "./**" # Exclude everything and include what you need in Public functions below
+    - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  downloadToPublicBucket:
+  downloadToBucket:
     handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     layers:
       - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
@@ -53,8 +52,8 @@ functions:
       include:
         - '*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
-      STAGE: ${self:custom.stage}
-      SERVICE: ${self:service}
+      PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
+      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
     tags: # Tag for this function. Every function are tagged with stage by default
   
 resources: # The resources your functions use
@@ -62,7 +61,7 @@ resources: # The resources your functions use
     S3Access:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}
+        RoleName: ${self:custom.stage}-${self:service}-s3AccessRole
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -74,6 +73,22 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
+          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                  Resource:
+                    - Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-privateBucketArn
+                        - /*
           - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -89,10 +104,10 @@ resources: # The resources your functions use
                     - Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-publicBucketArn
-                        - /public*
+                        - /*
       
   Outputs:
-    DownloadToPublicBucketLambdaFunctionArn:
+    DownloadToBucketLambdaFunctionArn:
       Export:
         Name: ${self:custom.stage}-${self:service}Arn
 

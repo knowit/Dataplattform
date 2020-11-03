@@ -2,12 +2,11 @@ from cv_partner_ingest_lambda import handler, url, url_v1, offset_size
 from json import loads
 import responses
 from pytest import fixture
-import re
 
 
 @fixture(autouse=True)
-def launch_lambda_mock(mocker):
-    mocker.patch('dataplattform.common.helper.Helper.launch_async_lambda')
+def mock_save_document(mocker):
+    mocker.patch('cv_partner_ingest_lambda.save_document')
 
 
 def make_test_json(user_id, cv_id):
@@ -55,10 +54,5 @@ def test_initial_ingest(s3_bucket):
     data = loads(response['Body'].read())
     assert data['data'][0]['user_id'] == user_id
     assert data['data'][0]['default_cv_id'] == cv_id
-    assert re.fullmatch(r'public/[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}.jpg', data['data'][0]['image_key'])
-    assert re.fullmatch(r'private/[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}.pdf', data['data'][0]['cv_no_pdf'])
-    assert re.fullmatch(r'private/[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}.pdf', data['data'][0]['cv_int_pdf'])
-    assert re.fullmatch(r'private/[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}.docx', data['data'][0]['cv_no_docx'])
-    assert re.fullmatch(r'private/[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}.docx', data['data'][0]['cv_int_docx'])
     cv_link_correct = url_v1 + f'/cvs/download/{user_id}/{cv_id}/{{LANG}}/{{FORMAT}}/'
     assert data['data'][0]['cv_link'] == cv_link_correct

@@ -1,11 +1,11 @@
-from dataplattform.common.helper import Helper
-from dataplattform.testing.plugin import FakeResponse
+from dataplattform.common.helper import download_from_http, save_document
+from dataplattform.testing.utilities import FakeResponse
 from os import environ
 from pytest import fixture
 
 
 @fixture(autouse=True)
-def test_data():
+def test_httpRequest():
     body = {'filetype': 'pdf', 'requestUrl': 'http://test_url.com',
             'filename': 'test.pdf', 'bucket': environ.get('PRIVATE_BUCKET')}
     yield body
@@ -16,27 +16,37 @@ def mock_urlopen(mocker):
     yield mocker.patch('urllib.request.urlopen', return_value=FakeResponse(data=b'{}'))
 
 
-def test_download_from_http_base_case(s3_private_bucket, test_data, mock_urlopen):
-    r = Helper().download_from_http(body=test_data)
+@fixture(autouse=True)
+def mock_launch_async_lambda(mocker):
+    yield mocker.patch('dataplattform.common.helper.launch_async_lambda')
+
+
+def test_download_from_http_base_case(s3_private_bucket, test_httpRequest, mock_urlopen):
+    r = download_from_http(test_httpRequest)
     assert r == 200
     response = s3_private_bucket.Object(next(iter(s3_private_bucket.objects.all())).key).get()
     assert response['Body'] is not None
 
 
-def test_download_from_http_invalid_filetype(s3_private_bucket, test_data, mock_urlopen):
-    test_data['filetype'] = 'html'
+def test_download_from_http_invalid_filetype(test_httpRequest, mock_urlopen):
+    test_httpRequest['filetype'] = 'html'
 
-    r = Helper().download_from_http(body=test_data)
+    r = download_from_http(test_httpRequest)
     assert r == 400
 
 
-def test_download_from_http_mismatch_content_type(s3_private_bucket, test_data, mock_urlopen):
-    test_data['filetype'] = 'docx'
-    r = Helper().download_from_http(body=test_data)
+def test_download_from_http_mismatch_content_type(test_httpRequest, mock_urlopen):
+    test_httpRequest['filetype'] = 'docx'
+    r = download_from_http(test_httpRequest)
     assert r == 400
 
 
-def test_download_from_http_not_readable(s3_private_bucket, test_data, mock_urlopen):
+def test_download_from_http_not_readable(test_httpRequest, mock_urlopen):
     mock_urlopen.return_value = FakeResponse(data=None, readable=False)
-    r = Helper().download_from_http(body=test_data)
+    r = download_from_http(test_httpRequest)
     assert r == 400
+
+
+def test_save_document(test_httpRequest, mock_urlopen):
+    key = save_document(test_httpRequest)
+    assert "test.pdf" == key

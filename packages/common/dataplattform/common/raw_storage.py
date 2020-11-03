@@ -1,13 +1,12 @@
 from dataplattform.common.aws import S3
+from os import environ
 
 
-class RawStorage():
+def write_file_to_bucket(data: bytes, filename: str = '',
+                         bucket: str = environ.get('PRIVATE_BUCKET', None)):
 
-    def __init__(self):
-        self.access_path = ''
+    if (bucket != environ.get('PUBLIC_BUCKET')):
+        bucket = environ.get('PRIVATE_BUCKET')
 
-    def write_file_to_bucket(self, data: bytes, filename: str = '',
-                             bucket: str = None):
-
-        s3 = S3(access_path=self.access_path, bucket=bucket)
-        return s3.put_raw(data=data, key=filename)
+    s3 = S3(access_path='', bucket=bucket)
+    return s3.put_raw(data=data, key=filename)

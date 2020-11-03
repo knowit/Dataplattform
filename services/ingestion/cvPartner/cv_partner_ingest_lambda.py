@@ -1,12 +1,10 @@
 from dataplattform.common.handlers.ingest import IngestHandler
-from dataplattform.common.helper import Helper
+from dataplattform.common.helper import save_document
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import requests
 from uuid import uuid4
-from os import environ
-from json import dumps
 
 url = 'https://knowit.cvpartner.com/api/v3'
 url_v1 = 'https://knowit.cvpartner.com/api/v1'
@@ -27,31 +25,24 @@ def ingest(event) -> Data:
     data_json = res.json()
 
     def download_private_cv_doc(person, filename, language: str = 'no', ext: str = 'pdf'):
-        event = {}
+        http_request = {'requestUrl': get_cv_link(person['cv']['user_id'],
+                                                  person['cv']['id'], language=language, ext=ext),
+                        'filename': f'private/{filename}',
+                        'filetype': f'{ext}',
+                        'header': {'Authorization': f'Bearer {api_token}'},
+                        'private': True
+                        }
 
-        body = {'requestUrl': get_cv_link(person['cv']['user_id'],
-                                          person['cv']['id'], language=language, ext=ext),
-                'filename': f'private/{filename}',
-                'filetype': f'{ext}',
-                'header': {'Authorization': f'Bearer {api_token}'},
-                'bucket': environ.get('PRIVATE_BUCKET')
-                }
-
-        event['body'] = body
-        Helper().launch_async_lambda(dumps(event), environ.get('DOWNLOAD_PRIVATE_LAMBDA'))
-        return f"{body['filename']}"
+        return save_document(http_request)
 
     def download_public_image(person, filename, ext: str = 'jpg'):
-        event = {}
-        body = {'requestUrl': person['cv']['image']['thumb']['url'],
-                'filename': f'public/{filename}',
-                'filetype': f'{ext}',
-                'bucket': environ.get('PUBLIC_BUCKET')
-                }
+        http_request = {'requestUrl': person['cv']['image']['thumb']['url'],
+                        'filename': f'public/{filename}',
+                        'filetype': f'{ext}',
+                        'private': False
+                        }
 
-        event['body'] = body
-        Helper().launch_async_lambda(dumps(event), environ.get('DOWNLOAD_PUBLIC_LAMBDA'))
-        return f"{body['filename']}"
+        return save_document(http_request)
 
     def write_cv_doc_to_private_bucket(person, language: str = 'no', ext: str = 'pdf'):
         new_key = f'cv_{language}_{ext}'

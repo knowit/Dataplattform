@@ -30,8 +30,7 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('SQS_MESSAGE_GROUP_ID', 'test_groud_id'),
         ('PRIVATE_BUCKET', 'private_test_bucket'),
         ('PUBLIC_BUCKET', 'public_test_bucket'),
-        ('DOWNLOAD_PRIVATE_LAMBDA', 'test_private_lambda'),
-        ('DOWNLOAD_PUBLIC_LAMBDA', 'test_public_lambda')
+        ('DOWNLOAD_LAMBDA', 'test_download_lambda'),
     ]
     for key, value in default_env:
         if key not in environ:
@@ -209,32 +208,3 @@ def create_table_mock(mocker):
     on_to_parquet_stub.assert_table_data_contains_df = assert_table_data_contains_df
 
     yield on_to_parquet_stub
-
-
-class FakeResponse:
-    status: int
-    data: bytes
-    readable_value: bool
-    content_type: str
-
-    def __init__(self, *, data: bytes, readable: bool = True,
-                 content_type: str = 'application/pdf'):
-        self.data = data
-        self.status = 200 if self.data is not None else 404
-        self.readable_value = readable
-        self.content_type = content_type
-
-    def read(self):
-        self.status = 200 if self.data is not None else 404
-        return self.data
-
-    def readable(self):
-        return self.readable_value
-
-    def close(self):
-        pass
-
-    def getheader(self, name: str = ''):
-        if (name == 'Content-Type'):
-            return self.content_type
-        return None
