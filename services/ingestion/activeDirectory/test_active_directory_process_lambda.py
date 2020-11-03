@@ -38,7 +38,7 @@ def test_initial_process(setup_queue_event, test_data, create_table_mock):
 
     handler(event, None)
     create_table_mock.assert_table_created(
-        'userPrinicipalName')
+        'activeDirectory')
 
 
 def test_process_table_content(setup_queue_event, test_data, create_table_mock):
