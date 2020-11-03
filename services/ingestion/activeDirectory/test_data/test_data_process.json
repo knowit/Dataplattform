@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "timestamp": 1600687329.653047
+  },
+  "data": [
+    {
+      "hasActiveDirectoryUser": true,
+      "hasGSuiteUser": true,
+      "disabledGSuite": false,
+      "isDisabledActiveDirectory": false,
+      "directReports": null,
+      "userPrinicipalName": "per.nordmann@knowit.no",
+      "primaryEmailAddress": "per.nordmann@knowit.no",
+      "displayName": "Per Nordmann",
+      "samAccountName": "pernord",
+      "telephoneNumber": "+47 12345678",
+      "company": "Knowit Objectnet",
+      "knowitBranch": "Solutions",
+      "distinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "managerDistinguishedName": "CN=Olav Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "isServiceUser": false,
+      "isExternalUser": false,
+      "isPasswordExpired": false,
+      "isDeleted": false,
+      "licenses": [
+        {
+          "product": "1Password",
+          "version": "Standard",
+          "iconFilename": "1password-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "CVPartner",
+          "version": "Standard",
+          "iconFilename": "CVPartner-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "IShield",
+          "version": "Standard",
+          "iconFilename": "iShield-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "Office 365 Account",
+          "version": "Standard",
+          "iconFilename": "Office365-64x64.png",
+          "licenseGroupName": "license"
+        }
+      ]
+    }
+  ]
+}
