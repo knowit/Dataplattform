@@ -113,9 +113,9 @@ class SSM:
             param = self.client.get_parameter(
                 Name=path_join('/', self.path, name),
                 WithDecryption=self.with_decryption).get('Parameter', {})
-            yield param.get('Value', None) \
+            yield param.get('Value', None).strip() \
                 if param.get('Type', '') != 'StringList' \
-                else param.get('Value', None).split(',')
+                else list(map(str.strip, param.get('Value', None).split(',')))
 
     def put(self, name, value, overwrite=True, tier='Standard'):
 
