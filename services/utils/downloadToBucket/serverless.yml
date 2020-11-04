@@ -5,8 +5,8 @@ custom:
   #Edit these variables###########################
   editable:
     timeout: 900
-    handlerFile: downloadToBucket
-    description: Downloads documents to a specific bucket
+    handlerFile: download_to_bucket
+    description: Downloads documents to a either a private or a public raw storage bucket
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   pythonRequirements:

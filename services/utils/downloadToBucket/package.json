@@ -1,5 +1,5 @@
 {
-  "name": "DOWNLOAD_TO_PRIVATE_BUCKET",
+  "name": "DOWNLOAD_TO_BUCKET",
   "description": "",
   "version": "0.1.0",
   "dependencies": {

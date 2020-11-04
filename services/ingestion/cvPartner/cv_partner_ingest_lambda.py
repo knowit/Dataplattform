@@ -24,37 +24,22 @@ def ingest(event) -> Data:
 
     data_json = res.json()
 
-    def download_private_cv_doc(person, filename, language: str = 'no', ext: str = 'pdf'):
-        http_request = {'requestUrl': get_cv_link(person['cv']['user_id'],
-                                                  person['cv']['id'], language=language, ext=ext),
-                        'filename': f'private/{filename}',
-                        'filetype': f'{ext}',
-                        'header': {'Authorization': f'Bearer {api_token}'},
-                        'private': True
-                        }
-
-        return save_document(http_request)
-
-    def download_public_image(person, filename, ext: str = 'jpg'):
-        http_request = {'requestUrl': person['cv']['image']['thumb']['url'],
-                        'filename': f'public/{filename}',
-                        'filetype': f'{ext}',
-                        'private': False
-                        }
-
-        return save_document(http_request)
-
     def write_cv_doc_to_private_bucket(person, language: str = 'no', ext: str = 'pdf'):
         new_key = f'cv_{language}_{ext}'
-        filename = f'{uuid4()}.{ext}'
-        key = download_private_cv_doc(person, filename, language, ext)
-        return {new_key: key}
+        filename = f'private/{uuid4()}.{ext}'
+        http_request = {'requestUrl': get_cv_link(person['cv']['user_id'],
+                                                  person['cv']['id'], language=language, ext=ext),
+                        'header': {'Authorization': f'Bearer {api_token}'},
+                        }
+        save_document(http_request, filename=filename, filetype=ext, private=True)
+        return {new_key: filename}
 
     def write_cv_image_to_public_bucket(person, ext: str = 'jpg'):
         new_key = 'image_key'
-        filename = f'{uuid4()}.{ext}'
-        key = download_public_image(person, filename, ext)
-        return {new_key: key}
+        filename = f'public/{uuid4()}.{ext}'
+        http_request = {'requestUrl': person['cv']['image']['thumb']['url']}
+        save_document(http_request, filename=filename, filetype=ext, private=False)
+        return {new_key: filename}
 
     def get_cv_link(user_id, cv_id, language: str = 'no', ext: str = 'pdf'):
         return url_v1 + f"/cvs/download/{user_id}/{cv_id}/{language}/{ext}/"
@@ -63,7 +48,10 @@ def ingest(event) -> Data:
         d = {
             'user_id': person['cv']['user_id'],
             'default_cv_id': person['cv']['id'],
-            'cv_link': url_v1 + f"/cvs/download/{person['cv']['user_id']}/{person['cv']['id']}/{{LANG}}/{{FORMAT}}/"
+            'cv_link': get_cv_link(person['cv']['user_id'],
+                                   person['cv']['id'],
+                                   language='{LANG}',
+                                   ext='{FORMAT}')
         }
 
         d.update(write_cv_image_to_public_bucket(person))
