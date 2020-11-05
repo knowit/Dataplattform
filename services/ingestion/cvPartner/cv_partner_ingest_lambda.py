@@ -1,10 +1,10 @@
 from dataplattform.common.handlers.ingest import IngestHandler
-from dataplattform.common.raw_storage import RawStorage
+from dataplattform.common.helper import save_document
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import requests
-import urllib.request as request
+from uuid import uuid4
 
 url = 'https://knowit.cvpartner.com/api/v3'
 url_v1 = 'https://knowit.cvpartner.com/api/v1'
@@ -24,21 +24,43 @@ def ingest(event) -> Data:
 
     data_json = res.json()
 
-    def get_jpg(image_path):
-        if image_path['url'] is None:
-            return
-        image_res = request.urlopen(image_path['url'])
-        if (image_res.status != 200):
-            return
-        return image_res.read()
+    def write_cv_doc_to_private_bucket(person, language: str = 'no', ext: str = 'pdf'):
+        new_key = f'cv_{language}_{ext}'
+        filename = f'private/{uuid4()}.{ext}'
+        http_request = {'requestUrl': get_cv_link(person['cv']['user_id'],
+                                                  person['cv']['id'], language=language, ext=ext),
+                        'header': {'Authorization': f'Bearer {api_token}'},
+                        }
+        save_document(http_request, filename=filename, filetype=ext, private=True)
+        return {new_key: filename}
+
+    def write_cv_image_to_public_bucket(person, ext: str = 'jpg'):
+        new_key = 'image_key'
+        filename = f'public/{uuid4()}.{ext}'
+        http_request = {'requestUrl': person['cv']['image']['thumb']['url']}
+        save_document(http_request, filename=filename, filetype=ext, private=False)
+        return {new_key: filename}
+
+    def get_cv_link(user_id, cv_id, language: str = 'no', ext: str = 'pdf'):
+        return url_v1 + f"/cvs/download/{user_id}/{cv_id}/{language}/{ext}/"
 
     def get_person(person):
-        return {
+        d = {
             'user_id': person['cv']['user_id'],
             'default_cv_id': person['cv']['id'],
-            'image_key': RawStorage().write_to_public_bucket(get_jpg(person['cv']['image']['thumb']), 'jpg'),
-            'cv_link': url_v1 + f"/cvs/download/{person['cv']['user_id']}/{person['cv']['id']}/{{LANG}}/{{FORMAT}}/"
+            'cv_link': get_cv_link(person['cv']['user_id'],
+                                   person['cv']['id'],
+                                   language='{LANG}',
+                                   ext='{FORMAT}')
         }
+
+        d.update(write_cv_image_to_public_bucket(person))
+        d.update(write_cv_doc_to_private_bucket(person, language='no', ext='pdf'))
+        d.update(write_cv_doc_to_private_bucket(person, language='int', ext='pdf'))
+        d.update(write_cv_doc_to_private_bucket(person, language='no', ext='docx'))
+        d.update(write_cv_doc_to_private_bucket(person, language='int', ext='docx'))
+
+        return d
 
     def get_cv(user_id, cv_id):
         cv = requests.get(url + f'/cvs/{user_id}/{cv_id}',

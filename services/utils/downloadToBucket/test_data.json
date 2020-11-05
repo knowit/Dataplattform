@@ -1,0 +1,8 @@
+{
+    "body": {
+        "requestUrl": "https://test_url.com"
+    },
+    "filename": "filename.pdf",
+    "filetype": "pdf",
+    "private": false
+}

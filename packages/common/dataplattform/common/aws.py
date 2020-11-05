@@ -26,7 +26,7 @@ class S3Result:
 
 class S3:
     def __init__(self, access_path: str = None, bucket: str = None):
-        self.access_path = access_path or environ.get("ACCESS_PATH")
+        self.access_path = environ.get("ACCESS_PATH") if access_path is None else access_path
         self.bucket = bucket or environ.get('DATALAKE')
         self.s3 = boto3.resource('s3')
 
@@ -34,9 +34,12 @@ class S3:
         data_json = data.to_json().encode('utf-8')
         return self.put_raw(data_json, ext='json', path=path)
 
-    def put_raw(self, data: bytes, ext: str, path: str = ''):
+    def put_raw(self, data: bytes, ext: str = '', path: str = '', key: str = None):
         if data is not None:
-            key = path_join(self.access_path, path, f'{uuid4()}.{ext}')
+            if key is None:
+                key = path_join(self.access_path, path, f'{uuid4()}.{ext}')
+            else:
+                key = path_join(self.access_path, path, key)
             s3_object = self.s3.Object(self.bucket, key)
             s3_object.put(Body=data)
             return key

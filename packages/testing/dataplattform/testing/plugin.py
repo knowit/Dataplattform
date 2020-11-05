@@ -29,7 +29,8 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('SQS_QUEUE_NAME', 'test.fifo'),
         ('SQS_MESSAGE_GROUP_ID', 'test_groud_id'),
         ('PRIVATE_BUCKET', 'private_test_bucket'),
-        ('PUBLIC_BUCKET', 'public_test_bucket')
+        ('PUBLIC_BUCKET', 'public_test_bucket'),
+        ('DOWNLOAD_LAMBDA', 'test_download_lambda'),
     ]
     for key, value in default_env:
         if key not in environ:

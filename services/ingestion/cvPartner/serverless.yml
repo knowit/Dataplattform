@@ -75,12 +75,11 @@ functions:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
-      PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
-      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+      DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
     tags: # Tag for this function. Every function are tagged with stage by default
 
     events: # The Events that trigger this Function
@@ -134,6 +133,14 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
+          - PolicyName: ${self:custom.stage}-InvokePublicDownloadLambda-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - lambda:invokeFunction
+                  Resource: !ImportValue ${self:custom.stage}-downloadToBucketArn
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -150,22 +157,6 @@ resources: # The resources your functions use
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:PutObject
-                    - s3:ListObjects*
-                    - s3:GetObject
-                    - s3:CopyObject
-                    - s3:DeleteObjects
-                  Resource:
-                    - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-publicBucketArn
-                        - /public*
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"

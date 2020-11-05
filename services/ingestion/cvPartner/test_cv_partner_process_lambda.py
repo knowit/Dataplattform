@@ -69,6 +69,10 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock):
             'born_year': [1995, 1985],
             'nationality': ["Norwegian", "Swedish"],
             'place_of_residence': ['Oslo', 'Oslo'],
+            'cv_no_pdf': ["cv_no_pdf_key1", "cv_no_pdf_key2"],
+            'cv_int_pdf': ["cv_int_pdf_key1", "cv_int_pdf_key2"],
+            'cv_no_docx': ["cv_no_docx_key1", "cv_no_docx_key2"],
+            'cv_int_docx': ["cv_int_docx_key1", "cv_int_docx_key2"],
             'twitter': ["", "twitter2"]
         }))
 

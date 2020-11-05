@@ -64,6 +64,22 @@ def test_s3_put_raw_data_none(s3_bucket):
     assert key is None
 
 
+def test_s3_put_raw_data_access_path_empty(s3_bucket):
+    s3 = aws.S3(access_path='')
+    input_bytes = 'some_bytes'
+    input_key = 'test_file.txt'
+    key = s3.put_raw(input_bytes, key=input_key)
+    assert key == input_key
+
+
+def test_s3_put_raw_data_with_path(s3_bucket):
+    s3 = aws.S3(access_path='')
+    input_bytes = 'some_bytes'
+    input_key = 'test_file.txt'
+    key = s3.put_raw(input_bytes, key=input_key, path='test')
+    assert key == f'test/{input_key}'
+
+
 def test_ssm_default():
     ssm = aws.SSM()
     assert ssm.path.startswith('/') and\

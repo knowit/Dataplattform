@@ -1,6 +1,12 @@
-from cv_partner_ingest_lambda import handler, url, url_v1
+from cv_partner_ingest_lambda import handler, url, url_v1, offset_size
 from json import loads
 import responses
+from pytest import fixture
+
+
+@fixture(autouse=True)
+def mock_save_document(mocker):
+    mocker.patch('cv_partner_ingest_lambda.save_document')
 
 
 def make_test_json(user_id, cv_id):
@@ -36,10 +42,9 @@ def cv_test_json(cv_id):
 def test_initial_ingest(s3_bucket):
     user_id = '1'
     cv_id = '2'
-    size = 1000
 
     responses.add(responses.GET,
-                  f'{url}/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={size}',
+                  f'{url}/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
                   json=make_test_json(user_id, cv_id), status=200)
     responses.add(responses.GET, f'{url}/cvs/{user_id}/{cv_id}',
                   json=cv_test_json(cv_id), status=200)
@@ -49,22 +54,5 @@ def test_initial_ingest(s3_bucket):
     data = loads(response['Body'].read())
     assert data['data'][0]['user_id'] == user_id
     assert data['data'][0]['default_cv_id'] == cv_id
-    assert data['data'][0]['image_key'] is not None
     cv_link_correct = url_v1 + f'/cvs/download/{user_id}/{cv_id}/{{LANG}}/{{FORMAT}}/'
     assert data['data'][0]['cv_link'] == cv_link_correct
-
-
-def test_public_bucket_image_ingest(s3_public_bucket):
-    user_id = '1'
-    cv_id = '2'
-    size = 1000
-
-    responses.add(responses.GET,
-                  f'{url}/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={size}',
-                  json=make_test_json(user_id, cv_id), status=200)
-    responses.add(responses.GET, f'{url}/cvs/{user_id}/{cv_id}',
-                  json=cv_test_json(cv_id), status=200)
-    handler(None, None)
-    response = s3_public_bucket.Object(next(iter(s3_public_bucket.objects.all())).key).get()
-    data = response['Body']
-    assert data is not None
