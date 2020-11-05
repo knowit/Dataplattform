@@ -46,6 +46,7 @@ class Query(Resource):
                 content_type='application/json')
 
     @ns.expect(parser)
+    @ns.doc(security={'oauth2': ['openid']})
     def get(self):
         args = parser.parse_args()
         try:
@@ -54,6 +55,7 @@ class Query(Resource):
             ns.abort(500, e)
 
     @ns.expect(QueryRequest)
+    @ns.doc(security={'oauth2': ['openid']})
     def post(self):
         try:
             return self.query(ns.payload['sql'], ns.payload.get('format', 'json'))
@@ -80,6 +82,7 @@ filter_parser.add_argument(
 @ns.route('/query/report/<name>', strict_slashes=False)
 class QueryReport(Resource):
     @ns.expect(filter_parser)
+    @ns.doc(security={'oauth2': ['openid']})
     def get(self, name):
         filters = filter_parser.parse_args().get('filter', [])
 

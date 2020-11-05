@@ -27,12 +27,14 @@ CreateReportModel = ns.model(
 @ns.route('/report', strict_slashes=False)
 class Report(Resource):
     @ns.marshal_with(ReportModel, as_list=True)
+    @ns.doc(security={'oauth2': ['openid']})
     def get(self):
         with ReportsRepository() as repo:
             return repo.all()
 
     @ns.expect(CreateReportModel)
     @ns.marshal_with(ReportModel, code=201)
+    @ns.doc(security={'oauth2': ['openid']})
     def post(self):
         return report_service.new_report(ns.payload)
 
@@ -41,6 +43,7 @@ class Report(Resource):
 @ns.param('name', 'Name of the report')
 class ReportItem(Resource):
     @ns.response(204, 'Report deleted')
+    @ns.doc(security={'oauth2': ['openid']})
     def delete(self, name):
         with ReportsRepository() as repo:
             repo.delete(name)

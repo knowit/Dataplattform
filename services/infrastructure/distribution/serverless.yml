@@ -13,6 +13,9 @@ custom:
   forwardedHeaders:
     - Accept
     - Content-Type
+    - Access-Control-Request-Headers
+    - Access-Control-Request-Method
+    - Origin
     - Authorization
 
 provider:
@@ -30,14 +33,6 @@ resources:
           Aliases:
             - ${self:custom.stage}-api.dataplattform.knowit.no
           Origins:
-            - DomainName: y6onyk7883.execute-api.eu-central-1.amazonaws.com # TODO: ref
-              OriginPath: /${self:custom.stage}
-              Id: ${self:custom.stage}-catalogue-api-origin
-              CustomOriginConfig:
-                HTTPSPort: 443
-                OriginProtocolPolicy: https-only
-                OriginSSLProtocols:
-                  - TLSv1.2
             - DomainName: 8z9couwu46.execute-api.eu-central-1.amazonaws.com # TODO: ref
               OriginPath: /${self:custom.stage}
               Id: ${self:custom.stage}-data-api-origin
@@ -46,30 +41,9 @@ resources:
                 OriginProtocolPolicy: https-only
                 OriginSSLProtocols:
                   - TLSv1.2
-            - DomainName: ${self:custom.stage}-dataplattform-users.auth.eu-central-1.amazoncognito.com
-              Id: ${self:custom.stage}-cognito-route
-              CustomOriginConfig:
-                HTTPSPort: 443
-                OriginProtocolPolicy: https-only
-                OriginSSLProtocols:
-                  - TLSv1.2
-          CacheBehaviors:
-            - TargetOriginId: ${self:custom.stage}-catalogue-api-origin
-              PathPattern: /catalogue/*
-              ForwardedValues:
-                QueryString: true
-                Headers: ${self:custom.forwardedHeaders}
-              ViewerProtocolPolicy: redirect-to-https
-              AllowedMethods: ${self:custom.allowedMethods}
-            - TargetOriginId: ${self:custom.stage}-data-api-origin
-              PathPattern: /data/*
-              ForwardedValues:
-                QueryString: true
-                Headers: ${self:custom.forwardedHeaders}
-              ViewerProtocolPolicy: redirect-to-https
-              AllowedMethods: ${self:custom.allowedMethods}
+
           DefaultCacheBehavior:
-            TargetOriginId: ${self:custom.stage}-cognito-route
+            TargetOriginId: ${self:custom.stage}-data-api-origin
             ForwardedValues:
               QueryString: true
               Headers: ${self:custom.forwardedHeaders}
