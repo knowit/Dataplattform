@@ -16,7 +16,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         return df
 
     df_new = pd.concat([make_dataframe(d) for d in data])
-    print(df_new)
     return {
         'activeDirectory': df_new
     }

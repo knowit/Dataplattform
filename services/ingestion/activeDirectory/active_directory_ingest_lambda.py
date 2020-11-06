@@ -17,9 +17,6 @@ def ingest(event) -> Data:
         for user in data:
             user_details = user['userDetails']
             list_of_users.append(user_details)
-            print(user_details)
-            print("----------")
-            break
         return list_of_users
 
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=get_list_of_users(data_json))
