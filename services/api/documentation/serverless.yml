@@ -1,0 +1,89 @@
+service: api-documentation
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  service: ${self:custom.stage}-${self:service}
+  bucketName: ${self:custom.service}-static-web
+  stageDomains:
+    dev: 
+      - dev.dataplattform.knowit.no
+      - dev-doc.dataplattform.knowit.no
+    prod: 
+      - dataplattform.knowit.no
+      - doc.dataplattform.knowit.no
+  domain: ${self:custom.stageDomains.${self:custom.stage}}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  runtime: nodejs12.x
+  stackName: ${self:custom.service}
+  timeout: 25
+
+resources:
+  Resources:
+    StaticS3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucketName}
+        AccessControl: PublicRead
+        WebsiteConfiguration:
+          IndexDocument: index.html
+          ErrorDocument: index.html
+
+    StaticS3BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: StaticS3Bucket
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: '*'
+              Action:
+                - s3:GetObject
+              Resource: arn:aws:s3:::${self:custom.bucketName}/*
+
+    Distribution:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Enabled: true
+          Aliases: ${self:custom.domain}
+          Origins:
+            - DomainName: ${self:custom.bucketName}.s3-website.${self:provider.region}.amazonaws.com
+              Id: ${self:custom.service}-default-origin
+              CustomOriginConfig:
+                HTTPPort: 80
+                OriginProtocolPolicy: http-only
+          DefaultRootObject: index.html
+          CustomErrorResponses:
+            - ErrorCode: 404
+              ResponseCode: 200
+              ResponsePagePath: /index.html
+          DefaultCacheBehavior:
+            TargetOriginId: ${self:custom.service}-default-origin
+            ForwardedValues:
+                QueryString: false
+            ViewerProtocolPolicy: redirect-to-https
+          PriceClass: PriceClass_100
+          ViewerCertificate:
+            AcmCertificateArn: 
+              Fn::Join: 
+                - ':'
+                - - 'arn:aws:acm:us-east-1'
+                  - !Ref 'AWS::AccountId'
+                  - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+            MinimumProtocolVersion: TLSv1.2_2019
+            SslSupportMethod: sni-only
+
+  Outputs:
+    StaticBucketOutput:
+      Value:
+        'Ref': StaticS3Bucket
+    DistributionOutput:
+      Value:
+        'Fn::GetAtt': [Distribution, DomainName]
+
