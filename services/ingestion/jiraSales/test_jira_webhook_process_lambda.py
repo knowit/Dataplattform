@@ -1,4 +1,4 @@
-from jira_webhook_process_lambda import handler
+from jira_process_lambda import handler
 from dataplattform.common import schema
 from json import load
 import pandas as pd
