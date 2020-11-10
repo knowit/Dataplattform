@@ -56,3 +56,4 @@ def test_insert_data(s3_bucket):
     assert data['data']['issue'] == 'TEST-1234' and\
         data['data']['customer'] == 'Test Testerson' and\
         data['data']['issue_status'] == 'Open'
+# some change to trigger pr run
