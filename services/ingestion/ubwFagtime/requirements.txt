@@ -1,5 +1,4 @@
 file:../../../packages/common
 file:../../../packages/query
-zeep
-xmltodict
-pandas
+zeep==3.4
+xmltodict==0.12

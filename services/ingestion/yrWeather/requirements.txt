@@ -1,5 +1,4 @@
 file:../../../packages/common
-requests
-xmltodict
-numpy
-pandas
+requests==2.23
+xmltodict==0.12
+numpy==1.18

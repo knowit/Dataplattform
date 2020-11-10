@@ -1,3 +1,2 @@
 file:../../../packages/common
-google-api-python-client
-pandas
+google-api-python-client==1.8
