@@ -1,6 +1,6 @@
-flask
-flask_restx
-werkzeug
-flask-cors
+flask==1.1
+flask_restx==0.2
+werkzeug==1.0
+flask-cors==3.0
 file:./common_lib
 file:../../../packages/api

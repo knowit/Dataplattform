@@ -1,1 +1,1 @@
-python-jose
+python-jose==3.1
