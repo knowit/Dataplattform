@@ -80,6 +80,11 @@ functions:
           cors: true
       - http:
           method: ANY
+          path: /catalogue/{proxy+}
+          authorizer: ${self:custom.authorizer}
+          cors: true
+      - http:
+          method: ANY
           path: /{proxy+}
           cors: true
       - http:
