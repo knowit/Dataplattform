@@ -1,5 +1,5 @@
 file:../../../packages/common
 file:../../../packages/query
-requests==2.23
-beautifulsoup4==4.9
-lxml==4.5
+requests
+beautifulsoup4
+lxml

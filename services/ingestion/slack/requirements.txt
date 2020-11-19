@@ -1,3 +1,4 @@
 file:../../../packages/common
-emojis==0.5
-requests==2.23
+emojis
+requests
+pandas

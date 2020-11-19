@@ -1,3 +1,4 @@
-requests==2.23
+pandas
+requests
 file:../../../packages/common
 file:../../../packages/query
