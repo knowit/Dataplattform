@@ -77,7 +77,9 @@ def test_table_content(client):
     res = response.json
     assert all([
         res['columns'] is not None,
-        res['columns'][0]['name'] == 'col1'
+        res['columns'][0]['name'] == 'col1',
+        res['lastAccessTime'] is not None,
+        res['updateTime'] is not None
     ])
 
 
@@ -107,3 +109,19 @@ def test_tables_route_content(client):
         res[0]['columns'] is not None,
         res[0]['columns'][0]['name'] == 'col1'
     ])
+
+
+def test_tables_no_update_or_last_access_time_is_200(client):
+    response = client.get('/catalogue/table/test_table_no_update')
+    assert response.status_code == 200
+
+
+def test_tables_no_update_or_last_access_time(client):
+    response = client.get('/catalogue/table/test_table_no_update')
+    res = response.json
+
+    with pytest.raises(KeyError):
+        res['LastAccessTime'] is None,
+
+    with pytest.raises(KeyError):
+        res['UpdateTime'] is None,

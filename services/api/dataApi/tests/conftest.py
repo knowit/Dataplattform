@@ -34,6 +34,18 @@ def glue_test_data():
                         }]
                     },
                     'PartitionKeys': []
+                },
+                'test_table_no_update': {
+                    'Name': 'test_table',
+                    'DatabaseName': 'test_database',
+                    'CreateTime': d,
+                    'StorageDescriptor': {
+                        'Columns': [{
+                            'Name': 'col1',
+                            'Type': 'string',
+                        }]
+                    },
+                    'PartitionKeys': []
                 }
             }
         },
