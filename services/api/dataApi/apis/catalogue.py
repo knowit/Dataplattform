@@ -148,7 +148,3 @@ class Table(Resource):
             ns.abort(404)
         except (GlueRepositoryException, Exception) as e:
             ns.abort(500, str(e))
-
-
-if __name__ == '__main__':
-    app.run(debug=True)
