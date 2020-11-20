@@ -1,4 +1,0 @@
-file:../../../packages/api
-flask==1.1
-flask_restx==0.2
-werkzeug==1.0

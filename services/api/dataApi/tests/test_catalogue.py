@@ -13,11 +13,6 @@ def client():
         yield client
 
 
-def test_root_spec(client):
-    response = client.get('/')
-    assert response.status_code == 200
-
-
 def test_database_route(client):
     response = client.get('/catalogue/database/test_database')
     assert response.status_code == 200
