@@ -63,8 +63,8 @@ class TableList(Resource):
                     'name': table['Name'],
                     'databaseName': table['DatabaseName'],
                     'createTime': table['CreateTime'],
-                    'updateTime': table['UpdateTime'],
-                    'lastAccessTime': table['LastAccessTime'],
+                    'updateTime': table.get('UpdateTime'),
+                    'lastAccessTime': table.get('LastAccessTime'),
                     'columns': [
                         {'name': column['Name'], 'type': column['Type']}
                         for column in [*table['StorageDescriptor']['Columns'], *table['PartitionKeys']]
@@ -136,8 +136,8 @@ class Table(Resource):
                 'name': table['Name'],
                 'databaseName': table['DatabaseName'],
                 'createTime': table['CreateTime'],
-                'updateTime': table['UpdateTime'],
-                'lastAccessTime': table['LastAccessTime'],
+                'updateTime': table.get('UpdateTime'),
+                'lastAccessTime': table.get('LastAccessTime'),
                 'columns': [
                     {'name': column['Name'], 'type': column['Type']}
                     for column in [*table['StorageDescriptor']['Columns'], *table['PartitionKeys']]
