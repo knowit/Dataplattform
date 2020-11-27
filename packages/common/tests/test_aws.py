@@ -2,6 +2,7 @@ from dataplattform.common import aws, schema
 from os import environ
 from pytest import mark
 import re
+from json import loads
 
 uuid_regex = r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}'
 
@@ -239,3 +240,16 @@ def test_sqs_send_message_attributes(sqs_queue):
 
     message = next(iter(sqs_queue.receive_messages()))
     assert message.message_attributes['s3FileName']['StringValue'] == 'file_name'
+
+
+def test_sns_send_message(sqs_queue, sns_topic):
+    sns_topic.subscribe(Protocol='sqs', Endpoint=sqs_queue.attributes['QueueArn'])
+
+    sns = aws.SNS(sns_topic.arn)
+    sns.publish({'test_key': 'test_value'}, "TEST_SUBJECT")
+
+    sqs_message = loads(next(iter(sqs_queue.receive_messages())).body)
+    assert sqs_message['Subject'] == "TEST_SUBJECT"
+
+    sns_message = loads(sqs_message['Message'])
+    assert sns_message['test_key'] == 'test_value'

@@ -1,5 +1,5 @@
 from pytest import fixture, hookimpl
-from moto import mock_s3, mock_ssm, mock_sqs
+from moto import mock_s3, mock_ssm, mock_sqs, mock_sns
 from boto3 import resource, client
 from os import environ
 from unittest.mock import patch, MagicMock
@@ -31,6 +31,7 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('PRIVATE_BUCKET', 'private_test_bucket'),
         ('PUBLIC_BUCKET', 'public_test_bucket'),
         ('DOWNLOAD_LAMBDA', 'test_download_lambda'),
+        ('SNS_TOPIC_NAME', 'test_sns_topic'),
     ]
     for key, value in default_env:
         if key not in environ:
@@ -89,6 +90,15 @@ def sqs_queue():
         sqs = resource('sqs')
         sqs.create_queue(QueueName=environ.get('SQS_QUEUE_NAME'))
         yield sqs.get_queue_by_name(QueueName=environ.get('SQS_QUEUE_NAME'))
+
+
+@fixture(autouse=True)
+def sns_topic():
+    with mock_sns():
+        sns = resource('sns')
+        topic = sns.create_topic(Name=environ.get('SNS_TOPIC_NAME'))
+        environ['DATA_UPDATE_TOPIC'] = topic.arn
+        yield topic
 
 
 @fixture(autouse=True)
