@@ -1,7 +1,6 @@
 import pytest
 import app
 import urllib.parse
-import boto3
 
 
 @pytest.fixture

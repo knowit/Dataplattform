@@ -1,5 +1,4 @@
 import pytest
-import boto3
 import datetime
 from botocore.exceptions import ClientError
 

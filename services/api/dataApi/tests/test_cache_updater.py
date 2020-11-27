@@ -54,7 +54,7 @@ def reports_repo_mock(mocker, test_report):
     )
     builder_get_by_tables.return_value = [test_report]
     builder_get.return_value = test_report
-    update_time_mock_builder = mocker.patch(
+    mocker.patch(
         "functions.cache_updater.ReportsRepository.update_cache_time"
     )
 

@@ -1,6 +1,5 @@
 from datetime import datetime
 from os import environ
-from unittest import mock
 from unittest.mock import patch
 
 from moto import mock_dynamodb2
@@ -58,14 +57,6 @@ def dynamo_mock(db_data):
                 }
             )
         yield table
-
-
-# @pytest.fixture(autouse=True)
-# def datetime_now_mock(mocker):
-#    builder_datetime_now = mocker.patch(
-#        "common.repositories.reports.ReportsRepository.datetime.datetime.now"
-#    )
-#    builder_datetime_now.return_value = "updated_date"
 
 
 def test_get(dynamo_mock):
