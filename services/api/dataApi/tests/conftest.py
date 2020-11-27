@@ -107,7 +107,40 @@ def mocked_glue_services(mocker, glue_test_data):
     glue_mock.get_paginator = mocker.MagicMock(
         side_effect=mock_paginator_side_effect
     )
+    yield glue_mock
+
+
+@pytest.fixture(autouse=True)
+def mocked_athena_services(mocker):
+    athena_mock = mocker.MagicMock()
+
+    athena_mock.get_query_execution = mocker.MagicMock(
+        return_value={
+            'QueryExecution': {
+                'Status': {'State': 'SUCCEEDED'},
+                'ResultConfiguration': {'OutputLocation': 's3://testlake/query/mock.csv'}
+            }
+        })
+    yield athena_mock
+
+
+@pytest.fixture(autouse=True)
+def mock_services(mocker, mocked_glue_services, mocked_athena_services):
+    def find_service(service):
+        if service == "glue":
+            return mocked_glue_services
+        elif service == "athena":
+            return mocked_athena_services
+        else:
+            return mocker.DEFAULT
 
     mocker.patch(
-        'boto3.client',
-        side_effect=lambda service: glue_mock if service == 'glue' else boto3.client(service))
+        "boto3.client",
+        side_effect=find_service
+    )
+
+
+@pytest.fixture(autouse=True)
+def setup_mock_athena_result(s3_bucket):
+    mock_data = '"col0","col1"\n"row0",0\n"row1",1'
+    s3_bucket.Object('query/mock.csv').put(Body=mock_data.encode('utf-8'))
