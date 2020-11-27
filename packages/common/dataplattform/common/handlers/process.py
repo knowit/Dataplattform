@@ -1,10 +1,11 @@
-from dataplattform.common.aws import S3
+from dataplattform.common.aws import S3, SNS
 from dataplattform.common.handlers import Response, verify_schema, make_wrapper_func
 from datetime import datetime
 import numpy as np
 import pandas as pd
 from typing import Dict, Any, Callable, List, AnyStr
 from warnings import catch_warnings, filterwarnings
+from os import environ
 
 with catch_warnings():
     filterwarnings("ignore")
@@ -68,6 +69,7 @@ class ProcessHandler:
                 ] if key
             ]
 
+        updated_lists = []
         tables = self.wrapped_func['process'](load_event_data(event), event.get('Records', []))
         partitions = self.wrapped_func_args.get(
             'process', {}).get('partitions', {})
@@ -75,15 +77,19 @@ class ProcessHandler:
         overwrite = self.wrapped_func_args.get(
             'process', {}).get('overwrite', False)
 
+        updated_tables = []
+
         for table_name, frame in tables.items():
             if frame is None:
                 continue
 
-            assert isinstance(frame, pd.DataFrame),\
+            assert isinstance(frame, pd.DataFrame), \
                 'Process must return a DataFrame'
 
             if frame.empty:
                 continue
+
+            updated_lists.append(table_name)
 
             table_partitions = partitions.get(table_name, [])
             frame = ensure_partitions_has_values(frame, table_partitions)
@@ -104,6 +110,11 @@ class ProcessHandler:
                              open_with=s3.fs.open,
                              append=table_exists)
 
+            updated_tables.append(table_name)
+
+        sns = SNS(environ.get('DATA_UPDATE_TOPIC'))
+        sns.publish({'tables': updated_tables}, 'DataUpdate')
+
         return Response().to_dict()
 
     def process(self, partitions, overwrite=False):
@@ -111,4 +122,5 @@ class ProcessHandler:
             self.wrapped_func['process'] = make_wrapper_func(f, dict)
             self.wrapped_func_args['process'] = dict(partitions=partitions, overwrite=overwrite)
             return self.wrapped_func['process']
+
         return wrap

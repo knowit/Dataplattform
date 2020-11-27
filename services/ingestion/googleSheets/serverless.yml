@@ -123,6 +123,7 @@ functions:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+      DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
     tags: # Tag for this function. Every function are tagged with stage by default
     
 
