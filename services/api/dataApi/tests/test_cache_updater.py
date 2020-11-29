@@ -1,6 +1,7 @@
 import functions.cache_updater as cache_updater
 import pandas as pd
 import pytest
+from io import BytesIO
 
 
 @pytest.fixture
@@ -61,13 +62,13 @@ def reports_repo_mock(mocker, test_report):
 
 def test_cache_updater_handler_data_update(s3_bucket, test_event_data_update):
     cache_updater.handler(test_event_data_update, None)
-    s3_bucket.Object('reports/level-3/testReport.gzip').download_file('/tmp/testUpdateReport.gzip')
-    result = pd.read_parquet('/tmp/testUpdateReport.gzip', engine='fastparquet').to_csv()
+    res = BytesIO(s3_bucket.Object('reports/level-3/testReport.gzip').get()['Body'].read())
+    result = pd.read_parquet(res, engine='fastparquet').to_csv()
     assert len(result) > 0 and 'col0' in result
 
 
 def test_cache_updater_handler_data_new(s3_bucket, test_event_new_report):
     cache_updater.handler(test_event_new_report, None)
-    s3_bucket.Object('reports/level-3/testReport.gzip').download_file('/tmp/testUpdateReport.gzip')
-    result = pd.read_parquet('/tmp/testUpdateReport.gzip', engine='fastparquet').to_csv()
+    res = BytesIO(s3_bucket.Object('reports/level-3/testReport.gzip').get()['Body'].read())
+    result = pd.read_parquet(res, engine='fastparquet').to_csv()
     assert len(result) > 0 and 'col0' in result
