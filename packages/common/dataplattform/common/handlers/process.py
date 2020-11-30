@@ -69,7 +69,6 @@ class ProcessHandler:
                 ] if key
             ]
 
-        updated_lists = []
         tables = self.wrapped_func['process'](load_event_data(event), event.get('Records', []))
         partitions = self.wrapped_func_args.get(
             'process', {}).get('partitions', {})
@@ -88,8 +87,6 @@ class ProcessHandler:
 
             if frame.empty:
                 continue
-
-            updated_lists.append(table_name)
 
             table_partitions = partitions.get(table_name, [])
             frame = ensure_partitions_has_values(frame, table_partitions)
