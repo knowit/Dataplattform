@@ -60,7 +60,6 @@ class ReportsRepository(DynamoDBRepository):
             )
         except ClientError as e:
             if e.response['Error']['Code'] == "ConditionalCheckFailedException":
-                print(e.response['Error']['Message'])
                 raise KeyError("Could not find report with name: " + name) from e
             else:
                 raise
