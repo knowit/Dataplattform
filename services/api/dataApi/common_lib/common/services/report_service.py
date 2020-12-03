@@ -1,16 +1,19 @@
 from common.repositories.reports import ReportsRepository
-from dataplattform.common.aws import SNS
 from common.services.athena_engine import process_sql
 from typing import Dict
 from functools import reduce
 import re
+import boto3
 import json
 from os import environ
 
 
 def pub_new_report(report: str):
-    sns = SNS(environ.get('NEW_REPORT_TOPIC'))
-    sns.publish(json.dumps({'report': report}), 'NewReport')
+    sns = boto3.resource('sns')
+    topic = sns.Topic(environ.get('NEW_REPORT_TOPIC'))
+    topic.publish(
+        Message=json.dumps({'report': report}),
+        Subject='NewReport')
 
 
 def new_report(new_report: Dict[str, str]):
