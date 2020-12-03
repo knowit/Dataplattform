@@ -1,7 +1,8 @@
-from boto3.dynamodb.conditions import Attr
-from common.repositories.dynamo_db import DynamoDBRepository
-from os import environ
 from datetime import datetime
+from os import environ
+
+from boto3.dynamodb.conditions import Key
+from common.repositories.dynamo_db import DynamoDBRepository
 
 
 class ReportsRepository(DynamoDBRepository):
@@ -35,11 +36,9 @@ class ReportsRepository(DynamoDBRepository):
             Item={
                 'name': model['name'],
                 'queryString': model['queryString'],
-                'tables':  model['tables'],
+                'tables': model['tables'],
                 'dataProtection': model['dataProtection'],
                 'created': now.isoformat(),
-                'lastUsed': None,
-                'lastCacheUpdate': None
             },
             Expected={
                 'name': {'Exists': False}
@@ -53,16 +52,18 @@ class ReportsRepository(DynamoDBRepository):
         try:
             self.table.update_item(
                 Key={'name': name},
-                AttributeUpdates={
-                    'lastCacheUpdate': {
-                        'Value': now.isoformat(),
-                        'Action': 'PUT'
-                    }
+                UpdateExpression="set lastCacheUpdate = :now",
+                ExpressionAttributeValues={
+                    ':now': now.isoformat()
                 },
-                ConditionExpression=Attr("name").eq(name)
+                ConditionExpression=Key("name").eq(name)
             )
-        except ClientError:
-            raise KeyError("Could not find report with name: "+name)
+        except ClientError as e:
+            if e.response['Error']['Code'] == "ConditionalCheckFailedException":
+                print(e.response['Error']['Message'])
+                raise KeyError("Could not find report with name: " + name) from e
+            else:
+                raise
 
     def delete(self, name: str):
         self.table.delete_item(

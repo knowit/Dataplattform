@@ -18,6 +18,7 @@ custom:
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-sqs-test.fifo
   sqsQueueDLName: ${self:custom.stage}-sqs-test-dl.fifo
+  snsUpdateTopic: !ImportValue ${self:custom.stage}-data-update-topic-arn
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
@@ -115,7 +116,7 @@ functions:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
-      DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
+      DATA_UPDATE_TOPIC: ${self:custom:snsUpdateTopic}
     tags: # Tag for this function. Every function are tagged with stage by default
 
 resources: # The resources your functions use
@@ -192,6 +193,14 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-snsRole
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sns:Publish
+                  Resource: ${self:custom:snsUpdateTopic}
     EventQueue:
       Type: AWS::SQS::Queue
       Properties: 

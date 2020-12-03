@@ -106,8 +106,6 @@ def test_create(dynamo_mock):
     new_item_result = dynamo_mock.get_item(Key={"name": "new_report"})
     assert new_item_result['Item']['name'] == "new_report"
     assert new_item_result['Item']['created'] is not None
-    assert new_item_result['Item']['lastUsed'] is None
-    assert new_item_result['Item']['lastCacheUpdate'] is None
 
 
 def test_update_cache_time(dynamo_mock):
