@@ -3,4 +3,5 @@ flask_restx
 werkzeug
 flask-cors
 file:./common_lib
+file:../../../packages/common
 file:../../../packages/api
