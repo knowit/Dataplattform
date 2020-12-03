@@ -224,6 +224,7 @@ resources:
                   Action:
                     - glue:GetTable
                     - glue:GetDatabase
+                    - glue:GetPartitions
                   Resource: 
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
