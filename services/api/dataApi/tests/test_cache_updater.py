@@ -1,60 +1,8 @@
 from io import BytesIO
-from os import environ
 
-import boto3
 import functions.cache_updater as cache_updater
 import pandas as pd
 import pytest
-from moto import mock_dynamodb2
-
-
-@pytest.fixture
-def db_data():
-    yield [
-        {
-            "created": "2020-10-14T10:32:23.971390",
-            "dataProtection": 3,
-            "lastCacheUpdate": "2020-12-02T15:13:39.165031",
-            "name": "testReport",
-            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
-            "tables": [
-                "test_table1",
-                "test_table2"
-            ]
-        },
-        {
-            "created": "2020-10-14T10:32:23.971390",
-            "dataProtection": 3,
-            "lastCacheUpdate": "2020-12-02T15:13:39.165031",
-            "name": "anotherReport",
-            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
-            "tables": [
-                "test_table3",
-                "test_table4"
-            ]
-        }
-
-    ]
-
-
-@pytest.fixture
-def dynamo_mock(db_data):
-    with mock_dynamodb2():
-        db = boto3.resource('dynamodb')
-        table = db.create_table(
-            AttributeDefinitions=[{'AttributeName': "name", 'AttributeType': 'S'}],
-            TableName=f'{environ.get("STAGE", "dev")}_reports_table',
-            KeySchema=[{'AttributeName': "name", 'KeyType': 'HASH'}],
-            ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
-        )
-        for item in db_data:
-            table.put_item(
-                Item=item,
-                Expected={
-                    'name': {'Exists': False}
-                }
-            )
-        yield table
 
 
 @pytest.fixture

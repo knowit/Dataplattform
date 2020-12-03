@@ -1,6 +1,10 @@
+from os import environ
 import pytest
 import datetime
+
+import boto3
 from botocore.exceptions import ClientError
+from moto import mock_dynamodb2
 
 
 @pytest.fixture
@@ -143,3 +147,54 @@ def mock_services(mocker, mocked_glue_services, mocked_athena_services):
 def setup_mock_athena_result(s3_bucket):
     mock_data = '"col0","col1"\n"row0",0\n"row1",1'
     s3_bucket.Object('query/mock.csv').put(Body=mock_data.encode('utf-8'))
+
+
+@pytest.fixture
+def db_data():
+    yield [
+        {
+            "created": "2020-10-14T10:32:23.971390",
+            "dataProtection": 3,
+            "lastCacheUpdate": "2020-10-14T10:32:23.971390",
+            "lastUsed": None,
+            "name": "testReport",
+            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
+            "tables": [
+                "test_table1",
+                "test_table2"
+            ]
+        },
+        {
+            "created": "2020-10-14T10:32:23.971390",
+            "dataProtection": 3,
+            "lastCacheUpdate": "2020-10-14T10:32:23.971390",
+            "lastUsed": None,
+            "name": "anotherReport",
+            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
+            "tables": [
+                "test_table3",
+                "test_table4"
+            ]
+        }
+
+    ]
+
+
+@pytest.fixture
+def dynamo_mock(db_data):
+    with mock_dynamodb2():
+        db = boto3.resource('dynamodb')
+        table = db.create_table(
+            AttributeDefinitions=[{'AttributeName': "name", 'AttributeType': 'S'}],
+            TableName=f'{environ.get("STAGE", "dev")}_reports_table',
+            KeySchema=[{'AttributeName': "name", 'KeyType': 'HASH'}],
+            ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+        )
+        for item in db_data:
+            table.put_item(
+                Item=item,
+                Expected={
+                    'name': {'Exists': False}
+                }
+            )
+        yield table

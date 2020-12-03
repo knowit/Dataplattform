@@ -1,62 +1,8 @@
 from datetime import datetime
-from os import environ
 from unittest.mock import patch
 
-from moto import mock_dynamodb2
-import boto3
 import pytest
 from common.repositories.reports import ReportsRepository
-
-
-@pytest.fixture
-def db_data():
-    yield [
-        {
-            "created": "2020-10-14T10:32:23.971390",
-            "dataProtection": 3,
-            "lastCacheUpdate": "2020-10-14T10:32:23.971390",
-            "lastUsed": None,
-            "name": "testReport",
-            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
-            "tables": [
-                "test_table1",
-                "test_table2"
-            ]
-        },
-        {
-            "created": "2020-10-14T10:32:23.971390",
-            "dataProtection": 3,
-            "lastCacheUpdate": "2020-10-14T10:32:23.971390",
-            "lastUsed": None,
-            "name": "anotherReport",
-            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
-            "tables": [
-                "test_table3",
-                "test_table4"
-            ]
-        }
-
-    ]
-
-
-@pytest.fixture
-def dynamo_mock(db_data):
-    with mock_dynamodb2():
-        db = boto3.resource('dynamodb')
-        table = db.create_table(
-            AttributeDefinitions=[{'AttributeName': "name", 'AttributeType': 'S'}],
-            TableName=f'{environ.get("STAGE", "dev")}_reports_table',
-            KeySchema=[{'AttributeName': "name", 'KeyType': 'HASH'}],
-            ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
-        )
-        for item in db_data:
-            table.put_item(
-                Item=item,
-                Expected={
-                    'name': {'Exists': False}
-                }
-            )
-        yield table
 
 
 def test_get(dynamo_mock):
