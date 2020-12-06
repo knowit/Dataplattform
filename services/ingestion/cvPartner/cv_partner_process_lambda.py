@@ -40,11 +40,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv_no_pdf',
         'cv_int_pdf',
         'cv_no_docx',
-        'cv_int_docx'
-        ]
-
-    image_table = [
-        'user_id',
+        'cv_int_docx',
         'image_key'
         ]
 
@@ -62,7 +58,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv.title.no': 'title'}, inplace=True)
     employee_df['born_year'] = column_type_to_int(employee_df['born_year'])
     employee_df = employee_df.fillna("")
-    image_df = df[image_table].copy()
 
     """
     Transforms:
@@ -262,6 +257,5 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv_partner_languages': create_languages_df(df),
         'cv_partner_project_experience': create_project_experiences_df(df),
         'cv_partner_technology_skills': create_technologies_df(df),
-        'cv_partner_work_experience': create_work_experiences_df(df),
-        'cv_partner_employee_images': image_df
+        'cv_partner_work_experience': create_work_experiences_df(df)
     }
