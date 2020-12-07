@@ -46,8 +46,7 @@ def test_initial_process(setup_queue_event, test_data, create_table_mock):
         'cv_partner_languages',
         'cv_partner_project_experience',
         'cv_partner_technology_skills',
-        'cv_partner_work_experience',
-        'cv_partner_employee_images')
+        'cv_partner_work_experience')
 
 
 def test_process_table_content(setup_queue_event, test_data, create_table_mock):
@@ -73,23 +72,9 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock):
             'cv_int_pdf': ["cv_int_pdf_key1", "cv_int_pdf_key2"],
             'cv_no_docx': ["cv_no_docx_key1", "cv_no_docx_key2"],
             'cv_int_docx': ["cv_int_docx_key1", "cv_int_docx_key2"],
+            'image_key': ["image_key1", "image_key2"],
             'twitter': ["", "twitter2"]
         }))
-
-
-def test_process_image_table_content(setup_queue_event, test_data, create_table_mock):
-    event = setup_queue_event(
-        schema.Data(
-            metadata=schema.Metadata(timestamp=0),
-            data=test_data['data']))
-
-    handler(event, None)
-    create_table_mock.assert_table_data_contains_df(
-        'cv_partner_employee_images',
-        pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_2'],
-            'image_key': ["image_key1", "image_key2"],
-            }))
 
 
 def test_process_table_content_missing_born_date(setup_queue_event, test_data, create_table_mock):
