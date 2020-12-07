@@ -116,7 +116,7 @@ functions:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
-      DATA_UPDATE_TOPIC: ${self:custom:snsUpdateTopic}
+      DATA_UPDATE_TOPIC: ${self:custom.snsUpdateTopic}
     tags: # Tag for this function. Every function are tagged with stage by default
 
 resources: # The resources your functions use
@@ -176,6 +176,7 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+          - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
@@ -193,14 +194,6 @@ resources: # The resources your functions use
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-snsRole
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - sns:Publish
-                  Resource: ${self:custom:snsUpdateTopic}
     EventQueue:
       Type: AWS::SQS::Queue
       Properties: 
