@@ -20,7 +20,7 @@ def make_test_json(user_details):
 
 
 def test_initial_ingest(s3_bucket, test_data):
-    responses.add(responses.GET, f'http://10.205.0.5:20201/api/Users', json=make_test_json(test_data), status=200)
+    responses.add(responses.GET, 'http://10.205.0.5:20201/api/Users', json=make_test_json(test_data), status=200)
 
     handler(None, None)
 
