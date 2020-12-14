@@ -51,5 +51,5 @@ def delete_report(name: str):
     with ReportsRepository() as repo:
         report = repo.get(name)
         repo.delete(report['name'])
-        pub_delete_report(report['name'], report['dataProtection'])
+        pub_delete_report(report['name'], int(report['dataProtection']))
     return f"Deleted ${name}"

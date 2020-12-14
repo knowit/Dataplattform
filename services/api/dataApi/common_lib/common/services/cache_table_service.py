@@ -46,6 +46,11 @@ def query_cache_table(protection: int, name: str):
     return query
 
 
+def delete_cache_table(protection: int, name: str):
+    cached_object(protection, name).delete()
+    return True
+
+
 def cache_table(protection: int, name: str):
     cache_object = cached_object(protection, name)
 

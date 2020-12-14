@@ -121,6 +121,26 @@ functions:
           arn: !ImportValue ${self:custom.stage}-data-update-topic-arn
           topicName: ${self:custom.stage}-DataUpdate
 
+  CacheDeleter:
+    handler: cache_deleter.handler
+    module: functions
+    name: ${self:custom.service}-CacheDeleter
+    description: Dataplattform API Cache deleter
+    role:  !GetAtt CacheUpdaterRole.Arn
+    package:
+      include:
+        - 'functions/cache_deleter.py'
+    # destinations: # TODO
+    #   onSuccess: xxx:xxx:target
+    #   onFailure: xxx:xxx:target
+    environment:
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      STAGE: ${self:custom.stage}
+    events:
+      - sns:
+          arn: !ImportValue ${self:custom.stage}-delete-report-topic-arn
+          topicName: ${self:custom.stage}-DeleteReport
+
 resources:
   Resources:
     Authorizer:

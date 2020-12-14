@@ -45,4 +45,7 @@ class ReportItem(Resource):
     @ns.response(204, 'Report deleted')
     @ns.doc(security={'oauth2': ['openid']})
     def delete(self, name):
-        return report_service.delete_report(name), 204
+        try:
+            return report_service.delete_report(name), 204
+        except KeyError:
+            return f'Could not find ${name}', 404
