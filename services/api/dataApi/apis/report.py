@@ -45,6 +45,4 @@ class ReportItem(Resource):
     @ns.response(204, 'Report deleted')
     @ns.doc(security={'oauth2': ['openid']})
     def delete(self, name):
-        with ReportsRepository() as repo:
-            repo.delete(name)
-            return '', 204
+        return report_service.delete_report(name), 204
