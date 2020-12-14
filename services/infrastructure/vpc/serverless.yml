@@ -1,0 +1,48 @@
+service: vpc-vpn
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+
+resources:
+  Resources:
+    
+    SundtCustomerGateway:
+      Type: AWS::EC2::CustomerGateway
+      Properties: #TODO: Add
+        BgpAsn: 65000 # Default
+        IpAdress: 0.0.0.0 # Må få fra Mattis
+        Type: ipsec.1
+
+    SundtVPNGateway:
+      Type: AWS::EC2::VPNGateway
+      Properties: # TODO: Add
+        Type: ipsec.1
+
+    SundtVPNPrivateCloud:
+     # Usikker på om vi trenger denne eller bare kan bruke default?
+      Type: AWS::EC2::VPC
+      Properties: # TODO: Add
+        CidrBlock: # Primary IPv4 CIDR block for the VPC
+        EnableDnsHostnames: false # Default, krever DNS support
+        EnableDnsSupport: true # Default
+        InstanceTenancy: default
+
+    SundtVPNRoutingTable:
+      Type: #Usikker på type her, og om den bør ligge her eller i lambda sin serverless
+      Properties: # TODO: Add
+
+    SundtVPNConnection:
+      Type: AWS::EC2::VPNConnection
+      Properties: # TODO: Add
+        CustomerGatewayId: !Ref SundtCustomerGateway
+        StaticRoutesOnly: false # Default, optional
+        Type: ipsec.1
+        VpnGatewayId: !Ref SundtVPNGateway
+        VpnTunnelOptionsSpecifications: # Optional
+          - PresharedKey: some-string
+            TunnelInsideCidr: cidrblock!
