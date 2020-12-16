@@ -1,6 +1,5 @@
 import pytest
 import app
-from moto import mock_sqs
 import json
 
 
