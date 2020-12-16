@@ -18,6 +18,7 @@ custom:
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-sqs-test.fifo
   sqsQueueDLName: ${self:custom.stage}-sqs-test-dl.fifo
+  snsUpdateTopic: !ImportValue ${self:custom.stage}-data-update-topic-arn
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
@@ -115,6 +116,7 @@ functions:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+      DATA_UPDATE_TOPIC: ${self:custom.snsUpdateTopic}
     tags: # Tag for this function. Every function are tagged with stage by default
 
 resources: # The resources your functions use
@@ -174,6 +176,7 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+          - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:

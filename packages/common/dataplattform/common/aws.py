@@ -3,7 +3,7 @@ from os import path, sep, environ
 from botocore.exceptions import ClientError
 from dataplattform.common.schema import Data
 from s3fs import S3FileSystem
-from json import loads
+from json import loads, dumps
 from uuid import uuid4
 
 
@@ -149,6 +149,17 @@ class SQS:
             },
             MessageGroupId=group_id or environ.get("SQS_MESSAGE_GROUP_ID"))
         return res['MessageId']
+
+
+class SNS:
+    def __init__(self, topicarn: str):
+        self.sns = boto3.resource('sns')
+        self.topic = self.sns.Topic(topicarn)
+
+    def publish(self, message: dict, subject: str):
+        self.topic.publish(
+            Message=dumps(message),
+            Subject=subject)
 
 
 def path_join(*paths):

@@ -1,6 +1,8 @@
-from common.repositories.dynamo_db import DynamoDBRepository
-from os import environ
 from datetime import datetime
+from os import environ
+
+from boto3.dynamodb.conditions import Key
+from common.repositories.dynamo_db import DynamoDBRepository
 
 
 class ReportsRepository(DynamoDBRepository):
@@ -16,6 +18,14 @@ class ReportsRepository(DynamoDBRepository):
         )
         return response['Item']
 
+    def get_by_tables(self, tables: [str]):
+
+        def compare_table(table):
+            return table in tables
+
+        result = filter(lambda report: any(compare_table(t) for t in report['tables']), self.all())
+        return list(result)
+
     def all(self):
         response = self.table.scan()
         return response['Items']
@@ -26,17 +36,33 @@ class ReportsRepository(DynamoDBRepository):
             Item={
                 'name': model['name'],
                 'queryString': model['queryString'],
-                'tables':  model['tables'],
+                'tables': model['tables'],
                 'dataProtection': model['dataProtection'],
                 'created': now.isoformat(),
-                'lastUsed': None,
-                'lastCacheUpdate': now.isoformat()
             },
             Expected={
                 'name': {'Exists': False}
             }
         )
         return True
+
+    def update_cache_time(self, name: str):
+        from botocore.exceptions import ClientError
+        now = datetime.now()
+        try:
+            self.table.update_item(
+                Key={'name': name},
+                UpdateExpression="set lastCacheUpdate = :now",
+                ExpressionAttributeValues={
+                    ':now': now.isoformat()
+                },
+                ConditionExpression=Key("name").eq(name)
+            )
+        except ClientError as e:
+            if e.response['Error']['Code'] == "ConditionalCheckFailedException":
+                raise KeyError("Could not find report with name: " + name) from e
+            else:
+                raise
 
     def delete(self, name: str):
         self.table.delete_item(

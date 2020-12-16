@@ -45,6 +45,18 @@ resources:
         Topics: 
           - !Ref NewReportTopic
           - !Ref DataUpdateTopic
+    
+    ProcessTopicPolicy:
+      Type: AWS::IAM::ManagedPolicy
+      Properties:
+        ManagedPolicyName: ${self:custom.stage}-lambda-topic-access-role
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - sns:Publish
+              Resource: !Ref DataUpdateTopic
 
   Outputs:
     NewReportTopicOutput:
@@ -58,3 +70,9 @@ resources:
         Ref: DataUpdateTopic
       Export:
         Name: ${self:custom.stage}-data-update-topic-arn
+
+    LambdaTopicAccessOutput:
+      Value:
+        Ref: ProcessTopicPolicy
+      Export:
+        Name: ${self:custom.stage}-process-lambda-topic-access-role

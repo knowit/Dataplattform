@@ -19,20 +19,20 @@ def handler(event, context):
         if topic == 'NewReport':
             return [repo.get(message['report'])]
         elif topic == 'DataUpdate':
-            pass  # TODO: Load all reports with data in source
+            return [report for table in message['tables'] for report in repo.get_by_tables(table)]
 
     with ReportsRepository() as repo:
         report_sets = [load_reports(topic, message, repo)
                        for topic, message in messages]
     reports = [report for reports in report_sets for report in reports]
-
     for report in reports:
         updateCache = cache_table_service.cache_table(
             report['dataProtection'], report['name'])
-
         updateCache(
             execute_query(report['queryString'], preprocess_sql=False)
         )
 
-        # TODO: update report table with cache update timestamp
+        with ReportsRepository() as repo:
+            repo.update_cache_time(report['name'])
+
     return {}

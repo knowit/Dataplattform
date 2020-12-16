@@ -169,6 +169,7 @@ resources:
                   Action:
                     - dynamodb:Scan
                     - dynamodb:GetItem
+                    - dynamodb:UpdateItem
                   Resource: !Sub 'arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
                 - Effect: Allow
                   Action:
@@ -223,6 +224,7 @@ resources:
                   Action:
                     - glue:GetTable
                     - glue:GetDatabase
+                    - glue:GetPartitions
                   Resource: 
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'

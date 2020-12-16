@@ -1,30 +1,6 @@
 import pytest
 import app
 import urllib.parse
-import boto3
-
-
-@pytest.fixture(autouse=True)
-def mocked_athena_services(mocker):
-    athena_mock = mocker.MagicMock()
-
-    athena_mock.get_query_execution = mocker.MagicMock(
-        return_value={
-            'QueryExecution': {
-                'Status': {'State': 'SUCCEEDED'},
-                'ResultConfiguration': {'OutputLocation': 's3://testlake/query/mock.csv'}
-            }
-        })
-
-    mocker.patch(
-        'boto3.client',
-        side_effect=lambda service: athena_mock if service == 'athena' else boto3.client(service))
-
-
-@pytest.fixture(autouse=True)
-def setup_mock_athena_result(s3_bucket):
-    mock_data = '"col0","col1"\n"row0",0\n"row1",1'
-    s3_bucket.Object('query/mock.csv').put(Body=mock_data.encode('utf-8'))
 
 
 @pytest.fixture

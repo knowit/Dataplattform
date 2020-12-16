@@ -1,7 +1,10 @@
+from os import environ
 import pytest
-import boto3
 import datetime
+
+import boto3
 from botocore.exceptions import ClientError
+from moto import mock_dynamodb2
 
 
 @pytest.fixture
@@ -107,7 +110,91 @@ def mocked_glue_services(mocker, glue_test_data):
     glue_mock.get_paginator = mocker.MagicMock(
         side_effect=mock_paginator_side_effect
     )
+    yield glue_mock
+
+
+@pytest.fixture(autouse=True)
+def mocked_athena_services(mocker):
+    athena_mock = mocker.MagicMock()
+
+    athena_mock.get_query_execution = mocker.MagicMock(
+        return_value={
+            'QueryExecution': {
+                'Status': {'State': 'SUCCEEDED'},
+                'ResultConfiguration': {'OutputLocation': 's3://testlake/query/mock.csv'}
+            }
+        })
+    yield athena_mock
+
+
+@pytest.fixture(autouse=True)
+def mock_services(mocker, mocked_glue_services, mocked_athena_services):
+    def find_service(service):
+        if service == "glue":
+            return mocked_glue_services
+        elif service == "athena":
+            return mocked_athena_services
+        else:
+            return mocker.DEFAULT
 
     mocker.patch(
-        'boto3.client',
-        side_effect=lambda service: glue_mock if service == 'glue' else boto3.client(service))
+        "boto3.client",
+        side_effect=find_service
+    )
+
+
+@pytest.fixture(autouse=True)
+def setup_mock_athena_result(s3_bucket):
+    mock_data = '"col0","col1"\n"row0",0\n"row1",1'
+    s3_bucket.Object('query/mock.csv').put(Body=mock_data.encode('utf-8'))
+
+
+@pytest.fixture
+def db_data():
+    yield [
+        {
+            "created": "2020-10-14T10:32:23.971390",
+            "dataProtection": 3,
+            "lastCacheUpdate": "2020-10-14T10:32:23.971390",
+            "lastUsed": None,
+            "name": "testReport",
+            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
+            "tables": [
+                "test_table1",
+                "test_table2"
+            ]
+        },
+        {
+            "created": "2020-10-14T10:32:23.971390",
+            "dataProtection": 3,
+            "lastCacheUpdate": "2020-10-14T10:32:23.971390",
+            "lastUsed": None,
+            "name": "anotherReport",
+            "queryString": "COUNT(*) from dev_level_3_database.cv_partner_employees",
+            "tables": [
+                "test_table3",
+                "test_table4"
+            ]
+        }
+
+    ]
+
+
+@pytest.fixture
+def dynamo_mock(db_data):
+    with mock_dynamodb2():
+        db = boto3.resource('dynamodb')
+        table = db.create_table(
+            AttributeDefinitions=[{'AttributeName': "name", 'AttributeType': 'S'}],
+            TableName=f'{environ.get("STAGE", "dev")}_reports_table',
+            KeySchema=[{'AttributeName': "name", 'KeyType': 'HASH'}],
+            ProvisionedThroughput={'ReadCapacityUnits': 1, 'WriteCapacityUnits': 1}
+        )
+        for item in db_data:
+            table.put_item(
+                Item=item,
+                Expected={
+                    'name': {'Exists': False}
+                }
+            )
+        yield table
