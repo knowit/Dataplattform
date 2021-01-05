@@ -72,6 +72,7 @@ functions:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
       NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
+      DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn
     events:
       - http:
           method: ANY
@@ -102,7 +103,7 @@ functions:
       - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
     name: ${self:custom.service}-CacheUpdater
     description: Dataplattform API Cache updater
-    role:  !GetAtt CacheUpdaterRole.Arn
+    role:  !GetAtt ReportCacheRole.Arn
     package:
       include:
         - 'functions/cache_updater.py'
@@ -119,6 +120,26 @@ functions:
       - sns: 
           arn: !ImportValue ${self:custom.stage}-data-update-topic-arn
           topicName: ${self:custom.stage}-DataUpdate
+
+  CacheDeleter:
+    handler: cache_deleter.handler
+    module: functions
+    name: ${self:custom.service}-CacheDeleter
+    description: Dataplattform API Cache deleter
+    role:  !GetAtt ReportCacheRole.Arn
+    package:
+      include:
+        - 'functions/cache_deleter.py'
+    # destinations: # TODO
+    #   onSuccess: xxx:xxx:target
+    #   onFailure: xxx:xxx:target
+    environment:
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      STAGE: ${self:custom.stage}
+    events:
+      - sns:
+          arn: !ImportValue ${self:custom.stage}-delete-report-topic-arn
+          topicName: ${self:custom.stage}-DeleteReport
 
 resources:
   Resources:
@@ -146,10 +167,10 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 
-    CacheUpdaterRole:
+    ReportCacheRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.service}-CacheUpdater-role
+        RoleName: ${self:custom.service}-ReportCache-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -161,7 +182,7 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ${self:custom.service}-CacheUpdater-policy
+          - PolicyName: ${self:custom.service}-ReportCache-policy
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -186,6 +207,7 @@ resources:
                 - Effect: Allow
                   Action:
                     - s3:PutObject
+                    - s3:DeleteObject
                   Resource:
                     - Fn::Join:
                       - ""

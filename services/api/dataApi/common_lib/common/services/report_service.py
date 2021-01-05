@@ -37,3 +37,19 @@ def new_report(new_report: Dict[str, str]):
         })
         pub_new_report(new_report['name'])
         return repo.get(new_report['name'])
+
+
+def pub_delete_report(name: str, protection: int):
+    sns = boto3.resource('sns')
+    topic = sns.Topic(environ.get('DELETE_REPORT_TOPIC'))
+    topic.publish(
+        Message=json.dumps({'name': name, 'dataProtection': protection}),
+        Subject='DeleteReport')
+
+
+def delete_report(name: str):
+    with ReportsRepository() as repo:
+        report = repo.get(name)
+        repo.delete(report['name'])
+        pub_delete_report(report['name'], int(report['dataProtection']))
+    return f"Deleted ${name}"

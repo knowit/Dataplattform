@@ -98,6 +98,8 @@ def sns_topic():
         sns = resource('sns')
         topic = sns.create_topic(Name=environ.get('SNS_TOPIC_NAME'))
         environ['DATA_UPDATE_TOPIC'] = topic.arn
+        environ['NEW_REPORT_TOPIC'] = topic.arn
+        environ['DELETE_REPORT_TOPIC'] = topic.arn
         yield topic
 
 
