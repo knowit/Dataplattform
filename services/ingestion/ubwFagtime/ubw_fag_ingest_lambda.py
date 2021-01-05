@@ -1,14 +1,12 @@
 from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
-from dataplattform.query.engine import Athena
 from datetime import datetime
 from xmltodict import parse
 from zeep import Client
 
 
 handler = IngestHandler()
-ath = Athena()
 
 
 @handler.ingest()

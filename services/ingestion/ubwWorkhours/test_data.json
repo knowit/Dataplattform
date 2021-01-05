@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "timestamp": 1601294392.604705
+  },
+  "data": [
+    {
+      "_recno": "0",
+      "_section": "D",
+      "tab": "B",
+      "reg_period": "202053",
+      "used_hrs": "4",
+      "f0_billable": "0",
+      "resource_id": "X1",
+      "xresource_id": "X1_name",
+      "r1project": "XX",
+      "xr1project":"Local Projects",
+      "work_order": "work order no 1",
+      "xwork_order": "Some work order desc.",
+      "xr0work_order": "costumer 1"
+    },
+    {
+      "_recno": "0",
+      "_section": "D",
+      "tab": "B",
+      "reg_period": "202053",
+      "used_hrs": "1",
+      "f0_billable": "1",
+      "resource_id": "X1",
+      "xresource_id": "X1_name",
+      "r1project": "XX",
+      "xr1project":"External Projects",
+      "work_order": "work order no 2",
+      "xwork_order": "Some work order desc.",
+      "xr0work_order": "costumer 2"
+    },
+    {
+        "_recno": "0",
+        "_section": "D",
+        "tab": "B",
+        "reg_period": "202053",
+        "used_hrs": "1",
+        "f0_billable": "0",
+        "resource_id": "X2",
+        "xresource_id": "X2_name",
+        "r1project": "XX",
+        "xr1project":"Local Projects",
+        "work_order": "work order no 3",
+        "xwork_order": "Some work order desc.",
+        "xr0work_order": "costumer 3"
+    }
+  ]
+}
