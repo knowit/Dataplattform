@@ -26,12 +26,17 @@ resources:
           BlockPublicPolicy: true
           IgnorePublicAcls: true
           RestrictPublicBuckets: true
+        LifecycleConfiguration:
+          ExpirationInDays: 8
   
     PublicRawStorageBucket:
      Type: AWS::S3::Bucket
      Properties:
         BucketName: ${self:custom.stagePublicBucketName}
         AccessControl: PublicRead
+        LifecycleConfiguration:
+          ExpirationInDays: 8
+  
 
     PrivateCloudFrontOriginAccessIdentity:
       Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
