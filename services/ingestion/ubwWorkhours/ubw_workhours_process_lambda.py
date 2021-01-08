@@ -7,7 +7,7 @@ import numpy as np
 handler = ProcessHandler()
 
 
-@handler.process(partitions={}, overwrite=True)
+@handler.process(partitions={})
 def process(data, events) -> Dict[str, pd.DataFrame]:
     data = [
         [dict(x, time=d['metadata']['timestamp']) for x in d['data']]
