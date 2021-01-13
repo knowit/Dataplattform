@@ -1,5 +1,6 @@
 from datetime import datetime
 from os import environ
+from typing import List
 
 from boto3.dynamodb.conditions import Key
 from common.repositories.dynamo_db import DynamoDBRepository
@@ -18,7 +19,7 @@ class ReportsRepository(DynamoDBRepository):
         )
         return response['Item']
 
-    def get_by_tables(self, tables: [str]):
+    def get_by_tables(self, tables: List[str]):
 
         def compare_table(table):
             return table in tables
