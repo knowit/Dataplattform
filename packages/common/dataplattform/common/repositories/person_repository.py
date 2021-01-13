@@ -25,6 +25,10 @@ class PersonRepository():
     def table(self):
         return self.db.Table(f'{environ.get("STAGE", "dev")}_{self.table_name}')
 
+    def get_guids(self):
+        result = self.table.scan()
+        return [item['guid'] for item in result['Items']]
+
     def get_guid_by(self, id_type: PersonIdentifierType, value: str):
         if (id_type == PersonIdentifierType.GUID):
             return value
