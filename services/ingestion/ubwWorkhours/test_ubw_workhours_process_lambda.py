@@ -39,6 +39,6 @@ def test_process_data(create_table_mock, setup_queue_event, test_data):
     handler(event, None)
 
     create_table_mock.assert_table_data_column(
-        'ubw_workhours',
+        'ubw_costumer_per_resource',
         'reg_period',
         pd.Series(['202053', '202053', '202053']))

@@ -9,7 +9,7 @@ from zeep import Client
 handler = IngestHandler()
 
 
-@handler.ingest(purge_raw_data=True)
+@handler.ingest()
 def ingest(event) -> Data:
     username, password, client, template_id = SSM(
         with_decryption=True
@@ -38,12 +38,7 @@ def ingest(event) -> Data:
             'Password': password,
         })
 
-    #return Data(
-    #    metadata=Metadata(timestamp=datetime.now().timestamp()),
-    #    data=parse(res['TemplateResult'])['Agresso']['AgressoQE']
-    #)
-
     return Data(
         metadata=Metadata(timestamp=datetime.now().timestamp()),
-        data=[]
+        data=parse(res['TemplateResult'])['Agresso']['AgressoQE']
     )

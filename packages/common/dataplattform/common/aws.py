@@ -30,7 +30,7 @@ class S3:
         self.bucket = bucket or environ.get('DATALAKE')
         self.s3 = boto3.resource('s3')
 
-    def put(self, data: Data, path: str = '', key: str = None):
+    def put(self, data: Data, path: str = ''):
         data_json = data.to_json().encode('utf-8')
         return self.put_raw(data_json, ext='json', path=path)
 
@@ -135,8 +135,7 @@ class SQS:
     def __init__(self):
         self.client = boto3.client('sqs')
 
-    def send_custom_filename_message(self, file_name: str = None, purge_file: str = '0',
-                                     queue_name: str = None, group_id: str = None):
+    def send_custom_filename_message(self, file_name: str = None, queue_name: str = None, group_id: str = None):
         response = self.client.get_queue_url(QueueName=queue_name or environ.get("SQS_QUEUE_NAME"))
         sqs_url = response['QueueUrl']
         res = self.client.send_message(
@@ -145,10 +144,6 @@ class SQS:
             MessageAttributes={
                 's3FileName': {
                     'StringValue': file_name,
-                    'DataType': 'String'
-                },
-                'purgeFile': {
-                    'StringValue': purge_file,
                     'DataType': 'String'
                 }
             },

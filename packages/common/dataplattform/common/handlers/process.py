@@ -62,14 +62,13 @@ class ProcessHandler:
             bucket=self.bucket)
 
         def load_event_data(event):
-            print(event)
             return [
                 s3.get(key) for key in
                 [
                     record.get('body', None) for record in event.get('Records', [])
                 ] if key
             ]
-        print(load_event_data(event))
+
         tables = self.wrapped_func['process'](load_event_data(event), event.get('Records', []))
         partitions = self.wrapped_func_args.get(
             'process', {}).get('partitions', {})

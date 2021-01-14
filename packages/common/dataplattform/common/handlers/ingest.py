@@ -30,22 +30,13 @@ class IngestHandler:
         assert 'ingest' in self.wrapped_func, \
             'IngestHandler must wrap and ingest function'
 
-        purge_raw_data = self.wrapped_func_args.get(
-            'ingest', {}).get('purge_raw_data', False)
-
         result = self.wrapped_func['ingest'](event)
         if result and isinstance(result, Response):
             return result.to_dict()
 
         if result:
-            # temporary solution to avoid storing raw data
-            if (purge_raw_data):
-                purge_raw_data = '1'
-                key = 'raw_data.json'
-            else:
-                key = None
             SQS().send_custom_filename_message(
-                s3.put(result, 'raw', key=key), purge_raw_data)
+                s3.put(result, 'raw'))
 
         return Response().to_dict()
 
@@ -56,9 +47,8 @@ class IngestHandler:
             return self.wrapped_func['validate']
         return wrap
 
-    def ingest(self, purge_raw_data=False):
+    def ingest(self):
         def wrap(f):
             self.wrapped_func['ingest'] = make_wrapper_func(f, Data, Response)
-            self.wrapped_func_args['ingest'] = dict(purge_raw_data=purge_raw_data)
             return self.wrapped_func['ingest']
         return wrap
