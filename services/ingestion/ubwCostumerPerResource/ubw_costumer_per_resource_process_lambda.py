@@ -10,7 +10,7 @@ handler = ProcessHandler()
 @handler.process(partitions={'ubw_costumer_per_resource': ['time']})
 def process(data, events) -> Dict[str, pd.DataFrame]:
     data = [
-        [dict(x, time=d['metadata']['timestamp']) for x in d['data']]
+        [dict(x, time=int(d['metadata']['timestamp'])) for x in d['data']]
         for d in [d.json() for d in data]
     ]
 
@@ -37,8 +37,8 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     ]
     work_hours_df = df[col_selection_table].copy()
     work_hours_df.rename(columns={
-        'resource_id': 'resource_alias',
-        'xresource_id': 'resource_name',
+        'resource_id': 'alias',
+        'xresource_id': 'name',
         'xwork_order': 'work_order_description',
         'xr1project': 'project_type',
         'xr0work_order': 'costumer'}, inplace=True)
@@ -48,16 +48,17 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     work_hours_df = work_hours_df.loc[lambda work_hours_df: work_hours_df['used_hrs'] > 0]
 
     # Find all unique aliases
-    unique_aliases = work_hours_df.resource_alias.unique()
+    unique_aliases = work_hours_df.alias.unique()
 
     df_list = []
     for alias in unique_aliases:
-        tmp_df = work_hours_df.loc[work_hours_df['resource_alias'] == alias].copy()
+        tmp_df = work_hours_df.loc[work_hours_df['alias'] == alias].copy()
         tmp_df = tmp_df.sort_values(by=['used_hrs'], ascending=False).copy()
         tmp_df['weigth'] = np.arange(1, len(tmp_df['used_hrs'])+1, 1)
         df_list.append(tmp_df)
 
     df = pd.concat(df_list, ignore_index=True)
+    df.pop('used_hrs')
 
     return {
         'ubw_costumer_per_resource': df

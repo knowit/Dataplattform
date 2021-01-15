@@ -1,17 +1,17 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: ubwWorkhours
+service: ubwCostumerPerResource
 
 custom:
   #Edit these variables###########################
   editable:
     timeout: 28
-    ingestHandlerFile: ubw_workhours_ingest_lambda
-    processHandlerFile: ubw_workhours_process_lambda
+    ingestHandlerFile: ubw_costumer_per_resource_ingest_lambda
+    processHandlerFile: ubw_costumer_per_resource_lambda
     databaseName: level_3
-    description: poll work hours from ubw
+    description: poll aggregated resource data from ubw
     scheduleRate: rate(7 days)
     accessLevel: level-3
-    dataFolder: ubw/workhours
+    dataFolder: ubw/costumer_per_resource
 
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy

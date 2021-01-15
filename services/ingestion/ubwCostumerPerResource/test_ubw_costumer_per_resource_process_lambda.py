@@ -1,5 +1,5 @@
 from pytest import fixture
-from ubw_workhours_process_lambda import handler
+from ubw_costumer_per_resource_process_lambda import handler
 import pandas as pd
 from os import path
 from json import load
