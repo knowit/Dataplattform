@@ -6,7 +6,7 @@ custom:
   editable:
     timeout: 28
     ingestHandlerFile: ubw_costumer_per_resource_ingest_lambda
-    processHandlerFile: ubw_costumer_per_resource_lambda
+    processHandlerFile: ubw_costumer_per_resource_process_lambda
     databaseName: level_3
     description: poll aggregated resource data from ubw
     scheduleRate: rate(7 days)
