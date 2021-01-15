@@ -80,6 +80,8 @@ functions:
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
       DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
+      PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
+      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
     tags: # Tag for this function. Every function are tagged with stage by default
 
     events: # The Events that trigger this Function

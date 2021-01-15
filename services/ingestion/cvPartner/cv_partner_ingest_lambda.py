@@ -1,10 +1,11 @@
 from dataplattform.common.handlers.ingest import IngestHandler
-from dataplattform.common.helper import save_document
+from dataplattform.common.helper import save_document, empty_content_in_path
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import requests
 from uuid import uuid4
+from os import environ
 
 url = 'https://knowit.cvpartner.com/api/v3'
 url_v1 = 'https://knowit.cvpartner.com/api/v1'
@@ -23,6 +24,8 @@ def ingest(event) -> Data:
                        headers={'Authorization': f'Bearer {api_token}'})
 
     data_json = res.json()
+    empty_content_in_path(environ.get('PRIVATE_BUCKET'), "private")
+    empty_content_in_path(environ.get('PUBLIC_BUCKET'), "public")
 
     def write_cv_doc_to_private_bucket(person, language: str = 'no', ext: str = 'pdf'):
         new_key = f'cv_{language}_{ext}'
