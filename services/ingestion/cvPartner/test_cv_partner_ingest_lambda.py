@@ -9,6 +9,20 @@ def mock_save_document(mocker):
     mocker.patch('cv_partner_ingest_lambda.save_document')
 
 
+def add_dummy_data(bucket, private=False):
+    prefix = "private" if private else "public"
+    dummy = [
+        f'{prefix}/dummy{prefix}.txt',
+        f'{prefix}/dummy{prefix}2.txt',
+        f'{prefix}/dummy{prefix}3.txt',
+        f'{prefix}/dummy{prefix}4.txt',
+        f'{prefix}/dummy{prefix}5.txt',
+        f'{prefix}/dummy{prefix}6.txt',
+    ]
+    for item in dummy:
+        bucket.put_object(Body='some data', Key=item)
+
+
 def make_test_json(user_id, cv_id):
     return {
         'cvs': [
@@ -39,10 +53,16 @@ def cv_test_json(cv_id):
     ]
 
 
-def test_initial_ingest(s3_bucket):
+def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
+    # add dummy data to the private and public buckets that will be purged by ingest
+    add_dummy_data(s3_private_bucket, private=True)
+    add_dummy_data(s3_public_bucket, private=False)
+
+    assert len(list(s3_private_bucket.objects.filter(Prefix='private'))) == 6
+    assert len(list(s3_public_bucket.objects.filter(Prefix='public'))) == 6
+
     user_id = '1'
     cv_id = '2'
-
     responses.add(responses.GET,
                   f'{url}/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
                   json=make_test_json(user_id, cv_id), status=200)
@@ -56,3 +76,6 @@ def test_initial_ingest(s3_bucket):
     assert data['data'][0]['default_cv_id'] == cv_id
     cv_link_correct = url_v1 + f'/cvs/download/{user_id}/{cv_id}/{{LANG}}/{{FORMAT}}/'
     assert data['data'][0]['cv_link'] == cv_link_correct
+
+    assert len(list(s3_private_bucket.objects.filter(Prefix='private'))) == 0
+    assert len(list(s3_public_bucket.objects.filter(Prefix='public'))) == 0
