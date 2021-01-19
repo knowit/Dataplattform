@@ -12,6 +12,8 @@ custom:
     scheduleRate: rate(7 days)
     accessLevel: level-3
     dataFolder: cvpartner
+    publicS3Prefix: public/images
+    privateS3Prefix: private/csv
 
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
@@ -82,6 +84,8 @@ functions:
       DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
       PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
+      PUBLIC_PREFIX: ${self:custom.publicS3Prefix}
+      PRIVATE_PREFIX: ${self:custom.privateS3Prefix}
     tags: # Tag for this function. Every function are tagged with stage by default
 
     events: # The Events that trigger this Function
