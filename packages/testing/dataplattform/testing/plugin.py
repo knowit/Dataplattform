@@ -32,6 +32,8 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('PUBLIC_BUCKET', 'public_test_bucket'),
         ('DOWNLOAD_LAMBDA', 'test_download_lambda'),
         ('SNS_TOPIC_NAME', 'test_sns_topic'),
+        ('PUBLIC_PREFIX', 'public/images'),
+        ('PRIVATE_PREFIX', 'private/cvs'),
     ]
     for key, value in default_env:
         if key not in environ:
