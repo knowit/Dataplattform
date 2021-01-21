@@ -15,6 +15,11 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         df = pd.json_normalize(payload)
         return df
 
+    def none_to_empty_str(tmp_str):
+        if tmp_str is None:
+            return ''
+        else:
+            return str(tmp_str)
     """
     Workaround for known pandas issue with conversion to int in
     the presence of nullable integers.
@@ -170,7 +175,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 continue
             tmp_string = ""
             for elem in col_list:
-                tmp_string = tmp_string + ";" + elem.get(tag, {}).get(sub_tag, '')
+                tmp_string = tmp_string + ";" + none_to_empty_str(elem.get(tag, {}).get(sub_tag, ''))
             new_col.append(tmp_string[1:])
         out_tmp[new_col_name] = new_col
         return out_tmp
