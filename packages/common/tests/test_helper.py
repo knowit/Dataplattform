@@ -23,9 +23,7 @@ def test_empty_content_in_path(s3_private_bucket):
         'private/deleted/whatever5.txt',
         'private/deleted/whatever6.txt',
     ]
-    for item in will_remain:
-        s3_private_bucket.put_object(Body='some data', Key=item)
-    for item in will_be_deleted:
+    for item in [*will_remain, *will_be_deleted]:
         s3_private_bucket.put_object(Body='some data', Key=item)
 
     len_remain_before = len(list(s3_private_bucket.objects.filter(Prefix='private/remain')))
