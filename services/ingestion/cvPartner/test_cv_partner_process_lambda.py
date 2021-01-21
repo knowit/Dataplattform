@@ -259,3 +259,32 @@ def test_work_experiences_df_missing(setup_queue_event, test_data,
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_work_experience', exp_df
         )
+
+
+"""
+Test replace none values with empty string
+"""
+
+
+def test_tag_value_none(setup_queue_event, test_data,
+                        create_table_mock):
+
+    tmp_data = test_data['data']
+    print(tmp_data[1]['cv']['technologies'][0]['technology_skills'][0]['tags'])
+    tmp_data[1]['cv']['technologies'][0]['technology_skills'][0]['tags']['no'] = None
+
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=tmp_data))
+
+    handler(event, None)
+
+    create_table_mock.assert_table_data(
+        'cv_partner_technology_skills',
+        pd.DataFrame({
+            'user_id': ['user_id_1', 'user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
+            'category': ["", "Programmeringsspråk", "Webutvikling", "Object-Relational Mapping (ORM)",
+                         "Systemutvikling"],
+            'technology_skills': ["", "Java", "Angular;HTML", ";Hibernate", "Android Studio"],
+        }))
