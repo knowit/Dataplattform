@@ -31,10 +31,13 @@ class IngestHandler:
             'IngestHandler must wrap and ingest function'
 
         result = self.wrapped_func['ingest'](event)
+        overwrite = self.wrapped_func_args.get('ingest', {}).get('overwrite', False)
         if result and isinstance(result, Response):
             return result.to_dict()
 
         if result:
+            if overwrite:
+                s3.empty_content_in_path('raw')
             SQS().send_custom_filename_message(
                 s3.put(result, 'raw'))
 
@@ -47,8 +50,9 @@ class IngestHandler:
             return self.wrapped_func['validate']
         return wrap
 
-    def ingest(self):
+    def ingest(self, overwrite=False):
         def wrap(f):
             self.wrapped_func['ingest'] = make_wrapper_func(f, Data, Response)
+            self.wrapped_func_args['ingest'] = dict(overwrite=overwrite)
             return self.wrapped_func['ingest']
         return wrap

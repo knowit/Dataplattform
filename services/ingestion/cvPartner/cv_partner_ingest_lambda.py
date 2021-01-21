@@ -13,7 +13,7 @@ offset_size = 1000
 handler = IngestHandler()
 
 
-@handler.ingest()
+@handler.ingest(overwrite=True)
 def ingest(event) -> Data:
 
     objectnet_id = SSM(with_decryption=False).get('cv_partner_objectnet_id')

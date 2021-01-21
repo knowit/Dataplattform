@@ -57,11 +57,14 @@ def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
     # add dummy data to the private and public buckets that will be purged by ingest
     public_prefix = environ.get('PUBLIC_PREFIX')
     private_prefix = environ.get('PRIVATE_PREFIX')
+    datalake_prefix = environ.get('ACCESS_PATH')+"raw"
     add_dummy_data(s3_private_bucket, private_prefix)
     add_dummy_data(s3_public_bucket, public_prefix)
+    add_dummy_data(s3_bucket, datalake_prefix)
 
     assert len(list(s3_private_bucket.objects.filter(Prefix=private_prefix))) == 6
     assert len(list(s3_public_bucket.objects.filter(Prefix=public_prefix))) == 6
+    assert len(list(s3_bucket.objects.filter(Prefix=datalake_prefix))) == 6
 
     user_id = '1'
     cv_id = '2'
@@ -81,3 +84,4 @@ def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
 
     assert len(list(s3_private_bucket.objects.filter(Prefix=private_prefix))) == 0
     assert len(list(s3_public_bucket.objects.filter(Prefix=public_prefix))) == 0
+    assert len(list(s3_bucket.objects.filter(Prefix=datalake_prefix))) == 1

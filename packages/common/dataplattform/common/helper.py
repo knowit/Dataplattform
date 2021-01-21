@@ -21,8 +21,6 @@ def save_document(http_request, filename, filetype, private=True):
 
 
 def empty_content_in_path(bucket, prefix):
-    s3_client = boto3.client('s3')
-    response = s3_client.list_objects_v2(Bucket=bucket, Prefix=prefix)
-    if 'Contents' in response:
-        for obj in response['Contents']:
-            s3_client.delete_object(Bucket=bucket, Key=obj['Key'])
+    s3 = boto3.resource('s3')
+    s3_bucket = s3.Bucket(bucket)
+    s3_bucket.objects.filter(Prefix=prefix).delete()
