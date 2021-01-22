@@ -42,7 +42,6 @@ class Glue:
 
     def update_crawler(self, table_name):
         crawler_metadata = self.get_crawler()
-
         if crawler_metadata is not None:
             current_targets = crawler_metadata.get('Crawler', {}).get('Targets', {}).get('S3Targets', [])
             path = f's3://{self.bucket}/{self.access_path}structured/{table_name}'
