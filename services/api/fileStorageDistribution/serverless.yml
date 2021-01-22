@@ -115,6 +115,7 @@ resources:
             TargetOriginId: ${self:custom.publicDomainId}
             ForwardedValues:
                 QueryString: false
+          DefaultRootObject: index.html
           Enabled: true
           ViewerCertificate:
             AcmCertificateArn:
