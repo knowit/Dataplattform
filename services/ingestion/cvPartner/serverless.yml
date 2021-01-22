@@ -159,6 +159,7 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
+                    - s3:DeleteObject
                   Resource:
                     - Fn::Join:
                       - ""
@@ -189,6 +190,19 @@ resources: # The resources your functions use
                     - Fn::Join:
                         - ""
                         - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}-List
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
                           - '*'
           - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}
             PolicyDocument:
