@@ -3,8 +3,63 @@ from os import environ
 from pytest import mark
 import re
 from json import loads
+import boto3
+from pytest import fixture
+import datetime
 
 uuid_regex = r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}'
+
+
+class GlueCrawlerMock:
+    def __init__(self):
+        self.d = datetime.datetime(2015, 1, 1).isoformat()
+        self.crawlers = {'dev_level_1_crawler': {
+            'Name': 'dev_level_1_crawler',
+            'Role': 'test-glue-level-1-glue-access',
+            'Targets': {
+                'S3Targets': [
+                    {
+                        'Path': 's3://dev-datalake-datalake/data/level-1/test_table',
+                        'Exclusions': [
+                            '*_metadata',
+                        ],
+                    },
+                ]
+            },
+            'DatabaseName': 'test_database',
+            'Description': 'database storing the glue table meta data',
+            'RecrawlPolicy': {
+                'RecrawlBehavior': 'CRAWL_EVERYTHING'
+            },
+            'State': 'READY',
+            'TablePrefix': 'string',
+            'Schedule': {
+                'ScheduleExpression': '0 0 * * ? *',
+                'State': 'SCHEDULED'
+            },
+            'CreationTime': self.d,
+            'Version': 123,
+        }}
+
+    def get_crawler(self, Name):
+        return {"Crawler": self.crawlers[Name]}
+
+    def update_crawler(self, Name, Targets):
+        self.crawlers[Name]['Targets'].update(Targets)
+
+
+@fixture
+def class_fixture():
+    yield GlueCrawlerMock()
+
+
+@fixture
+def glue(mocker, class_fixture):
+    mocker.patch(
+        'boto3.client',
+        side_effect=lambda service: class_fixture if service == 'glue' else mocker.DEFAULT
+    )
+    yield class_fixture
 
 
 def test_s3_default():
@@ -253,3 +308,9 @@ def test_sns_send_message(sqs_queue, sns_topic):
 
     sns_message = loads(sqs_message['Message'])
     assert sns_message['test_key'] == 'test_value'
+
+
+def test_update_crawler(glue):
+    glue_handler = aws.Glue(access_level="1", access_path="s3://dev-datalake-datalake/data/level-1/test_table")
+    res = glue_handler.update_crawler("test-table2")
+    assert any(["test-table2" in targets['Path'] for targets in glue.crawlers['dev_level_1_crawler']['Targets']['S3Targets']])

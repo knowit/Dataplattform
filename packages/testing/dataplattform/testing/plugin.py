@@ -34,6 +34,7 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('SNS_TOPIC_NAME', 'test_sns_topic'),
         ('PUBLIC_PREFIX', 'public/images'),
         ('PRIVATE_PREFIX', 'private/cvs'),
+        ('ACCESS_LEVEL', 'level-1')
     ]
     for key, value in default_env:
         if key not in environ:
