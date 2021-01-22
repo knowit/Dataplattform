@@ -3,7 +3,6 @@ from os import environ
 from pytest import mark
 import re
 from json import loads
-import boto3
 from pytest import fixture
 import datetime
 
@@ -64,14 +63,14 @@ def glue(mocker, class_fixture):
 
 def test_s3_default():
     s3 = aws.S3()
-    assert s3.access_path == environ.get("ACCESS_PATH") and\
-        s3.bucket == environ.get('DATALAKE')
+    assert s3.access_path == environ.get("ACCESS_PATH") and \
+           s3.bucket == environ.get('DATALAKE')
 
 
 def test_s3_default_overrides():
     s3 = aws.S3(access_path='/abc', bucket='myBucket')
-    assert s3.access_path == '/abc' and\
-        s3.bucket == 'myBucket'
+    assert s3.access_path == '/abc' and \
+           s3.bucket == 'myBucket'
 
 
 @mark.parametrize('path, expected_key_pattern', [
@@ -138,9 +137,9 @@ def test_s3_put_raw_data_with_path(s3_bucket):
 
 def test_ssm_default():
     ssm = aws.SSM()
-    assert ssm.path.startswith('/') and\
-        environ.get('STAGE') in ssm.path and\
-        ssm.path.endswith(environ.get('SERVICE'))
+    assert ssm.path.startswith('/') and \
+           environ.get('STAGE') in ssm.path and \
+           ssm.path.endswith(environ.get('SERVICE'))
 
 
 def test_ssm_get_paramenter(ssm_client):
@@ -230,7 +229,7 @@ def test_s3_get_empty():
     s3 = aws.S3(access_path='/data')
     res = s3.get('test.txt')
     assert res.raw is None and \
-        'NoSuchKey' in str(res.error)
+           'NoSuchKey' in str(res.error)
 
 
 def test_s3_get_absolute_path_data(s3_bucket):
@@ -312,5 +311,6 @@ def test_sns_send_message(sqs_queue, sns_topic):
 
 def test_update_crawler(glue):
     glue_handler = aws.Glue(access_level="1", access_path="s3://dev-datalake-datalake/data/level-1/test_table")
-    res = glue_handler.update_crawler("test-table2")
-    assert any(["test-table2" in targets['Path'] for targets in glue.crawlers['dev_level_1_crawler']['Targets']['S3Targets']])
+    glue_handler.update_crawler("test-table2")
+    assert any(
+        ["test-table2" in targets['Path'] for targets in glue.crawlers['dev_level_1_crawler']['Targets']['S3Targets']])
