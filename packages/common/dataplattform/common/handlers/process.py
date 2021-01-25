@@ -153,11 +153,14 @@ class PersonalProcessHandler(ProcessHandler):
 
             del frame[self.id_type.value]
 
-        for table_name, table_partitions in partitions.items():
-            if "guid" not in table_partitions:
-                table_partitions.insert(0, "guid")
+            table_partition = partitions.get(table_name, [])
 
-            if self.id_type.value in table_partitions:
-                table_partitions.remove(self.id_type.value)
+            if "guid" not in table_partition:
+                table_partition.insert(0, "guid")
+
+            if self.id_type.value in table_partition:
+                table_partition.remove(self.id_type.value)
+
+            partitions[table_name] = table_partition
 
         return data, partitions, overwrite
