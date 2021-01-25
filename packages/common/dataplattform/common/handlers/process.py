@@ -143,11 +143,21 @@ class PersonalProcessHandler(ProcessHandler):
 
     def call_wrapped(self, s3_data, event):
         data, partitions, overwrite = super().call_wrapped(s3_data, event)
-        data = self.transform_guid(data)
-        return data, partitions, overwrite
 
-    def transform_guid(self, data):
-        with PersonRepository() as repo:
-            return {f'{repo.get_guid_by(self.id_type, person)}/{k}': v
-                    for person, tables in data.items()
-                    for k, v in tables.items()}
+        for table_name, frame in data.items():
+            assert self.id_type.value in frame, \
+                f"id column {self.id_type.name} missing on table {table_name}"
+
+            with PersonRepository() as repo:
+                frame["guid"] = frame[self.id_type.value].transform(lambda v: repo.get_guid_by(self.id_type, v))
+
+            del frame[self.id_type.value]
+
+        for table_name, table_partitions in partitions.items():
+            if "guid" not in table_partitions:
+                table_partitions.insert(0, "guid")
+
+            if self.id_type.value in table_partitions:
+                table_partitions.remove(self.id_type.value)
+
+        return data, partitions, overwrite
