@@ -16,7 +16,6 @@ def check_partitionkeys(table):
 
 
 def transform_uri(uri, bucketname):
-    print(bucketname)
     prefix = f's3://{bucketname}/'
     return uri[len(prefix):]
 
