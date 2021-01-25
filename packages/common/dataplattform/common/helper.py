@@ -1,4 +1,5 @@
 import boto3
+from dataplattform.common.aws import S3
 from os import environ
 from json import dumps
 
@@ -21,6 +22,5 @@ def save_document(http_request, filename, filetype, private=True):
 
 
 def empty_content_in_path(bucket, prefix):
-    s3 = boto3.resource('s3')
-    s3_bucket = s3.Bucket(bucket)
-    s3_bucket.objects.filter(Prefix=prefix).delete()
+    s3 = S3(bucket=bucket, access_path='')
+    s3.empty_content_in_path(path=prefix)
