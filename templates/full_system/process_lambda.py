@@ -1,12 +1,13 @@
-from dataplattform.common.handlers.process import ProcessHandler
+from dataplattform.common.handlers.process import PersonDataProcessHandler
+from dataplattform.common.repositories.person_repository import PersonIdentifierType
 import pandas as pd
 from typing import Dict
 
 
-handler = ProcessHandler()
+handler = PersonDataProcessHandler(PersonIdentifierType.ALIAS)
 
 
-@handler.process(partitions={})
+@handler.process(partitions={}, person_data_tables=['person_data_test_5'])
 def process(data, events) -> Dict[str, pd.DataFrame]:
     out_df = pd.concat([pd.json_normalize(d.json()['data'])for d in data])
-    return {'some_structured_data': out_df}
+    return {'person_data_test_5': out_df}

@@ -1,0 +1,52 @@
+service: metadata
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  service: ${self:custom.stage}-${self:service}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.service}
+
+resources:
+  Resources:
+    PersonalMetadataTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.stage}_personal_metadata_table
+        AttributeDefinitions:
+          - AttributeName: guid
+            AttributeType: S
+        KeySchema:
+          - AttributeName: guid
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        # SSESpecification: # Kryptering !?
+        
+    
+    PersonalMetadataTableAccess:
+      Type: AWS::IAM::ManagedPolicy
+      Properties:
+        Description: Access to ${self:custom.stage} Personal Metadata Table
+        ManagedPolicyName: ${self:custom.stage}-personal-metadata-table
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - dynamodb:Scan
+                - dynamodb:GetItem
+                - dynamodb:UpdateItem
+              Resource: !GetAtt PersonalMetadataTable.Arn
+
+
+  Outputs:
+    PersonalMetadataTableAccessOutput:
+      Value:
+        Ref: PersonalMetadataTableAccess
+      Export:
+        Name: ${self:custom.stage}-personal-metadata-table-access-policy

@@ -1,5 +1,6 @@
 from dataplattform.common.aws import S3, SNS
 from dataplattform.common.handlers import Response, verify_schema, make_wrapper_func
+from dataplattform.common.repositories.person_repository import PersonRepository, PersonIdentifierType
 from datetime import datetime
 import numpy as np
 import pandas as pd
@@ -52,30 +53,40 @@ class ProcessHandler:
         self.bucket = bucket
         self.wrapped_func: Dict[str, Callable] = {}
         self.wrapped_func_args: Dict[str, Any] = {}
+        self.s3 = S3(
+            access_path=access_path,
+            bucket=bucket)
 
     def __call__(self, event, context=None):
         assert 'process' in self.wrapped_func, \
             'ProcessHandler must wrap a process function'
 
-        s3 = S3(
-            access_path=self.access_path,
-            bucket=self.bucket)
+        s3_data = self.get_s3_data(event)
 
-        def load_event_data(event):
-            return [
-                s3.get(key) for key in
-                [
-                    record.get('body', None) for record in event.get('Records', [])
-                ] if key
-            ]
+        updated_tables = self.update_tables(
+            *self.call_wrapped(s3_data, event)
+        )
 
-        tables = self.wrapped_func['process'](load_event_data(event), event.get('Records', []))
-        partitions = self.wrapped_func_args.get(
-            'process', {}).get('partitions', {})
+        self.send_data_update_message(updated_tables)
 
-        overwrite = self.wrapped_func_args.get(
-            'process', {}).get('overwrite', False)
+        return Response().to_dict()
 
+    def get_s3_data(self, event):
+        return [
+            self.s3.get(key) for key in
+            [
+                record.get('body', None) for record in event.get('Records', [])
+            ] if key
+        ]
+
+    def call_wrapped(self, s3_data, event):
+        data = self.wrapped_func['process'](s3_data, event.get('Records', []))
+        partitions = self.wrapped_func_args.get('process', {}).get('partitions', {})
+        overwrite = self.wrapped_func_args.get('process', {}).get('overwrite', False)
+
+        return data, partitions, overwrite
+
+    def update_tables(self, tables, partitions, overwrite):
         updated_tables = []
 
         for table_name, frame in tables.items():
@@ -91,10 +102,10 @@ class ProcessHandler:
             table_partitions = partitions.get(table_name, [])
             frame = ensure_partitions_has_values(frame, table_partitions)
 
-            table_exists = check_exists(s3, frame, table_name, table_partitions)
+            table_exists = check_exists(self.s3, frame, table_name, table_partitions)
 
-            if overwrite and table_exists:
-                delete_table(s3, table_name)
+            if table_exists and overwrite:
+                delete_table(self.s3, table_name)
                 table_exists = False
 
             frame.to_parquet(f'structured/{table_name}',
@@ -104,20 +115,68 @@ class ProcessHandler:
                              partition_cols=table_partitions,
                              file_scheme='hive',
                              mkdirs=lambda x: None,  # noop
-                             open_with=s3.fs.open,
+                             open_with=self.s3.fs.open,
                              append=table_exists)
 
             updated_tables.append(table_name)
 
+        return updated_tables
+
+    def send_data_update_message(self, updated_tables):
         sns = SNS(environ.get('DATA_UPDATE_TOPIC'))
         sns.publish({'tables': updated_tables}, 'DataUpdate')
-
-        return Response().to_dict()
+        return True
 
     def process(self, partitions, overwrite=False):
         def wrap(f):
             self.wrapped_func['process'] = make_wrapper_func(f, dict)
             self.wrapped_func_args['process'] = dict(partitions=partitions, overwrite=overwrite)
+            return self.wrapped_func['process']
+
+        return wrap
+
+
+class PersonDataProcessHandler(ProcessHandler):
+    def __init__(self, id_type: PersonIdentifierType, access_path=None, bucket=None) -> None:
+        super().__init__(access_path=access_path, bucket=bucket)
+        self.id_type = id_type
+
+    def call_wrapped(self, s3_data, event):
+        data, partitions, overwrite = super().call_wrapped(s3_data, event)
+
+        pdtables = self.wrapped_func_args.get('process', {}).get('person_data_tables', [])
+
+        for table_name in pdtables:
+            frame = data[table_name]
+
+            assert self.id_type.value in frame, \
+                f"id column {self.id_type.name} missing on table {table_name}"
+
+            with PersonRepository() as repo:
+                frame["guid"] = frame[self.id_type.value].transform(lambda v: repo.get_guid_by(self.id_type, v))
+
+            del frame[self.id_type.value]
+
+            table_partition = partitions.get(table_name, [])
+
+            if "guid" not in table_partition:
+                table_partition.insert(0, "guid")
+
+            if self.id_type.value in table_partition:
+                table_partition.remove(self.id_type.value)
+
+            partitions[table_name] = table_partition
+
+        return data, partitions, overwrite
+
+    def process(self, partitions, person_data_tables: List[str], overwrite=False):
+        def wrap(f):
+            self.wrapped_func['process'] = make_wrapper_func(f, dict)
+            self.wrapped_func_args['process'] = dict(
+                partitions=partitions,
+                overwrite=overwrite,
+                person_data_tables=person_data_tables
+            )
             return self.wrapped_func['process']
 
         return wrap
