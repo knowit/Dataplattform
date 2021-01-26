@@ -1,10 +1,10 @@
-from dataplattform.common.handlers.process import PersonalProcessHandler
+from dataplattform.common.handlers.process import PersonDataProcessHandler
 from dataplattform.common.repositories.person_repository import PersonIdentifierType
 import pandas as pd
 from typing import Dict
 
 
-handler = PersonalProcessHandler(PersonIdentifierType.ALIAS)
+handler = PersonDataProcessHandler(PersonIdentifierType.ALIAS)
 
 
 @handler.process(partitions={})

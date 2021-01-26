@@ -136,7 +136,7 @@ class ProcessHandler:
         return wrap
 
 
-class PersonalProcessHandler(ProcessHandler):
+class PersonDataProcessHandler(ProcessHandler):
     def __init__(self, id_type: PersonIdentifierType, access_path=None, bucket=None) -> None:
         super().__init__(access_path=access_path, bucket=bucket)
         self.id_type = id_type
