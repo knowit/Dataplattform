@@ -144,7 +144,11 @@ class PersonDataProcessHandler(ProcessHandler):
     def call_wrapped(self, s3_data, event):
         data, partitions, overwrite = super().call_wrapped(s3_data, event)
 
-        for table_name, frame in data.items():
+        pdtables = self.wrapped_func_args['person_data_tables']
+
+        for table_name in pdtables:
+            frame = data[table_name]
+
             assert self.id_type.value in frame, \
                 f"id column {self.id_type.name} missing on table {table_name}"
 
@@ -164,3 +168,15 @@ class PersonDataProcessHandler(ProcessHandler):
             partitions[table_name] = table_partition
 
         return data, partitions, overwrite
+
+    def process(self, partitions, person_data_tables: List[str], overwrite=False):
+        def wrap(f):
+            self.wrapped_func['process'] = make_wrapper_func(f, dict)
+            self.wrapped_func_args['process'] = dict(
+                partitions=partitions,
+                overwrite=overwrite,
+                person_data_tables=person_data_tables
+            )
+            return self.wrapped_func['process']
+
+        return wrap
