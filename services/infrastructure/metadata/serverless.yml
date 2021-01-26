@@ -2,10 +2,6 @@ service: metadata
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  publicBucketName: public-raw-storage-bucket
-  privateBucketName: private-raw-storage-bucket
-  stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName} 
-  stagePrivateBucketName: ${self:custom.stage}-${self:custom.privateBucketName} 
   service: ${self:custom.stage}-${self:service}
 
 provider:
