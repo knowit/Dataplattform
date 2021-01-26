@@ -144,7 +144,7 @@ class PersonDataProcessHandler(ProcessHandler):
     def call_wrapped(self, s3_data, event):
         data, partitions, overwrite = super().call_wrapped(s3_data, event)
 
-        pdtables = self.wrapped_func_args['person_data_tables']
+        pdtables = self.wrapped_func_args.get('process', {}).get('person_data_tables', [])
 
         for table_name in pdtables:
             frame = data[table_name]
