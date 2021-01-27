@@ -48,10 +48,10 @@ class Glue:
 
             if path not in [target.get('Path', None) for target in current_targets]:
                 targets = [*current_targets, {
-                    'Path': path,
-                    'Exclusions': ['*_metadata']
-                }
-                           ]
+                        'Path': path,
+                        'Exclusions': ['*_metadata']
+                    }
+                ]
                 # Will not update if crawler is running
                 try:
                     self.glue.update_crawler(
@@ -66,6 +66,7 @@ class Glue:
             self.glue.start_crawler(Name=self.crawler_name)
         except ClientError as e:
             print(e)
+
 
 class S3:
     def __init__(self, access_path: str = None, bucket: str = None):
