@@ -1,10 +1,11 @@
 from dataplattform.common.handlers.ingest import IngestHandler
-from dataplattform.common.helper import save_document
+from dataplattform.common.helper import save_document, empty_content_in_path
 from dataplattform.common.aws import SSM
 from dataplattform.common.schema import Data, Metadata
 from datetime import datetime
 import requests
 from uuid import uuid4
+from os import environ
 
 url = 'https://knowit.cvpartner.com/api/v3'
 url_v1 = 'https://knowit.cvpartner.com/api/v1'
@@ -12,7 +13,7 @@ offset_size = 1000
 handler = IngestHandler()
 
 
-@handler.ingest()
+@handler.ingest(overwrite=True)
 def ingest(event) -> Data:
 
     objectnet_id = SSM(with_decryption=False).get('cv_partner_objectnet_id')
@@ -23,10 +24,12 @@ def ingest(event) -> Data:
                        headers={'Authorization': f'Bearer {api_token}'})
 
     data_json = res.json()
+    empty_content_in_path(bucket=environ.get('PRIVATE_BUCKET'), prefix=environ.get('PRIVATE_PREFIX'))
+    empty_content_in_path(bucket=environ.get('PUBLIC_BUCKET'), prefix=environ.get('PUBLIC_PREFIX'))
 
     def write_cv_doc_to_private_bucket(person, language: str = 'no', ext: str = 'pdf'):
         new_key = f'cv_{language}_{ext}'
-        filename = f'private/{uuid4()}.{ext}'
+        filename = f'{environ.get("PRIVATE_PREFIX")}/{uuid4()}.{ext}'
         http_request = {'requestUrl': get_cv_link(person['cv']['user_id'],
                                                   person['cv']['id'], language=language, ext=ext),
                         'header': {'Authorization': f'Bearer {api_token}'},
@@ -36,7 +39,7 @@ def ingest(event) -> Data:
 
     def write_cv_image_to_public_bucket(person, ext: str = 'jpg'):
         new_key = 'image_key'
-        filename = f'public/{uuid4()}.{ext}'
+        filename = f'{environ.get("PUBLIC_PREFIX")}/{uuid4()}.{ext}'
         http_request = {'requestUrl': person['cv']['image']['thumb']['url']}
         save_document(http_request, filename=filename, filetype=ext, private=False)
         return {new_key: filename}

@@ -1,4 +1,5 @@
 import boto3
+from dataplattform.common.aws import S3
 from os import environ
 from json import dumps
 
@@ -18,3 +19,8 @@ def save_document(http_request, filename, filetype, private=True):
     event['filetype'] = filetype
     event['private'] = private
     launch_async_lambda(dumps(event), environ.get('DOWNLOAD_LAMBDA'))
+
+
+def empty_content_in_path(bucket, prefix):
+    s3 = S3(bucket=bucket, access_path='')
+    s3.empty_content_in_path(path=prefix)

@@ -12,6 +12,8 @@ custom:
     scheduleRate: rate(7 days)
     accessLevel: level-3
     dataFolder: cvpartner
+    publicS3Prefix: public/images
+    privateS3Prefix: private/cvs
 
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
@@ -80,6 +82,10 @@ functions:
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
       DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
+      PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
+      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
+      PUBLIC_PREFIX: ${self:custom.editable.publicS3Prefix}
+      PRIVATE_PREFIX: ${self:custom.editable.privateS3Prefix}
     tags: # Tag for this function. Every function are tagged with stage by default
 
     events: # The Events that trigger this Function
@@ -153,11 +159,75 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
+                    - s3:DeleteObject
                   Resource:
                     - Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}-List
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-privateBucketArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}-List
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}-List
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:DeleteObject
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-privateBucketArn
+                          - /${self:custom.editable.privateS3Prefix}*
+          - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:DeleteObject
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - /${self:custom.editable.publicS3Prefix}*
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
