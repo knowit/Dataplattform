@@ -1,4 +1,4 @@
-from dataplattform.common.aws import S3, SNS
+from dataplattform.common.aws import S3, SNS, Glue
 from dataplattform.common.handlers import Response, verify_schema, make_wrapper_func
 from dataplattform.common.repositories.person_repository import PersonRepository, PersonIdentifierType
 from datetime import datetime
@@ -117,6 +117,9 @@ class ProcessHandler:
                              mkdirs=lambda x: None,  # noop
                              open_with=self.s3.fs.open,
                              append=table_exists)
+
+            glue = Glue()
+            glue.update_crawler(table_name)
 
             updated_tables.append(table_name)
 

@@ -24,6 +24,50 @@ class S3Result:
         return loads(self.res['Body'].read(), **json_args) if self.res else None
 
 
+class Glue:
+    def __init__(self, access_level=None, access_path=None):
+        self.access_level = access_level or environ.get('ACCESS_LEVEL')
+        self.access_path = access_path or environ.get('ACCESS_PATH')
+        self.bucket = environ.get('DATALAKE')
+        self.stage = environ.get('STAGE')
+        self.glue = boto3.client('glue')
+        self.crawler_name = f'{self.stage}_level_{self.access_level[-1]}_crawler'
+
+    def get_crawler(self):
+        try:
+            res = self.glue.get_crawler(Name=self.crawler_name)
+            return res
+        except ClientError as e:
+            print(e)
+
+    def update_crawler(self, table_name):
+        crawler_metadata = self.get_crawler()
+        if crawler_metadata is not None:
+            current_targets = crawler_metadata.get('Crawler', {}).get('Targets', {}).get('S3Targets', [])
+            path = f's3://{self.bucket}/{self.access_path}structured/{table_name}'
+
+            if path not in [target.get('Path', None) for target in current_targets]:
+                targets = [*current_targets, {
+                        'Path': path,
+                        'Exclusions': ['*_metadata']
+                    }
+                ]
+                # Will not update if crawler is running
+                try:
+                    self.glue.update_crawler(
+                        Name=self.crawler_name,
+                        Targets={'S3Targets': targets},
+                    )
+                except ClientError as e:
+                    print(e)
+
+    def start(self):
+        try:
+            self.glue.start_crawler(Name=self.crawler_name)
+        except ClientError as e:
+            print(e)
+
+
 class S3:
     def __init__(self, access_path: str = None, bucket: str = None):
         self.access_path = environ.get("ACCESS_PATH") if access_path is None else access_path

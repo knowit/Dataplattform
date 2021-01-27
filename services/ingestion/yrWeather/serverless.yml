@@ -114,6 +114,7 @@ functions:
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
+      ACCESS_LEVEL: ${self:custom.editable.accessLevel}
     tags: # Tag for this function. Every function are tagged with stage by default
 
 resources: # The resources your functions use
@@ -212,6 +213,19 @@ resources: # The resources your functions use
                         - ""
                         - - !ImportValue ${self:custom.stage}-datalakeArn
                           - '*'
+          - PolicyName: ${self:custom.stage}-glue-${self:service}-role
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - glue:GetCrawler
+                    - glue:UpdateCrawler
+                  Resource:
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
 
     EventQueue:
       Type: AWS::SQS::Queue
