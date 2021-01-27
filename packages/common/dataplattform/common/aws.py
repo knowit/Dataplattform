@@ -99,10 +99,13 @@ class S3:
                 raise e
             return S3Result(None, error=e)
 
-    def empty_content_in_path(self, path):
+    def empty_content_in_path(self, path, delete_all_versions=True):
         prefix = path_join(self.access_path, path)
         bucket = self.s3.Bucket(self.bucket)
-        bucket.objects.filter(Prefix=prefix).delete()
+        if delete_all_versions:
+            bucket.object_versions.filter(Prefix=prefix).delete()
+        else:
+            bucket.objects.filter(Prefix=prefix).delete()
 
     @property
     def fs(self):
