@@ -7,6 +7,7 @@ from io import BytesIO
 from os import environ
 from cachetools import cached, TTLCache
 from typing import Tuple, List
+from dataplattform.common.aws import S3
 
 
 @cached(cache=TTLCache(1, 60))
@@ -88,6 +89,9 @@ def execute(sql: str, preprocess_sql=True) -> pd.DataFrame:
 
     bucket, *path = output_location.lstrip('s3://').split('/')
     data = s3.Object(bucket, '/'.join(path)).get()
+
+    s3 = S3(access_path='', bucket=bucket)
+    s3.empty_content_in_path("query")
 
     # TODO store in s3 and return presigned download url
     # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-presigned-urls.html
