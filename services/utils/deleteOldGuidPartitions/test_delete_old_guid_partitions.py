@@ -143,7 +143,10 @@ def glue(mocker):
     glue_data = get_glue_data()
     glue_mock = mocker.MagicMock()
 
-    glue_mock.get_databases.return_value = dict(DatabaseList=glue_data['databases'])
+    def get_databases():
+        return dict(DatabaseList=glue_data['databases'])
+
+    glue_mock.get_databases.side_effect = get_databases
 
     def get_tables(**kwargs):
         tables = filter(lambda t: t['DatabaseName'] == kwargs['DatabaseName'], glue_data['tables'])
@@ -166,6 +169,25 @@ def glue(mocker):
         return dict(Partitions=list(partitions))
 
     glue_mock.get_partitions.side_effect = get_partitions
+
+    get_databases_mock = mocker.MagicMock()
+    get_databases_mock.paginate.return_value = [get_databases()]
+    get_tables_mock = mocker.MagicMock()
+    get_tables_mock.paginate.side_effect = lambda **kwargs: [get_tables(**kwargs)]
+    get_partitions_mock = mocker.MagicMock()
+    get_partitions_mock.paginate.side_effect = lambda **kwargs: [get_partitions(**kwargs)]
+
+    mocks = dict(
+        get_databases=get_databases_mock,
+        get_tables=get_tables_mock,
+        get_partitions=get_partitions_mock
+    )
+
+    def get_paginator(service):
+        print(f"get paginator for: {service}")
+        return mocks.get(service, mocker.DEFAULT)
+
+    glue_mock.get_paginator.side_effect = get_paginator
 
     mocker.patch(
         'boto3.client',
@@ -221,7 +243,7 @@ def test_get_guids(person_repository):
 
 def test_glue_get_databases(s3, glue, person_repository):
     handler(None, None)
-    glue.get_databases.assert_called_once()
+    glue.get_paginator.assert_any_call('get_databases')
 
 
 def test_glue_get_tables(s3, glue, person_repository):
@@ -232,8 +254,9 @@ def test_glue_get_tables(s3, glue, person_repository):
 
     handler(None, None)
 
-    assert glue.get_tables.call_count == 2
-    glue.get_tables.assert_has_calls(calls)
+    table_paginator = glue.get_paginator('get_tables')
+    assert table_paginator.paginate.call_count == 2
+    table_paginator.paginate.assert_has_calls(calls)
 
 
 def test_glue_get_partitions(s3, glue, person_repository):
@@ -250,8 +273,9 @@ def test_glue_get_partitions(s3, glue, person_repository):
 
     handler(None, None)
 
-    assert glue.get_partitions.call_count == 2
-    glue.get_partitions.assert_has_calls(calls)
+    partition_paginator = glue.get_paginator('get_partitions')
+    assert partition_paginator.paginate.call_count == 2
+    partition_paginator.paginate.assert_has_calls(calls)
 
 
 def test_glue_delete_partitions(s3, glue, person_repository):

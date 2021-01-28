@@ -1,6 +1,7 @@
-import boto3
 from os import environ
 from dataplattform.common.repositories.person_repository import PersonRepository
+from dataplattform.common.helper import empty_content_in_path
+from dataplattform.common.aws import Glue
 
 
 def get_guids():
@@ -21,29 +22,24 @@ def transform_uri(uri, bucketname):
 
 
 def handler(event, context):
-    glue = boto3.client('glue')
-    datalake = boto3.resource('s3').Bucket(environ.get('DATALAKE'))
+    glue = Glue()
     guids = get_guids()
 
-    for database in glue.get_databases()['DatabaseList']:
-        tables = glue.get_tables(DatabaseName=database['Name'])
-        tables = filter(check_partitionkeys, tables['TableList'])
+    for database in glue.get_databases():
+        tables = glue.get_tables(database['Name'])
+        tables = filter(check_partitionkeys, tables)
         for table in tables:
-            outdated_partitions = glue.get_partitions(
-                DatabaseName=database['Name'],
-                TableName=table['Name'],
-                Expression="guid NOT IN ({})".format(','.join(map(lambda g: f"'{g}'", guids)))
-            )['Partitions']
-
-            partitions_to_delete = [{k: v for k, v in p.items() if k == 'Values'} for p in outdated_partitions]
-
-            glue.batch_delete_partition(
-                DatabaseName=database['Name'],
-                TableName=table['Name'],
-                PartitionsToDelete=partitions_to_delete
+            partitions_to_delete = glue.get_partitions(
+                database['Name'],
+                table['Name'],
+                "guid NOT IN ({})".format(','.join(map(lambda g: f"'{g}'", guids)))
             )
 
-            for p in outdated_partitions:
-                keyPrefix = transform_uri(p['StorageDescriptor']['Location'], datalake.name)
-                print(keyPrefix)
-                datalake.objects.filter(Prefix=keyPrefix).delete()
+            values = [{k: v for k, v in p.items() if k == 'Values'} for p in partitions_to_delete]
+
+            glue.delete_partitions(database['Name'], table['Name'], values)
+
+            datalake = environ.get("DATALAKE")
+            for p in partitions_to_delete:
+                keyPrefix = transform_uri(p['StorageDescriptor']['Location'], datalake)
+                empty_content_in_path(environ.get('DATALAKE'), keyPrefix)
