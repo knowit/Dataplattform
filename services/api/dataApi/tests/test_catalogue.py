@@ -39,7 +39,7 @@ def test_database_route_404_ignore(client):
 
 
 def test_database_table_route_404_ignore(client):
-    response = client.get('/catalogue/database/default/test_table')
+    response = client.get('/catalogue/database/default/table/test_table_default')
     assert response.status_code == 404
 
 

@@ -1,6 +1,6 @@
-import boto3
-from botocore.exceptions import ClientError
 import os
+from botocore.exceptions import ClientError
+from dataplattform.common.aws import Glue
 
 STAGE = os.environ.get('STAGE', None)
 
@@ -15,22 +15,21 @@ class GlueRepositoryNotFoundException(Exception):
 
 class GlueRepositoryBase:
     def __init__(self):
-        self.client = boto3.client('glue')
+        self.glue = Glue(ignore_databases=['default'])
 
 
 class DatabaseRepository(GlueRepositoryBase):
-    ignore_databases = ['default']
 
     def get(self, database_name: str):
         try:
-            db = self.client.get_database(Name=f'{STAGE}_{database_name}' if STAGE else database_name)
-            if (db['Database']['Name'] in self.ignore_databases):
-                raise GlueRepositoryNotFoundException('Not found')
+            db = self.glue.get_database(f'{STAGE}_{database_name}' if STAGE else database_name)
             return {
-                **db['Database'],
-                'Name': db['Database']['Name'].lstrip(f'{STAGE}_'),
-                '_Name': db['Database']['Name']
+                **db,
+                'Name': db['Name'].lstrip(f'{STAGE}_'),
+                '_Name': db['Name']
             }
+        except Glue.DatabaseIgnoredException:
+            raise GlueRepositoryNotFoundException('Not found')
         except ClientError as error:
             if error.response['Error']['Code'] == 'EntityNotFoundException':
                 raise GlueRepositoryNotFoundException(error.response['Error']['Message'])
@@ -38,13 +37,11 @@ class DatabaseRepository(GlueRepositoryBase):
                 raise GlueRepositoryException(error.response['Error']['Message'])
 
     def all(self):
-        paginator = self.client.get_paginator('get_databases')
         try:
-            response_iterator = paginator.paginate()
+            databases = self.glue.get_databases()
             return [
                 {**db, 'Name': db['Name'].lstrip(f'{STAGE}_'), '_Name': db['Name']}
-                for resp in response_iterator for db in resp['DatabaseList']
-                if db['Name'] not in self.ignore_databases
+                for db in databases
             ]
         except ClientError as error:
             raise GlueRepositoryException(error.response['Error']['Message'])
@@ -53,10 +50,10 @@ class DatabaseRepository(GlueRepositoryBase):
 class TableRepository(GlueRepositoryBase):
     def get(self, database_name: str, table_name: str):
         try:
-            table = self.client.get_table(
-                DatabaseName=f'{STAGE}_{database_name}' if STAGE else database_name,
-                Name=table_name)
+            table = self.glue.get_table(table_name, f'{STAGE}_{database_name}' if STAGE else database_name)
             return {**table['Table'], 'DatabaseName': table['Table']['DatabaseName'].lstrip(f'{STAGE}_')}
+        except Glue.DatabaseIgnoredException:
+            raise GlueRepositoryNotFoundException('Not Found')
         except ClientError as error:
             if error.response['Error']['Code'] == 'EntityNotFoundException':
                 raise GlueRepositoryNotFoundException(error.response['Error']['Message'])
@@ -64,12 +61,11 @@ class TableRepository(GlueRepositoryBase):
                 raise GlueRepositoryException(error.response['Error']['Message'])
 
     def all(self, database_name: str):
-        paginator = self.client.get_paginator('get_tables')
         try:
-            response_iterator = paginator.paginate(DatabaseName=f'{STAGE}_{database_name}' if STAGE else database_name)
+            tables = self.glue.get_tables(f'{STAGE}_{database_name}' if STAGE else database_name)
             return [
                 {**table, 'DatabaseName': table['DatabaseName'].lstrip(f'{STAGE}_')}
-                for resp in response_iterator for table in resp['TableList']
+                for table in tables
             ]
         except ClientError as error:
             raise GlueRepositoryException(error.response['Error']['Message'])
