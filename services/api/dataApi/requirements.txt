@@ -4,3 +4,4 @@ werkzeug
 flask-cors
 file:./common_lib
 file:../../../packages/api
+file:../../../packages/common
