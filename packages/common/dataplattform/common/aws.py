@@ -25,12 +25,65 @@ class S3Result:
 
 
 class Glue:
+
+    class DatabaseIgnoredException(Exception):
+        pass
+
+    def __init__(self, ignore_databases=[]):
+        self.glue = boto3.client('glue')
+        self.ignore_databases = ignore_databases
+
+    def get_database(self, name):
+        if name in self.ignore_databases:
+            raise Glue.DatabaseIgnoredException(f'{name} is on ignore list')
+
+        return self.glue.get_database(Name=name)['Database']
+
+    def get_databases(self):
+        iterator = self.glue.get_paginator('get_databases').paginate()
+        return [
+            db
+            for resp in iterator for db in resp['DatabaseList']
+            if db['Name'] not in self.ignore_databases
+        ]
+
+    def get_table(self, name, database):
+        if database in self.ignore_databases:
+            raise Glue.DatabaseIgnoredException(f'{database} is on ignore list')
+
+        return self.glue.get_table(Name=name, DatabaseName=database)
+
+    def get_tables(self, database):
+        iterator = self.glue \
+            .get_paginator('get_tables') \
+            .paginate(DatabaseName=database)
+        return [tbl for resp in iterator for tbl in resp['TableList']]
+
+    def get_partitions(self, database, table, expression=None):
+        iterator = self.glue \
+            .get_paginator('get_partitions') \
+            .paginate(DatabaseName=database, TableName=table, Expression=expression)
+        return [part for resp in iterator for part in resp['Partitions']]
+
+    def get_paritions_values(self, database, table, expression=None):
+        partitions = self.get_paritions(database, table, expression)
+        return [{k: v for k, v in p.items() if k == 'Values'} for p in partitions]
+
+    def delete_partitions(self, database, table, values):
+        return self.glue.batch_delete_partition(
+            DatabaseName=database,
+            TableName=table,
+            PartitionsToDelete=values
+        )
+
+
+class GlueCrawler(Glue):
     def __init__(self, access_level=None, access_path=None):
+        super().__init__()
         self.access_level = access_level or environ.get('ACCESS_LEVEL')
         self.access_path = access_path or environ.get('ACCESS_PATH')
         self.bucket = environ.get('DATALAKE')
         self.stage = environ.get('STAGE')
-        self.glue = boto3.client('glue')
         self.crawler_name = f'{self.stage}_level_{self.access_level[-1]}_crawler'
 
     def get_crawler(self):
