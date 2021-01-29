@@ -21,6 +21,6 @@ def save_document(http_request, filename, filetype, private=True):
     launch_async_lambda(dumps(event), environ.get('DOWNLOAD_LAMBDA'))
 
 
-def empty_content_in_path(bucket, prefix):
+def empty_content_in_path(bucket, prefix, delete_all_versions=False):
     s3 = S3(bucket=bucket, access_path='')
-    s3.empty_content_in_path(path=prefix)
+    s3.empty_content_in_path(path=prefix, delete_all_versions=delete_all_versions)
