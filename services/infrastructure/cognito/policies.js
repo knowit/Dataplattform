@@ -6,14 +6,14 @@ module.exports = serverless => {
     const commonStatement = [
         {
             'Effect': 'Allow',
-            'Action': ['s3:GetBucketLocation', 's3:ListBucket', 's3:ListBucketMultipartUploads'],
+            'Action': ['s3:GetBucketLocation', 's3:ListBucket', 's3:ListBucketMultipartUploads', 's3:ListBucketVersions'],
             'Resource': [
                 {'Fn::ImportValue': `${stage}-datalakeArn`}
             ]
         },
         {
             'Effect': 'Allow',
-            'Action': ['s3:GetObject', 's3:PutObject', 's3:ListMultipartUploadParts', 's3:AbortMultipartUpload', 's3:DeleteObject'],
+            'Action': ['s3:GetObject', 's3:PutObject', 's3:ListMultipartUploadParts', 's3:AbortMultipartUpload', 's3:DeleteObject', 's3:DeleteObjectVersion'],
             'Resource': [
                 {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, '/query*']]}
             ]

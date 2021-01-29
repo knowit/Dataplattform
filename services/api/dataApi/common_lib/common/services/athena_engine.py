@@ -91,7 +91,7 @@ def execute(sql: str, preprocess_sql=True) -> pd.DataFrame:
     data = s3.Object(bucket, '/'.join(path)).get()
 
     s3 = S3(access_path='', bucket=bucket)
-    s3.empty_content_in_path("query")
+    s3.empty_content_in_path("query", delete_all_versions=True)
 
     # TODO store in s3 and return presigned download url
     # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/s3-presigned-urls.html
