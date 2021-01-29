@@ -37,7 +37,7 @@ class IngestHandler:
 
         if result:
             if overwrite:
-                s3.empty_content_in_path('raw')
+                s3.empty_content_in_path('raw', delete_all_versions=True)
             SQS().send_custom_filename_message(
                 s3.put(result, 'raw'))
 
