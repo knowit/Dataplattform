@@ -70,16 +70,17 @@ def execute(sql: str, preprocess_sql=True) -> pd.DataFrame:
     s3 = boto3.resource('s3')
     athena = boto3.client('athena')
 
+    staging_dir = f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}/environ.get("DEFAULT_STAGING_DIR", \
+                   "/data/level-3/athena-stage")'
     begin_query_response = athena.start_query_execution(
         QueryString=sql,
         ResultConfiguration={
-            'OutputLocation': f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}/query/',
+            'OutputLocation': staging_dir,
             'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'}
         }
     )
 
     query_id = begin_query_response['QueryExecutionId']
-
     while True:
         sleep(0.1)
         output_location = query_complete(athena, query_id)
