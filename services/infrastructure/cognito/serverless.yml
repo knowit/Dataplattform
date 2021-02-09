@@ -2,9 +2,7 @@ service: cognito
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  policies: ${file(./policies.js)}
-  levelStagingDir: !ImportValue ${self:custom.stage}-defaultStagingDir
-      
+  policies: ${file(./policies.js)}    
 
 provider:
   name: aws

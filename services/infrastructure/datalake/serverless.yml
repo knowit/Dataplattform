@@ -81,15 +81,15 @@ resources:
     Level3StagingDir:
       Value: ${self:custom.default_level_3_staging_dir}
       Export:
-        Name: ${self:custom.stage}-default-level-3-staging_dir
+        Name: ${self:custom.stage}-level-3-staging_dir
     Level2StagingDir:
       Value: ${self:custom.default_level_2_staging_dir}
       Export:
-        Name: ${self:custom.stage}-default-level-2-staging_dir
+        Name: ${self:custom.stage}-level-2-staging_dir
     Level1StagingDir:
       Value: ${self:custom.default_level_1_staging_dir}
       Export:
-        Name: ${self:custom.stage}-default-level-1-staging_dir
+        Name: ${self:custom.stage}-level-1-staging_dir
     LogBucketName:
       Value: ${self:resources.Resources.LogBucket.Properties.BucketName}
       Export:

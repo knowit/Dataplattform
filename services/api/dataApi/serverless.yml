@@ -71,9 +71,12 @@ functions:
     environment: 
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
-      DEFAULT_STAGING_DIR: !ImportValue ${self:custom.stage}-defaultStagingDir
       NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
       DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn
+      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-level-3-staging_dir
+      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-level-2-staging_dir
+      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-level-1-staging_dir
+      
     events:
       - http:
           method: ANY
