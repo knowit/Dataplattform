@@ -4,7 +4,9 @@ custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
-  default_staging_dir: data/level-3/athena-stage
+  default_level_3_staging_dir: data/level-3/athena-stage
+  default_level_2_staging_dir: data/level-2/athena-stage
+  default_level_1_staging_dir: data/level-1/athena-stage
 
 
 provider:
@@ -52,7 +54,15 @@ resources:
           Rules:
             - ExpirationInDays: 7
               NoncurrentVersionExpirationInDays: 7
-              Prefix: ${self:custom.default_staging_dir}
+              Prefix: ${self:custom.default_level_3_staging_dir}
+              Status: Enabled
+            - ExpirationInDays: 7
+              NoncurrentVersionExpirationInDays: 7
+              Prefix: ${self:custom.default_level_2_staging_dir}
+              Status: Enabled
+            - ExpirationInDays: 7
+              NoncurrentVersionExpirationInDays: 7
+              Prefix: ${self:custom.default_level_1_staging_dir}
               Status: Enabled
         LoggingConfiguration:
           DestinationBucketName: ${self:resources.Resources.LogBucket.Properties.BucketName}
@@ -68,10 +78,18 @@ resources:
       Value: ${self:resources.Resources.DataLake.Properties.BucketName}
       Export:
         Name: ${self:custom.stage}-datalakeName
-    DefaultStagingDir:
-      Value: ${self:custom.default_staging_dir}
+    Level3StagingDir:
+      Value: ${self:custom.default_level_3_staging_dir}
       Export:
-        Name: ${self:custom.stage}-defaultStagingDir
+        Name: ${self:custom.stage}-default-level-3-staging_dir
+    Level2StagingDir:
+      Value: ${self:custom.default_level_2_staging_dir}
+      Export:
+        Name: ${self:custom.stage}-default-level-2-staging_dir
+    Level1StagingDir:
+      Value: ${self:custom.default_level_1_staging_dir}
+      Export:
+        Name: ${self:custom.stage}-default-level-1-staging_dir
     LogBucketName:
       Value: ${self:resources.Resources.LogBucket.Properties.BucketName}
       Export:
