@@ -34,6 +34,10 @@ resources:
           BlockPublicPolicy: True
           IgnorePublicAcls: True
           RestrictPublicBuckets: True
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
 
   #Arn of S3 bucket needs to be exported in order to use it from other services (ingestion and processing)
   Outputs:
