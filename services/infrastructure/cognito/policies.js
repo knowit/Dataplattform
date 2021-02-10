@@ -47,6 +47,13 @@ module.exports = serverless => {
     const accessStatement = (path, database) => ([
         {
             'Effect': 'Allow',
+            'Action': ['s3:GetObject', 's3:PutObject', 's3:ListMultipartUploadParts', 's3:AbortMultipartUpload', 's3:DeleteObject'],
+            'Resource': [
+                {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, `/data/${path}/athena-stage/*`]]}
+            ]
+        },
+        {
+            'Effect': 'Allow',
             'Action': ['s3:GetObject'],
             'Resource': [
                 {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, `/data/${path}/*`]]}

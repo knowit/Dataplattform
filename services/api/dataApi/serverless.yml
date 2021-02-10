@@ -9,7 +9,7 @@ custom:
     packRequirements: false
     pythonBin: python
   pythonRequirements:
-    dockerizePip: true
+    dockerizePip: non-linux
     slim: true
     slimPatternsAppendDefaults: false
     slimPatterns:
@@ -38,7 +38,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
   runtime: python3.7
   memorySize: 1024
   timeout: 28
@@ -73,9 +73,9 @@ functions:
       STAGE: ${self:custom.stage}
       NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
       DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn
-      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-level-3-staging_dir
-      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-level-2-staging_dir
-      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-level-1-staging_dir
+      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-level-3-staging-dir
+      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-level-2-staging-dir
+      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-level-1-staging-dir
       
     events:
       - http:
