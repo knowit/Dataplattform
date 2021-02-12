@@ -26,12 +26,19 @@ resources:
           BlockPublicPolicy: true
           IgnorePublicAcls: true
           RestrictPublicBuckets: true
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+              - ServerSideEncryptionByDefault:
+                  SSEAlgorithm: AES256
+
+    
   
     PublicRawStorageBucket:
      Type: AWS::S3::Bucket
      Properties:
         BucketName: ${self:custom.stagePublicBucketName}
         AccessControl: PublicRead
+      
 
     PrivateCloudFrontOriginAccessIdentity:
       Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
