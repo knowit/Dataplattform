@@ -1,4 +1,4 @@
 file:../../../packages/common
-requests==2.23
-xmltodict==0.12
+requests
+xmltodict
 numpy
