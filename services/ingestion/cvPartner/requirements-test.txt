@@ -1,2 +1,2 @@
-responses==0.10
+responses
 file:../../../packages/testing
