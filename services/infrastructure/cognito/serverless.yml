@@ -2,7 +2,7 @@ service: cognito
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  policies: ${file(./policies.js)}
+  policies: ${file(./policies.js)}    
 
 provider:
   name: aws

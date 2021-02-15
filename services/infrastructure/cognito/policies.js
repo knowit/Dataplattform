@@ -13,13 +13,6 @@ module.exports = serverless => {
         },
         {
             'Effect': 'Allow',
-            'Action': ['s3:GetObject', 's3:PutObject', 's3:ListMultipartUploadParts', 's3:AbortMultipartUpload', 's3:DeleteObject'],
-            'Resource': [
-                {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, '/query*']]}
-            ]
-        },
-        {
-            'Effect': 'Allow',
             'Action': ['athena:StartQueryExecution', 'athena:GetQueryExecution'],
             'Resource': [
                 {'Fn::Join': [':', ['arn:aws:athena', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, 'workgroup/primary']]}
@@ -41,7 +34,7 @@ module.exports = serverless => {
             'Effect': 'Allow',
             'Action': ['dynamodb:Scan', 'dynamodb:GetItem', 'dynamodb:PutItem', 'dynamodb:DeleteItem'],
             'Resource': [
-                {'Fn::Join': [':', ['arn:aws:dynamodb', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, `table/${stage}_*`]]},
+                {'Fn::Join': [':', ['arn:aws:dynamodb', {'Ref': 'AWS::Region'}, {'Ref': 'AWS::AccountId'}, `table/${stage}_reports_table`]]},
             ]
         },
         {
@@ -52,6 +45,13 @@ module.exports = serverless => {
     ]
 
     const accessStatement = (path, database) => ([
+        {
+            'Effect': 'Allow',
+            'Action': ['s3:GetObject', 's3:PutObject', 's3:ListMultipartUploadParts', 's3:AbortMultipartUpload', 's3:DeleteObject'],
+            'Resource': [
+                {'Fn::Join': ['', [{'Fn::ImportValue': `${stage}-datalakeArn`}, `/data/${path}/athena-stage/*`]]}
+            ]
+        },
         {
             'Effect': 'Allow',
             'Action': ['s3:GetObject'],

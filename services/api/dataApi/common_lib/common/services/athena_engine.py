@@ -40,8 +40,18 @@ def table_map():
 
 def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
     used_tables = []
+    protection_level = 1
+    tmp_sql = sql.split(' ')
     for (_, database, table) in table_map():
-        if table in sql:
+        if table in tmp_sql:
+            tmp_database = database
+            tmp_str = tmp_database.replace(f'{environ.get("STAGE", "dev")}_level_', '').split('_database')
+            protection_level_tmp = int(tmp_str[0])
+            if (protection_level_tmp not in [1, 2, 3]):
+                raise ValueError("Protection level not in correct range")
+            else:
+                protection_level = max(protection_level_tmp, protection_level)
+
             used_tables.append((database, table))
             sql = sql.replace(table, f'{database}.{table}')
 
@@ -49,7 +59,7 @@ def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
     if statement.get_type() != 'SELECT':
         raise Exception('Illegal SQL statement')
 
-    return str(statement), used_tables
+    return str(statement), used_tables, protection_level
 
 
 def query_complete(athena, query_id: str):
@@ -63,23 +73,37 @@ def query_complete(athena, query_id: str):
         return None
 
 
+def get_staging_dir(protection_level):
+    rootdir = f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}'
+    if protection_level == 3:
+        return rootdir + "/" + str(environ.get('LEVEL_3_STAGING_DIR'))
+    elif protection_level == 2:
+        return rootdir + "/" + str(environ.get('LEVEL_2_STAGING_DIR'))
+    elif protection_level == 1:
+        return rootdir + "/" + str(environ.get('LEVEL_1_STAGING_DIR'))
+    else:
+        raise ValueError("Protection level not in correct range")
+
+
 def execute(sql: str, preprocess_sql=True) -> pd.DataFrame:
+    protection_level = 3
     if preprocess_sql:
-        sql, _ = process_sql(sql)
+        sql, _, protection_level = process_sql(sql)
 
     s3 = boto3.resource('s3')
     athena = boto3.client('athena')
 
+    print(get_staging_dir(protection_level))
+
     begin_query_response = athena.start_query_execution(
         QueryString=sql,
         ResultConfiguration={
-            'OutputLocation': f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}/query/',
+            'OutputLocation':  get_staging_dir(protection_level),
             'EncryptionConfiguration': {'EncryptionOption': 'SSE_S3'}
         }
     )
 
     query_id = begin_query_response['QueryExecutionId']
-
     while True:
         sleep(0.1)
         output_location = query_complete(athena, query_id)
