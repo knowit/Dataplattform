@@ -20,7 +20,6 @@ def validate(event) -> bool:
 
 @handler.ingest()
 def ingest(event) -> Data:
-    print(event)
     body = loads(event['body'])
     event_type, item = body['webhookEvent'].split(':')[-1], body['issue']
 

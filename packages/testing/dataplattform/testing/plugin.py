@@ -1,5 +1,7 @@
+import datetime
+
 from pytest import fixture, hookimpl
-from moto import mock_s3, mock_ssm, mock_sqs, mock_sns
+from moto import mock_s3, mock_ssm, mock_sqs, mock_sns, mock_dynamodb2
 from boto3 import resource, client
 from os import environ
 from unittest.mock import patch, MagicMock
@@ -34,11 +36,56 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('SNS_TOPIC_NAME', 'test_sns_topic'),
         ('PUBLIC_PREFIX', 'public/images'),
         ('PRIVATE_PREFIX', 'private/cvs'),
-        ('ACCESS_LEVEL', 'level-1')
+        ('ACCESS_LEVEL', 'level-1'),
+        ('PERSON_DATA_TABLE', 'my_test_person_data_table')
     ]
     for key, value in default_env:
         if key not in environ:
             environ[key] = value
+
+
+@fixture
+def db_person_data():
+    yield [
+        {'guid': '20dbbfa18380233aa643575720b893fac5137699', 'email': 'per.nordmann@knowit.no',
+         'displayName': 'Per Nordmann', 'alias': 'pernord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
+         'distinguished_name': 'Per Nordmann', 'manager': 'Olav Nordmann'},
+        {'guid': '491b9fa9bfac17563882b0fdc6f3a8a97417bd99', 'email': 'kari.nordmann@knowit.no',
+         'displayName': 'Kari Nordmann', 'alias': 'karnord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
+         'distinguished_name': 'Kari Nordmann', 'manager': 'Olav Nordmann'},
+        {'guid': '5edbcdf460809039eb4897ccf8ce3bb5e501884d', 'email': 'lisa.nordmann@knowit.no',
+         'displayName': 'Lisa Nordmann', 'alias': 'lisnord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
+         'distinguished_name': 'Lisa Nordmann', 'manager': 'Per Nordmann'}
+    ]
+
+
+@fixture()
+def dynamodb_resource(db_person_data):
+    with mock_dynamodb2():
+        dynamodb_resource = resource('dynamodb')
+        table = dynamodb_resource.create_table(
+            TableName=environ.get('PERSON_DATA_TABLE'),
+            KeySchema=[
+                {
+                    'AttributeName': "guid",
+                    'KeyType': "HASH"  # Partition key
+                }
+            ],
+            AttributeDefinitions=[
+                {
+                    'AttributeName': "guid",
+                    'AttributeType': "S"
+                }
+            ],
+            ProvisionedThroughput={
+                'ReadCapacityUnits': 10,
+                'WriteCapacityUnits': 10
+            }
+        )
+        for item in db_person_data:
+            table.put_item(
+                Item=item)
+        yield table
 
 
 @fixture(autouse=True)
@@ -223,3 +270,61 @@ def create_table_mock(mocker):
     on_to_parquet_stub.assert_table_data_contains_df = assert_table_data_contains_df
 
     yield on_to_parquet_stub
+
+
+class GlueCrawlerMock:
+    def __init__(self):
+        self.d = datetime.datetime(2015, 1, 1).isoformat()
+        self.crawlers = {'dev_level_1_crawler': {
+            'Name': 'dev_level_1_crawler',
+            'Role': 'test-glue-level-1-glue-access',
+            'Targets': {
+                'S3Targets': [
+                    {
+                        'Path': 's3://dev-datalake-datalake/data/level-1/test_table',
+                        'Exclusions': [
+                            '*_metadata',
+                        ],
+                    },
+                ]
+            },
+            'DatabaseName': 'test_database',
+            'Description': 'database storing the glue table meta data',
+            'RecrawlPolicy': {
+                'RecrawlBehavior': 'CRAWL_EVERYTHING'
+            },
+            'State': 'READY',
+            'TablePrefix': 'string',
+            'Schedule': {
+                'ScheduleExpression': '0 0 * * ? *',
+                'State': 'SCHEDULED'
+            },
+            'CreationTime': self.d,
+            'Version': 123,
+        }}
+
+    def get_crawler(self, Name):
+        return {"Crawler": self.crawlers[Name]}
+
+    def update_crawler(self, Name, Targets):
+        self.crawlers[Name]['Targets'].update(Targets)
+
+
+@fixture
+def class_fixture():
+    yield GlueCrawlerMock()
+
+
+@fixture
+def glue(mocker, class_fixture):
+    mocker.patch(
+        'boto3.client',
+        side_effect=lambda service: class_fixture if service == 'glue' else mocker.DEFAULT
+    )
+    yield class_fixture
+
+
+@fixture(autouse=True)
+def glue_mock(mocker):
+    mock_glue = mocker.patch('dataplattform.common.aws.Glue.update_crawler')
+    yield mock_glue
