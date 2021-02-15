@@ -1,13 +1,13 @@
-from dataplattform.common.handlers.process import ProcessHandler
+from dataplattform.common.handlers.process import PersonDataProcessHandler
+from dataplattform.common.repositories.person_repository import PersonIdentifierType
 from typing import Dict
 import pandas as pd
 import numpy as np
 
+handler = PersonDataProcessHandler(PersonIdentifierType.EMAIL)
 
-handler = ProcessHandler()
 
-
-@handler.process(partitions={}, overwrite=True)
+@handler.process(partitions={}, overwrite=True,  person_data_tables=['cv_partner_employees'])
 def process(data, events) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()

@@ -272,58 +272,6 @@ def create_table_mock(mocker):
     yield on_to_parquet_stub
 
 
-class GlueCrawlerMock:
-    def __init__(self):
-        self.d = datetime.datetime(2015, 1, 1).isoformat()
-        self.crawlers = {'dev_level_1_crawler': {
-            'Name': 'dev_level_1_crawler',
-            'Role': 'test-glue-level-1-glue-access',
-            'Targets': {
-                'S3Targets': [
-                    {
-                        'Path': 's3://dev-datalake-datalake/data/level-1/test_table',
-                        'Exclusions': [
-                            '*_metadata',
-                        ],
-                    },
-                ]
-            },
-            'DatabaseName': 'test_database',
-            'Description': 'database storing the glue table meta data',
-            'RecrawlPolicy': {
-                'RecrawlBehavior': 'CRAWL_EVERYTHING'
-            },
-            'State': 'READY',
-            'TablePrefix': 'string',
-            'Schedule': {
-                'ScheduleExpression': '0 0 * * ? *',
-                'State': 'SCHEDULED'
-            },
-            'CreationTime': self.d,
-            'Version': 123,
-        }}
-
-    def get_crawler(self, Name):
-        return {"Crawler": self.crawlers[Name]}
-
-    def update_crawler(self, Name, Targets):
-        self.crawlers[Name]['Targets'].update(Targets)
-
-
-@fixture
-def class_fixture():
-    yield GlueCrawlerMock()
-
-
-@fixture
-def glue(mocker, class_fixture):
-    mocker.patch(
-        'boto3.client',
-        side_effect=lambda service: class_fixture if service == 'glue' else mocker.DEFAULT
-    )
-    yield class_fixture
-
-
 @fixture(autouse=True)
 def glue_mock(mocker):
     mock_glue = mocker.patch('dataplattform.common.aws.Glue.update_crawler')

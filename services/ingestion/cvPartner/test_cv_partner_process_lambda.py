@@ -4,6 +4,7 @@ from pytest import fixture
 from os import path
 from json import load
 import pandas as pd
+from io import BytesIO
 
 
 @fixture
@@ -30,7 +31,7 @@ def setup_queue_event(s3_bucket):
     yield make_queue_event
 
 
-def test_initial_process(setup_queue_event, test_data, create_table_mock):
+def test_initial_process(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -49,7 +50,7 @@ def test_initial_process(setup_queue_event, test_data, create_table_mock):
         'cv_partner_work_experience')
 
 
-def test_process_table_content(setup_queue_event, test_data, create_table_mock):
+def test_process_table_content(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -60,10 +61,12 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock):
         'cv_partner_employees',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_2'],
+            'guid': ['20dbbfa18380233aa643575720b893fac5137699', '491b9fa9bfac17563882b0fdc6f3a8a97417bd99'],
+            'manager': ['Olav Nordmann', 'Olav Nordmann'],
             'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
             'link': ["link1", "link2"],
+            'email': ['per.nordmann@knowit.no', 'kari.nordmann@knowit.no'],
             'navn': ['Test Testerson', 'Test Testerson 2'],
-            'email': ["test@test.no", "test@test2.no"],
             'telefon': ['+123456', '+123456'],
             'born_year': [1995, 1985],
             'nationality': ["Norwegian", "Swedish"],
@@ -77,7 +80,7 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock):
         }))
 
 
-def test_process_table_content_missing_born_date(setup_queue_event, test_data, create_table_mock):
+def test_process_table_content_missing_born_date(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
 
     tmp_data = test_data['data']
     tmp_data[0]['cv'].pop('born_year', None)
@@ -92,10 +95,12 @@ def test_process_table_content_missing_born_date(setup_queue_event, test_data, c
         'cv_partner_employees',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_2'],
+            'guid': ['20dbbfa18380233aa643575720b893fac5137699', '491b9fa9bfac17563882b0fdc6f3a8a97417bd99'],
+            'manager': ['Olav Nordmann', 'Olav Nordmann'],
             'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
             'link': ["link1", "link2"],
             'navn': ['Test Testerson', 'Test Testerson 2'],
-            'email': ["test@test.no", "test@test2.no"],
+            'email': ['per.nordmann@knowit.no', 'kari.nordmann@knowit.no'],
             'telefon': ['+123456', '+123456'],
             'born_year': [-1, 1985],
             'nationality': ["Norwegian", "Swedish"],
@@ -104,7 +109,7 @@ def test_process_table_content_missing_born_date(setup_queue_event, test_data, c
         }))
 
 
-def test_process_education_table_content(setup_queue_event, test_data, create_table_mock):
+def test_process_education_table_content(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -129,7 +134,7 @@ Case: user1 has no education
 
 
 def test_process_education_table_content_missing(setup_queue_event, test_data,
-                                                 create_table_mock):
+                                                 create_table_mock, dynamodb_resource):
 
     tmp_data = test_data['data']
     tmp_data[0]['cv'].pop('educations', None)
@@ -152,7 +157,7 @@ def test_process_education_table_content_missing(setup_queue_event, test_data,
             }))
 
 
-def test_project_experiences_df(setup_queue_event, test_data, create_table_mock):
+def test_project_experiences_df(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -179,7 +184,8 @@ Case: project skills not defined for a project
 """
 
 
-def test_project_experiences_df_project_skills_missing(setup_queue_event, test_data, create_table_mock):
+def test_project_experiences_df_project_skills_missing(setup_queue_event, test_data, create_table_mock,
+                                                       dynamodb_resource):
     tmp_data = test_data['data']
     tmp_data[0]['cv']['project_experiences'][1].pop('project_experience_skills', None)
 
@@ -209,7 +215,7 @@ Case: costumer not defined for a project
 """
 
 
-def test_project_experiences_df_costumer_missing(setup_queue_event, test_data, create_table_mock):
+def test_project_experiences_df_costumer_missing(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
     tmp_data = test_data['data']
     tmp_data[0]['cv']['project_experiences'][0].pop('customer', None)
 
@@ -240,7 +246,7 @@ Test replace missing values with pd.NA
 
 
 def test_work_experiences_df_missing(setup_queue_event, test_data,
-                                     create_table_mock):
+                                     create_table_mock, dynamodb_resource):
 
     tmp_data = test_data['data']
     tmp_data[1]['cv']['work_experiences'][0].pop('month_from', None)
@@ -267,7 +273,7 @@ Test replace none values with empty string
 
 
 def test_tag_value_none(setup_queue_event, test_data,
-                        create_table_mock):
+                        create_table_mock, dynamodb_resource):
 
     tmp_data = test_data['data']
     print(tmp_data[1]['cv']['technologies'][0]['technology_skills'][0]['tags'])
@@ -288,3 +294,22 @@ def test_tag_value_none(setup_queue_event, test_data,
                          "Systemutvikling"],
             'technology_skills': ["", "Java", "Angular;HTML", ";Hibernate", "Android Studio"],
         }))
+
+
+def test_set_guid_from_ad_data(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+    tmp_data = test_data['data']
+    tmp_data[1]['cv']['email'] = "non.existing@mail.no"
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=test_data['data']))
+
+    handler(event, None)
+
+    cv_partner_employees_object = s3_bucket.Object("data/test/structured/cv_partner_employees/part.0.parquet")
+    cv_partner_employees = pd.read_parquet(BytesIO(cv_partner_employees_object.get()['Body'].read()))
+    assert cv_partner_employees.loc[cv_partner_employees['user_id'] == "user_id_1"]['guid'][0] \
+           == "20dbbfa18380233aa643575720b893fac5137699"
+    assert len(cv_partner_employees) == 1
+    assert cv_partner_employees.loc[cv_partner_employees['user_id'] == "user_id_1"]['manager'][0] \
+           == "Olav Nordmann"

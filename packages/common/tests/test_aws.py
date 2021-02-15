@@ -1,17 +1,17 @@
+from datetime import datetime
+
 from dataplattform.common import aws, schema
 from os import environ
-from pytest import mark
+from pytest import mark, fixture
 import re
 from json import loads
-from pytest import fixture
-import datetime
 
 uuid_regex = r'[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}'
 
 
 class GlueCrawlerMock:
     def __init__(self):
-        self.d = datetime.datetime(2015, 1, 1).isoformat()
+        self.d = datetime(2015, 1, 1).isoformat()
         self.crawlers = {'dev_level_1_crawler': {
             'Name': 'dev_level_1_crawler',
             'Role': 'test-glue-level-1-glue-access',
@@ -59,6 +59,11 @@ def glue(mocker, class_fixture):
         side_effect=lambda service: class_fixture if service == 'glue' else mocker.DEFAULT
     )
     yield class_fixture
+
+
+@fixture
+def glue_mock(mocker):
+    yield mocker.DEFAULT
 
 
 def test_s3_default():

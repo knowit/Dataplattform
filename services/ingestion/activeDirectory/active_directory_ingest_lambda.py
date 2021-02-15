@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import boto3
-from os import environ, path
+from os import environ
 import json
 import hashlib
 
@@ -11,18 +11,6 @@ url = 'http://10.205.0.5:20201/api/Users'
 def handler(event, context):
     res = requests.get(f'{url}')
     data_json = res.json()
-    """
-    def make_test_json():
-        with open(path.join(path.dirname(__file__), 'test_data_ingest.json'), 'r') as json_file:
-            user_details = json.load(json_file)
-            return [
-                {
-                    'userDetails': user_detail
-                } for user_detail in user_details
-            ]
-
-    data_json = make_test_json()
-    """
 
     def get_list_of_users(data):
         list_of_users = []

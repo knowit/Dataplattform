@@ -122,6 +122,7 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
+      PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
     tags: # Tag for this function. Every function are tagged with stage by default
 
 resources: # The resources your functions use
@@ -264,6 +265,7 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
           - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
+          - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:

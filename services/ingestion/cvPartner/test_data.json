@@ -695,8 +695,8 @@
                 "name": "Test Testerson",
                 "user_id": "user_id_1",
                 "company_id": "12345",
-                "external_unique_id": "test@test.no",
-                "email": "test@test.no",
+                "external_unique_id": "per.nordmann@knowit.no",
+                "email": "per.nordmann@knowit.no",
                 "country_code": "no",
                 "language_code": "no",
                 "language_codes": [
@@ -1428,8 +1428,8 @@
                 "name": "Test Testerson 2",
                 "user_id": "user_id_2",
                 "company_id": "12345",
-                "external_unique_id": "test@test.no",
-                "email": "test@test2.no",
+                "external_unique_id": "kari.nordmann@knowit.no",
+                "email": "kari.nordmann@knowit.no",
                 "country_code": "no",
                 "language_code": "no",
                 "language_codes": [
