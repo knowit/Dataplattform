@@ -11,9 +11,7 @@ class PersonIdentifierType(Enum):
     FULL_NAME = 'full_name'
 
 
-class PersonRepository():
-    table_name = 'personal_metadata_table'
-
+class PersonRepository:
     def __enter__(self):
         self.db = boto3.resource('dynamodb')
         return self
@@ -23,13 +21,25 @@ class PersonRepository():
 
     @property
     def table(self):
-        return self.db.Table(f'{environ.get("STAGE", "dev")}_{self.table_name}')
+        return self.db.Table(environ.get('PERSON_DATA_TABLE'))
 
     def get_guid_by(self, id_type: PersonIdentifierType, value: str):
-        if (id_type == PersonIdentifierType.GUID):
+        if id_type == PersonIdentifierType.GUID:
             return value
 
         response = self.table.scan(
             FilterExpression=Attr(id_type.value).eq(value)
         )
-        return response['Items'][0]['guid']
+
+        if len(response.get('Items', [])) == 0:
+            return ""
+        return response.get('Items', [])[0].get('guid', "")
+
+    def get_manager_by(self, id_type: PersonIdentifierType, value: str):
+        response = self.table.scan(
+            FilterExpression=Attr(id_type.value).eq(value)
+        )
+
+        if len(response.get('Items', [])) == 0:
+            return ""
+        return response.get('Items', [])[0].get('manager', "")

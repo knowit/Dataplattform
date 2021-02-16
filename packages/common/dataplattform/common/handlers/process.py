@@ -157,18 +157,9 @@ class PersonDataProcessHandler(ProcessHandler):
 
             with PersonRepository() as repo:
                 frame["guid"] = frame[self.id_type.value].transform(lambda v: repo.get_guid_by(self.id_type, v))
-
-            del frame[self.id_type.value]
-
-            table_partition = partitions.get(table_name, [])
-
-            if "guid" not in table_partition:
-                table_partition.insert(0, "guid")
-
-            if self.id_type.value in table_partition:
-                table_partition.remove(self.id_type.value)
-
-            partitions[table_name] = table_partition
+                frame["manager"] = frame[self.id_type.value].transform(lambda v: repo.get_manager_by(self.id_type, v))
+                indexNames = frame[frame['guid'] == ""].index
+                frame.drop(indexNames, inplace=True)
 
         return data, partitions, overwrite
 

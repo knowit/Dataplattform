@@ -9,6 +9,8 @@ provider:
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}
+  deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 resources:
   Resources:
@@ -25,9 +27,9 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        # SSESpecification: # Kryptering !?
-        
-    
+        SSESpecification:
+          SSEEnabled: True
+
     PersonalMetadataTableAccess:
       Type: AWS::IAM::ManagedPolicy
       Properties:
@@ -41,8 +43,10 @@ resources:
                 - dynamodb:Scan
                 - dynamodb:GetItem
                 - dynamodb:UpdateItem
+                - dynamodb:DeleteItem
+                - dynamodb:Batch*
+                - dynamodb:DescribeTable
               Resource: !GetAtt PersonalMetadataTable.Arn
-
 
   Outputs:
     PersonalMetadataTableAccessOutput:
@@ -50,3 +54,11 @@ resources:
         Ref: PersonalMetadataTableAccess
       Export:
         Name: ${self:custom.stage}-personal-metadata-table-access-policy
+    PersonalMetadataTableName:
+      Value: ${self:resources.Resources.PersonalMetadataTable.Properties.TableName}
+      Export:
+        Name: ${self:custom.stage}-personal-metadata-table-name
+    PersonalMetadataTableArn:
+      Value: !GetAtt PersonalMetadataTable.Arn
+      Export:
+        Name: ${self:custom.stage}-personal-metadata-tableArn

@@ -1,0 +1,113 @@
+# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+service: activeDirectory
+
+custom:
+  #Edit these variables###########################
+  editable:
+    timeout: 60
+    ingestHandlerFile: active_directory_ingest_lambda
+    databaseName: level_3
+    description: Active directory output is saved to encrypted dynamoDB table
+    scheduleRate: rate(7 days)
+    
+  ################################################
+  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  pythonRequirements:
+    dockerizePip: non-linux
+    noDeploy:
+      - boto3 # Default in lambda rt
+      - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket # Name of s3 bucket
+  runtime: python3.7
+  memorySize: 1024 # MB
+  timeout: ${self:custom.editable.timeout} # seconds
+  tags: # Tags that will be added to each of the deployment resources.
+    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
+    Layer: Ingestion # ingestion, processing, restApi, infrastructure
+    Ingestion: Pollers #webHooks, Pollers, iot
+  stackTags: # Tags for cloud formation
+    # key: value
+  environment: # Environment variables, often stored in SSM
+
+package:
+  individually: true
+  exclude:
+    - "./**" # Exclude everything and include what you need in the functions below
+
+functions:
+  ingest: # A Function
+    handler: ${self:custom.editable.ingestHandlerFile}.handler
+    layers:
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    description: ${self:custom.editable.description}
+    role: !GetAtt IngestLambdaRole.Arn
+    vpc:
+      securityGroupIds:
+        - ${ssm:/${self:custom.stage}/${self:service}/SECURITY_GROUP_ID} #Use import
+      subnetIds:
+        - ${ssm:/${self:custom.stage}/${self:service}/PRIVATE_SUBNET_ID}
+    package:
+      include:
+        - '*.py' # Files to include in deployment
+        - '*.json'
+    environment: # Environment variables, often stored in SSM
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
+    tags: # Tag for this function. Every function are tagged with stage by default
+
+    events: # The Events that trigger this Function
+      - schedule:
+          name: ${self:custom.stage}-${self:service}-timer
+          description: ${self:custom.editable.description}
+          rate: ${self:custom.editable.scheduleRate}
+          enabled: false
+
+resources: # The resources your functions use
+  Resources:
+    IngestLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy" 
+        Policies:
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters
