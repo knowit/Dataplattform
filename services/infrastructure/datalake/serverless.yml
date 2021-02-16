@@ -7,7 +7,10 @@ custom:
   defaultLevel3StagingDir: data/level-3/athena-stage
   defaultLevel2StagingDir: data/level-2/athena-stage
   defaultLevel1StagingDir: data/level-1/athena-stage
-
+  level3ReportDir: reports/level-3/
+  level2ReportDir: reports/level-2/
+  level1ReportDir: reports/level-1/
+  
 
 provider:
   name: aws
@@ -64,6 +67,16 @@ resources:
               NoncurrentVersionExpirationInDays: 1
               Prefix: ${self:custom.defaultLevel1StagingDir}
               Status: Enabled
+            - NoncurrentVersionExpirationInDays: 1
+              Prefix: ${self:custom.level3ReportDir}
+              Status: Enabled
+            - NoncurrentVersionExpirationInDays: 1
+              Prefix: ${self:custom.level2ReportDir}
+              Status: Enabled
+            - NoncurrentVersionExpirationInDays: 1
+              Prefix: ${self:custom.level1ReportDir}
+              Status: Enabled
+        
         LoggingConfiguration:
           DestinationBucketName: ${self:resources.Resources.LogBucket.Properties.BucketName}
           LogFilePrefix: ${self:resources.Resources.LogBucket.Properties.BucketName}
