@@ -29,7 +29,9 @@ def handler(event, context):
         updateCache = cache_table_service.cache_table(
             report['dataProtection'], report['name'])
         updateCache(
-            execute_query(report['queryString'], preprocess_sql=False)
+            execute_query(report['queryString'],
+                          protection_level=report['dataProtection'],
+                          preprocess_sql=False)
         )
 
         with ReportsRepository() as repo:
