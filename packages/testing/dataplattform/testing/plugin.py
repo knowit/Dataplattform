@@ -1,5 +1,3 @@
-import datetime
-
 from pytest import fixture, hookimpl
 from moto import mock_s3, mock_ssm, mock_sqs, mock_sns, mock_dynamodb2
 from boto3 import resource, client
@@ -270,10 +268,3 @@ def create_table_mock(mocker):
     on_to_parquet_stub.assert_table_data_contains_df = assert_table_data_contains_df
 
     yield on_to_parquet_stub
-
-
-@fixture(autouse=True)
-def glue_mock(mocker):
-    from dataplattform.common.aws import Glue
-    mock_glue = mocker.patch('dataplattform.common.aws.Glue.update_crawler')
-    yield mock_glue

@@ -1,3 +1,2 @@
 pyarrow
 file:../../../packages/testing
-file:../../../packages/common
