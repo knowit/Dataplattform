@@ -9,7 +9,7 @@ custom:
     databaseName: level_3
     description: Active directory output is saved to encrypted dynamoDB table
     scheduleRate: rate(7 days)
-    
+
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   pythonRequirements:
@@ -96,7 +96,7 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-          - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy" 
+          - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
         Policies:
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
