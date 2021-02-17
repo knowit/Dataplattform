@@ -274,5 +274,6 @@ def create_table_mock(mocker):
 
 @fixture(autouse=True)
 def glue_mock(mocker):
+    from dataplattform.common.aws import Glue
     mock_glue = mocker.patch('dataplattform.common.aws.Glue.update_crawler')
     yield mock_glue
