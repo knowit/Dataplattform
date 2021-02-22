@@ -59,6 +59,14 @@ def handler(event, context):
     df_json = json.loads(json.dumps(employee_df.to_dict(orient='records')))
 
     with table.batch_writer() as batch:
+        for each in table.scan()['Items']:
+            batch.delete_item(
+                Key={
+                    'guid': each['guid'],
+                }
+            )
+
+    with table.batch_writer() as batch:
         for element in df_json:
             batch.put_item(Item=element)
 

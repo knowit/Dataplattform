@@ -37,8 +37,8 @@ class Glue:
         try:
             res = self.glue.get_crawler(Name=self.crawler_name)
             return res
-        except ClientError as e:
-            print(e)
+        except ClientError:
+            return None
 
     def update_crawler(self, table_name):
         crawler_metadata = self.get_crawler()
@@ -65,7 +65,7 @@ class Glue:
         try:
             self.glue.start_crawler(Name=self.crawler_name)
         except ClientError as e:
-            print(e)
+            raise e
 
 
 class S3:
