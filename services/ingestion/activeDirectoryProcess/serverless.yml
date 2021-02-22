@@ -1,10 +1,10 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: activeDirectory2
+service: activeDirectoryProcess
 
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 900
+    timeout: 12
     ingestHandlerFile: ad_ingest_lambda
     processHandlerFile: ad_process_lambda
     databaseName: level_3
@@ -162,6 +162,20 @@ resources: # The resources your functions use
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:ListBucketVersions
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - '*'
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
@@ -208,6 +222,7 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
+                    - s3:DeleteObjectVersion
                   Resource:
                     - Fn::Join:
                       - ""
@@ -220,6 +235,7 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - s3:ListBucket
+                    - s3:ListBucketVersions
                     - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:
