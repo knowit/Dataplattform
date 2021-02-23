@@ -1,14 +1,16 @@
+from datetime import datetime
+
 from dataplattform.common.handlers.process import PersonDataProcessHandler
 from dataplattform.common.repositories.person_repository import PersonIdentifierType
 from typing import Dict
 import pandas as pd
 import numpy as np
 
-
 handler = PersonDataProcessHandler(PersonIdentifierType.ALIAS)
 
 
-@handler.process(partitions={}, overwrite=True, person_data_tables=['ubw_costumer_per_resource'])
+@handler.process(partitions={}, overwrite=True, person_data_tables=['ubw_customer_per_resource'],
+                 historical_tables=['ubw_per_project_data'])
 def process(data, events) -> Dict[str, pd.DataFrame]:
     data = [
         [dict(x, time=int(d['metadata']['timestamp'])) for x in d['data']]
@@ -40,7 +42,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'resource_id': 'alias',
         'xwork_order': 'work_order_description',
         'xr1project': 'project_type',
-        'xr0work_order': 'costumer'}, inplace=True)
+        'xr0work_order': 'customer'}, inplace=True)
 
     work_hours_df['used_hrs'] = column_type_to_float(work_hours_df['used_hrs'])
     work_hours_df['alias'] = work_hours_df['alias'].str.lower()
@@ -53,12 +55,29 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     for alias in unique_aliases:
         tmp_df = work_hours_df.loc[work_hours_df['alias'] == alias].copy()
         tmp_df = tmp_df.sort_values(by=['used_hrs'], ascending=False).copy()
-        tmp_df['weigth'] = np.arange(1, len(tmp_df['used_hrs'])+1, 1)
+        tmp_df['weigth'] = np.arange(1, len(tmp_df['used_hrs']) + 1, 1)
         df_list.append(tmp_df)
 
     df = pd.concat(df_list, ignore_index=True)
+
+    def get_per_project_data(dataframe):
+        project_customers = []
+        reg_period = dataframe.iloc[0]['reg_period']
+        timestamp = dataframe.iloc[0]['time']
+        for customer in dataframe['customer'].unique():
+            project_customers.append({
+                'customer': customer,
+                'employees': dataframe[dataframe['customer'] == customer]['alias'].unique().shape[0],
+                'hours': dataframe[dataframe['customer'] == customer]['used_hrs'].sum(),
+                'reg_period': reg_period,
+                'timestamp': timestamp
+            })
+        return pd.DataFrame(project_customers)
+
+    per_project_data = get_per_project_data(df)
     df.pop('used_hrs')
 
     return {
-        'ubw_costumer_per_resource': df
+        'ubw_customer_per_resource': df,
+        'ubw_per_project_data': per_project_data
     }
