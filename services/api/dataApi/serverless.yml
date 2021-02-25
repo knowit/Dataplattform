@@ -73,9 +73,9 @@ functions:
       STAGE: ${self:custom.stage}
       NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
       DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn
-      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-level-3-staging-dir
-      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-level-2-staging-dir
-      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-level-1-staging-dir
+      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
+      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-2-staging-dir
+      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-1-staging-dir
       
     events:
       - http:
@@ -116,9 +116,9 @@ functions:
     #   onFailure: xxx:xxx:target
     environment: 
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
-      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-level-3-staging-dir
-      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-level-2-staging-dir
-      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-level-1-staging-dir
+      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
+      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-2-staging-dir
+      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-1-staging-dir
       STAGE: ${self:custom.stage}
     events:
       - sns: 
@@ -211,8 +211,8 @@ resources:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - "/"
-                        - !ImportValue ${self:custom.stage}-level-3-staging-dir
-                        - "/*"
+                        - !ImportValue ${self:custom.stage}-default-level-3-staging-dir
+                        - "*"
                 - Effect: Allow
                   Action:
                     - s3:GetObject
@@ -225,8 +225,8 @@ resources:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - "/"
-                        - !ImportValue ${self:custom.stage}-level-2-staging-dir
-                        - "/*"
+                        - !ImportValue ${self:custom.stage}-default-level-2-staging-dir
+                        - "*"
                 - Effect: Allow
                   Action:
                     - s3:GetObject
@@ -239,8 +239,8 @@ resources:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - "/"
-                        - !ImportValue ${self:custom.stage}-level-1-staging-dir
-                        - "/*"
+                        - !ImportValue ${self:custom.stage}-default-level-1-staging-dir
+                        - "*"
                 - Effect: Allow
                   Action:
                     - s3:PutObject

@@ -4,9 +4,9 @@ custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
-  defaultLevel3StagingDir: data/level-3/athena-stage
-  defaultLevel2StagingDir: data/level-2/athena-stage
-  defaultLevel1StagingDir: data/level-1/athena-stage
+  level3StagingDir: data/level-3/athena-stage/
+  level2StagingDir: data/level-2/athena-stage/
+  level1StagingDir: data/level-1/athena-stage/
   level3ReportDir: reports/level-3/
   level2ReportDir: reports/level-2/
   level1ReportDir: reports/level-1/
@@ -57,15 +57,15 @@ resources:
           Rules:
             - ExpirationInDays: 1
               NoncurrentVersionExpirationInDays: 1
-              Prefix: ${self:custom.defaultLevel3StagingDir}
+              Prefix: ${self:custom.level3StagingDir}
               Status: Enabled
             - ExpirationInDays: 1
               NoncurrentVersionExpirationInDays: 1
-              Prefix: ${self:custom.defaultLevel2StagingDir}
+              Prefix: ${self:custom.level2StagingDir}
               Status: Enabled
             - ExpirationInDays: 1
               NoncurrentVersionExpirationInDays: 1
-              Prefix: ${self:custom.defaultLevel1StagingDir}
+              Prefix: ${self:custom.level1StagingDir}
               Status: Enabled
             - NoncurrentVersionExpirationInDays: 1
               Prefix: ${self:custom.level3ReportDir}
@@ -91,18 +91,18 @@ resources:
       Value: ${self:resources.Resources.DataLake.Properties.BucketName}
       Export:
         Name: ${self:custom.stage}-datalakeName
-    Level3StagingDir:
-      Value: ${self:custom.defaultLevel3StagingDir}
+    DefaultLevel3StagingDir:
+      Value: ${self:custom.level3StagingDir}
       Export:
-        Name: ${self:custom.stage}-level-3-staging-dir
-    Level2StagingDir:
-      Value: ${self:custom.defaultLevel2StagingDir}
+        Name: ${self:custom.stage}-default-level-3-staging-dir
+    DefaultLevel2StagingDir:
+      Value: ${self:custom.level2StagingDir}
       Export:
-        Name: ${self:custom.stage}-level-2-staging-dir
-    Level1StagingDir:
-      Value: ${self:custom.defaultLevel1StagingDir}
+        Name: ${self:custom.stage}-default-level-2-staging-dir
+    DefaultLevel1StagingDir:
+      Value: ${self:custom.level1StagingDir}
       Export:
-        Name: ${self:custom.stage}-level-1-staging-dir
+        Name: ${self:custom.stage}-default-level-1-staging-dir
     LogBucketName:
       Value: ${self:resources.Resources.LogBucket.Properties.BucketName}
       Export:
