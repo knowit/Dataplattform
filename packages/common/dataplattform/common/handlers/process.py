@@ -157,7 +157,6 @@ class PersonDataProcessHandler(ProcessHandler):
 
             with PersonRepository() as repo:
                 frame["guid"] = frame[self.id_type.value].transform(lambda v: repo.get_guid_by(self.id_type, v))
-                frame["manager"] = frame[self.id_type.value].transform(lambda v: repo.get_manager_by(self.id_type, v))
                 indexNames = frame[frame['guid'] == ""].index
                 frame.drop(indexNames, inplace=True)
 
