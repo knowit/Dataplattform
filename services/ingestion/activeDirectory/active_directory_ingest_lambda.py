@@ -29,10 +29,9 @@ def handler(event, context):
         return df
 
     df = pd.concat([make_dataframe(d) for d in users], ignore_index=True)
-
-    df = df[df['isServiceUser'] == 0]
-    df = df[df['isExternalUser'] == 0]
-    df = df[df['isDeleted'] == 0]
+    df = df.loc[~df['isServiceUser'], :]
+    df = df.loc[~df['isExternalUser'], :]
+    df = df.loc[~df['isDeleted'], :]
 
     employee_table = [
         'guid',
