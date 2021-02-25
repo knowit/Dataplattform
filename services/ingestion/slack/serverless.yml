@@ -3,7 +3,7 @@ service: slackWebhook
 custom:
   #Edit these variables###########################
   editable:
-    timeout: 12
+    timeout: 60
     ingestHandlerFile: slack_webhook_ingest_lambda
     processHandlerFile: slack_webhook_process_lambda
     databaseName: level_2
