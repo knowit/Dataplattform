@@ -29,6 +29,10 @@ def handler(event, context):
         return df
 
     df = pd.concat([make_dataframe(d) for d in users], ignore_index=True)
+    df = df.loc[~df['isServiceUser'], :]
+    df = df.loc[~df['isExternalUser'], :]
+    df = df.loc[~df['isDeleted'], :]
+
     employee_table = [
         'guid',
         'primaryEmailAddress',
@@ -38,7 +42,7 @@ def handler(event, context):
         'knowitBranch',
         'distinguishedName',
         'managerDistinguishedName',
-        ]
+    ]
 
     employee_df = df[employee_table].copy()
     employee_df.rename(columns={
