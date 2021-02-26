@@ -1,5 +1,5 @@
 file:../../../packages/common
 file:../../../packages/query
-requests
+requests==2.23
 beautifulsoup4
 lxml
