@@ -9,8 +9,8 @@ from zeep import Client
 handler = IngestHandler()
 
 
-@handler.ingest()
-def ingest(event, overwrite=True) -> Data:
+@handler.ingest(overwrite=True)
+def ingest(event) -> Data:
     username, password, client, template_id = SSM(
         with_decryption=True
     ).get('UBW_USERNAME', 'UBW_PASSWORD', 'UBW_CLIENT', 'UBW_TEMPLATE_ID')

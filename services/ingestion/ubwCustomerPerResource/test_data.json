@@ -16,7 +16,7 @@
       "xr1project":"Local Projects",
       "work_order": "work order no 1",
       "xwork_order": "Some work order desc.",
-      "xr0work_order": "costumer 1"
+      "xr0work_order": "customer 1"
     },
     {
       "_recno": "0",
@@ -31,7 +31,7 @@
       "xr1project":"External Projects",
       "work_order": "work order no 2",
       "xwork_order": "Some work order desc.",
-      "xr0work_order": "costumer 2"
+      "xr0work_order": "customer 2"
     },
     {
         "_recno": "0",
@@ -46,7 +46,7 @@
         "xr1project":"Local Projects",
         "work_order": "work order no 3",
         "xwork_order": "Some work order desc.",
-        "xr0work_order": "costumer 3"
+        "xr0work_order": "customer 3"
     }
   ]
 }
