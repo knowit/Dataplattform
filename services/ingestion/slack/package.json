@@ -1,5 +1,5 @@
 {
-  "name": "github-ingest",
+  "name": "slack-webhook",
   "description": "",
   "version": "0.1.0",
   "devDependencies": {
