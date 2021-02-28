@@ -148,6 +148,7 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
+                    - s3:ListObjectVersions 
                   Resource:
                     - Fn::Join:
                       - "" 
@@ -191,11 +192,27 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
+                    - s3:DeleteObject
+                    - s3:DeleteObjectVersion
                   Resource:
                     - Fn::Join:
                       - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:ListBucketVersions
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                      - "" 
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - '*'
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"

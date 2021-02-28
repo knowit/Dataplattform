@@ -83,11 +83,12 @@ class ProcessHandler:
         data = self.wrapped_func['process'](s3_data, event.get('Records', []))
         partitions = self.wrapped_func_args.get('process', {}).get('partitions', {})
         overwrite = self.wrapped_func_args.get('process', {}).get('overwrite', False)
+        overwrite_all_versions = self.wrapped_func_args.get('process', {}).get('overwrite_all_versions', False)
         historical_tables = self.wrapped_func_args.get('process', {}).get('historical_tables', [])
 
-        return data, partitions, overwrite, historical_tables
+        return data, partitions, overwrite, overwrite_all_versions, historical_tables
 
-    def update_tables(self, tables, partitions, overwrite, historical_tables):
+    def update_tables(self, tables, partitions, overwrite, overwrite_all_versions, historical_tables):
         updated_tables = []
 
         for table_name, frame in tables.items():
@@ -104,8 +105,13 @@ class ProcessHandler:
             frame = ensure_partitions_has_values(frame, table_partitions)
 
             table_exists = check_exists(self.s3, frame, table_name, table_partitions)
+
             if table_exists and overwrite and (table_name not in historical_tables):
                 delete_table(self.s3, table_name)
+                table_exists = False
+
+            if overwrite_all_versions and (table_name not in historical_tables):
+                self.s3.empty_content_in_path('structured/{table_name}', delete_all_versions=True)
                 table_exists = False
 
             frame.to_parquet(f'structured/{table_name}',
@@ -130,10 +136,11 @@ class ProcessHandler:
         sns.publish({'tables': updated_tables}, 'DataUpdate')
         return True
 
-    def process(self, partitions, overwrite=False, historical_tables=[]):
+    def process(self, partitions, overwrite=False, overwrite_all_versions=False, historical_tables=[]):
         def wrap(f):
             self.wrapped_func['process'] = make_wrapper_func(f, dict)
             self.wrapped_func_args['process'] = dict(partitions=partitions, overwrite=overwrite,
+                                                     overwrite_all_versions=overwrite_all_versions,
                                                      historical_tables=historical_tables)
             return self.wrapped_func['process']
 
@@ -146,7 +153,7 @@ class PersonDataProcessHandler(ProcessHandler):
         self.id_type = id_type
 
     def call_wrapped(self, s3_data, event):
-        data, partitions, overwrite, historical_tables = super().call_wrapped(s3_data, event)
+        data, partitions, overwrite, overwrite_all_versions, historical_tables = super().call_wrapped(s3_data, event)
 
         pdtables = self.wrapped_func_args.get('process', {}).get('person_data_tables', [])
 
@@ -161,14 +168,16 @@ class PersonDataProcessHandler(ProcessHandler):
                 indexNames = frame[frame['guid'] == ""].index
                 frame.drop(indexNames, inplace=True)
 
-        return data, partitions, overwrite, historical_tables
+        return data, partitions, overwrite, overwrite_all_versions, historical_tables
 
-    def process(self, partitions, person_data_tables: List[str], overwrite=False, historical_tables=[]):
+    def process(self, partitions, person_data_tables: List[str], overwrite=False, overwrite_all_versions=False,
+                historical_tables=[]):
         def wrap(f):
             self.wrapped_func['process'] = make_wrapper_func(f, dict)
             self.wrapped_func_args['process'] = dict(
                 partitions=partitions,
                 overwrite=overwrite,
+                overwrite_all_versions=overwrite_all_versions,
                 person_data_tables=person_data_tables,
                 historical_tables=historical_tables
             )

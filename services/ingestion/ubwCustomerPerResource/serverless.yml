@@ -235,6 +235,7 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
+                    - s3:DeleteObjectVersion
                   Resource:
                     - Fn::Join:
                         - ""
@@ -247,6 +248,7 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - s3:ListBucket
+                    - s3:ListBucketVersions
                     - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:

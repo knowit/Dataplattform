@@ -464,3 +464,56 @@ def test_handler_call_process_overwrite_empty_historical_data(s3_bucket, setup_q
     ]
     assert len(expected_keys) == len(keys_in_s3)
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+
+
+def test_handler_call_process_overwrite_historical_data_overwrite_versions(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
+    process_handler = handler.ProcessHandler()
+
+    @process_handler.process(partitions={}, overwrite=False, overwrite_all_versions=True, historical_tables=['test'])
+    def test_process(data, events):
+        return {
+            'test': pd.DataFrame({'a': [1, 1, 1], 'b': [1, 2, 3]})
+        }
+
+    process_handler(event)
+    process_handler(event)  # Called twice
+
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    expected_keys = [
+        'data/test/structured/test/_common_metadata',
+        'data/test/structured/test/_metadata',
+        'data/test/structured/test/part.0.parquet',
+        'data/test/structured/test/part.1.parquet',
+    ]
+    assert len(expected_keys) == len(keys_in_s3)
+    assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+
+
+def test_handler_call_process_overwrite_all_versions_empty_historical_data(s3_bucket, setup_queue_event):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
+    process_handler = handler.ProcessHandler()
+
+    @process_handler.process(partitions={}, overwrite=False, overwrite_all_versions=True, historical_tables=[])
+    def test_process(data, events):
+        return {
+            'test': pd.DataFrame({'a': [1, 1, 1], 'b': [1, 2, 3]})
+        }
+
+    process_handler(event)
+    process_handler(event)  # Called twice
+
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    expected_keys = [
+        'data/test/structured/test/_common_metadata',
+        'data/test/structured/test/_metadata',
+        'data/test/structured/test/part.0.parquet',
+    ]
+    assert len(expected_keys) == len(keys_in_s3)
+    assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])

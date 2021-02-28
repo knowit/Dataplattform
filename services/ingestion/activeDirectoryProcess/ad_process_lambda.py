@@ -8,7 +8,7 @@ from typing import Dict
 handler = ProcessHandler()
 
 
-@handler.process(partitions={}, overwrite=True)
+@handler.process(partitions={}, overwrite=True, overwrite_all_versions=True)
 def process(data, events) -> Dict[str, pd.DataFrame]:
     db = boto3.resource('dynamodb')
     person_data_table = db.Table(environ.get('PERSON_DATA_TABLE'))
