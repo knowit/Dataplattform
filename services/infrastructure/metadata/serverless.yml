@@ -25,10 +25,13 @@ resources:
           - AttributeName: guid
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
+          ReadCapacityUnits: 10
+          WriteCapacityUnits: 10
         SSESpecification:
           SSEEnabled: True
+          SSEType: KMS
+          KMSMasterKeyId: de8ca893-e2fc-4f8c-83b1-bc41a9a3a79a
+
 
     PersonalMetadataTableAccess:
       Type: AWS::IAM::ManagedPolicy

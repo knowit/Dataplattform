@@ -77,7 +77,7 @@ functions:
           name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
-          enabled: false
+          enabled: true
 
 resources: # The resources your functions use
   Resources:
