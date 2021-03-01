@@ -17,7 +17,7 @@ def pub_new_report(report: str):
 
 
 def new_report(new_report: Dict[str, str]):
-    sql, used_tables = process_sql(new_report['queryString'])
+    sql, used_tables, _ = process_sql(new_report['queryString'])
 
     tables = [table for (database, table) in used_tables]
     data_protection_level = reduce(

@@ -85,15 +85,12 @@ def get_staging_dir(protection_level):
         raise ValueError("Protection level not in correct range")
 
 
-def execute(sql: str, preprocess_sql=True) -> pd.DataFrame:
-    protection_level = 3
+def execute(sql: str, protection_level=3, preprocess_sql=True) -> pd.DataFrame:
     if preprocess_sql:
         sql, _, protection_level = process_sql(sql)
 
     s3 = boto3.resource('s3')
     athena = boto3.client('athena')
-
-    print(get_staging_dir(protection_level))
 
     begin_query_response = athena.start_query_execution(
         QueryString=sql,
