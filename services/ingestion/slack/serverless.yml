@@ -106,6 +106,7 @@ functions:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
+    timeout: ${self:custom.editable.timeout}
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
     package:
