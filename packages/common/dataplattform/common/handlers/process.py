@@ -112,6 +112,7 @@ class ProcessHandler:
 
             if overwrite_all_versions and (table_name not in historical_tables):
                 self.s3.empty_content_in_path('structured/{table_name}', delete_all_versions=True)
+                self.s3.empty_content_in_path('structured/deprecated', delete_all_versions=True)
                 table_exists = False
 
             frame.to_parquet(f'structured/{table_name}',
