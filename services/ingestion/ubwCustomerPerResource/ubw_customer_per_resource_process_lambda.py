@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from dataplattform.common.handlers.process import PersonDataProcessHandler
 from dataplattform.common.repositories.person_repository import PersonIdentifierType
 from typing import Dict

@@ -99,13 +99,21 @@ class S3:
                 raise e
             return S3Result(None, error=e)
 
-    def empty_content_in_path(self, path, delete_all_versions=False):
+    # Filter is used to be able to specify the files that you wish to delete and keep the rest, handle with care.
+    def empty_content_in_path(self, path, delete_all_versions=False, filter_val=None):
         prefix = path_join(self.access_path, path)
         bucket = self.s3.Bucket(self.bucket)
         if delete_all_versions:
-            bucket.object_versions.filter(Prefix=prefix).delete()
+            objects_to_be_deleted = bucket.object_versions.filter(Prefix=prefix)
         else:
-            bucket.objects.filter(Prefix=prefix).delete()
+            objects_to_be_deleted = bucket.objects.filter(Prefix=prefix)
+
+        if filter_val is not None:
+            for obj in objects_to_be_deleted:
+                if filter_val in obj.key:
+                    self.fs.rm(obj.key)
+        else:
+            objects_to_be_deleted.delete()
 
     @property
     def fs(self):

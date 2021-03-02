@@ -1,5 +1,8 @@
 from dataplattform.common import schema
 from dataplattform.common.handlers import process as handler
+from dataplattform.common.handlers.process import PersonDataProcessHandler as person_data_handler
+from dataplattform.common.repositories.person_repository import PersonIdentifierType
+
 import re
 import pytest
 import pandas as pd
@@ -176,7 +179,6 @@ def test_handler_call_process_s3_parquet_overwrite(s3_bucket, setup_queue_event)
     process_handler(event)
 
     keys_in_s3_second_time = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
-    print(keys_in_s3_second_time)
     expected_keys = [
         'data/test/structured/test/_common_metadata',
         'data/test/structured/test/_metadata',
@@ -489,6 +491,42 @@ def test_handler_call_process_overwrite_historical_data_overwrite_versions(s3_bu
         'data/test/structured/test/part.0.parquet',
         'data/test/structured/test/part.1.parquet',
     ]
+    assert len(expected_keys) == len(keys_in_s3)
+    assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+
+
+def test_handler_call_process_overwrite_historical_data_overwrite_versions_person_data(s3_bucket, setup_queue_event,
+                                                                                       dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=''))
+    process_handler = person_data_handler(PersonIdentifierType.ALIAS)
+
+    @process_handler.process(partitions={}, person_data_tables=['test'], overwrite=False, overwrite_all_versions=True,
+                             historical_tables=['test_2'])
+    def test_process(data, events):
+        return {
+            'test': pd.DataFrame({'alias': ['olanord', 'karnord', 'lisnord'], 'b': [1, 2, 3]}),
+            'test_2': pd.DataFrame({'a': [1, 1, 1], 'b': [1, 2, 3]})
+        }
+
+    process_handler(event)
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    process_handler(event)  # Called twice
+
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+
+    expected_keys = [
+        'data/test/structured/test/_common_metadata',
+        'data/test/structured/test/_metadata',
+        'data/test/structured/test/part.0.parquet',
+        'data/test/structured/test_2/_common_metadata',
+        'data/test/structured/test_2/_metadata',
+        'data/test/structured/test_2/part.0.parquet',
+        'data/test/structured/test_2/part.1.parquet',
+    ]
+
     assert len(expected_keys) == len(keys_in_s3)
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 

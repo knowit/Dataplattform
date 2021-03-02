@@ -36,3 +36,30 @@ def test_empty_content_in_path(s3_private_bucket):
     assert len_deleted_before == len(will_be_deleted)
     assert len_remain_after == len(will_remain)
     assert len_deleted_after == 0
+
+
+def test_empty_content_in_path_with_filter(s3_private_bucket):
+    will_remain = [
+        'private/remain/whatever.txt',
+        'private/remain/whatever2.txt',
+        'private/remain/whatever3.txt',
+        'private/remain/whatever4.txt',
+        'private/remain/whatever5.txt',
+        'private/remain/whatever6.txt',
+    ]
+    will_be_deleted = [
+        'private/deleted/whatever2.txt',
+    ]
+    for item in [*will_remain, *will_be_deleted]:
+        s3_private_bucket.put_object(Body='some data', Key=item)
+
+    len_remain_before = len(list(s3_private_bucket.objects.filter(Prefix='private/remain')))
+    len_deleted_before = len(list(s3_private_bucket.objects.filter(Prefix='private/deleted')))
+    empty_content_in_path(environ.get('PRIVATE_BUCKET'), "private/deleted", filter_val='/whatever2.txt')
+    len_remain_after = len(list(s3_private_bucket.objects.filter(Prefix='private/remain')))
+    len_deleted_after = len(list(s3_private_bucket.objects.filter(Prefix='private/deleted')))
+
+    assert len_remain_before == len(will_remain)
+    assert len_deleted_before == len(will_be_deleted)
+    assert len_remain_after == len(will_remain)
+    assert len_deleted_after == 0
