@@ -53,6 +53,9 @@ provider:
   stackTags: # Tags for cloud formation
     # key: value
   environment: # Environment variables, often stored in SSM
+  tracing:
+    apiGateway: true
+    lambda: true
      
   
 package:
