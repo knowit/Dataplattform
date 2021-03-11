@@ -7,7 +7,8 @@ import numpy as np
 handler = PersonDataProcessHandler(PersonIdentifierType.EMAIL)
 
 
-@handler.process(partitions={}, overwrite=True,  person_data_tables=['cv_partner_employees'])
+@handler.process(partitions={}, overwrite=True, overwrite_all_versions=True,
+                 person_data_tables=['cv_partner_employees'])
 def process(data, events) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()

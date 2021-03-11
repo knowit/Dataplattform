@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from dataplattform.common.handlers.process import PersonDataProcessHandler
 from dataplattform.common.repositories.person_repository import PersonIdentifierType
 from typing import Dict
@@ -9,7 +7,8 @@ import numpy as np
 handler = PersonDataProcessHandler(PersonIdentifierType.ALIAS)
 
 
-@handler.process(partitions={}, overwrite=True, person_data_tables=['ubw_customer_per_resource'],
+@handler.process(partitions={}, overwrite=True, overwrite_all_versions=True,
+                 person_data_tables=['ubw_customer_per_resource'],
                  historical_tables=['ubw_per_project_data'])
 def process(data, events) -> Dict[str, pd.DataFrame]:
     data = [

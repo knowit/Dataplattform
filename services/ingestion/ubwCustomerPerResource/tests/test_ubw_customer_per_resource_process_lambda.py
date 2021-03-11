@@ -107,7 +107,6 @@ def test_process_data_test_dataframe_content(create_table_mock, setup_queue_even
             'guid': ['20dbbfa18380233aa643575720b893fac5137699',
                      '20dbbfa18380233aa643575720b893fac5137699',
                      '491b9fa9bfac17563882b0fdc6f3a8a97417bd99'],
-            'manager': ['Olav Nordmann', 'Olav Nordmann', 'Olav Nordmann']
         }))
 
 
