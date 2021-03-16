@@ -41,7 +41,10 @@ provider:
     Ingestion: Pollers #webHooks, Pollers, iot
   stackTags: # Tags for cloud formation
     # key: value
-  environment: # Environment variables, often stored in SSM
+  environment: # Environment variables, ofthen stored in SSM
+  tracing:
+    apiGateway: true
+    lambda: true
 
 package:
   individually: true
@@ -97,6 +100,7 @@ resources: # The resources your functions use
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
           - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
