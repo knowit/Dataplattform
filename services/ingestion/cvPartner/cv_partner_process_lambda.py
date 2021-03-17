@@ -10,7 +10,15 @@ handler = PersonDataProcessHandler(PersonIdentifierType.EMAIL)
 
 
 @handler.process(partitions={}, overwrite=True, overwrite_all_versions=True,
-                 person_data_tables=['cv_partner_employees'])
+                 person_data_tables=['cv_partner_employees'],
+                 historical_tables=['cv_partner_historical_employees',
+                                    'cv_partner_historical_eduation',
+                                    'cv_partner_historical_courses',
+                                    'cv_partner_historical_key_qualification',
+                                    'cv_partner_historical_languages',
+                                    'cv_partner_historical_project_experience',
+                                    'cv_partner_historical_technology_skills',
+                                    'cv_partner_historical_work_experience'])
 def process(data, events) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
         d = d.json()
@@ -258,25 +266,50 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     # remove description and anonymize user_ids
     def anonymize_table(df):
-        tmp_col = df['user_id'].copy()
-        
+        tmp_df = df.copy()
+        tmp_col = tmp_df['user_id'].copy()
+        # draw new salt per table and per ingestion of new data
+        salt = uuid.uuid4().hex
+
         def hash_user_id(id):
-            salt = uuid.uuid4.hex()
             return hashlib.sha512(id.encode('utf-8') + salt.encode('utf-8')).hexdigest()
-        
+
         tmp_col = tmp_col.apply(hash_user_id)
-        print(tmp_col)
-        
-    anonymize_table(create_education_df)
+        if 'description' in tmp_df.columns:
+            del tmp_df['description']
+        if 'long_description' in tmp_df.columns:
+            del tmp_df['long_description']
+
+        return tmp_df
+
+    education_df = create_education_df(df)
+    blogs_df = create_blogs_df(df)
+    courses_df = create_courses_df(df)
+    key_qualification_df = create_key_qualification_df(df)
+    languages_df = create_languages_df(df)
+    project_experiences_df = create_project_experiences_df(df)
+    technology_skills_df = create_technologies_df(df)
+    work_experiences_df = create_work_experiences_df(df)
+
+    employees_anonym_columns = ['born_year', 'nationality', 'place_of_residence', 'title']
+    anonymized_employees = employee_df[employees_anonym_columns].copy()
 
     return {
         'cv_partner_employees': employee_df,
-        'cv_partner_education': create_education_df(df),
-        'cv_partner_blogs': create_blogs_df(df),
-        'cv_partner_courses': create_courses_df(df),
-        'cv_partner_key_qualification': create_key_qualification_df(df),
-        'cv_partner_languages': create_languages_df(df),
-        'cv_partner_project_experience': create_project_experiences_df(df),
-        'cv_partner_technology_skills': create_technologies_df(df),
-        'cv_partner_work_experience': create_work_experiences_df(df)
+        'cv_partner_historical_employees': anonymized_employees,
+        'cv_partner_education': education_df,
+        'cv_partner_historical_eduation': anonymize_table(education_df),
+        'cv_partner_blogs': blogs_df,
+        'cv_partner_courses': courses_df,
+        'cv_partner_historical_courses': anonymize_table(courses_df),
+        'cv_partner_key_qualification': key_qualification_df,
+        'cv_partner_historical_key_qualification': anonymize_table(key_qualification_df),
+        'cv_partner_languages': languages_df,
+        'cv_partner_historical_languages': anonymize_table(languages_df),
+        'cv_partner_project_experience': project_experiences_df,
+        'cv_partner_historical_project_experience': anonymize_table(project_experiences_df),
+        'cv_partner_technology_skills': technology_skills_df,
+        'cv_partner_historical_technology_skills': anonymize_table(technology_skills_df),
+        'cv_partner_work_experience': work_experiences_df,
+        'cv_partner_historical_work_experience': anonymize_table(work_experiences_df)
     }
