@@ -3,6 +3,8 @@ from dataplattform.common.repositories.person_repository import PersonIdentifier
 from typing import Dict
 import pandas as pd
 import numpy as np
+import uuid
+import hashlib
 
 handler = PersonDataProcessHandler(PersonIdentifierType.EMAIL)
 
@@ -253,6 +255,19 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         tmp['year_from'] = column_type_to_int(tmp['year_from'])
 
         return tmp
+
+    # remove description and anonymize user_ids
+    def anonymize_table(df):
+        tmp_col = df['user_id'].copy()
+        
+        def hash_user_id(id):
+            salt = uuid.uuid4.hex()
+            return hashlib.sha512(id.encode('utf-8') + salt.encode('utf-8')).hexdigest()
+        
+        tmp_col = tmp_col.apply(hash_user_id)
+        print(tmp_col)
+        
+    anonymize_table(create_education_df)
 
     return {
         'cv_partner_employees': employee_df,
