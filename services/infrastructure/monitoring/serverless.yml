@@ -552,6 +552,26 @@ resources:
             ]
           }
 
+    LambdaAlarm:
+      Type: AWS::CloudWatch::Alarm
+      Properties:
+        AlarmActions:
+          - !ImportValue ${self:custom.stage}-alarm-topic-arn
+        InsufficientDataActions:
+          - !ImportValue ${self:custom.stage}-alarm-topic-arn
+        OKActions:
+          - !ImportValue ${self:custom.stage}-alarm-topic-arn
+        AlarmName: ${self:custom.stage}-lambda-error-alarm
+        AlarmDescription: Goes into ALARM when there are errors in lambda
+        ComparisonOperator: GreaterThanThreshold
+        DatapointsToAlarm: 1
+        EvaluationPeriods: 1
+        Namespace: AWS/Lambda
+        MetricName: Errors
+        Period: 300
+        Statistic: Sum
+        Threshold: 0.0
+        TreatMissingData: notBreaching
 
     LambdaXRayTracing:
       Type: AWS::IAM::ManagedPolicy
