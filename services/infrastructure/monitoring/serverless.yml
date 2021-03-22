@@ -34,7 +34,7 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND process ', 'Sum', 300 )",
                         "label": "All ProcessInvocations",
                         "id": "p",
-                        "region": "eu-central-1",
+                        "region": "${self:provider.region}",
                         "visible": false
                       }
                     ],
@@ -43,13 +43,13 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND process', 'Sum', 300)",
                         "label": "",
                         "id": "er",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -82,7 +82,7 @@ resources:
                         "label": "AllQueues",
                         "id": "q",
                         "visible": false,
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -91,7 +91,7 @@ resources:
                         "label": "All DeadLetters",
                         "id": "dl",
                         "visible": false,
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -99,7 +99,7 @@ resources:
                         "expression": "SUM(q)",
                         "label": "MessagesReceived",
                         "id": "e1",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -107,12 +107,12 @@ resources:
                         "expression": "SUM(dl)",
                         "label": "MessagesReceived in DL",
                         "id": "e2",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "singleValue",
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 3600,
                   "title": "SQS",
@@ -132,7 +132,7 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND ingest ', 'Sum', 300)",
                         "label": "",
                         "id": "i",
-                        "region": "eu-central-1",
+                        "region": "${self:provider.region}",
                         "yAxis": "left",
                         "visible": false
                       }
@@ -142,14 +142,14 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND ingest', 'Sum', 300)",
                         "label": "",
                         "id": "er",
-                        "region": "eu-central-1",
+                        "region": "${self:provider.region}",
                         "yAxis": "left"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -201,7 +201,7 @@ resources:
                     ]
                   ],
                   "view": "singleValue",
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Average",
                   "period": 604800,
                   "stacked": false,
@@ -222,7 +222,7 @@ resources:
                         "expression": "SUM(er)",
                         "label": "IngestErrors",
                         "id": "e1",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -230,7 +230,7 @@ resources:
                         "expression": "SUM(i) - SUM(er)",
                         "label": "IngestSuccesses",
                         "id": "e2",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -239,7 +239,7 @@ resources:
                         "label": "All IngestInvocations",
                         "id": "i",
                         "visible": false,
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -248,13 +248,13 @@ resources:
                         "label": "All IngestErrors",
                         "id": "er",
                         "visible": false,
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": true,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -286,7 +286,7 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND ingest ', 'Sum', 300)",
                         "label": "",
                         "id": "i",
-                        "region": "eu-central-1",
+                        "region": "${self:provider.region}",
                         "yAxis": "left"
                       }
                     ],
@@ -295,7 +295,7 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND ingest', 'Sum', 300 )",
                         "label": "All IngestErrors",
                         "id": "er",
-                        "region": "eu-central-1",
+                        "region": "${self:provider.region}",
                         "yAxis": "left",
                         "visible": false
                       }
@@ -303,7 +303,7 @@ resources:
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -336,7 +336,7 @@ resources:
                         "expression": "SUM(er)",
                         "label": "ProcessErrors",
                         "id": "e1",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -344,7 +344,7 @@ resources:
                         "expression": "SUM(p) - SUM(er)",
                         "label": "ProcessSuccesses",
                         "id": "e2",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -353,7 +353,7 @@ resources:
                         "label": "All ProcessInvocations",
                         "id": "p",
                         "visible": false,
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -362,13 +362,13 @@ resources:
                         "label": "All ProcessErrors",
                         "id": "er",
                         "visible": false,
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": true,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -400,7 +400,7 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND process ', 'Sum', 300)",
                         "label": "",
                         "id": "p",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ],
                     [
@@ -409,13 +409,13 @@ resources:
                         "label": "All ProcessErrors",
                         "id": "er",
                         "visible": false,
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -467,13 +467,13 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND ${self:custom.stage} AND ingest', 'Sum', 300 )",
                         "label": "Expression1",
                         "id": "e1",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Average",
                   "period": 300,
                   "legend": {
@@ -504,13 +504,13 @@ resources:
                         "expression": "SEARCH(' {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND ${self:custom.stage} AND process', 'Sum', 300 )",
                         "label": "Duration",
                         "id": "e1",
-                        "region": "eu-central-1"
+                        "region": "${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Average",
                   "period": 300,
                   "legend": {
@@ -567,7 +567,7 @@ resources:
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "liveData": true
@@ -601,7 +601,7 @@ resources:
                     ]
                   ],
                   "view": "singleValue",
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stat": "Sum",
                   "period": 3600,
                   "title": "Requests",
@@ -617,7 +617,7 @@ resources:
                 "height": 12,
                 "properties": {
                   "query": "SOURCE '/aws/api-gateway/DataAPI-${self:custom.stage}' | fields @timestamp, @message\n| sort @timestamp desc\n| limit 100\n| filter @message not like \"200\"",
-                  "region": "eu-central-1",
+                  "region": "${self:provider.region}",
                   "stacked": false,
                   "title": "Non 200 Logs",
                   "view": "table"
