@@ -453,6 +453,80 @@ resources:
                 "properties": {
                   "markdown": "# Ingestion"
                 }
+              },
+              {
+                "type": "metric",
+                "x": 0,
+                "y": 22,
+                "width": 12,
+                "height": 6,
+                "properties": {
+                  "metrics": [
+                    [
+                      {
+                        "expression": "SEARCH(' {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND ${self:custom.stage} AND ingest', 'Sum', 300 )",
+                        "label": "Expression1",
+                        "id": "e1",
+                        "region": "eu-central-1"
+                      }
+                    ]
+                  ],
+                  "view": "timeSeries",
+                  "stacked": false,
+                  "region": "eu-central-1",
+                  "stat": "Average",
+                  "period": 300,
+                  "legend": {
+                    "position": "hidden"
+                  },
+                  "liveData": true,
+                  "yAxis": {
+                    "left": {
+                      "showUnits": false
+                    },
+                    "right": {
+                      "showUnits": false
+                    }
+                  },
+                  "title": "Duration"
+                }
+              },
+              {
+                "type": "metric",
+                "x": 12,
+                "y": 22,
+                "width": 12,
+                "height": 6,
+                "properties": {
+                  "metrics": [
+                    [
+                      {
+                        "expression": "SEARCH(' {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND ${self:custom.stage} AND process', 'Sum', 300 )",
+                        "label": "Duration",
+                        "id": "e1",
+                        "region": "eu-central-1"
+                      }
+                    ]
+                  ],
+                  "view": "timeSeries",
+                  "stacked": false,
+                  "region": "eu-central-1",
+                  "stat": "Average",
+                  "period": 300,
+                  "legend": {
+                    "position": "hidden"
+                  },
+                  "liveData": true,
+                  "yAxis": {
+                    "left": {
+                      "showUnits": false
+                    },
+                    "right": {
+                      "showUnits": false
+                    }
+                  },
+                  "title": "Duration"
+                }
               }
             ]
           }
