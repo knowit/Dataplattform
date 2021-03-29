@@ -1,4 +1,4 @@
-from services.ingestion.kompetanseKartlegging.kompetansekartlegging_ingest_lambda import handler
+from kompetansekartlegging_ingest_lambda import handler
 
 
 def test_response():
