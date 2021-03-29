@@ -13,12 +13,7 @@ handler = IngestHandler()
 def handler(event) -> Data:
     api_token = SSM(with_decryption=True).get('API_KEY')
     res = requests.get(f'{base_url}/answers', headers={'x-api-key': api_token})
-    print()
-    print(api_token)
-    print(res.status_code)
-    print(res)
-
     return Data(
         metadata=Metadata(timestamp=datetime.now().timestamp()),
-        data=res
+        data=res.json()
     )
