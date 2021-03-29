@@ -11,8 +11,7 @@ handler = IngestHandler()
 
 @handler.ingest()
 def handler(event) -> Data:
-    # api_token = SSM(with_decryption=True).get('API_KEY')
-    api_token = 'JdxxQx8ENO5tZVnErJQwH2UDRGcwfDtj1Wz985ms'
+    api_token = SSM(with_decryption=True).get('API_KEY')
     res = requests.get(f'{base_url}/answers', headers={'x-api-key': api_token})
     print()
     print(api_token)
