@@ -2,6 +2,7 @@ from kompetansekartlegging_ingest_lambda import handler, base_url
 from pytest import fixture
 from responses import RequestsMock, GET
 from os import path
+import json
 import re
 
 
@@ -55,6 +56,8 @@ def test_initial_ingest(mocked_responses,
     mocked_responses.add(GET, re.compile(f'{base_url}/catalogs/.*?/questions'), body=test_questions_data, status=200)
 
     data = handler(None)
+    # with open(path.join(path.dirname(__file__), 'ingest.json'), 'w+') as f:
+    #     json.dump(data.to_dict(), f)
 
     assert data.data['users'] is not None
     assert data.data['answers'] is not None
