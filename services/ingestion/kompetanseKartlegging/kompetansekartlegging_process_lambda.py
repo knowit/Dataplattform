@@ -16,29 +16,17 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         return pd.DataFrame(data=users)
 
     def create_answers_df():
-        answer_data = data['answers']
-        formatted_answer_data = []
+        df = pd.json_normalize(data['answers'], meta=['username', 'email'], record_path=['answers'])
 
-        for entry in answer_data:
-            email = entry['email']
-            answers = filter(lambda answer: 'unanswered' not in answer, entry['answers'])
-            formatted_answer_data.append(
-                list(map(
-                    lambda answer: {
-                        'email': email,
-                        'question_id': answer['question']['id'],
-                        'knowledge': answer.get('knowledge'),
-                        'motivation': answer.get('motivation'),
-                        'customScaleValue': answer.get('customScaleValue'),
-                    }, answers)
-                )
-            )
+        mapping = {'question.id': 'questionId', 'question.scaleStart': 'scaleStart',
+                   'question.scaleMiddle': 'scaleMiddle', 'question.scaleEnd': 'scaleEnd'}
 
-        flattened = [data_point for sublist in formatted_answer_data for data_point in sublist]
-        return pd.DataFrame(data=flattened)
+        df.rename(columns=mapping, inplace=True)
 
-    def create_answers_alt():
-        return pd.json_normalize(data['answers'])
+        fields = ['username', 'email', 'questionId', 'unanswered', 'knowledge', 'motivation', 'updatedAt',
+                  'customScaleValue', 'scaleStart', 'scaleMiddle', 'scaleEnd']
+
+        return df[fields]
 
     def create_catalogs_df():
         return pd.DataFrame(data['catalogs'])
@@ -54,6 +42,5 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'kompetansekartlegging_answers': create_answers_df(),
         'kompetansekartlegging_catalogs': create_catalogs_df(),
         'kompetansekartlegging_questions': create_questions_df(),
-        'kompetansekartlegging_categories': create_categories_df(),
-        'alternative_answers': create_answers_alt()
+        'kompetansekartlegging_categories': create_categories_df()
     }
