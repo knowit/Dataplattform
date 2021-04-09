@@ -37,6 +37,9 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         flattened = [data_point for sublist in formatted_answer_data for data_point in sublist]
         return pd.DataFrame(data=flattened)
 
+    def create_answers_alt():
+        return pd.json_normalize(data['answers'])
+
     def create_catalogs_df():
         return pd.DataFrame(data['catalogs'])
 
@@ -51,5 +54,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'kompetansekartlegging_answers': create_answers_df(),
         'kompetansekartlegging_catalogs': create_catalogs_df(),
         'kompetansekartlegging_questions': create_questions_df(),
-        'kompetansekartlegging_categories': create_categories_df()
+        'kompetansekartlegging_categories': create_categories_df(),
+        'alternative_answers': create_answers_alt()
     }
