@@ -4,12 +4,11 @@ from pytest import fixture
 from os import path
 import json
 import pandas as pd
-from io import BytesIO
 
 
 @fixture
 def test_data():
-    with open(path.join(path.dirname(__file__), 'ingest.json'), 'r') as json_file:
+    with open(path.join(path.dirname(__file__), 'test_data/ingest.json'), 'r') as json_file:
         yield json.load(json_file)
 
 
@@ -39,7 +38,13 @@ def test_initial_process(setup_queue_event, test_data, create_table_mock, dynamo
             data=test_data['data']))
 
     handler(event, None)
-    create_table_mock.assert_table_created('kompetansekartlegging_employees', 'kompetansekartlegging_answers')
+    create_table_mock.assert_table_created(
+        'kompetansekartlegging_users',
+        'kompetansekartlegging_answers',
+        'kompetansekartlegging_catalogs',
+        'kompetansekartlegging_questions',
+        'kompetansekartlegging_categories'
+    )
 
 
 def test_process_users_content(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
@@ -50,7 +55,7 @@ def test_process_users_content(setup_queue_event, test_data, create_table_mock, 
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
-        'kompetansekartlegging_employees',
+        'kompetansekartlegging_users',
         pd.DataFrame({
             'username': ['2c54bb77-190a-4651-9009-7c9fab39a03a', '3c2af0ad-19f0-4f0d-b6dc-031dfcaa423b'],
             'email': ['per.nordmann@knowit.no', 'kari.nordmann@knowit.no'],
