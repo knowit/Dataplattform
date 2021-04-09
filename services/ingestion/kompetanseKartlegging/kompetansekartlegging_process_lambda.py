@@ -11,9 +11,10 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     data = data[0].json()['data']
 
     def create_user_df():
-        users = [{'username': user["username"], 'email': user['attributes'][0]['Value']}
-                 for user in data['users']]
-        return pd.DataFrame(data=users)
+        df = pd.json_normalize(data['users'], meta=['username'], record_path=['attributes'])
+        df.rename(columns={'Value': 'email'}, inplace=True)
+        fields = ['username', 'email']
+        return df[fields]
 
     def create_answers_df():
         df = pd.json_normalize(data['answers'], meta=['username', 'email'], record_path=['answers'])
