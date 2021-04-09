@@ -2,37 +2,36 @@ from services.ingestion.kompetanseKartlegging.kompetansekartlegging_ingest_lambd
 from pytest import fixture
 from responses import RequestsMock, GET
 from os import path
-import json
 import re
 
 
 @fixture
 def test_answers_data():
-    with open(path.join(path.dirname(__file__), 'test_answers_data.json'), 'r') as f:
+    with open(path.join(path.dirname(__file__), 'test_data/test_answers_data.json'), 'r') as f:
         yield f.read()
 
 
 @fixture
 def test_catalogs_data():
-    with open(path.join(path.dirname(__file__), 'test_catalogs_data.json'), 'r') as f:
+    with open(path.join(path.dirname(__file__), 'test_data/test_catalogs_data.json'), 'r') as f:
         yield f.read()
 
 
 @fixture
 def test_categories_data():
-    with open(path.join(path.dirname(__file__), 'test_categories_data.json'), 'r') as f:
+    with open(path.join(path.dirname(__file__), 'test_data/test_categories_data.json'), 'r') as f:
         yield f.read()
 
 
 @fixture
 def test_questions_data():
-    with open(path.join(path.dirname(__file__), 'test_questions_data.json'), 'r') as f:
+    with open(path.join(path.dirname(__file__), 'test_data/test_questions_data.json'), 'r') as f:
         yield f.read()
 
 
 @fixture
 def test_users_data():
-    with open(path.join(path.dirname(__file__), 'test_users_data.json'), 'r') as f:
+    with open(path.join(path.dirname(__file__), 'test_data/test_users_data.json'), 'r') as f:
         yield f.read()
 
 

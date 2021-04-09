@@ -1,1 +1,1 @@
-tests/*.json
+tests/test_data/*.json
