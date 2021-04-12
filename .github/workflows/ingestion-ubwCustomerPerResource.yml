@@ -8,7 +8,6 @@ on:
     paths:
       - "services/ingestion/ubwCustomerPerResource/**"
       - "packages/common/**"
-      - "packages/query/**"
 
 jobs:
   lint:
