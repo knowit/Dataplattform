@@ -10,12 +10,19 @@ url = 'http://10.205.0.5:20201/api/Users'
 
 def handler(event, context):
     res = requests.get(f'{url}')
+
     data_json = res.json()
+
+    def create_guid(v):
+        m = hashlib.sha1()
+        m.update(v.encode('utf-8'))
+        return m.hexdigest()
 
     def get_list_of_users(data):
         list_of_users = []
         for user in data:
             user_details = user['userDetails']
+            user_details['managerguid'] = "" if user['manager'] is None else create_guid(user['manager']['samAccountName'])
             list_of_users.append(user_details)
         return list_of_users
 
@@ -42,6 +49,7 @@ def handler(event, context):
         'knowitBranch',
         'distinguishedName',
         'managerDistinguishedName',
+        'managerguid'
     ]
 
     employee_df = df[employee_table].copy()
@@ -62,16 +70,4 @@ def handler(event, context):
     table = resource.Table(environ.get('PERSON_DATA_TABLE'))
     df_json = json.loads(json.dumps(employee_df.to_dict(orient='records')))
 
-    with table.batch_writer() as batch:
-        for each in table.scan()['Items']:
-            batch.delete_item(
-                Key={
-                    'guid': each['guid'],
-                }
-            )
-
-    with table.batch_writer() as batch:
-        for element in df_json:
-            batch.put_item(Item=element)
-
-    return 200
+    return df_json
