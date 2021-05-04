@@ -1,8 +1,6 @@
 {
-  "dependencies": {
-    "serverless-pseudo-parameters": "^2.5.0"
-  },
   "devDependencies": {
-    "serverless-plugin-conditional-functions": "^1.0.5"
+    "serverless-plugin-conditional-functions": "^1.0.5",
+    "serverless-pseudo-parameters": "^2.5.0"
   }
 }

@@ -36,7 +36,6 @@ functions:
     package:
       include:
         - "*.py"
-        - "*.json"
     events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
