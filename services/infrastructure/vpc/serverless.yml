@@ -8,9 +8,9 @@ custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
-  VpcCIDR: 10.193.0.0/16
-  PublicSubnetCIDR: 10.193.1.0/24
-  PrivateSubnetCIDR: 10.193.0.0/24
+  VpcCIDR: 10.194.0.0/16
+  PublicSubnetCIDR: 10.194.1.0/24
+  PrivateSubnetCIDR: 10.194.0.0/24
   SSHLocation: 0.0.0.0/0
   PersonalMetadataTable: arn:aws:dynamodb:${self:provider.region}:#{AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table
 
