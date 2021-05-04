@@ -1,0 +1,188 @@
+service: vpc
+frameworkVersion: "2"
+
+plugins:
+  - serverless-pseudo-parameters
+
+custom:
+  project: dataplattform
+  stage: ${opt:stage, self:provider.stage}
+  service: ${self:custom.stage}-${self:service}
+  VpcCIDR: 10.193.0.0/16
+  PublicSubnetCIDR: 10.193.1.0/24
+  PrivateSubnetCIDR: 10.193.0.0/24
+  SSHLocation: 0.0.0.0/0
+  PersonalMetadataTable: arn:aws:dynamodb:${self:provider.region}:#{AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table
+
+provider:
+  name: aws
+  region: eu-central-1
+  stackName: ${self:custom.service}
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+
+resources:
+  Resources:
+    VPC:
+      Type: AWS::EC2::VPC
+      Properties:
+        CidrBlock: ${self:custom.VpcCIDR}
+        EnableDnsHostnames: true
+        EnableDnsSupport: true
+        InstanceTenancy: default
+        Tags:
+          - Key: Name
+            Value: ${self:service}-${self:custom.project}-${self:custom.stage}
+
+    InternetGateway:
+      Type: AWS::EC2::InternetGateway
+      Properties:
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-${self:custom.project}-igw
+
+    InternetGatewayAttachment:
+      Type: AWS::EC2::VPCGatewayAttachment
+      Properties:
+        InternetGatewayId: !Ref InternetGateway
+        VpcId: !Ref VPC
+
+    PublicSubnet:
+      Type: AWS::EC2::Subnet
+      Properties:
+        AvailabilityZone: !Select [0, !GetAZs ""]
+        CidrBlock: ${self:custom.PublicSubnetCIDR}
+        MapPublicIpOnLaunch: true
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-public-subnet
+        VpcId: !Ref VPC
+
+    PublicRouteTable:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-public-route-table
+        VpcId: !Ref VPC
+
+    PublicRoute:
+      Type: AWS::EC2::Route
+      Properties:
+        DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: !Ref InternetGateway
+        RouteTableId: !Ref PublicRouteTable
+
+    PublicSubnetRouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref PublicRouteTable
+        SubnetId: !Ref PublicSubnet
+
+    PrivateSubnet:
+      Type: AWS::EC2::Subnet
+      Properties:
+        AvailabilityZone: !Select [0, !GetAZs ""]
+        CidrBlock: ${self:custom.PrivateSubnetCIDR}
+        MapPublicIpOnLaunch: false
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-private-subnet
+        VpcId: !Ref VPC
+
+    PrivateRouteTable:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-private-route-table
+        VpcId: !Ref VPC
+
+    PrivateSubnetRouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref PrivateRouteTable
+        SubnetId: !Ref PrivateSubnet
+
+    PrivateSubnetSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Allows all subnet to communicate
+        SecurityGroupIngress:
+          - IpProtocol: -1
+            CidrIp: ${self:custom.PublicSubnetCIDR}
+          - IpProtocol: -1
+            CidrIp: ${self:custom.PrivateSubnetCIDR}
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-private-subnet-default-sg
+        VpcId: !Ref VPC
+
+    VPCEndpoint:
+      Type: AWS::EC2::VPCEndpoint
+      Properties:
+        PrivateDnsEnabled: false
+        RouteTableIds:
+          - !Ref PrivateRouteTable
+        ServiceName: !Sub com.amazonaws.${self:provider.region}.dynamodb
+        VpcId: !Ref VPC
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal: "*"
+              Action:
+                - "dynamodb:Batch*"
+                - "dynamodb:Delete*"
+                - "dynamodb:DescribeTable"
+                - "dynamodb:GetItem"
+                - "dynamodb:PutItem"
+                - "dynamodb:Update*"
+                - "dynamodb:Scan"
+              Resource:
+                - "${self:custom.PersonalMetadataTable}"
+
+    ElasticIP:
+      Type: AWS::EC2::EIP
+      Properties:
+        Domain: vpc
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-eip
+
+    NATGateway:
+      Type: AWS::EC2::NatGateway
+      Properties:
+        AllocationId: !GetAtt ElasticIP.AllocationId
+        SubnetId: !Ref PublicSubnet
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-ngw
+
+  Outputs:
+    VPC:
+      Description: VPC ID
+      Export:
+        Name: !Sub ${AWS::StackName}-VPC
+      Value: !Ref VPC
+
+    PublicSubnet:
+      Description: PublicSubnet ID
+      Export:
+        Name: !Sub ${AWS::StackName}-PublicSubnet
+      Value: !Ref PublicSubnet
+
+    PrivateSubnet:
+      Description: PrivateSubnet ID
+      Export:
+        Name: !Sub ${AWS::StackName}-PrivateSubnet
+      Value: !Ref PrivateSubnet
+
+    PrivateSubnetSecurityGroup:
+      Description: PrivateSubnetSecurityGroup ID
+      Export:
+        Name: !Sub ${AWS::StackName}-PrivateSubnetSecurityGroup
+      Value: !Ref PrivateSubnetSecurityGroup
