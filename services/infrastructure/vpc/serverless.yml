@@ -11,7 +11,6 @@ custom:
   VpcCIDR: 10.194.0.0/16
   PublicSubnetCIDR: 10.194.1.0/24
   PrivateSubnetCIDR: 10.194.0.0/24
-  SSHLocation: 0.0.0.0/0
   PersonalMetadataTable: arn:aws:dynamodb:${self:provider.region}:#{AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table
 
 provider:
@@ -144,23 +143,6 @@ resources:
                 - "dynamodb:Scan"
               Resource:
                 - "${self:custom.PersonalMetadataTable}"
-
-    ElasticIP:
-      Type: AWS::EC2::EIP
-      Properties:
-        Domain: vpc
-        Tags:
-          - Key: Name
-            Value: ${self:custom.stage}-eip
-
-    NATGateway:
-      Type: AWS::EC2::NatGateway
-      Properties:
-        AllocationId: !GetAtt ElasticIP.AllocationId
-        SubnetId: !Ref PublicSubnet
-        Tags:
-          - Key: Name
-            Value: ${self:custom.stage}-ngw
 
   Outputs:
     VPC:
