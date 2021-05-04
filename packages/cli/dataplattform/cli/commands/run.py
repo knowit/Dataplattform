@@ -15,6 +15,11 @@ from moto import mock_sqs
 from boto3 import resource
 
 
+override_env = [
+    ('AWS_XRAY_SDK_ENABLED', "false")
+]
+
+
 def init(parser: ArgumentParser):
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true')
     parser.add_argument('-p', '--profile', dest='profile', action='store_true')
@@ -87,6 +92,10 @@ def prepare_runner(handler: str, environment: Dict[str, str], args: Namespace):
 
     def setup_env():
         env = resovle_cloudformation_imports(environment)
+
+        for k, v in override_env:
+            env[k] = v
+
         for k, v in env.items():
             if args.verbose:
                 print(f'ENVIRONMENT {k}: {v}')

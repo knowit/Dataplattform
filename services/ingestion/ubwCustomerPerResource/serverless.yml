@@ -52,6 +52,9 @@ provider:
   stackTags: # Tags for cloud formation
     # key: value
   environment: # Service wide environment variables
+  tracing:
+    apiGateway: true
+    lambda: true
 
 
 package:
@@ -134,6 +137,7 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
@@ -200,6 +204,7 @@ resources: # The resources your functions use
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
           - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
           - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-Glue-${self:service}
             PolicyDocument:

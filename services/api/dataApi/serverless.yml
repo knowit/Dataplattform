@@ -49,6 +49,11 @@ provider:
   stackTags:
     project: ${self:custom.project}
     layer: API
+  logs:
+    restApi: true
+  tracing:
+    apiGateway: true
+    lambda: true
 
 package:
   individually: true
@@ -188,6 +193,7 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.service}-ReportCache-policy
             PolicyDocument:
