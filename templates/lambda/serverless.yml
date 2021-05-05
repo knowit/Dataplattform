@@ -10,7 +10,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket # Name of s3 bucket
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: 6 # seconds
@@ -22,9 +22,9 @@ provider:
     #restApi: linkedIn
     #infrastructure: s3
     # key: value
-  stackTags: # Tags for cloud formation
+  stackTags:# Tags for cloud formation
     # key: value
-  environment: # Service wide environment variables
+  environment:# Service wide environment variables
     #ENVIRONMENT_VARIABLE_NAME: 123456789
 
 package:
@@ -39,11 +39,11 @@ functions:
     description: Hello world lambda <3
     package:
       include:
-        - '*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - "*.py" # Files to include in deployment
+    environment:# Environment variables, often stored in SSM
       #ENVIRONMENT_VARIABLE_NAME: ${ssm:ssm_key}
     tags: # Tag for this function. Every function are tagged with stage by default
-    events: # How to trigger the lambda
+    events:# How to trigger the lambda
       # Check link at line 1 for examples
 
 resources: # The resources your functions use

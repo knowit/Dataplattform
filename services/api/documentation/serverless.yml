@@ -5,10 +5,10 @@ custom:
   service: ${self:custom.stage}-${self:service}
   bucketName: ${self:custom.service}-static-web
   stageDomains:
-    dev: 
+    dev:
       - dev.dataplattform.knowit.no
       - dev-doc.dataplattform.knowit.no
-    prod: 
+    prod:
       - dataplattform.knowit.no
       - doc.dataplattform.knowit.no
   domain: ${self:custom.stageDomains.${self:custom.stage}}
@@ -20,6 +20,8 @@ provider:
   runtime: nodejs12.x
   stackName: ${self:custom.service}
   timeout: 25
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 resources:
   Resources:
@@ -41,7 +43,7 @@ resources:
           Statement:
             - Sid: PublicReadGetObject
               Effect: Allow
-              Principal: '*'
+              Principal: "*"
               Action:
                 - s3:GetObject
               Resource: arn:aws:s3:::${self:custom.bucketName}/*
@@ -66,15 +68,15 @@ resources:
           DefaultCacheBehavior:
             TargetOriginId: ${self:custom.service}-default-origin
             ForwardedValues:
-                QueryString: false
+              QueryString: false
             ViewerProtocolPolicy: redirect-to-https
           PriceClass: PriceClass_100
           ViewerCertificate:
-            AcmCertificateArn: 
-              Fn::Join: 
-                - ':'
-                - - 'arn:aws:acm:us-east-1'
-                  - !Ref 'AWS::AccountId'
+            AcmCertificateArn:
+              Fn::Join:
+                - ":"
+                - - "arn:aws:acm:us-east-1"
+                  - !Ref "AWS::AccountId"
                   - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
@@ -82,8 +84,7 @@ resources:
   Outputs:
     StaticBucketOutput:
       Value:
-        'Ref': StaticS3Bucket
+        "Ref": StaticS3Bucket
     DistributionOutput:
       Value:
-        'Fn::GetAtt': [Distribution, DomainName]
-
+        "Fn::GetAtt": [Distribution, DomainName]

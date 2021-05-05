@@ -38,7 +38,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
   runtime: python3.7
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
