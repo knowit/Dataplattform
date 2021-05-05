@@ -37,7 +37,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket # Name of s3 bucket
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
@@ -49,13 +49,12 @@ provider:
     #restApi: linkedIn
     #infrastructure: s3
     # key: value
-  stackTags: # Tags for cloud formation
+  stackTags:# Tags for cloud formation
     # key: value
   environment: # Service wide environment variables
   tracing:
     apiGateway: true
     lambda: true
-
 
 package:
   individually: true
@@ -73,7 +72,7 @@ functions:
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - "*.py" # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -109,7 +108,7 @@ functions:
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - "*.py" # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -166,12 +165,12 @@ resources: # The resources your functions use
                   Resource: !GetAtt EventQueue.Arn
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                    - "ssm:GetParameter*"
+                  Resource: !Sub "arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*"
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -217,29 +216,29 @@ resources: # The resources your functions use
                     - Fn::Join:
                         - ""
                         - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - '*'
+                          - "*"
           - PolicyName: ${self:custom.stage}-Glue-${self:service}
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - 'glue:GetTable'
-                    - 'glue:GetDatabase'
-                  Resource: 
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+                    - "glue:GetTable"
+                    - "glue:GetDatabase"
+                  Resource:
+                    - !Sub "arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog"
+                    - !Sub "arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database"
+                    - !Sub "arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*"
           - PolicyName: ${self:custom.stage}-Athena-${self:service}
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - 'athena:StartQueryExecution'
-                    - 'athena:GetQueryExecution'
-                    - 'athena:GetQueryResults'
-                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary'
+                    - "athena:StartQueryExecution"
+                    - "athena:GetQueryExecution"
+                    - "athena:GetQueryResults"
+                  Resource: !Sub "arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary"
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
@@ -249,10 +248,10 @@ resources: # The resources your functions use
                     - glue:GetCrawler
                     - glue:UpdateCrawler
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
+                    - !Sub "arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog"
+                    - !Sub "arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*"
+                    - !Sub "arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*"
+                    - !Sub "arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*"
 
     EventQueue:
       Type: AWS::SQS::Queue
@@ -271,7 +270,6 @@ resources: # The resources your functions use
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
-
 
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 

@@ -2,12 +2,14 @@ service: cognito
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  policies: ${file(./policies.js)}    
+  policies: ${file(./policies.js)}
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 resources:
   Resources:
@@ -20,7 +22,7 @@ resources:
           UnusedAccountValidityDays: 7
         AutoVerifiedAttributes:
           - email
-        UsernameAttributes: 
+        UsernameAttributes:
           - email
         UsernameConfiguration:
           CaseSensitive: true
@@ -40,10 +42,10 @@ resources:
         ExplicitAuthFlows:
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
-        PreventUserExistenceErrors: ENABLED 
+        PreventUserExistenceErrors: ENABLED
 
-    UserPoolDomain: 
-      Type: AWS::Cognito::UserPoolDomain 
+    UserPoolDomain:
+      Type: AWS::Cognito::UserPoolDomain
       Properties:
         UserPoolId: !Ref CognitoUserPool
         Domain: ${self:custom.stage}-dataplattform-users
@@ -89,19 +91,19 @@ resources:
         Policies:
           - PolicyName: CanAssumeRole
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - 'sts:AssumeRole'
+                    - "sts:AssumeRole"
                   Resource: "*"
           - PolicyName: CanListCognitoGroups
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - 'cognito-idp:GetGroup'
+                    - "cognito-idp:GetGroup"
                   Resource: !GetAtt CognitoUserPool.Arn
 
     Level1:
@@ -163,4 +165,3 @@ resources:
       Value: !Ref CognitoUserPool
       Export:
         Name: ${self:custom.stage}-cognito-userPoolId
-    

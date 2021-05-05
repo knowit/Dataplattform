@@ -1,7 +1,7 @@
 service: cloudfront-raw-storage
 
 custom:
-  stage: ${opt:stage, self:provider.stage} 
+  stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
   userPoolRegion: eu-central-1
   publicBucketName: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
@@ -15,18 +15,18 @@ custom:
   publicFrontOrigin:
     DomainName: ${self:custom.publicDomainName}
     Id: ${self:custom.publicDomainId}
-    S3OriginConfig: 
+    S3OriginConfig:
       OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PublicOriginAccessIdentity}
-  privateFrontOrigin: 
+  privateFrontOrigin:
     DomainName: ${self:custom.privateDomainName}
     Id: ${self:custom.privateDomainId}
-    S3OriginConfig: 
+    S3OriginConfig:
       OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PrivateOriginAccessIdentity}
-  
+
   userPoolId: ${cf.${self:custom.userPoolRegion}:cognito-${self:custom.stage}.CognitoUserPoolId}
   scripts:
     hooks:
-      'before:deploy:deploy': python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId} 
+      "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
 
 package:
   individually: true
@@ -34,17 +34,17 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 pythonRequirements:
-    dockerizePip: non-linux
-    noDeploy:
-      - boto3 # Default in lambda rt
-      - botocore
-      - pandas # Layer
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
+  dockerizePip: non-linux
+  noDeploy:
+    - boto3 # Default in lambda rt
+    - botocore
+    - pandas # Layer
+    - pytz
+    - numpy
+    - numpy.libs
+    - fastparquet
+    - numba
+    - llvmlite
 
 provider:
   name: aws
@@ -52,7 +52,8 @@ provider:
   region: us-east-1
   stackName: ${self:custom.service}
   runtime: python3.7
-
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 functions:
   edgeLambdaJwtAuthenticator:
@@ -62,12 +63,12 @@ functions:
       - cloudFront:
           eventType: viewer-request
           isDefaultOrigin: false
-          pathPattern: '/private/*'
+          pathPattern: "/private/*"
           origin: ${self:custom.privateFrontOrigin}
     role: !GetAtt EdgeLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - "*.py" # Files to include in deployment
 resources:
   Resources:
     EdgeLambdaRole:
@@ -77,13 +78,13 @@ resources:
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - edgelambda.amazonaws.com
-                - lambda.amazonaws.com
-            Action:
-              - sts:AssumeRole
+            - Effect: Allow
+              Principal:
+                Service:
+                  - edgelambda.amazonaws.com
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 
@@ -93,36 +94,36 @@ resources:
         DistributionConfig:
           Aliases:
             - ${self:custom.stage}-storage.dataplattform.knowit.no
-          Origins: 
+          Origins:
             - ${self:custom.publicFrontOrigin}
             - ${self:custom.privateFrontOrigin}
           CacheBehaviors:
             - TargetOriginId: ${self:custom.privateDomainId}
-              AllowedMethods: 
+              AllowedMethods:
                 - HEAD
                 - GET
               ForwardedValues:
                 QueryString: false
                 Headers:
                   - Authorization
-              PathPattern: '/private/*'
+              PathPattern: "/private/*"
               ViewerProtocolPolicy: redirect-to-https
           DefaultCacheBehavior:
             AllowedMethods:
-                - HEAD
-                - GET
+              - HEAD
+              - GET
             ViewerProtocolPolicy: redirect-to-https
             TargetOriginId: ${self:custom.publicDomainId}
             ForwardedValues:
-                QueryString: false
+              QueryString: false
           DefaultRootObject: index.html
           Enabled: true
           ViewerCertificate:
             AcmCertificateArn:
-              Fn::Join: 
-                - ':'
-                - - 'arn:aws:acm:us-east-1'
-                  - !Ref 'AWS::AccountId'
+              Fn::Join:
+                - ":"
+                - - "arn:aws:acm:us-east-1"
+                  - !Ref "AWS::AccountId"
                   - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
@@ -130,10 +131,10 @@ resources:
   Outputs:
     CloudFrontDistributionOutput:
       Value:
-        'Fn::GetAtt': [CloudFrontDistribution, DomainName]
+        "Fn::GetAtt": [CloudFrontDistribution, DomainName]
     CloudFrontDistributionId:
-      Value: 
-        'Ref': CloudFrontDistribution
+      Value:
+        "Ref": CloudFrontDistribution
 
 plugins:
   - serverless-python-requirements

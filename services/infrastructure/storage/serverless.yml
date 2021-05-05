@@ -4,8 +4,8 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   publicBucketName: public-raw-storage-bucket
   privateBucketName: private-raw-storage-bucket
-  stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName} 
-  stagePrivateBucketName: ${self:custom.stage}-${self:custom.privateBucketName} 
+  stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName}
+  stagePrivateBucketName: ${self:custom.stage}-${self:custom.privateBucketName}
   service: ${self:custom.stage}-${self:service}
 
 provider:
@@ -13,6 +13,8 @@ provider:
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 resources:
   Resources:
@@ -28,34 +30,31 @@ resources:
           RestrictPublicBuckets: true
         BucketEncryption:
           ServerSideEncryptionConfiguration:
-              - ServerSideEncryptionByDefault:
-                  SSEAlgorithm: AES256
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: AES256
 
-    
-  
     PublicRawStorageBucket:
-     Type: AWS::S3::Bucket
-     Properties:
+      Type: AWS::S3::Bucket
+      Properties:
         BucketName: ${self:custom.stagePublicBucketName}
         AccessControl: PublicRead
-      
 
     PrivateCloudFrontOriginAccessIdentity:
       Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
       Properties:
         CloudFrontOriginAccessIdentityConfig:
           Comment: "CloudFront OAI"
-    
+
     PublicCloudFrontOriginAccessIdentity:
       Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
       Properties:
         CloudFrontOriginAccessIdentityConfig:
           Comment: "CloudFront OAI"
-  
+
     PrivateRawStorageBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
-        Bucket: 
+        Bucket:
           Ref: PrivateRawStorageBucket
         PolicyDocument:
           Version: "2012-10-17"
@@ -72,7 +71,7 @@ resources:
               Resource: !GetAtt PrivateRawStorageBucket.Arn
               Principal:
                 CanonicalUser: !GetAtt PrivateCloudFrontOriginAccessIdentity.S3CanonicalUserId
-    
+
     PublicRawStorageBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -93,7 +92,7 @@ resources:
               Resource: !GetAtt PublicRawStorageBucket.Arn
               Principal:
                 CanonicalUser: !GetAtt PublicCloudFrontOriginAccessIdentity.S3CanonicalUserId
-  
+
   Outputs:
     PublicRawStorageBucketName:
       Value: !Ref PublicRawStorageBucket
@@ -119,4 +118,3 @@ resources:
       Value: !GetAtt PrivateRawStorageBucket.Arn
       Export:
         Name: ${self:custom.stage}-privateBucketArn
-    
