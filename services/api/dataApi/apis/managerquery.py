@@ -5,7 +5,7 @@ from common.repositories.reports import ReportsRepository
 import common.services.cache_table_service as cache_table_service
 
 
-ns = Namespace('Employee', path='/data')
+ns = Namespace('ManagerQuery', path='/employee')
 
 parser = ns.parser()
 parser.add_argument(
@@ -20,14 +20,13 @@ parser.add_argument(
     default='json',
     choices=['json', 'csv'])
 
-QueryRequest = ns.model(
-    'Query', {
+EmployeeModel = ns.model(
+    'Employee', {
         'email': fields.String(),
         'format': fields.String(default='json', enum=['json', 'csv']),
     })
 
 
-#Nye endepunktet
 @ns.route('/email', strict_slashes=False)
 @ns.doc(
     responses={400: 'Validation Error'},
@@ -36,7 +35,8 @@ QueryRequest = ns.model(
 class Email(Resource):
     def email(self, email_address, output_format):
         sql = "select * from active_directory where email is " + email_address
-        df = engine.execute(sql)
+        #df = engine.execute(sql)
+        return "yes"
 
         if output_format == 'csv':
             return Response(
@@ -46,3 +46,13 @@ class Email(Resource):
             return Response(
                 df.to_json(orient='records'),
                 content_type='application/json')
+
+    @ns.expect(parser)
+    @ns.doc(security={'oauth2': ['openid']})
+    @ns.doc(model=EmployeeModel)
+    def get(self):
+        args = parser.parse_args()
+        try:
+            return self.email(args.email, args.output_format)
+        except Exception as e:
+            ns.abort(500, e)
