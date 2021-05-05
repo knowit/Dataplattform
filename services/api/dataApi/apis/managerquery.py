@@ -5,7 +5,7 @@ from common.repositories.reports import ReportsRepository
 import common.services.cache_table_service as cache_table_service
 
 
-ns = Namespace('Employee', path='/data')
+ns = Namespace('ManagerQuery', path='/employee')
 
 parser = ns.parser()
 parser.add_argument(
@@ -20,23 +20,43 @@ parser.add_argument(
     default='json',
     choices=['json', 'csv'])
 
-QueryRequest = ns.model(
-    'Query', {
+EmployeeModel = ns.model(
+    'Employee', {
         'email': fields.String(),
         'format': fields.String(default='json', enum=['json', 'csv']),
     })
 
 
-#Nye endepunktet
 @ns.route('/email', strict_slashes=False)
 @ns.doc(
     responses={400: 'Validation Error'},
     produces=['application/json', 'text/csv']
 )
 class Email(Resource):
-    def email(self,email, output_format):
-        sql = "select * from active_directory where email is " + email
-        df = engine.execute(sql)
+    def email(self, email_address, output_format):
+        'select a.guid,a.displayname,a.email,b.guid,b.displayname,b.email,c.guid,c.displayname,c.email ' +
+        'from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid where a.email=\'lin@knowit.no\''
+        sql = "select * from active_directory where email is " + email_address
+        #df = engine.execute(sql)
+        data_json = df.to_json(orient='records')
+
+        def setUser(data, keys , n):
+            if(len(keys) > (n) and (data[keys[n]] is not None)):
+                person = {}
+                person[keys[0]] = data[keys[n]]
+                person[keys[1]] = data[keys[n+1]]
+                person[keys[2]] = data[keys[n+2]]
+                manager = setUser(data,keys,n+3)
+                person['manager'] = manager
+                return person
+            else:
+                return None
+            
+        list_of_users = []
+        for user in data_json:
+            keys = list(user.keys())
+            user_details = setUser(user,keys,0)
+            list_of_users.append(user_details)
 
         if output_format == 'csv':
             return Response(
@@ -44,75 +64,15 @@ class Email(Resource):
                 content_type='text/csv')
         else:
             return Response(
-                df.to_json(orient='records'),
-                content_type='application/json')
-
-
-@ns.route('/query', strict_slashes=False)
-@ns.doc(
-    responses={400: 'Validation Error'},
-    produces=['application/json', 'text/csv']
-)
-class Query(Resource):
-    def query(self, sql, output_format):
-        df = engine.execute(sql)
-
-        if output_format == 'csv':
-            return Response(
-                df.to_csv(index=False),
-                content_type='text/csv')
-        else:
-            return Response(
-                df.to_json(orient='records'),
+                list_of_users,
                 content_type='application/json')
 
     @ns.expect(parser)
     @ns.doc(security={'oauth2': ['openid']})
+    @ns.doc(model=EmployeeModel)
     def get(self):
         args = parser.parse_args()
         try:
-            return self.query(args.sql, args.output_format)
+            return self.email(args.email, args.output_format)
         except Exception as e:
             ns.abort(500, e)
-
-    @ns.expect(QueryRequest)
-    @ns.doc(security={'oauth2': ['openid']})
-    def post(self):
-        try:
-            return self.query(ns.payload['sql'], ns.payload.get('format', 'json'))
-        except Exception as e:
-            ns.abort(500, e)
-
-
-class FilterType:
-    __schema__ = {'type': 'string', 'format': 'field:value'}
-
-    def __call__(self, value: str):
-        field, _, value = value.partition(':')
-        return field, value
-
-
-filter_parser = ns.parser()
-filter_parser.add_argument(
-    'filter',
-    type=FilterType(),
-    dest='filter',
-    action='append')
-
-
-@ns.route('/query/report/<name>', strict_slashes=False)
-class QueryReport(Resource):
-    @ns.expect(filter_parser)
-    @ns.doc(security={'oauth2': ['openid']})
-    def get(self, name):
-        filters = filter_parser.parse_args().get('filter', [])
-
-        with ReportsRepository() as repo:
-            report = repo.get(name)
-
-        query = cache_table_service.query_cache_table(
-            report['dataProtection'], report['name'])
-
-        return Response(
-            query(filters),
-            content_type='application/json')
