@@ -103,7 +103,7 @@ functions:
           cors: true
       - http:
           method: GET
-          path: /employee/email
+          path: /employee
           authorizer: ${self:custom.authorizer}
           cors: true
       

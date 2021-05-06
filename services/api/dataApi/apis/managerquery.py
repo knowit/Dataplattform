@@ -23,7 +23,7 @@ EmployeeModel = ns.model(
     })
 
 
-@ns.route('/email', strict_slashes=False)
+@ns.route('/', strict_slashes=False)
 @ns.doc(
     responses={400: 'Validation Error'},
     produces=['application/json', 'text/csv']
