@@ -12,14 +12,14 @@ parser.add_argument(
     'email',
     type=str,
     dest='email',
-    required=True)
+    required=False)
 
 EmployeeModel = ns.model(
     'Employee', {
         'guid' : fields.String(),
         'displayname': fields.String(),
         'email': fields.String(),
-        'manager': fields.Nested(EmployeeModel)
+        'manager': fields.String()
     })
 
 
