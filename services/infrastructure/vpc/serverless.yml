@@ -8,9 +8,27 @@ custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
-  VpcCIDR: 10.194.0.0/16
-  PublicSubnetCIDR: 10.194.1.0/24
-  PrivateSubnetCIDR: 10.194.0.0/24
+  VpcCIDR:
+    dev: 10.194.0.0/18
+    pre-prod: 10.194.128.0/18
+    prod: 10.194.192.0/18
+  PrivateSubnet1CIDR:
+    dev: 10.194.0.0/24
+    pre-prod: 10.194.128.0/24
+    prod: 10.194.192.0/24
+  PrivateSubnet2CIDR:
+    dev: 10.194.1.0/24
+    pre-prod: 10.194.129.0/24
+    prod: 10.194.193.0/24
+  PublicSubnet1CIDR:
+    dev: 10.194.2.0/24
+    pre-prod: 10.194.130.0/24
+    prod: 10.194.194.0/24
+  PublicSubnet2CIDR:
+    dev: 10.194.3.0/24
+    pre-prod: 10.194.131.0/24
+    prod: 10.194.195.0/24
+
   PersonalMetadataTable: arn:aws:dynamodb:${self:provider.region}:#{AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table
 
 provider:
@@ -25,7 +43,7 @@ resources:
     VPC:
       Type: AWS::EC2::VPC
       Properties:
-        CidrBlock: ${self:custom.VpcCIDR}
+        CidrBlock: ${self:custom.VpcCIDR.${self:custom.stage}}
         EnableDnsHostnames: true
         EnableDnsSupport: true
         InstanceTenancy: default
@@ -46,15 +64,26 @@ resources:
         InternetGatewayId: !Ref InternetGateway
         VpcId: !Ref VPC
 
-    PublicSubnet:
+    PublicSubnet1:
       Type: AWS::EC2::Subnet
       Properties:
         AvailabilityZone: !Select [0, !GetAZs ""]
-        CidrBlock: ${self:custom.PublicSubnetCIDR}
+        CidrBlock: ${self:custom.PublicSubnet1CIDR.${self:custom.stage}}
         MapPublicIpOnLaunch: true
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-public-subnet
+            Value: ${self:custom.stage}-public-subnet-1
+        VpcId: !Ref VPC
+
+    PublicSubnet2:
+      Type: AWS::EC2::Subnet
+      Properties:
+        AvailabilityZone: !Select [1, !GetAZs ""]
+        CidrBlock: ${self:custom.PublicSubnet2CIDR.${self:custom.stage}}
+        MapPublicIpOnLaunch: true
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-public-subnet-2
         VpcId: !Ref VPC
 
     PublicRouteTable:
@@ -72,21 +101,38 @@ resources:
         GatewayId: !Ref InternetGateway
         RouteTableId: !Ref PublicRouteTable
 
-    PublicSubnetRouteTableAssociation:
+    PublicSubnet1RouteTableAssociation:
       Type: AWS::EC2::SubnetRouteTableAssociation
       Properties:
         RouteTableId: !Ref PublicRouteTable
-        SubnetId: !Ref PublicSubnet
+        SubnetId: !Ref PublicSubnet1
 
-    PrivateSubnet:
+    PublicSubnet2RouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref PublicRouteTable
+        SubnetId: !Ref PublicSubnet2
+
+    PrivateSubnet1:
       Type: AWS::EC2::Subnet
       Properties:
         AvailabilityZone: !Select [0, !GetAZs ""]
-        CidrBlock: ${self:custom.PrivateSubnetCIDR}
+        CidrBlock: ${self:custom.PrivateSubnet1CIDR.${self:custom.stage}}
         MapPublicIpOnLaunch: false
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-private-subnet
+            Value: ${self:custom.stage}-private-subnet-1
+        VpcId: !Ref VPC
+
+    PrivateSubnet2:
+      Type: AWS::EC2::Subnet
+      Properties:
+        AvailabilityZone: !Select [1, !GetAZs ""]
+        CidrBlock: ${self:custom.PrivateSubnet2CIDR.${self:custom.stage}}
+        MapPublicIpOnLaunch: false
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-private-subnet-2
         VpcId: !Ref VPC
 
     PrivateRouteTable:
@@ -97,21 +143,44 @@ resources:
             Value: ${self:custom.stage}-private-route-table
         VpcId: !Ref VPC
 
-    PrivateSubnetRouteTableAssociation:
+    PrivateSubnet1RouteTableAssociation:
       Type: AWS::EC2::SubnetRouteTableAssociation
       Properties:
         RouteTableId: !Ref PrivateRouteTable
-        SubnetId: !Ref PrivateSubnet
+        SubnetId: !Ref PrivateSubnet1
+
+    PrivateSubnet2RouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        RouteTableId: !Ref PrivateRouteTable
+        SubnetId: !Ref PrivateSubnet2
+
+    PublicSubnetSecurityGroup:
+      Type: AWS::EC2::SecurityGroup
+      Properties:
+        GroupDescription: Allows inbound traffic from the public subnets.
+        SecurityGroupIngress:
+          - IpProtocol: -1
+            CidrIp: ${self:custom.PublicSubnet1CIDR.${self:custom.stage}}
+          - IpProtocol: -1
+            CidrIp: ${self:custom.PublicSubnet2CIDR.${self:custom.stage}}
+        SecurityGroupEgress:
+          - IpProtocol: -1
+            CidrIp: 0.0.0.0/0
+        Tags:
+          - Key: Name
+            Value: ${self:custom.stage}-public-subnet-default-sg
+        VpcId: !Ref VPC
 
     PrivateSubnetSecurityGroup:
       Type: AWS::EC2::SecurityGroup
       Properties:
-        GroupDescription: Allows all subnet to communicate
+        GroupDescription: Allows inbound traffic from the private subnets.
         SecurityGroupIngress:
           - IpProtocol: -1
-            CidrIp: ${self:custom.PublicSubnetCIDR}
+            CidrIp: ${self:custom.PrivateSubnet1CIDR.${self:custom.stage}}
           - IpProtocol: -1
-            CidrIp: ${self:custom.PrivateSubnetCIDR}
+            CidrIp: ${self:custom.PrivateSubnet2CIDR.${self:custom.stage}}
         SecurityGroupEgress:
           - IpProtocol: -1
             CidrIp: 0.0.0.0/0
@@ -151,20 +220,38 @@ resources:
         Name: !Sub ${AWS::StackName}-VPC
       Value: !Ref VPC
 
-    PublicSubnet:
-      Description: PublicSubnet ID
+    PublicSubnet1:
+      Description: PublicSubnet1 ID
       Export:
-        Name: !Sub ${AWS::StackName}-PublicSubnet
-      Value: !Ref PublicSubnet
+        Name: !Sub ${AWS::StackName}-public-subnet-1
+      Value: !Ref PublicSubnet1
 
-    PrivateSubnet:
-      Description: PrivateSubnet ID
+    PublicSubnet2:
+      Description: PublicSubnet2 ID
       Export:
-        Name: !Sub ${AWS::StackName}-PrivateSubnet
-      Value: !Ref PrivateSubnet
+        Name: !Sub ${AWS::StackName}-public-subnet-2
+      Value: !Ref PublicSubnet2
+
+    PrivateSubnet1:
+      Description: PrivateSubnet1 ID
+      Export:
+        Name: !Sub ${AWS::StackName}-private-subnet-1
+      Value: !Ref PrivateSubnet1
+
+    PrivateSubnet2:
+      Description: PrivateSubnet2 ID
+      Export:
+        Name: !Sub ${AWS::StackName}-private-subnet-2
+      Value: !Ref PrivateSubnet2
 
     PrivateSubnetSecurityGroup:
       Description: PrivateSubnetSecurityGroup ID
       Export:
-        Name: !Sub ${AWS::StackName}-PrivateSubnetSecurityGroup
+        Name: !Sub ${AWS::StackName}-private-subnet-default-sg
       Value: !Ref PrivateSubnetSecurityGroup
+
+    PublicSubnetSecurityGroup:
+      Description: PublicSubnetSecurityGroup ID
+      Export:
+        Name: !Sub ${AWS::StackName}-public-subnet-default-sg
+      Value: !Ref PublicSubnetSecurityGroup
