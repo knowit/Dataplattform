@@ -35,7 +35,7 @@ EmployeeModel = ns.model(
 class Email(Resource):
     def email(self, email_address, output_format,email):
         'select a.guid,a.displayname,a.email,b.guid,b.displayname,b.email,c.guid,c.displayname,c.email ' +
-        'from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid where a.email=\'lin@knowit.no\''
+        'from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid where a.email=\''+email+'\''
         sql = "select * from active_directory where email is " + email_address
         #df = engine.execute(sql)
         data_json = df.to_json(orient='records')
