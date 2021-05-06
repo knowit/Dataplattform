@@ -16,7 +16,10 @@ parser.add_argument(
 
 EmployeeModel = ns.model(
     'Employee', {
+        'guid' : fields.String(),
+        'displayname': fields.String(),
         'email': fields.String(),
+        'manager': fields.Nested(EmployeeModel)
     })
 
 
@@ -27,8 +30,8 @@ EmployeeModel = ns.model(
 )
 class Email(Resource):
     def email(self, email_address):
-        emp_sql = 'select a.guid,a.displayname,a.email,b.guid,b.displayname,b.email,c.guid,c.displayname,c.email ' + 'from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid where a.email=\''+email_address+'\''
-        #sql = "select * from active_directory where email is " + email_address
+        email = "" if email_address is None else 'where a.email=\''+email_address+'\''
+        emp_sql = 'select a.guid,a.displayname,a.email,b.guid,b.displayname,b.email,c.guid,c.displayname,c.email from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid ' + email
         df = engine.execute(emp_sql)
         data_json = df.to_json(orient='records')
 
