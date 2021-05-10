@@ -20,6 +20,8 @@ provider:
   runtime: nodejs12.x
   stackName: ${self:custom.service}
   timeout: 25
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 resources:
   Resources:

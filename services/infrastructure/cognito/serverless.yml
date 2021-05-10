@@ -8,6 +8,8 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 resources:
   Resources:

@@ -13,6 +13,8 @@ provider:
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}
+  deploymentBucket:
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
 
 resources:
   Resources:

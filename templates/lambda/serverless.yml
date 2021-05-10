@@ -10,7 +10,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: 6 # seconds
