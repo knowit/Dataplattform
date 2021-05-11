@@ -32,7 +32,7 @@ EmployeeModel = ns.model(
 class Email(Resource):
     def email(self, email_address):
         email = "" if email_address is None else 'where a.email=\'{}\''.format(email_address)
-        emp_sql = 'select a.guid,a.displayname,a.email,b.guid,b.displayname,b.email,c.guid,c.displayname,c.email from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid ' + email
+        emp_sql = 'select a.guid,a.displayname,a.email,b.guid,b.displayname,b.email,c.guid,c.displayname,c.email,d.guid,d.displayname,d.email from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid left outer join active_directory d on c.managerguid = d.guid ' + email
 
         df = engine.execute(emp_sql)
         data_json = df.to_json(orient='records')
