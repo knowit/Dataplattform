@@ -3,6 +3,7 @@ from flask_restx import Resource, Namespace, fields
 from flask import Response
 from common.repositories.reports import ReportsRepository
 import common.services.cache_table_service as cache_table_service
+import json
 
 
 ns = Namespace('ManagerQuery', path='/employee')
@@ -32,6 +33,7 @@ class Email(Resource):
     def email(self, email_address):
         email = "" if email_address is None else 'where a.email=\'{}\''.format(email_address)
         emp_sql = 'select a.guid,a.displayname,a.email,b.guid,b.displayname,b.email,c.guid,c.displayname,c.email from active_directory a left outer join active_directory b on a.managerguid = b.guid left outer join active_directory c on b.managerguid = c.guid ' + email
+
         df = engine.execute(emp_sql)
         data_json = df.to_json(orient='records')
 
@@ -48,13 +50,13 @@ class Email(Resource):
                 return None
             
         list_of_users = []
-        for user in data_json:
+        for user in json.loads(data_json):
             keys = list(user.keys())
             user_details = setUser(user,keys,0)
             list_of_users.append(user_details)
 
         return Response(
-            list_of_users,
+            json.dumps(list_of_users),
             content_type='application/json')
 
     @ns.expect(parser)
