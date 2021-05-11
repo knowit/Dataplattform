@@ -8,6 +8,7 @@ from dataplattform.api import flask_ext
 from apis.query import ns as query_ns
 from apis.report import ns as report_ns
 from apis.catalogue import ns as catalogue_ns
+from apis.managerquery import ns as managerquery_ns
 
 
 auth_url = 'dev-auth.dataplattform.knowit.no' \
@@ -36,6 +37,7 @@ CORS(app)
 api.add_namespace(query_ns)
 api.add_namespace(report_ns)
 api.add_namespace(catalogue_ns)
+api.add_namespace(managerquery_ns)
 
 
 @app.route('/schema.json')
