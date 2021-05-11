@@ -10,7 +10,6 @@ url = 'http://10.205.0.5:20201/api/Users'
 
 def handler(event, context):
     res = requests.get(f'{url}')
-
     data_json = res.json()
 
     def create_guid(v):
