@@ -14,11 +14,7 @@ def test_data():
 
 
 def make_test_json(user_details):
-    return [
-        {
-            'userDetails': user_detail
-        } for user_detail in user_details
-    ]
+    return user_details
 
 
 def add_ddb_dummy_data(ddb_table):
@@ -48,7 +44,7 @@ def test_initial_ingest(s3_bucket, test_data, dynamodb_resource):
 
 
 def test_filter_service_user(s3_bucket, test_data, dynamodb_resource):
-    test_data[2]['isServiceUser'] = True
+    test_data[2]['userDetails']['isServiceUser'] = True
     responses.add(responses.GET, 'http://10.205.0.5:20201/api/Users', json=make_test_json(test_data), status=200)
 
     handler(None, None)
@@ -56,3 +52,14 @@ def test_filter_service_user(s3_bucket, test_data, dynamodb_resource):
     resource = boto3.resource('dynamodb')
     table = resource.Table(environ.get('PERSON_DATA_TABLE'))
     assert table.item_count == 2
+
+
+def test_find_manager_uuid(s3_bucket, test_data, dynamodb_resource):
+    responses.add(responses.GET, 'http://10.205.0.5:20201/api/Users', json=make_test_json(test_data), status=200)
+    resource = boto3.resource('dynamodb')
+    table = resource.Table(environ.get('PERSON_DATA_TABLE'))
+
+    handler(None, None)
+
+    persons = table.scan()['Items']
+    assert persons[0]['managerguid'] == 'e04e18496ba542cf9aa1ede5e2bf100288d96f99'

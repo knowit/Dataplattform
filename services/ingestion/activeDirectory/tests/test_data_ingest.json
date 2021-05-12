@@ -1,139 +1,178 @@
-[
-{
-  "hasActiveDirectoryUser": true,
-  "hasGSuiteUser": true,
-  "disabledGSuite": false,
-  "isDisabledActiveDirectory": false,
-  "directReports": null,
-  "userPrinicipalName": "per.nordmann@knowit.no",
-  "primaryEmailAddress": "per.nordmann@knowit.no",
-  "displayName": "Per Nordmann",
-  "samAccountName": "pernord",
-  "telephoneNumber": "+47 12345678",
-  "company": "Knowit Objectnet",
-  "knowitBranch": "Solutions",
-  "distinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
-  "managerDistinguishedName": "CN=Olav Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
-  "isServiceUser": false,
-  "isExternalUser": false,
-  "isPasswordExpired": false,
-  "isDeleted": false,
-  "licenses": [
-    {
-      "product": "1Password",
-      "version": "Standard",
-      "iconFilename": "1password-64x64.png",
-      "licenseGroupName": "license"
+[{
+    "userDetails": {
+      "hasActiveDirectoryUser": true,
+      "hasGSuiteUser": true,
+      "disabledGSuite": false,
+      "isDisabledActiveDirectory": false,
+      "directReports": null,
+      "userPrinicipalName": "per.nordmann@knowit.no",
+      "primaryEmailAddress": "per.nordmann@knowit.no",
+      "displayName": "Per Nordmann",
+      "samAccountName": "pernord",
+      "telephoneNumber": "+47 12345678",
+      "company": "Knowit Objectnet",
+      "knowitBranch": "Solutions",
+      "distinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "managerDistinguishedName": "CN=Olav Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "isServiceUser": false,
+      "isExternalUser": false,
+      "isPasswordExpired": false,
+      "isDeleted": false,
+      "licenses": [{
+          "product": "1Password",
+          "version": "Standard",
+          "iconFilename": "1password-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "CVPartner",
+          "version": "Standard",
+          "iconFilename": "CVPartner-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "IShield",
+          "version": "Standard",
+          "iconFilename": "iShield-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "Office 365 Account",
+          "version": "Standard",
+          "iconFilename": "Office365-64x64.png",
+          "licenseGroupName": "license"
+        }
+      ]
     },
-    {
-      "product": "CVPartner",
-      "version": "Standard",
-      "iconFilename": "CVPartner-64x64.png",
-      "licenseGroupName": "license"
-    },
-    {
-      "product": "IShield",
-      "version": "Standard",
-      "iconFilename": "iShield-64x64.png",
-      "licenseGroupName": "license"
-    },
-    {
-      "product": "Office 365 Account",
-      "version": "Standard",
-      "iconFilename": "Office365-64x64.png",
-      "licenseGroupName": "license"
+    "manager": {
+      "userPrinicipalName": "reidun.åker@knowit.se",
+      "primaryEmailAddress": "reidun.åker@knowit.se",
+      "displayName": "Reidun Åker",
+      "samAccountName": "reiåke",
+      "telephoneNumber": "+47 13 37 48 68",
+      "company": "Knowit AB",
+      "knowitBranch": null,
+      "distinguishedName": "Johan Schmidt",
+      "managerDistinguishedName": "CN=Reidar Mark,OU=Knowit AB,OU=Knowit,DC=knowit,DC=local",
+      "manager": null
     }
-  ]
-},
-{
-  "hasActiveDirectoryUser": true,
-  "hasGSuiteUser": true,
-  "disabledGSuite": false,
-  "isDisabledActiveDirectory": false,
-  "directReports": null,
-  "userPrinicipalName": "kari.nordmann@knowit.no",
-  "primaryEmailAddress": "kari.nordmann@knowit.no",
-  "displayName": "Kari Nordmann",
-  "samAccountName": "karnord",
-  "telephoneNumber": "+47 12345678",
-  "company": "Knowit Objectnet",
-  "knowitBranch": "Solutions",
-  "distinguishedName": "CN=Kari Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
-  "managerDistinguishedName": "CN=Olav Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
-  "isServiceUser": false,
-  "isExternalUser": false,
-  "isPasswordExpired": false,
-  "isDeleted": false,
-  "licenses": [
-    {
-      "product": "1Password",
-      "version": "Standard",
-      "iconFilename": "1password-64x64.png",
-      "licenseGroupName": "license"
+  },
+  {
+    "userDetails": {
+      "hasActiveDirectoryUser": true,
+      "hasGSuiteUser": true,
+      "disabledGSuite": false,
+      "isDisabledActiveDirectory": false,
+      "directReports": null,
+      "userPrinicipalName": "kari.nordmann@knowit.no",
+      "primaryEmailAddress": "kari.nordmann@knowit.no",
+      "displayName": "Kari Nordmann",
+      "samAccountName": "karnord",
+      "telephoneNumber": "+47 12345678",
+      "company": "Knowit Objectnet",
+      "knowitBranch": "Solutions",
+      "distinguishedName": "CN=Kari Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "managerDistinguishedName": "CN=Olav Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "isServiceUser": false,
+      "isExternalUser": false,
+      "isPasswordExpired": false,
+      "isDeleted": false,
+      "licenses": [{
+          "product": "1Password",
+          "version": "Standard",
+          "iconFilename": "1password-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "CVPartner",
+          "version": "Standard",
+          "iconFilename": "CVPartner-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "IShield",
+          "version": "Standard",
+          "iconFilename": "iShield-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "Office 365 Account",
+          "version": "Standard",
+          "iconFilename": "Office365-64x64.png",
+          "licenseGroupName": "license"
+        }
+      ]
     },
-    {
-      "product": "CVPartner",
-      "version": "Standard",
-      "iconFilename": "CVPartner-64x64.png",
-      "licenseGroupName": "license"
-    },
-    {
-      "product": "IShield",
-      "version": "Standard",
-      "iconFilename": "iShield-64x64.png",
-      "licenseGroupName": "license"
-    },
-    {
-      "product": "Office 365 Account",
-      "version": "Standard",
-      "iconFilename": "Office365-64x64.png",
-      "licenseGroupName": "license"
+    "manager": {
+      "userPrinicipalName": "reidun.åker@knowit.se",
+      "primaryEmailAddress": "reidun.åker@knowit.se",
+      "displayName": "Reidun Åker",
+      "samAccountName": "reiåke",
+      "telephoneNumber": "+47 13 37 48 68",
+      "company": "Knowit AB",
+      "knowitBranch": null,
+      "distinguishedName": "Johan Schmidt",
+      "managerDistinguishedName": "CN=Reidar Mark,OU=Knowit AB,OU=Knowit,DC=knowit,DC=local",
+      "manager": null
     }
-  ]
-},
-{
-  "hasActiveDirectoryUser": true,
-  "hasGSuiteUser": true,
-  "disabledGSuite": false,
-  "isDisabledActiveDirectory": false,
-  "directReports": null,
-  "userPrinicipalName": "lisa.nordmann@knowit.no",
-  "primaryEmailAddress": "lisa.nordmann@knowit.no",
-  "displayName": "Lisa Nordmann",
-  "samAccountName": "lisnord",
-  "telephoneNumber": "+47 12345678",
-  "company": "Knowit Objectnet",
-  "knowitBranch": "Solutions",
-  "distinguishedName": "CN=Lisa Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
-  "managerDistinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
-  "isServiceUser": false,
-  "isExternalUser": false,
-  "isPasswordExpired": false,
-  "isDeleted": false,
-  "licenses": [
-    {
-      "product": "1Password",
-      "version": "Standard",
-      "iconFilename": "1password-64x64.png",
-      "licenseGroupName": "license"
+  },
+  {
+    "userDetails": {
+      "hasActiveDirectoryUser": true,
+      "hasGSuiteUser": true,
+      "disabledGSuite": false,
+      "isDisabledActiveDirectory": false,
+      "directReports": null,
+      "userPrinicipalName": "lisa.nordmann@knowit.no",
+      "primaryEmailAddress": "lisa.nordmann@knowit.no",
+      "displayName": "Lisa Nordmann",
+      "samAccountName": "lisnord",
+      "telephoneNumber": "+47 12345678",
+      "company": "Knowit Objectnet",
+      "knowitBranch": "Solutions",
+      "distinguishedName": "CN=Lisa Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "managerDistinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+      "isServiceUser": false,
+      "isExternalUser": false,
+      "isPasswordExpired": false,
+      "isDeleted": false,
+      "licenses": [{
+          "product": "1Password",
+          "version": "Standard",
+          "iconFilename": "1password-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "CVPartner",
+          "version": "Standard",
+          "iconFilename": "CVPartner-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "IShield",
+          "version": "Standard",
+          "iconFilename": "iShield-64x64.png",
+          "licenseGroupName": "license"
+        },
+        {
+          "product": "Office 365 Account",
+          "version": "Standard",
+          "iconFilename": "Office365-64x64.png",
+          "licenseGroupName": "license"
+        }
+      ]
     },
-    {
-      "product": "CVPartner",
-      "version": "Standard",
-      "iconFilename": "CVPartner-64x64.png",
-      "licenseGroupName": "license"
-    },
-    {
-      "product": "IShield",
-      "version": "Standard",
-      "iconFilename": "iShield-64x64.png",
-      "licenseGroupName": "license"
-    },
-    {
-      "product": "Office 365 Account",
-      "version": "Standard",
-      "iconFilename": "Office365-64x64.png",
-      "licenseGroupName": "license"
+    "manager": {
+      "userPrinicipalName": "reidun.åker@knowit.se",
+      "primaryEmailAddress": "reidun.åker@knowit.se",
+      "displayName": "Reidun Åker",
+      "samAccountName": "reiåke",
+      "telephoneNumber": "+47 13 37 48 68",
+      "company": "Knowit AB",
+      "knowitBranch": null,
+      "distinguishedName": "Johan Schmidt",
+      "managerDistinguishedName": "CN=Reidar Mark,OU=Knowit AB,OU=Knowit,DC=knowit,DC=local",
+      "manager": null
     }
-  ]
-}]
+  }
+]
