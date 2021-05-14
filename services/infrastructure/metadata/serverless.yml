@@ -2,6 +2,9 @@ service: metadata
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   service: ${self:custom.stage}-${self:service}
   project: dataplattform
   editable:
@@ -13,6 +16,7 @@ custom:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:

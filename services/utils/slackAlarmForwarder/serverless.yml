@@ -8,7 +8,10 @@ custom:
     handlerFile: forwarder
     description: Forwards Alarms from the ${self:custom.stage}-CloudwatchAlarms SNS topic to slack 
   ################################################
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
@@ -24,6 +27,7 @@ custom:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}

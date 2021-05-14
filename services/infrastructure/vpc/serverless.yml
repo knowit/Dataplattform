@@ -7,6 +7,9 @@ plugins:
 custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   service: ${self:custom.stage}-${self:service}
   VpcCIDR:
     dev: 10.194.0.0/18
@@ -33,6 +36,7 @@ custom:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:

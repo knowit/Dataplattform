@@ -2,6 +2,9 @@ service: numpyDepLayer
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   project: dataplattform-${self:custom.stage}
   pythonRequirements:
     dockerizePip: non-linux
@@ -16,6 +19,7 @@ custom:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}

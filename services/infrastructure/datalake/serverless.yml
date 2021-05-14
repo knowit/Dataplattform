@@ -3,6 +3,9 @@ service: datalake
 custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   service: ${self:custom.stage}-${self:service}
   level3StagingDir: data/level-3/athena-stage/
   level2StagingDir: data/level-2/athena-stage/
@@ -14,6 +17,7 @@ custom:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}

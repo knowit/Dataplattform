@@ -2,10 +2,14 @@ service: ingestApiGateway
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   project: dataplattform-${self:custom.stage}
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}

@@ -2,10 +2,14 @@ service: cognito
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   policies: ${file(./policies.js)}    
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}  
   stage: dev
   region: eu-central-1
 

@@ -2,6 +2,9 @@ service: raw-storage-for-dataplattform
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   publicBucketName: public-raw-storage-bucket
   privateBucketName: private-raw-storage-bucket
   stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName} 
@@ -10,6 +13,7 @@ custom:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}

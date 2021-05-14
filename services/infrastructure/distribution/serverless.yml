@@ -2,6 +2,9 @@ service: cloudfront-api-dist
 
 custom:
   stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev
   allowedMethods:
     - GET
     - HEAD
@@ -20,6 +23,7 @@ custom:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   stage: dev
   region: eu-central-1
 

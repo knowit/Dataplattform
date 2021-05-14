@@ -1,7 +1,10 @@
 service: cloudfront-raw-storage
 
 custom:
-  stage: ${opt:stage, self:provider.stage} 
+  stage: ${opt:stage, self:provider.stage}
+  profile:
+    prod: dataplattform-prod
+    dev: dataplattform-dev 
   service: ${self:custom.stage}-${self:service}
   userPoolRegion: eu-central-1
   publicBucketName: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
@@ -48,6 +51,7 @@ pythonRequirements:
 
 provider:
   name: aws
+  profile: ${self:custom.profile.${self:custom.stage}}
   stage: dev
   region: us-east-1
   stackName: ${self:custom.service}
