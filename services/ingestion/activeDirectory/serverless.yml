@@ -31,7 +31,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket # Name of s3 bucket
+    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
@@ -39,7 +39,7 @@ provider:
     Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
     Layer: Ingestion # ingestion, processing, restApi, infrastructure
     Ingestion: Pollers #webHooks, Pollers, iot
-  stackTags: # Tags for cloud formation
+  stackTags:# Tags for cloud formation
     # key: value
   environment: # Environment variables, ofthen stored in SSM
   tracing:
@@ -67,8 +67,8 @@ functions:
         - ${ssm:/${self:custom.stage}/${self:service}/PRIVATE_SUBNET_ID}
     package:
       include:
-        - '*.py' # Files to include in deployment
-        - '*.json'
+        - "*.py" # Files to include in deployment
+        - "*.json"
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -104,13 +104,12 @@ resources: # The resources your functions use
         Policies:
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
-              Version: '2012-10-17'
+              Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
-
+                    - "ssm:GetParameter*"
+                  Resource: !Sub "arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*"
 
 plugins:
   - serverless-python-requirements

@@ -53,7 +53,7 @@ provider:
   stackName: ${self:custom.service}
   runtime: python3.7
   deploymentBucket:
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
 
 
 functions:

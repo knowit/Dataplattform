@@ -20,7 +20,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+    name: ${file(../../deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
   tags:
     project: dataplattform

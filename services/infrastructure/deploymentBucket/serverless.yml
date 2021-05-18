@@ -3,6 +3,8 @@ service: deploymentBucket
 plugins:
   - serverless-deployment-bucket
 
+deploymentBucketName: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
@@ -15,7 +17,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+    name: ${self:deploymentBucketName}
     serverSideEncryption: AES256
 
 # Stack will not deploy unless at least one CF resource is defined.

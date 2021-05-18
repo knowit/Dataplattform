@@ -8,7 +8,7 @@ provider:
   stage: dev
   region: eu-central-1
   deploymentBucket:
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
 resources:
   Resources:
