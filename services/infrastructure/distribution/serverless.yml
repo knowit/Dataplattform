@@ -22,6 +22,8 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
+  deploymentBucket:
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
 resources:
   Resources:

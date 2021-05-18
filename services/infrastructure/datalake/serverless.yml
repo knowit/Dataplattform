@@ -18,7 +18,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
   tags:
     project: dataplattform

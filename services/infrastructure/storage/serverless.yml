@@ -13,6 +13,8 @@ provider:
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}
+  deploymentBucket:
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
 resources:
   Resources:
