@@ -3,7 +3,7 @@ service: deploymentBucket
 plugins:
   - serverless-deployment-bucket
 
-deploymentBucketName: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+deploymentBucketName: ${self:custom.stage}-dataplattform-deploymentbucket
 
 custom:
   stage: ${opt:stage, self:provider.stage}
