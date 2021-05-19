@@ -1,12 +1,11 @@
-name: Deploy layers-fastparquet
+name: Deploy layers-numpy
 
 on:
   push:
     branches:
       - develop
       - master
-    paths:
-      - "services/infrastructure/layers/fastparquet/**"
+      - feature/github-actions-deployment
 
 jobs:
   deploy:
@@ -14,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: services/infrastructure/layers/fastparquet
+        working-directory: services/infrastructure/layers/numpy
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
