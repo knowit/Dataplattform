@@ -1,4 +1,4 @@
-name: Deploy infrastructure - deploymentbucket
+name: Deploy infrastructure - deploymentBucket
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: services/infrastructure/deploymentbucket
+        working-directory: services/infrastructure/deploymentBucket
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
