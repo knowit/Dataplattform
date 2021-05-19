@@ -6,6 +6,8 @@ on:
       - develop
       - master
       - feature/github-actions-deployment
+    paths:
+      - "services/infrastructure/layers/fastparquet/**"
 
 jobs:
   deploy:
