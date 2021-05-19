@@ -5,9 +5,8 @@ on:
     branches:
       - develop
       - master
-      - feature/github-actions-deployment
-    #paths:
-    #  - "services/infrastructure/metadata/**"
+    paths:
+      - "services/infrastructure/metadata/**"
 
 jobs:
   deploy:
