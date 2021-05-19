@@ -1,0 +1,39 @@
+name: Deploy infrastructure - distribution
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - "services/infrastructure/distribution/**"
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/infrastructure/distribution
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+
+      - name: Serverless AWS authentication
+        run: |
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
+          else
+            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
+          fi
+
+      - name: Run serverless deploy
+        run: |
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment
+          else
+            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment
+          fi
