@@ -1,4 +1,4 @@
-name: Deploy infrastructure - deploymentBucket
+name: Deploy infrastructure - events
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - develop
       - master
     paths:
-      - "services/infrastructure/deploymentBucket/**"
+      - "services/infrastructure/events/**"
 
 jobs:
   deploy:
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: services/infrastructure/deploymentBucket
+        working-directory: services/infrastructure/events
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
