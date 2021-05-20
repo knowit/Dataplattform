@@ -32,7 +32,7 @@ resources:
     LogBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.service}-log-bucket
+        BucketName: ${self:custom.service}-logbucket
         VersioningConfiguration:
           Status: Enabled #keeps different versions of object if overwrited/updated
         AccessControl:
@@ -41,7 +41,7 @@ resources:
     DataLake:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.stage}-${self:custom.service}-bucket
+        BucketName: ${self:custom.service}-bucket
         VersioningConfiguration:
           Status: Enabled #keeps different versions of object if overwrited/updated
         PublicAccessBlockConfiguration: #blocks any public access to s3 bucket
