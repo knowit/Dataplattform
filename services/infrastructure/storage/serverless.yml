@@ -2,8 +2,8 @@ service: raw-storage-for-dataplattform
 
 custom:
   stage: ${opt:stage, self:provider.stage}
-  publicBucketName: public-raw-storage-bucket
-  privateBucketName: private-raw-storage-bucket
+  publicBucketName: public-raw-storagebucket
+  privateBucketName: private-raw-storagebucket
   stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName} 
   stagePrivateBucketName: ${self:custom.stage}-${self:custom.privateBucketName} 
   service: ${self:custom.stage}-${self:service}
