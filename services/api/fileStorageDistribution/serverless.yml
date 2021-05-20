@@ -48,12 +48,9 @@ pythonRequirements:
 
 provider:
   name: aws
-  stage: dev
   region: us-east-1
   stackName: ${self:custom.service}
   runtime: python3.7
-  deploymentBucket:
-    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
 
 functions:
   edgeLambdaJwtAuthenticator:
