@@ -3,7 +3,7 @@ service: api-documentation
 custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
-  bucketName: ${self:custom.service}-static-web
+  bucketName: ${self:custom.service}-staticweb
   stageDomains:
     dev:
       - dev.dataplattform.knowit.no
