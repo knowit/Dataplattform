@@ -39,7 +39,7 @@ provider:
     Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
     Layer: Ingestion # ingestion, processing, restApi, infrastructure
     Ingestion: Pollers #webHooks, Pollers, iot
-  stackTags:# Tags for cloud formation
+  stackTags: # Tags for cloud formation
     # key: value
   environment: # Environment variables, ofthen stored in SSM
   tracing:
@@ -62,9 +62,10 @@ functions:
     role: !GetAtt IngestLambdaRole.Arn
     vpc:
       securityGroupIds:
-        - ${ssm:/${self:custom.stage}/${self:service}/SECURITY_GROUP_ID} #Use import
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
       subnetIds:
-        - ${ssm:/${self:custom.stage}/${self:service}/PRIVATE_SUBNET_ID}
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-1
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
     package:
       include:
         - "*.py" # Files to include in deployment
