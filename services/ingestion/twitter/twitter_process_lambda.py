@@ -2,6 +2,7 @@ from dataplattform.common.handlers.process import ProcessHandler
 from dataplattform.query.engine import Athena
 import pandas as pd
 from typing import Dict
+from pyathena.error import OperationalError
 
 
 handler = ProcessHandler()
@@ -30,11 +31,14 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     timeline_data = pd.concat([pd.DataFrame.from_records(d) for d in timeline_data])
     accounts_data = pd.concat([pd.DataFrame.from_records(d) for d in accounts_data])
 
-    in_tweets_df = ath.from_('twitter_tweets').select('tweet_id').execute(ath).as_pandas()
-    in_timeline_df = ath.from_('twitter_timeline').select('tweet_id').execute(ath).as_pandas()
-
-    search_data = search_data[~search_data.tweet_id.isin(in_tweets_df.tweet_id)]
-    timeline_data = timeline_data[~timeline_data.tweet_id.isin(in_timeline_df.tweet_id)]
+    try:
+        in_tweets_df = ath.from_('twitter_tweets').select('tweet_id').execute(ath).as_pandas()
+        in_timeline_df = ath.from_('twitter_timeline').select('tweet_id').execute(ath).as_pandas()
+        search_data = search_data[~search_data.tweet_id.isin(in_tweets_df.tweet_id)]
+        timeline_data = timeline_data[~timeline_data.tweet_id.isin(in_timeline_df.tweet_id)]
+        
+    except OperationalError as err:  # Workaround for inital construction of tables when changing names
+        print(f'OperationalError {err}')
 
     return {
         'twitter_tweets': search_data,
