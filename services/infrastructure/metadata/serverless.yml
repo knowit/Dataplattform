@@ -8,8 +8,8 @@ custom:
     mockDescription: Mock data for the DynamoDB table named personal_metadata_table
     mockRate: rate(30 days)
   mockEnabled: # Swap prod and dev at migration
-    prod: true
-    dev: false
+    prod: false
+    dev: true
 
 provider:
   name: aws
