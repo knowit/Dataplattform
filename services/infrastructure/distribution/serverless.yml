@@ -33,9 +33,9 @@ resources:
         DistributionConfig:
           Enabled: true
           Aliases:
-            - ${self:custom.stage}-api.dataplattform.knowit.no
+            - ${self:custom.stage}-api.new-dev.dataplattform.knowit.no
           Origins:
-            - DomainName: 8z9couwu46.execute-api.eu-central-1.amazonaws.com # TODO: ref
+            - DomainName: vfpozplwkb.execute-api.eu-central-1.amazonaws.com # TODO: ref
               OriginPath: /${self:custom.stage}
               Id: ${self:custom.stage}-data-api-origin
               CustomOriginConfig:
@@ -59,7 +59,8 @@ resources:
                 - ':'
                 - - 'arn:aws:acm:us-east-1'
                   - !Ref 'AWS::AccountId'
-                  - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+                  #- certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+                  - certificate/350e85c2-e41d-4f27-b5d2-1c75810aadd3
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 
