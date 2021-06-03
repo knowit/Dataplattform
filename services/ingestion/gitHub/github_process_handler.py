@@ -2,6 +2,7 @@ from dataplattform.common.handlers.process import ProcessHandler
 from dataplattform.query.engine import Athena
 from typing import Dict
 import pandas as pd
+from pyathena.error import OperationalError
 
 handler = ProcessHandler()
 ath = Athena()
@@ -38,11 +39,18 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     github_dataframe = pd.concat([make_dataframe(d) for d in data])
 
-    reg_ids_df = ath.from_('github_knowit_repos').select('id').execute(ath).as_pandas()
-    github_dataframe = github_dataframe[~github_dataframe.id.isin(reg_ids_df.id)]
+    try:
+        reg_ids_df = ath.from_('github_knowit_repos').select(
+            'id').execute(ath).as_pandas()
+        github_dataframe = github_dataframe[~github_dataframe.id.isin(
+            reg_ids_df.id)]
 
-    repos_table = github_dataframe.loc[:, repos_table_coloumns]
-    repos_status_table = github_dataframe.loc[:, repos_status_table_coloumns]
+        repos_table = github_dataframe.loc[:, repos_table_coloumns]
+        repos_status_table = github_dataframe.loc[:,
+                                                  repos_status_table_coloumns]
+
+    except OperationalError as err:  # Workaround for inital construction of tables when changing names
+        print(f'OperationalError {err}')
 
     return {
         'github_knowit_repos': repos_table,
