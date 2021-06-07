@@ -10,7 +10,7 @@ handler = PersonDataProcessHandler(PersonIdentifierType.EMAIL)
 def process(data, events) -> Dict[str, pd.DataFrame]:
     data = data[0].json()['data']
 
-    def create_user_df():
+    def create_users_df():
         df = pd.json_normalize(data['users'], meta=['username'], record_path=['attributes'])
         df.rename(columns={'Value': 'email'}, inplace=True)
         fields = ['username', 'email']
@@ -18,15 +18,8 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     def create_answers_df():
         df = pd.json_normalize(data['answers'], meta=['username', 'email'], record_path=['answers'])
-
-        mapping = {'question.id': 'questionId', 'question.scaleStart': 'scaleStart',
-                   'question.scaleMiddle': 'scaleMiddle', 'question.scaleEnd': 'scaleEnd'}
-
-        df.rename(columns=mapping, inplace=True)
-
-        fields = ['username', 'email', 'questionId', 'unanswered', 'knowledge', 'motivation', 'updatedAt',
-                  'customScaleValue', 'scaleStart', 'scaleMiddle', 'scaleEnd']
-
+        df.rename(columns={'question.id': 'questionId'}, inplace=True)
+        fields = ['username', 'email', 'questionId', 'knowledge', 'motivation', 'updatedAt', 'customScaleValue']
         return df[fields]
 
     def create_catalogs_df():
@@ -39,7 +32,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         return pd.DataFrame(data['categories'])
 
     return {
-        'kompetansekartlegging_users': create_user_df(),
+        'kompetansekartlegging_users': create_users_df(),
         'kompetansekartlegging_answers': create_answers_df(),
         'kompetansekartlegging_catalogs': create_catalogs_df(),
         'kompetansekartlegging_questions': create_questions_df(),

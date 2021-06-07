@@ -4,14 +4,15 @@ from dataplattform.common.aws import SSM
 from datetime import datetime
 import requests
 
-base_url = 'https://jn76t2rune.execute-api.eu-central-1.amazonaws.com/dev'
+base_url = 'https://api.kompetanse.knowit.no/dev'
+# base_url = 'https://api.kompetanse.knowit.no'
 
 handler = IngestHandler()
 
 
 @handler.ingest()
-def handler(event) -> Data:
-    api_token = SSM(with_decryption=True).get('API_KEY')
+def ingest(event) -> Data:
+    api_token = SSM(with_decryption=True).get('kompetansekartlegging_api_key_dev')
     users = requests.get(f'{base_url}/users', headers={'x-api-key': api_token}).json()
     answers = requests.get(f'{base_url}/answers', headers={'x-api-key': api_token}).json()
     catalogs = requests.get(f'{base_url}/catalogs', headers={'x-api-key': api_token}).json()

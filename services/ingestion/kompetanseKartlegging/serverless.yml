@@ -1,5 +1,5 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
-service: kompetanseKartlegging
+service: kompetansekartlegging
 
 custom:
   #Edit these variables###########################
@@ -8,7 +8,7 @@ custom:
     ingestHandlerFile: kompetansekartlegging_ingest_lambda
     processHandlerFile: kompetansekartlegging_process_lambda
     databaseName: level_3
-    description: poll aggregated resource data from ubw
+    description: data from kompetansekartlegging-API
     scheduleRate: rate(7 days)
     accessLevel: level-3
     dataFolder: kompetansekartlegging

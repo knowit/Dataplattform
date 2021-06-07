@@ -1,4 +1,4 @@
-from services.ingestion.kompetanseKartlegging.kompetansekartlegging_process_lambda import handler
+from kompetansekartlegging_process_lambda import handler
 from dataplattform.common import schema
 from pytest import fixture
 from os import path
@@ -73,10 +73,15 @@ def test_process_answers_content(setup_queue_event, test_data, create_table_mock
     create_table_mock.assert_table_data_contains_df(
         'kompetansekartlegging_answers',
         pd.DataFrame({
-            'email': ['per.nordmann@knowit.no', 'per.nordmann@knowit.no'],
-            'question_id': ['46757916-5762-4b29-901c-736f9dca33af', 'e176f891-9e96-42d9-92c8-4b5f726c94f8'],
-            'knowledge': [-1.00000, None],
-            'motivation': [0.80000, None],
-            'customScaleValue': [None, 1.60000],
-            'guid': ['20dbbfa18380233aa643575720b893fac5137699', '20dbbfa18380233aa643575720b893fac5137699']
+            'email': ['per.nordmann@knowit.no'],
+            'questionId': ['d1862cf3-7123-4d35-9cfd-6587e97dc0c8'],
+            'unanswered': [True],
+            'knowledge': [None],
+            'motivation': [None],
+            'updatedAt': [None],
+            'customScaleValue': [None],
+            'scaleStart': [None],
+            'scaleMiddle': [None],
+            'scaleEnd': [None],
+            'guid': ['20dbbfa18380233aa643575720b893fac5137699']
         }))

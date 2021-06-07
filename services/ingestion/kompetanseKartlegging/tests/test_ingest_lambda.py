@@ -1,4 +1,5 @@
-from services.ingestion.kompetanseKartlegging.kompetansekartlegging_ingest_lambda import handler, base_url
+from kompetansekartlegging_ingest_lambda import handler, base_url
+from json import loads
 from pytest import fixture
 from responses import RequestsMock, GET
 from os import path
@@ -46,7 +47,8 @@ def test_initial_ingest(mocked_responses,
                         test_users_data,
                         test_catalogs_data,
                         test_categories_data,
-                        test_questions_data):
+                        test_questions_data,
+                        s3_bucket):
     # add mocked responses
     mocked_responses.add(GET, f'{base_url}/users', body=test_users_data, status=200)
     mocked_responses.add(GET, f'{base_url}/answers', body=test_answers_data, status=200)
@@ -54,10 +56,14 @@ def test_initial_ingest(mocked_responses,
     mocked_responses.add(GET, re.compile(f'{base_url}/catalogs/.*?/categories'), body=test_categories_data, status=200)
     mocked_responses.add(GET, re.compile(f'{base_url}/catalogs/.*?/questions'), body=test_questions_data, status=200)
 
-    data = handler(None)
+    handler(None, None)
 
-    assert data.data['users'] is not None
-    assert data.data['answers'] is not None
-    assert data.data['catalogs'] is not None
-    assert data.data['categories'] is not None
-    assert data.data['questions'] is not None
+    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
+    data = loads(response['Body'].read())
+    data = data['data']
+
+    assert data['users'] is not None
+    assert data['answers'] is not None
+    assert data['catalogs'] is not None
+    assert data['categories'] is not None
+    assert data['questions'] is not None
