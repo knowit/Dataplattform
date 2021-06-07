@@ -6,6 +6,11 @@ from s3fs import S3FileSystem
 from json import loads, dumps
 from uuid import uuid4
 
+from aws_xray_sdk.core import patch_all
+
+# Add AWS xray support
+patch_all()
+
 
 class S3Result:
     def __init__(self, res, error=None):

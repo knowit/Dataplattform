@@ -7,6 +7,8 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
+  deploymentBucket:
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
 resources:
   Resources:
@@ -28,6 +30,12 @@ resources:
         DisplayName: DeleteReport
         TopicName: ${self:custom.stage}-DeleteReport
 
+    AlarmTopic:
+      Type: AWS::SNS::Topic
+      Properties:
+        DisplayName: CloudwatchAlarms
+        TopicName: ${self:custom.stage}-CloudwatchAlarms
+
     TopicPolicy:
       Type: AWS::SNS::TopicPolicy
       Properties: 
@@ -47,11 +55,22 @@ resources:
               Condition:
                 StringEquals:
                   AWS:SourceAccount: !Ref 'AWS::AccountId'
+            - Sid: ${self:custom.stage}-CloudwatchTopicAccess
+              Effect: Allow
+              Principal:
+                Service: cloudwatch.amazonaws.com
+              Action:
+                - sns:Publish
+              Resource: '*'
+              Condition:
+                StringEquals:
+                  AWS:SourceOwner: !Ref AWS::AccountId
         
         Topics: 
           - !Ref NewReportTopic
           - !Ref DataUpdateTopic
           - !Ref DeleteReportTopic
+          - !Ref AlarmTopic
     
     ProcessTopicPolicy:
       Type: AWS::IAM::ManagedPolicy
@@ -83,6 +102,12 @@ resources:
         Ref: DeleteReportTopic
       Export:
         Name: ${self:custom.stage}-delete-report-topic-arn
+
+    AlarmTopicOutput:
+      Value:
+        Ref: AlarmTopic
+      Export:
+        Name: ${self:custom.stage}-alarm-topic-arn
 
     LambdaTopicAccessOutput:
       Value:

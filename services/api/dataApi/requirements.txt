@@ -1,6 +1,6 @@
 flask
 flask_restx
-werkzeug
+werkzeug==1.0.1
 flask-cors
 file:./common_lib
 file:../../../packages/api

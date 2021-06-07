@@ -1,0 +1,90 @@
+# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
+service: slackAlarmForwarder
+
+custom:
+  #Edit these variables###########################
+  editable:
+    timeout: 900
+    handlerFile: forwarder
+    description: Forwards Alarms from the ${self:custom.stage}-CloudwatchAlarms SNS topic to slack 
+  ################################################
+  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  pythonRequirements:
+    dockerizePip: non-linux
+    noDeploy:
+      - boto3 # Default in lambda rt
+      - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
+  runtime: python3.7
+  memorySize: 1024 # MB
+  timeout: ${self:custom.editable.timeout} # seconds
+  
+package:
+  individually: true
+  exclude:
+    - "./**" # Exclude everything and include what you need in the functions below
+
+functions:
+  forwarder:
+    handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    name: ${self:custom.stage}-${self:service} # Always begin name with stage
+    description: ${self:custom.editable.description}
+    role: !GetAtt ForwarderRole.Arn
+    package:
+      include:
+        - '*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      SLACK_CALLBACK_SSM_NAME: slack_callback_url
+    events:
+      - sns:
+          arn: !ImportValue ${self:custom.stage}-alarm-topic-arn
+          topicName: ${self:custom.stage}-CloudwatchAlarms
+  
+resources: # The resources your functions use
+  Resources:
+    ForwarderRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-forwarderRole
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'ssm:GetParameter*'
+                    - 'ssm:PutParameter*'
+                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+      
+  Outputs:
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters

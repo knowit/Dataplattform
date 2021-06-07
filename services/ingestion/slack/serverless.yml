@@ -36,7 +36,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket
+    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
   memorySize: 1024
 
@@ -49,6 +49,9 @@ provider:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
     restApiRootResourceId:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-rootResourceId
+  tracing:
+    apiGateway: true
+    lambda: true
 
   tags:
     project: ${self:custom.project}
@@ -138,6 +141,7 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
@@ -188,6 +192,7 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
           - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:

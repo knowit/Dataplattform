@@ -37,7 +37,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket # Name of s3 bucket
+    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
@@ -52,7 +52,9 @@ provider:
   stackTags: # Tags for cloud formation
     # key: value
   environment: # Environment variables, often stored in SSM
-
+  tracing:
+    apiGateway: true
+    lambda: true
 
 package:
   individually: true
@@ -135,6 +137,7 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-InvokePublicDownloadLambda-${self:service}
             PolicyDocument:
@@ -210,6 +213,7 @@ resources: # The resources your functions use
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
           - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
           - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:

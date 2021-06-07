@@ -8,6 +8,8 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
+  deploymentBucket:
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
 resources:
   Resources:
@@ -46,7 +48,7 @@ resources:
       Type: AWS::Cognito::UserPoolDomain 
       Properties:
         UserPoolId: !Ref CognitoUserPool
-        Domain: ${self:custom.stage}-dataplattform-users
+        Domain: ${self:custom.stage}-dataplattform-userpooldomain
 
     CognitoUserPoolGroupLevel1:
       Type: AWS::Cognito::UserPoolGroup
@@ -85,6 +87,7 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: CanAssumeRole
             PolicyDocument:
