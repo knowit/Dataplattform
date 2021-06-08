@@ -10,8 +10,8 @@ from apis.report import ns as report_ns
 from apis.catalogue import ns as catalogue_ns
 
 
-auth_url = 'dev-auth.dataplattform.knowit.no' \
-    if environ.get('STAGE', 'dev') == 'dev' else 'auth.dataplattform.knowit.no'
+auth_url = 'dev-auth.new-dev.dataplattform.knowit.no' \
+    if environ.get('STAGE', 'dev') == 'dev' else 'auth.new-dev.dataplattform.knowit.no'
 
 app = Flask(__name__)
 

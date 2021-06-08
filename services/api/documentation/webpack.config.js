@@ -45,8 +45,9 @@ module.exports = {
       template: 'index.html'
     }),
     new DefinePlugin({
-      API_URL: JSON.stringify('dev-api.dataplattform.knowit.no'),
-      DEMO_CLIENT_ID: JSON.stringify('27g4krd7m209soqhk050hoa0bn')
+      API_URL: JSON.stringify('dev-api.new-dev.dataplattform.knowit.no'),
+      DEMO_CLIENT_ID: JSON.stringify('46r144f3qdhere7igl8d2gjacr')
+      //DEMO_CLIENT_ID: JSON.stringify('27g4krd7m209soqhk050hoa0bn')
     })
   ],
   output: {

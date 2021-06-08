@@ -6,8 +6,8 @@ custom:
   bucketName: ${self:custom.service}-staticweb
   stageDomains:
     dev:
-      - dev.dataplattform.knowit.no
-      - dev-doc.dataplattform.knowit.no
+      - dev.new-dev.dataplattform.knowit.no
+      - dev-doc.new-dev.dataplattform.knowit.no
     prod:
       - dataplattform.knowit.no
       - doc.dataplattform.knowit.no
@@ -77,7 +77,8 @@ resources:
                 - ":"
                 - - "arn:aws:acm:us-east-1"
                   - !Ref "AWS::AccountId"
-                  - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+                  #- certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+                  - certificate/31616810-a799-4a55-a0ef-052f94e2ddb7
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 
