@@ -83,7 +83,7 @@ def test_process_catalogs_content(create_table_mock):
         'kompetansekartlegging_catalogs',
         pd.DataFrame({
             'id': ['fb9e8f06-4cfa-463e-9e8f-cc0853464070', '63371236-3116-4e6d-85aa-168f6d34d18b', None],
-            'label': ['2021V', None, 'no_id'],
+            'label': ['2021V', None, 'no_id']
         })
     )
 
