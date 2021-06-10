@@ -1,9 +1,12 @@
 service: raw-storage-for-dataplattform
 
+plugins:
+  - serverless-pseudo-parameters
+
 custom:
   stage: ${opt:stage, self:provider.stage}
-  publicBucketName: public-raw-storagebucket
-  privateBucketName: private-raw-storagebucket
+  publicBucketName: public-raw-storagebucket-#{AWS::AccountId}
+  privateBucketName: private-raw-storagebucket-#{AWS::AccountId}
   stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName} 
   stagePrivateBucketName: ${self:custom.stage}-${self:custom.privateBucketName} 
   service: ${self:custom.stage}-${self:service}
