@@ -8,7 +8,7 @@
     "start": "webpack-dev-server --open",
     "predeploy:dev": "yarn build",
     "deploy:dev": "aws s3 sync dist s3://dev-api-documentation-staticweb",
-    "postdeploy:dev": "aws cloudfront create-invalidation --distribution-id E27PLVUQXRJ6X4 --paths /"
+    "postdeploy:dev": "aws cloudfront create-invalidation --distribution-id E2V358T6QZ2R2T --paths /"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^1.0.1",
