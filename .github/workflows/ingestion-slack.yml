@@ -5,7 +5,11 @@ on:
   push:
     branches:
       - master
+      - develop
   pull_request:
+    branches:
+      - master
+      - develop
     paths:
       - 'services/ingestion/slack/**'
       - 'packages/common/**'
