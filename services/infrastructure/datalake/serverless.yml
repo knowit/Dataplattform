@@ -1,5 +1,8 @@
 service: datalake
 
+plugins:
+  - serverless-pseudo-parameters
+
 custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
@@ -32,7 +35,7 @@ resources:
     LogBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.service}-logbucket
+        BucketName: ${self:custom.service}-logbucket-#{AWS::AccountId}
         VersioningConfiguration:
           Status: Enabled #keeps different versions of object if overwrited/updated
         AccessControl:
@@ -41,7 +44,7 @@ resources:
     DataLake:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.service}-bucket
+        BucketName: ${self:custom.service}-bucket-#{AWS::AccountId}
         VersioningConfiguration:
           Status: Enabled #keeps different versions of object if overwrited/updated
         PublicAccessBlockConfiguration: #blocks any public access to s3 bucket
