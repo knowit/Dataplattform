@@ -24,7 +24,7 @@ provider:
   stackName: ${self:custom.service}
   timeout: 25
   deploymentBucket:
-    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:
