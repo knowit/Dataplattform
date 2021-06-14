@@ -7,6 +7,7 @@ custom:
     timeout: 900
     ingestHandlerFile: cv_partner_ingest_lambda
     processHandlerFile: cv_partner_process_lambda
+    mockHandlerFile: cv_partner_mock_handler
     databaseName: level_3
     description: cvPartner saved to s3, post on sqs, poll on sqs and post on s3
     scheduleRate: rate(7 days)
@@ -14,6 +15,7 @@ custom:
     dataFolder: cvpartner
     publicS3Prefix: public/images
     privateS3Prefix: private/cvs
+    mockRate: rate(30 days)
 
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
@@ -32,6 +34,9 @@ custom:
       - fastparquet
       - numba
       - llvmlite
+  mockEnabled:
+    prod: false
+    dev: true
 
 provider:
   name: aws
@@ -128,8 +133,54 @@ functions:
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
     tags: # Tag for this function. Every function are tagged with stage by default
 
+  mock:
+    enabled: ${self:custom.mockEnabled.${self:custom.stage}}
+    handler: ${self:custom.editable.mockHandlerFile}.mock
+    environment:
+      STAGE: ${self:custom.stage}
+    name: ${self:custom.stage}-${self:service}-mock
+    description: Mock data for CVpartner ingestor
+    role: !GetAtt MockMetadataLambdaRole.Arn
+    vpc:
+      securityGroupIds:
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
+      subnetIds:
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-1
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
+    package:
+      include:
+        - "*.py"
+        - "tests/test_data.json"
+    events:
+      - schedule:
+          name: ${self:custom.stage}-${self:service}-timer
+          description: ${self:custom.editable.mockDescription}
+          rate: ${self:custom.editable.mockRate}
+          enabled: true
+
 resources: # The resources your functions use
+  Conditions:
+    CreateCVpartnerMockLambdaRole:
+      Fn::Equals:
+        - ${self:custom.mockEnabled.${self:custom.stage}}
+        - true
   Resources:
+    MockLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.mockHandlerFile}-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Principal:
+                  Service:
+                    - lambda.amazonaws.com
+                Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -254,6 +305,7 @@ resources: # The resources your functions use
                   Action:
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
