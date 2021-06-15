@@ -9,7 +9,7 @@ from io import BytesIO
 
 @fixture
 def test_data():
-    with open(path.join(path.dirname(__file__), 'test_data.json'), 'r') as json_file:
+    with open(path.join(path.dirname(__file__), 'test_data/test_data.json'), 'r') as json_file:
         yield load(json_file)
 
 

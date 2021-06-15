@@ -7,7 +7,7 @@ custom:
     timeout: 900
     ingestHandlerFile: cv_partner_ingest_lambda
     processHandlerFile: cv_partner_process_lambda
-    mockHandlerFile: cv_partner_mock_handler
+    mockHandlerFile: cv_partner_mock_lambda
     databaseName: level_3
     description: cvPartner saved to s3, post on sqs, poll on sqs and post on s3
     scheduleRate: rate(7 days)
@@ -16,6 +16,7 @@ custom:
     publicS3Prefix: public/images
     privateS3Prefix: private/cvs
     mockRate: rate(30 days)
+    mockDescription: upload mocked data for e2e testing
 
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
@@ -37,6 +38,9 @@ custom:
   mockEnabled:
     prod: false
     dev: true
+  ingestEnabled:
+    prod: true
+    dev: false
 
 provider:
   name: aws
@@ -71,6 +75,7 @@ package:
 
 functions:
   ingest: # A Function
+    enabled: ${self:custom.ingestEnabled.${self:custom.stage}}
     handler: ${self:custom.editable.ingestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
@@ -135,12 +140,23 @@ functions:
 
   mock:
     enabled: ${self:custom.mockEnabled.${self:custom.stage}}
-    handler: ${self:custom.editable.mockHandlerFile}.mock
-    environment:
+    handler: ${self:custom.editable.mockHandlerFile}.handler
+    environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      ACCESS_PATH: ${self:custom.accessPath}
+      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+      SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+      DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
+      PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
+      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
+      PUBLIC_PREFIX: ${self:custom.editable.publicS3Prefix}
+      PRIVATE_PREFIX: ${self:custom.editable.privateS3Prefix}
     name: ${self:custom.stage}-${self:service}-mock
     description: Mock data for CVpartner ingestor
-    role: !GetAtt MockMetadataLambdaRole.Arn
+    role: !GetAtt IngestLambdaRole.Arn
     vpc:
       securityGroupIds:
         - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
@@ -150,37 +166,38 @@ functions:
     package:
       include:
         - "*.py"
-        - "tests/test_data.json"
+        - "tests/test_data/test_data.json"
+        - "tests/test_data/**"
     events:
       - schedule:
-          name: ${self:custom.stage}-${self:service}-timer
+          name: ${self:custom.stage}-${self:service}-mock-timer
           description: ${self:custom.editable.mockDescription}
           rate: ${self:custom.editable.mockRate}
           enabled: true
 
 resources: # The resources your functions use
   Conditions:
-    CreateCVpartnerMockLambdaRole:
+    CreateMockLambdaRole:
       Fn::Equals:
         - ${self:custom.mockEnabled.${self:custom.stage}}
         - true
   Resources:
     MockLambdaRole:
       Type: AWS::IAM::Role
+      Condition: CreateMockLambdaRole
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.mockHandlerFile}-role
+        RoleName: ${self:custom.stage}-${self:service}-mock-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Principal:
-                  Service:
-                    - lambda.amazonaws.com
-                Action: sts:AssumeRole
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
-
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -223,47 +240,31 @@ resources: # The resources your functions use
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}-List
+
+          - PolicyName: ${self:custom.stage}-Bucket-${self:service}-List
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
+                    - s3:PutObject
                     - s3:ListBucket
                     - s3:GetBucketLocation
+                    - s3:ListBucketVersions
                   Resource:
                     - Fn::Join:
                         - ""
                         - - !ImportValue ${self:custom.stage}-privateBucketArn
                           - '*'
-          - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}-List
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:ListBucket
-                    - s3:GetBucketLocation
-                  Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-publicBucketArn
-                          - '*'
-          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}-List
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:ListBucket
-                    - s3:ListBucketVersions
-                    - s3:GetBucketLocation
-                  Resource:
                     - Fn::Join:
                         - ""
                         - - !ImportValue ${self:custom.stage}-datalakeArn
                           - '*'
-          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-storage-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -275,14 +276,6 @@ resources: # The resources your functions use
                         - ""
                         - - !ImportValue ${self:custom.stage}-privateBucketArn
                           - /${self:custom.editable.privateS3Prefix}*
-          - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:DeleteObject
-                  Resource:
                     - Fn::Join:
                         - ""
                         - - !ImportValue ${self:custom.stage}-publicBucketArn
@@ -394,3 +387,4 @@ resources: # The resources your functions use
 plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
+  - serverless-plugin-conditional-functions
