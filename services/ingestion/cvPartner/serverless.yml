@@ -157,12 +157,6 @@ functions:
     name: ${self:custom.stage}-${self:service}-mock
     description: Mock data for CVpartner ingestor
     role: !GetAtt IngestLambdaRole.Arn
-    vpc:
-      securityGroupIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
-      subnetIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-1
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
     package:
       include:
         - "*.py"
@@ -197,7 +191,6 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
