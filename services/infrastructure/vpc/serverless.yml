@@ -189,7 +189,25 @@ resources:
             Value: ${self:custom.stage}-private-subnet-default-sg
         VpcId: !Ref VPC
 
-    DynamoDBVPCEndpoint:
+    VPCEndpointS3:
+      Type: AWS::EC2::VPCEndpoint
+      Properties:
+        PrivateDnsEnabled: false
+        RouteTableIds:
+          - !Ref PrivateRouteTable
+        ServiceName: !Sub com.amazonaws.${self:provider.region}.s3
+        VpcId: !Ref VPC
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal: "*"
+              Action:
+                - "*"
+              Resource:
+                - "*"
+
+    VPCEndpoint:
       Type: AWS::EC2::VPCEndpoint
       Properties:
         PrivateDnsEnabled: false
@@ -213,41 +231,6 @@ resources:
               Resource:
                 - "${self:custom.PersonalMetadataTable}"
 
-    S3VPCEndpoint:
-      Type: AWS::EC2::VPCEndpoint
-        Properties:
-          PrivateDnsEnabled: false
-        ServiceName: !Sub com.amazonaws.${self:provider.region}.s3
-        VpcId: !Ref VPC
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Principal: "*"
-                Action:
-                  - s3:PutObject
-                  - s3:ListObjects*
-                  - s3:GetObject
-                  - s3:CopyObject
-                  - s3:DeleteObjects
-                  - s3:DeleteObject
-                  - s3:DeleteObjectVersion
-                  - s3:GetBucketLocation
-                  - s3:ListBucket
-                  - s3:ListBucketVersions
-                Resource:
-                  - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
-                  - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-privateBucketArn
-                        - '*'
-                  - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-publicBucketArn
-                        - '*'
 
   Outputs:
     VPC:
