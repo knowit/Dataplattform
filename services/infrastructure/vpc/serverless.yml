@@ -189,24 +189,6 @@ resources:
             Value: ${self:custom.stage}-private-subnet-default-sg
         VpcId: !Ref VPC
 
-    VPCEndpointS3:
-      Type: AWS::EC2::VPCEndpoint
-      Properties:
-        PrivateDnsEnabled: false
-        RouteTableIds:
-          - !Ref PrivateRouteTable
-        ServiceName: !Sub com.amazonaws.${self:provider.region}.s3
-        VpcId: !Ref VPC
-        PolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal: "*"
-              Action:
-                - "*"
-              Resource:
-                - "*"
-
     VPCEndpoint:
       Type: AWS::EC2::VPCEndpoint
       Properties:
@@ -230,7 +212,6 @@ resources:
                 - "dynamodb:Scan"
               Resource:
                 - "${self:custom.PersonalMetadataTable}"
-
 
   Outputs:
     VPC:
