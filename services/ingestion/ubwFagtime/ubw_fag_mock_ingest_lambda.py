@@ -7,7 +7,7 @@ handler = IngestHandler()
 
 
 @handler.ingest()
-def mock(event, context) -> Data:
+def mock(event) -> Data:
     test_data = open('tests/test_data.json')
     test_json = json.load(test_data)
 
