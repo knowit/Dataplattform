@@ -74,7 +74,8 @@ def query_complete(athena, query_id: str):
 
 
 def get_staging_dir(protection_level):
-    rootdir = f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}'
+    #rootdir = f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}'
+    rootdir = f's3://{environ.get("DATALAKE", "dev-datalake-bucket")}'
     if protection_level == 3:
         return rootdir + "/" + str(environ.get('LEVEL_3_STAGING_DIR'))
     elif protection_level == 2:

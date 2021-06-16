@@ -6,7 +6,8 @@ from typing import Tuple, List
 
 def cached_key(protection: int, name: str) -> Tuple[str, str]:
     return (
-        environ.get("DATALAKE", "dev-datalake-datalake"),
+        #environ.get("DATALAKE", "dev-datalake-datalake"),
+        environ.get("DATALAKE", "dev-datalake-bucket"),
         f'reports/level-{protection}/{name}.gzip'
     )
 
