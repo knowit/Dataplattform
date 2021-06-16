@@ -1,5 +1,3 @@
-import json
-
 from cv_partner_ingest_lambda import handler, url, url_v1, offset_size
 from json import loads
 import responses

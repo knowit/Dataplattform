@@ -22,7 +22,5 @@ def mock(event) -> Data:
         bucket = environ.get('PUBLIC_BUCKET') if entry.path.endswith('.jpg') else environ.get('PRIVATE_BUCKET')
         aws_client.upload_file(entry.path, bucket, entry.name)
 
-    return Data(
-        metadata=Metadata(timestamp=data_json['metadata']['timestamp']),
-        data=data_json['data']
-    )
+    return Data(metadata=Metadata(timestamp=data_json['metadata']['timestamp']),
+                data=data_json['data'])
