@@ -12,10 +12,17 @@ def handler(event, context):
     res = requests.get(f'{url}')
     data_json = res.json()
 
+    def create_guid(v):
+        m = hashlib.sha1()
+        m.update(v.encode('utf-8'))
+        return m.hexdigest()
+
     def get_list_of_users(data):
         list_of_users = []
         for user in data:
             user_details = user['userDetails']
+            managerguid = "" if user['manager'] is None else create_guid(user['manager']['samAccountName'])
+            user_details['managerguid'] = managerguid
             list_of_users.append(user_details)
         return list_of_users
 
@@ -42,6 +49,7 @@ def handler(event, context):
         'knowitBranch',
         'distinguishedName',
         'managerDistinguishedName',
+        'managerguid'
     ]
 
     employee_df = df[employee_table].copy()

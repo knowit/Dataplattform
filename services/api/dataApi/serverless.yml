@@ -101,6 +101,11 @@ functions:
           method: ANY
           path: /
           cors: true
+      - http:
+          method: GET
+          path: /employee
+          authorizer: ${self:custom.authorizer}
+          cors: true
       
 
   CacheUpdater:

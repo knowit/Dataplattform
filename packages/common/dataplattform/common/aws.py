@@ -116,7 +116,8 @@ class S3:
         if filter_val is not None:
             for obj in objects_to_be_deleted:
                 if filter_val in obj.key:
-                    self.fs.rm(obj.key)
+                    if self.fs.exists(obj.key):
+                        self.fs.rm(obj.key)
         else:
             objects_to_be_deleted.delete()
 

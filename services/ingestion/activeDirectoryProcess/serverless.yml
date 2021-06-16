@@ -226,6 +226,7 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
+                    - s3:DeleteObject                    
                     - s3:DeleteObjectVersion
                   Resource:
                     - Fn::Join:
