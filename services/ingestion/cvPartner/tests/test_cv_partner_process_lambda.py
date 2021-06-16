@@ -61,10 +61,10 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock, 
         'cv_partner_employees',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_2'],
-            'guid': ['20dbbfa18380233aa643575720b893fac5137699', '491b9fa9bfac17563882b0fdc6f3a8a97417bd99'],
+            'guid': ['0000000000000000000000000000000000000000', '0000000000000000000000000000000000000001'],
             'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
             'link': ["link1", "link2"],
-            'email': ['per.nordmann@knowit.no', 'kari.nordmann@knowit.no'],
+            'email': ['navn.a.navnesen@smplcompany.a.no', 'navn.b.navnesen@smplcompany.a.no'],
             'navn': ['Test Testerson', 'Test Testerson 2'],
             'telefon': ['+123456', '+123456'],
             'born_year': [1995, 1985],
@@ -94,11 +94,11 @@ def test_process_table_content_missing_born_date(setup_queue_event, test_data, c
         'cv_partner_employees',
         pd.DataFrame({
             'user_id': ['user_id_1', 'user_id_2'],
-            'guid': ['20dbbfa18380233aa643575720b893fac5137699', '491b9fa9bfac17563882b0fdc6f3a8a97417bd99'],
+            'guid': ['0000000000000000000000000000000000000000', '0000000000000000000000000000000000000001'],
             'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
             'link': ["link1", "link2"],
             'navn': ['Test Testerson', 'Test Testerson 2'],
-            'email': ['per.nordmann@knowit.no', 'kari.nordmann@knowit.no'],
+            'email': ['navn.a.navnesen@smplcompany.a.no', 'navn.b.navnesen@smplcompany.a.no'],
             'telefon': ['+123456', '+123456'],
             'born_year': [-1, 1985],
             'nationality': ["Norwegian", "Swedish"],
@@ -307,5 +307,5 @@ def test_set_guid_from_ad_data(s3_bucket, setup_queue_event, test_data, dynamodb
     cv_partner_employees_object = s3_bucket.Object("data/test/structured/cv_partner_employees/part.0.parquet")
     cv_partner_employees = pd.read_parquet(BytesIO(cv_partner_employees_object.get()['Body'].read()))
     assert cv_partner_employees.loc[cv_partner_employees['user_id'] == "user_id_1"]['guid'][0] \
-           == "20dbbfa18380233aa643575720b893fac5137699"
+           == "0000000000000000000000000000000000000000"
     assert len(cv_partner_employees) == 1

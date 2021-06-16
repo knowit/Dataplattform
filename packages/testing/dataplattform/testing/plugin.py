@@ -54,7 +54,13 @@ def db_person_data():
          'distinguished_name': 'Kari Nordmann', 'manager': 'Olav Nordmann'},
         {'guid': '5edbcdf460809039eb4897ccf8ce3bb5e501884d', 'email': 'lisa.nordmann@knowit.no',
          'displayName': 'Lisa Nordmann', 'alias': 'lisnord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
-         'distinguished_name': 'Lisa Nordmann', 'manager': 'Per Nordmann'}
+         'distinguished_name': 'Lisa Nordmann', 'manager': 'Per Nordmann'},
+        {'guid': '0000000000000000000000000000000000000000', 'email': 'navn.a.navnesen@smplcompany.a.no',
+         'displayName': 'Navn A. Navnesen ', 'alias': 'aliasa', 'company': 'Sample Company A',
+         'knowitBranch': 'Branchname A', 'distinguished_name': 'Navn A. Navnesen ', 'manager': 'Ola A. Nordmann '},
+        {'guid': '0000000000000000000000000000000000000001', 'email': 'navn.b.navnesen@smplcompany.a.no',
+         'displayName': 'Navn B. Navnesen ', 'alias': 'aliasb', 'company': 'Sample Company A',
+         'knowitBranch': 'Branchname A', 'distinguished_name': 'Navn B. Navnesen ', 'manager': 'Ola A. Nordmann '}
     ]
 
 
