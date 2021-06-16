@@ -22,13 +22,20 @@ def find_file(filename):
 
 def load_serverless_config(path, serverless_cli=None, serverless_file=None):
     serverless_cli = serverless_cli or 'serverless'
-    serverless_file = os.path.relpath(serverless_file or find_file('serverless.yml'))
+    serverless_file = os.path.relpath(
+        serverless_file or find_file('serverless.yml'))
 
     p = run([
         serverless_cli, 'print', '--path', path, '--format', 'json', '--config', serverless_file],
         check=True, capture_output=True, shell=os.name != 'posix', encoding='utf-8')
 
-    return loads(p.stdout)
+    index_1 = p.stdout.index('{')
+    index_2 = p.stdout.rindex('}') + 1
+
+    # Remove potential warnings and grab the returned json only
+    config_json_string = p.stdout[index_1: index_2: 1]
+
+    return loads(config_json_string)
 
 
 def serverless_environment(serverless_cli=None, serverless_file=None, serverless_config=None):
