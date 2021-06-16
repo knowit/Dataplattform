@@ -183,7 +183,7 @@ resources:
                       "StorageType",
                       "StandardStorage",
                       "BucketName",
-                      "${self:custom.stage}-datalake-datalake",
+                      "${self:custom.stage}-datalake-bucket",
                       {
                         "label": "Average Size"
                       }
