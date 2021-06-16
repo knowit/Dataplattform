@@ -155,8 +155,8 @@ functions:
       PUBLIC_PREFIX: ${self:custom.editable.publicS3Prefix}
       PRIVATE_PREFIX: ${self:custom.editable.privateS3Prefix}
     name: ${self:custom.stage}-${self:service}-mock
-    description: Mock data for CVpartner ingestor
-    role: !GetAtt IngestLambdaRole.Arn
+    description: Mock CVpartner-ingestor data
+    role: !GetAtt MockLambdaRole.Arn
     package:
       include:
         - "*.py"
@@ -175,6 +175,10 @@ resources: # The resources your functions use
       Fn::Equals:
         - ${self:custom.mockEnabled.${self:custom.stage}}
         - true
+    CreateIngestLambdaRole:
+      Fn::Equals:
+        - ${self:custom.ingestEnabled.${self:custom.stage}}
+        - true
   Resources:
     MockLambdaRole:
       Type: AWS::IAM::Role
@@ -191,8 +195,79 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                    - s3:DeleteObject
+                    - s3:DeleteObjectVersion
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
+
+          - PolicyName: ${self:custom.stage}-Bucket-${self:service}-List
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                    - s3:ListBucketVersions
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-privateBucketArn
+                          - '*'
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - '*'
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-storage-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:DeleteObject
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-privateBucketArn
+                          - /${self:custom.editable.privateS3Prefix}*
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - /${self:custom.editable.publicS3Prefix}*
+          - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:GetQueueUrl
+                    - sqs:SendMessageBatch
+                    - sqs:SendMessage
+                  Resource: !GetAtt EventQueue.Arn
+
     IngestLambdaRole:
       Type: AWS::IAM::Role
+      Condition: CreateIngestLambdaRole
       Properties:
         RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
         AssumeRolePolicyDocument:
