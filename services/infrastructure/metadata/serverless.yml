@@ -10,6 +10,9 @@ custom:
   mockEnabled:
     prod: false
     dev: true
+  pythonRequirements:
+    dockerizePip: non-linux
+    faker: true
 
 provider:
   name: aws
@@ -122,4 +125,5 @@ resources:
 
 plugins:
   - serverless-pseudo-parameters
+  - serverless-python-requirements
   - serverless-plugin-conditional-functions
