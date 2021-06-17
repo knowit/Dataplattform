@@ -9,7 +9,7 @@ provider:
   stage: dev
   region: eu-central-1
   deploymentBucket:
-    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:
