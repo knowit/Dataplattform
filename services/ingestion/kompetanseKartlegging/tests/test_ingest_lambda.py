@@ -1,4 +1,4 @@
-from kompetansekartlegging_ingest_lambda import handler, base_url
+from kompetansekartlegging_ingest_lambda import handler
 from json import loads
 from pytest import fixture
 from responses import RequestsMock, GET
@@ -49,6 +49,8 @@ def test_initial_ingest(mocked_responses,
                         test_categories_data,
                         test_questions_data,
                         s3_bucket):
+    base_url = 'https://api.kompetanse.knowit.no/dev'
+
     # add mocked responses
     mocked_responses.add(GET, f'{base_url}/users', body=test_users_data, status=200)
     mocked_responses.add(GET, f'{base_url}/answers', body=test_answers_data, status=200)
