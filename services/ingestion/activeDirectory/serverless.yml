@@ -31,7 +31,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
+    name:  ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
