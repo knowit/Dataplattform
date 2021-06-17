@@ -12,6 +12,15 @@ custom:
     scheduleRate: rate(7 days)
     accessLevel: level-3
     dataFolder: ubw/customer_per_resource
+    mockIngestHandlerFile: ubw_costumer_per_resource_mock_ingest_lambda
+    mockDescription: Mock data for costumer_per_resource_mock_ingest table
+    mockRate: rate(7 days)
+  mockEnabled:
+    prod: false
+    dev: true
+  ingestEnabled:
+    prod: true
+    dev: false
 
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
@@ -50,7 +59,7 @@ provider:
     #infrastructure: s3
     # key: value
   stackTags: # Tags for cloud formation
-    # key: value
+  # key: value
   environment: # Service wide environment variables
   tracing:
     apiGateway: true
@@ -63,7 +72,36 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
+  mock:
+    enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
+    handler: ${self:custom.editable.mockIngestHandlerFile}.handler
+    layers:
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-mock-ingest
+    description: ${self:custom.editable.mockDescription}
+    role: !GetAtt MockLambdaRole.Arn
+    package:
+      include:
+        - '*.py'
+        - 'tests/test_data.json'
+    environment:
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      ACCESS_PATH: ${self:custom.accessPath}
+      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+      SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+
+    events:
+      - schedule:
+          name: ${self:custom.stage}-${self:service}-mock-timer
+          description: ${self:custom.editable.description}
+          rate: ${self:custom.editable.scheduleRate}
+          enabled: true
   ingest: # A Function
+    enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
     handler: ${self:custom.editable.ingestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
@@ -122,7 +160,62 @@ functions:
     tags: # Tag for this function. Every function are tagged with stage by default
 
 resources: # The resources your functions use
+  Conditions:
+    CreateMockLambdaRole:
+      Fn::Equals:
+        - ${self:custom.mockEnabled.${self:custom.stage}}
+        - true
+    CreateIngestLambdaRole:
+      Fn::Equals:
+        - ${self:custom.ingestEnabled.${self:custom.stage}}
+        - true
   Resources:
+    MockLambdaRole:
+      Condition: CreateMockLambdaRole
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-mock-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+        Policies: # TODO mulig denne trenger versjon 2 av datalakeIO
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                    - s3:DeleteObjectVersion
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
+          - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - sqs:GetQueueUrl
+                    - sqs:SendMessageBatch
+                    - sqs:SendMessage
+                  Resource: !GetAtt EventQueue.Arn
+
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -298,3 +391,5 @@ resources: # The resources your functions use
 plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
+  - serverless-plugin-conditional-functions
+
