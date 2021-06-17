@@ -35,7 +35,7 @@ resources:
           Aliases:
             - ${self:custom.stage}-api.new-dev.dataplattform.knowit.no
           Origins:
-            - DomainName: 8ulz5c2yl8.execute-api.eu-central-1.amazonaws.com # TODO: ref
+            - DomainName: 88kfvemnz1.execute-api.eu-central-1.amazonaws.com # TODO: ref
               OriginPath: /${self:custom.stage}
               Id: ${self:custom.stage}-data-api-origin
               CustomOriginConfig:
