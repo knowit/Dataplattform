@@ -27,6 +27,12 @@ custom:
   scripts:
     hooks:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
+  distributionAlias:
+    dev: storage.new-dev.dataplattform.knowit.no
+    prod: storage.dataplattform.knowit.no
+  certificate:
+    dev: certificate/350e85c2-e41d-4f27-b5d2-1c75810aadd3
+    prod: certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
 
 package:
   individually: true
@@ -90,7 +96,7 @@ resources:
       Properties:
         DistributionConfig:
           Aliases:
-            - ${self:custom.stage}-storage.new-dev.dataplattform.knowit.no
+            - ${self:custom.stage}-${self:custom.distributionAlias.${self:custom.stage}}
           Origins:
             - ${self:custom.publicFrontOrigin}
             - ${self:custom.privateFrontOrigin}
@@ -118,11 +124,10 @@ resources:
           ViewerCertificate:
             AcmCertificateArn:
               Fn::Join:
-                - ':'
-                - - 'arn:aws:acm:us-east-1'
-                  - !Ref 'AWS::AccountId'
-                  #- certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
-                  - certificate/350e85c2-e41d-4f27-b5d2-1c75810aadd3
+                - ":"
+                - - "arn:aws:acm:us-east-1"
+                  - !Ref "AWS::AccountId"
+                  - ${self:custom.certificate.${self:custom.stage}}
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 
