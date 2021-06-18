@@ -206,6 +206,7 @@ resources:
                   Resource: !GetAtt EventQueue.Arn
 
     IngestLambdaRole:
+      Condition: CreateIngestLambdaRole
       Type: AWS::IAM::Role
       Properties:
         RoleName: ${self:custom.stage}-${self:service}-ingest-role
