@@ -17,6 +17,15 @@ custom:
     - Access-Control-Request-Method
     - Origin
     - Authorization
+  distributionAlias:
+    dev: dev-api.new-dev.dataplattform.knowit.no
+    prod: dev-api.dataplattform.knowit.no
+  certificate:
+    dev: certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+    prod: certificate/350e85c2-e41d-4f27-b5d2-1c75810aadd3
+  originDomain:
+    dev: 88kfvemnz1.execute-api.eu-central-1.amazonaws.com
+    prod: 8z9couwu46.execute-api.eu-central-1.amazonaws.com
 
 provider:
   name: aws
@@ -33,9 +42,9 @@ resources:
         DistributionConfig:
           Enabled: true
           Aliases:
-            - ${self:custom.stage}-api.new-dev.dataplattform.knowit.no
+            - ${self:custom.distributionAlias.${self:custom.stage}}
           Origins:
-            - DomainName: 88kfvemnz1.execute-api.eu-central-1.amazonaws.com # TODO: ref
+            - DomainName: ${self:custom.domainOrigin.${self:custom.stage}} # TODO: ref
               OriginPath: /${self:custom.stage}
               Id: ${self:custom.stage}-data-api-origin
               CustomOriginConfig:
@@ -54,17 +63,16 @@ resources:
 
           PriceClass: PriceClass_100
           ViewerCertificate:
-            AcmCertificateArn: 
-              Fn::Join: 
-                - ':'
-                - - 'arn:aws:acm:us-east-1'
-                  - !Ref 'AWS::AccountId'
-                  #- certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
-                  - certificate/350e85c2-e41d-4f27-b5d2-1c75810aadd3
+            AcmCertificateArn:
+              Fn::Join:
+                - ":"
+                - - "arn:aws:acm:us-east-1"
+                  - !Ref "AWS::AccountId"
+                  - ${self:custom.certificate.${self:custom.stage}}
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 
   Outputs:
     APIDistributionOutput:
       Value:
-        'Fn::GetAtt': [APIDistribution, DomainName]
+        "Fn::GetAtt": [APIDistribution, DomainName]
