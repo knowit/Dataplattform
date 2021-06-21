@@ -15,10 +15,7 @@ custom:
     dataFolder: cvpartner
     publicS3Prefix: public/images
     privateS3Prefix: private/cvs
-    mockRate: rate(30 days)
-    mockDescription: upload mocked data for e2e testing
 
-  ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
@@ -35,12 +32,6 @@ custom:
       - fastparquet
       - numba
       - llvmlite
-  mockEnabled:
-    prod: false
-    dev: true
-  ingestEnabled:
-    prod: true
-    dev: false
 
 provider:
   name: aws
@@ -75,7 +66,6 @@ package:
 
 functions:
   ingest: # A Function
-    enabled: ${self:custom.ingestEnabled.${self:custom.stage}}
     handler: ${self:custom.editable.ingestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
@@ -138,136 +128,10 @@ functions:
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
     tags: # Tag for this function. Every function are tagged with stage by default
 
-  mock:
-    enabled: ${self:custom.mockEnabled.${self:custom.stage}}
-    handler: ${self:custom.editable.mockHandlerFile}.handler
-    environment: # Environment variables, often stored in SSM
-      STAGE: ${self:custom.stage}
-      SERVICE: ${self:service}
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
-      ACCESS_PATH: ${self:custom.accessPath}
-      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
-      SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
-      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-      DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
-      PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
-      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
-      PUBLIC_PREFIX: ${self:custom.editable.publicS3Prefix}
-      PRIVATE_PREFIX: ${self:custom.editable.privateS3Prefix}
-    name: ${self:custom.stage}-${self:service}-mock
-    description: Mock CVpartner-ingestor data
-    role: !GetAtt MockLambdaRole.Arn
-    package:
-      include:
-        - "*.py"
-        - "tests/test_data/test_data.json"
-        - "tests/test_data/**"
-    events:
-      - schedule:
-          name: ${self:custom.stage}-${self:service}-mock-timer
-          description: ${self:custom.editable.mockDescription}
-          rate: ${self:custom.editable.mockRate}
-          enabled: true
-
 resources: # The resources your functions use
-  Conditions:
-    CreateMockLambdaRole:
-      Fn::Equals:
-        - ${self:custom.mockEnabled.${self:custom.stage}}
-        - true
-    CreateIngestLambdaRole:
-      Fn::Equals:
-        - ${self:custom.ingestEnabled.${self:custom.stage}}
-        - true
   Resources:
-    MockLambdaRole:
-      Type: AWS::IAM::Role
-      Condition: CreateMockLambdaRole
-      Properties:
-        RoleName: ${self:custom.stage}-${self:service}-mock-role
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - lambda.amazonaws.com
-              Action: sts:AssumeRole
-        ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:PutObject
-                    - s3:ListObjects*
-                    - s3:GetObject
-                    - s3:CopyObject
-                    - s3:DeleteObjects
-                    - s3:DeleteObject
-                    - s3:DeleteObjectVersion
-                  Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /${self:custom.accessPath}*
-
-          - PolicyName: ${self:custom.stage}-Bucket-${self:service}-List
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:PutObject
-                    - s3:ListBucket
-                    - s3:GetBucketLocation
-                    - s3:ListBucketVersions
-                  Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-privateBucketArn
-                          - '*'
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - '*'
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-publicBucketArn
-                          - '*'
-          - PolicyName: ${self:custom.stage}-storage-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:DeleteObject
-                  Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-privateBucketArn
-                          - /${self:custom.editable.privateS3Prefix}*
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-publicBucketArn
-                          - /${self:custom.editable.publicS3Prefix}*
-          - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - sqs:GetQueueUrl
-                    - sqs:SendMessageBatch
-                    - sqs:SendMessage
-                  Resource: !GetAtt EventQueue.Arn
-
     IngestLambdaRole:
       Type: AWS::IAM::Role
-      Condition: CreateIngestLambdaRole
       Properties:
         RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
         AssumeRolePolicyDocument:
