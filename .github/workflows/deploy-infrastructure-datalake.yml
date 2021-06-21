@@ -22,6 +22,9 @@ jobs:
       - name: Install Serverless Framework
         run: npm install -g serverless
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Serverless AWS authentication
         run: |
           if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then

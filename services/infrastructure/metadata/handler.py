@@ -1,5 +1,9 @@
 import boto3
 import os
+from faker import Faker
+
+fake = Faker('no_NO')
+Faker.seed(123456)
 
 
 def mock(event, context):
@@ -7,20 +11,33 @@ def mock(event, context):
         dynamodb = boto3.resource('dynamodb')
         table_name = os.environ['STAGE'] + '_personal_metadata_table'
         table = dynamodb.Table(table_name)
-        base = ord('A')
-        base_lower = ord('a')
+
         with table.batch_writer() as batch:
+            sub_divisions = ['Objectnet', 'Experience']
+
             for i in range(10):
+                first_name = fake.first_name()
+                last_name = fake.last_name()
+                knowit_branch = sub_divisions[i % 2]
+
+                guid = fake.sha1()
+                alias = f'{str.lower(first_name[:3])}{str.lower(last_name[:3])}'
+                company = f'Knowit {knowit_branch}'
+                display_name = f'{first_name} {last_name}'
+                distinguished_name = display_name
+                email = f'{str.lower(first_name)}.{str.lower(last_name)}@knowit.no'
+                manager = fake.name()
+
                 batch.put_item(
                     Item={
-                        'guid': '000000000000000000000000000000000000000' + str(i),
-                        'alias': 'alias' + chr(base_lower + i),
-                        'company': 'Sample Company ' + chr(base + (i // 5)),
-                        'displayName': 'Navn ' + chr(base + i) + '. Navnesen ',
-                        'distinguished_name': 'Navn ' + chr(base + i) + '. Navnesen ',
-                        'email': 'navn.' + chr(base_lower + i) + '.navnesen@smplcompany.' + chr(base_lower + (i // 5)) + '.no',
-                        'knowitBranch': 'Branchname ' + chr(base + (i // 5)),
-                        'manager': 'Ola ' + chr(base + (i // 4)) + '. Nordmann '
+                        'guid': guid,
+                        'alias': alias,
+                        'company': company,
+                        'displayName': display_name,
+                        'distinguished_name': distinguished_name,
+                        'email': email,
+                        'knowitBranch': knowit_branch,
+                        'manager': manager
                     }
                 )
 
