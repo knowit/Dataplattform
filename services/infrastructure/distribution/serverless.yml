@@ -20,9 +20,7 @@ custom:
   distributionAlias:
     dev: dev-api.new-dev.dataplattform.knowit.no
     prod: dev-api.dataplattform.knowit.no
-  certificate:
-    dev: ${ssm:/dev/USEA1/sslIdentifier}
-    prod: ${ssm:/prod/USEA1/sslIdentifier}
+  certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
   originDomain:
     dev: 88kfvemnz1.execute-api.eu-central-1.amazonaws.com
     prod: 8z9couwu46.execute-api.eu-central-1.amazonaws.com
@@ -68,7 +66,7 @@ resources:
                 - ":"
                 - - "arn:aws:acm:us-east-1"
                   - !Ref "AWS::AccountId"
-                  - ${self:custom.certificate.${self:custom.stage}}
+                  - ${self:custom.certificate}
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 
