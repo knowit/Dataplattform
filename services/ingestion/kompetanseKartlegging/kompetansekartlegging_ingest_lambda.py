@@ -8,7 +8,7 @@ from os import environ
 handler = IngestHandler()
 
 
-@handler.ingest()
+@handler.ingest(overwrite=True)
 def ingest(event) -> Data:
     base_url = 'https://api.kompetanse.knowit.no'
     stage = environ['STAGE']

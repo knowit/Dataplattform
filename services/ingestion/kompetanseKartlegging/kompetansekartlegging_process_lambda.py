@@ -6,7 +6,8 @@ import pandas as pd
 handler = PersonDataProcessHandler(PersonIdentifierType.EMAIL)
 
 
-@handler.process(partitions={}, person_data_tables=['kompetansekartlegging_users', 'kompetansekartlegging_answers'])
+@handler.process(partitions={}, overwrite=True, overwrite_all_versions=True,
+                 person_data_tables=['kompetansekartlegging_users', 'kompetansekartlegging_answers'])
 def process(data, events) -> Dict[str, pd.DataFrame]:
     data = data[0].json()['data']
 
