@@ -18,7 +18,7 @@ class GlueCrawlerMock:
             'Targets': {
                 'S3Targets': [
                     {
-                        'Path': 's3://dev-datalake-datalake/data/level-1/test_table',
+                        'Path': 's3://dev-datalake-bucket/data/level-1/test_table',
                         'Exclusions': [
                             '*_metadata',
                         ],
@@ -315,7 +315,7 @@ def test_sns_send_message(sqs_queue, sns_topic):
 
 
 def test_update_crawler(glue):
-    glue_handler = aws.Glue(access_level="1", access_path="s3://dev-datalake-datalake/data/level-1/test_table")
+    glue_handler = aws.Glue(access_level="1", access_path="s3://dev-datalake-bucket/data/level-1/test_table")
     glue_handler.update_crawler("test-table2")
     assert any(
         ["test-table2" in targets['Path'] for targets in glue.crawlers['dev_level_1_crawler']['Targets']['S3Targets']])
