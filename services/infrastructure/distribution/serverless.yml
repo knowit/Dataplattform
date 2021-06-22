@@ -42,7 +42,7 @@ resources:
           Aliases:
             - ${self:custom.distributionAlias.${self:custom.stage}}
           Origins:
-            - DomainName: ${self:custom.originDomain.${self:custom.stage}} # TODO: ref
+            - DomainName: ${self:custom.originDomain.${self:custom.stage}}
               OriginPath: /${self:custom.stage}
               Id: ${self:custom.stage}-data-api-origin
               CustomOriginConfig:
