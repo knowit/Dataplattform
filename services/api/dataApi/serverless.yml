@@ -76,7 +76,7 @@ functions:
     environment: 
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
-      authurl: ${ssm:/${self:custom.stage}/cognitoAuthUrl}
+      AUTHURL: ${ssm:/${self:custom.stage}/cognitoAuthUrl}
       NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
       DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn
       LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
@@ -296,8 +296,15 @@ resources:
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
 
-
-
+  Outputs:
+    ApiUrl:
+      Value:
+        Fn::Join:
+          - ""
+          - - Ref: ApiGatewayRestApi
+            - ".execute-api.${self:provider.region}.amazonaws.com"
+      Export:
+        Name: DataAPI-Gateway-url
 
 plugins:
   - serverless-python-requirements
