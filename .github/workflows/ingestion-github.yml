@@ -33,7 +33,11 @@ jobs:
         # stop the build if there are Python syntax errors or undefined names
         flake8 ./services/ingestion/gitHub --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 ./services/ingestion/gitHub --count --max-line-length=120 --statistics
-  
+    - name: Lint with yamllint
+      run: |
+        pip install yamllint
+        yamllint -c ./.config/.yamllint ./services/ingestion/gitHub
+
   test:
     runs-on: ubuntu-latest
     container:
