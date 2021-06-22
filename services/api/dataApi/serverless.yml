@@ -77,6 +77,7 @@ functions:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
       AUTHURL: ${ssm:/${self:custom.stage}/cognitoAuthUrl}
+
       NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
       DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn
       LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
