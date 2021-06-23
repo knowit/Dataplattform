@@ -10,6 +10,7 @@ from apis.report import ns as report_ns
 from apis.catalogue import ns as catalogue_ns
 
 
+
 auth_url = environ.get('AUTHURL')
 
 app = Flask(__name__)
