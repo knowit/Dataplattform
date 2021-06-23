@@ -17,7 +17,7 @@ custom:
     - Access-Control-Request-Method
     - Origin
     - Authorization
-  distributionAlias: ${ssm:/${self:custom.stage}/distributionAlias}
+  distributionAlias: ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
   originDomain: !ImportValue ${self:custom:stage}-DataAPI-Gateway-url
 

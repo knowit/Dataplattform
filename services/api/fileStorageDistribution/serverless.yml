@@ -27,9 +27,7 @@ custom:
   scripts:
     hooks:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
-  distributionAlias:
-    dev: storage.new-dev.dataplattform.knowit.no
-    prod: storage.dataplattform.knowit.no
+  distributionAlias: ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
 
 package:
@@ -94,7 +92,7 @@ resources:
       Properties:
         DistributionConfig:
           Aliases:
-            - ${self:custom.stage}-${self:custom.distributionAlias.${self:custom.stage}}
+            - ${self:custom.stage}-${self:custom.distributionAlias}
           Origins:
             - ${self:custom.publicFrontOrigin}
             - ${self:custom.privateFrontOrigin}
