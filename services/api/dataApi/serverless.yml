@@ -83,7 +83,6 @@ functions:
       LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
       LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-2-staging-dir
       LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-1-staging-dir
-      
     events:
       - http:
           method: ANY
@@ -212,7 +211,7 @@ resources:
                     - s3:AbortMultipartUpload
                     - s3:DeleteObject
                   Resource:
-                    - Fn::Join:
+                    Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - "/"
@@ -226,7 +225,7 @@ resources:
                     - s3:AbortMultipartUpload
                     - s3:DeleteObject
                   Resource:
-                    - Fn::Join:
+                    Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - "/"
@@ -240,7 +239,7 @@ resources:
                     - s3:AbortMultipartUpload
                     - s3:DeleteObject
                   Resource:
-                    - Fn::Join:
+                    Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - "/"
@@ -251,7 +250,7 @@ resources:
                     - s3:PutObject
                     - s3:DeleteObject
                   Resource:
-                    - Fn::Join:
+                    Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /reports/*
@@ -259,7 +258,7 @@ resources:
                   Action:
                     - s3:GetObject
                   Resource:
-                    - Fn::Join:
+                    Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /data/*
