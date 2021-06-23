@@ -301,7 +301,7 @@ resources:
           - - Ref: ApiGatewayRestApi
             - ".execute-api.${self:provider.region}.amazonaws.com"
       Export:
-        Name: ${self:custom:stage}-DataAPI-Gateway-url
+        Name: ${self:custom.stage}-DataAPI-Gateway-url
 
 plugins:
   - serverless-python-requirements
