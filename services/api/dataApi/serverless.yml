@@ -73,7 +73,7 @@ functions:
       include:
         - 'app.py'
         - 'apis/**/*.py'
-    environment: 
+    environment:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
       AUTHURL: ${ssm:/${self:custom.stage}/cognitoAuthUrl}
@@ -103,7 +103,6 @@ functions:
           path: /
           cors: true
       
-
   CacheUpdater:
     handler: cache_updater.handler
     module: functions
@@ -120,17 +119,17 @@ functions:
     # destinations: # TODO
     #   onSuccess: xxx:xxx:target 
     #   onFailure: xxx:xxx:target
-    environment: 
+    environment:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
       LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-2-staging-dir
       LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-1-staging-dir
       STAGE: ${self:custom.stage}
     events:
-      - sns: 
+      - sns:
           arn: !ImportValue ${self:custom.stage}-new-report-topic-arn
           topicName: ${self:custom.stage}-NewReport
-      - sns: 
+      - sns:
           arn: !ImportValue ${self:custom.stage}-data-update-topic-arn
           topicName: ${self:custom.stage}-DataUpdate
 
@@ -139,7 +138,7 @@ functions:
     module: functions
     name: ${self:custom.service}-CacheDeleter
     description: Dataplattform API Cache deleter
-    role:  !GetAtt ReportCacheRole.Arn
+    role: !GetAtt ReportCacheRole.Arn
     package:
       include:
         - 'functions/cache_deleter.py'
