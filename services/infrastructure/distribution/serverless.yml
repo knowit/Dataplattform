@@ -19,7 +19,7 @@ custom:
     - Authorization
   distributionAlias: ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
-  originDomain: !ImportValue ${self:custom:stage}-DataAPI-Gateway-url
+  originDomain: !ImportValue ${self:custom.stage}-DataAPI-Gateway-url
 
 provider:
   name: aws
