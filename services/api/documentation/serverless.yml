@@ -7,13 +7,9 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
   bucketName: ${self:custom.service}-staticweb-#{AWS::AccountId}
-  domain:
-    dev:
-      - dev.new-dev.dataplattform.knowit.no
-      - dev-doc.new-dev.dataplattform.knowit.no
-    prod:
-      - dataplattform.knowit.no
-      - doc.dataplattform.knowit.no
+  distributionAlias:
+    - ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
+    - doc.${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
 
 provider:
@@ -56,7 +52,7 @@ resources:
       Properties:
         DistributionConfig:
           Enabled: true
-          Aliases: ${self:custom.domain.${self:custom.stage}}
+          Aliases: ${self:custom.distributionAlias}
           Origins:
             - DomainName: ${self:custom.bucketName}.s3-website.${self:provider.region}.amazonaws.com
               Id: ${self:custom.service}-default-origin
