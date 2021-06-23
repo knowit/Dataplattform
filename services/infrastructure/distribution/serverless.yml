@@ -17,13 +17,9 @@ custom:
     - Access-Control-Request-Method
     - Origin
     - Authorization
-  distributionAlias:
-    dev: dev-api.new-dev.dataplattform.knowit.no
-    prod: dev-api.dataplattform.knowit.no
+  distributionAlias: ${ssm:/${self:custom.stage}/distributionAlias}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
-  originDomain:
-    dev: 88kfvemnz1.execute-api.eu-central-1.amazonaws.com
-    prod: 8z9couwu46.execute-api.eu-central-1.amazonaws.com
+  originDomain: !ImportValue ${self:custom:stage}-DataAPI-Gateway-url
 
 provider:
   name: aws
@@ -40,9 +36,10 @@ resources:
         DistributionConfig:
           Enabled: true
           Aliases:
-            - ${self:custom.distributionAlias.${self:custom.stage}}
+            - ${self:custom.distributionAlias}
           Origins:
-            - DomainName: ${self:custom.originDomain.${self:custom.stage}}
+            - DomainName: ${self:custom.originDomain}
+
               OriginPath: /${self:custom.stage}
               Id: ${self:custom.stage}-data-api-origin
               CustomOriginConfig:
