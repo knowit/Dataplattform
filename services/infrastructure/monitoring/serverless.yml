@@ -1,8 +1,12 @@
 service: monitoring
 
+plugins:
+  - serverless-pseudo-parameters
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
+  datalakeName: ${self:custom.stage}-datalake-bucket-#{AWS::AccountId}
 
 provider:
   name: aws
@@ -183,7 +187,7 @@ resources:
                       "StorageType",
                       "StandardStorage",
                       "BucketName",
-                      "${self:custom.stage}-datalake-datalake",
+                      "${self:custom.datalakeName}",
                       {
                         "label": "Average Size"
                       }

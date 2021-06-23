@@ -27,6 +27,8 @@ custom:
   scripts:
     hooks:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
+  distributionAlias: ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
+  certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
 
 package:
   individually: true
@@ -90,7 +92,7 @@ resources:
       Properties:
         DistributionConfig:
           Aliases:
-            - ${self:custom.stage}-storage.dataplattform.knowit.no
+            - ${self:custom.stage}-${self:custom.distributionAlias}
           Origins:
             - ${self:custom.publicFrontOrigin}
             - ${self:custom.privateFrontOrigin}
@@ -121,7 +123,7 @@ resources:
                 - ":"
                 - - "arn:aws:acm:us-east-1"
                   - !Ref "AWS::AccountId"
-                  - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
+                  - ${self:custom.certificate}
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 
