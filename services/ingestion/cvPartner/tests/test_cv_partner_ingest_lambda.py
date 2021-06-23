@@ -1,4 +1,4 @@
-from cv_partner_ingest_lambda import handler, url, url_v1, offset_size
+from cv_partner_ingest_lambda import handler, offset_size
 from json import loads
 import responses
 from pytest import fixture
@@ -55,6 +55,8 @@ def cv_test_json(cv_id):
 
 def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
     # add dummy data to the private and public buckets that will be purged by ingest
+    base_url = 'https://knowittest2.cvpartner.com/api'
+
     public_prefix = environ.get('PUBLIC_PREFIX')
     private_prefix = environ.get('PRIVATE_PREFIX')
     datalake_prefix = environ.get('ACCESS_PATH')+"raw"
@@ -69,9 +71,9 @@ def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
     user_id = '1'
     cv_id = '2'
     responses.add(responses.GET,
-                  f'{url}/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
+                  f'{base_url}/v3/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
                   json=make_test_json(user_id, cv_id), status=200)
-    responses.add(responses.GET, f'{url}/cvs/{user_id}/{cv_id}',
+    responses.add(responses.GET, f'{base_url}/v3/cvs/{user_id}/{cv_id}',
                   json=cv_test_json(cv_id), status=200)
     handler(None, None)
 
@@ -79,7 +81,7 @@ def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
     data = loads(response['Body'].read())
     assert data['data'][0]['user_id'] == user_id
     assert data['data'][0]['default_cv_id'] == cv_id
-    cv_link_correct = url_v1 + f'/cvs/download/{user_id}/{cv_id}/{{LANG}}/{{FORMAT}}/'
+    cv_link_correct = f'{base_url}/v1/cvs/download/{user_id}/{cv_id}/{{LANG}}/{{FORMAT}}/'
     assert data['data'][0]['cv_link'] == cv_link_correct
 
     assert len(list(s3_private_bucket.objects.filter(Prefix=private_prefix))) == 0

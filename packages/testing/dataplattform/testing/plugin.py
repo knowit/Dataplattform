@@ -55,12 +55,15 @@ def db_person_data():
         {'guid': '5edbcdf460809039eb4897ccf8ce3bb5e501884d', 'email': 'lisa.nordmann@knowit.no',
          'displayName': 'Lisa Nordmann', 'alias': 'lisnord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
          'distinguished_name': 'Lisa Nordmann', 'manager': 'Per Nordmann'},
-        {'guid': '0000000000000000000000000000000000000000', 'email': 'navn.a.navnesen@smplcompany.a.no',
-         'displayName': 'Navn A. Navnesen ', 'alias': 'aliasa', 'company': 'Sample Company A',
-         'knowitBranch': 'Branchname A', 'distinguished_name': 'Navn A. Navnesen ', 'manager': 'Ola A. Nordmann '},
-        {'guid': '0000000000000000000000000000000000000001', 'email': 'navn.b.navnesen@smplcompany.a.no',
-         'displayName': 'Navn B. Navnesen ', 'alias': 'aliasb', 'company': 'Sample Company A',
-         'knowitBranch': 'Branchname A', 'distinguished_name': 'Navn B. Navnesen ', 'manager': 'Ola A. Nordmann '}
+
+        {'guid': 'b051b402346144a6cdcceb0027f6e80d29019f50', 'email': 'fredrik.arnesen@knowit.no',
+         'displayName': 'Fredrik Arnesen', 'alias': 'frearn', 'company': 'Knowit Objectnet', 'knowitBranch': 'Objectnet',
+         'distinguished_name': 'Fredrik Arnesen', 'manager': 'Karoline Hauge'},
+
+        {'guid': '5d79f8b771cd4921b667f9227aece292213806d6', 'email': 'einar.halvorsen@knowit.no',
+         'displayName': 'Einar Halvorsen', 'alias': 'einhal', 'company': 'Knowit Experience',
+         'knowitBranch': 'Experience', 'distinguished_name': 'Einar Halvorsen', 'manager': 'Marie Lie'}
+
     ]
 
 

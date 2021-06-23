@@ -9,7 +9,7 @@ from io import BytesIO
 
 @fixture
 def test_data():
-    with open(path.join(path.dirname(__file__), 'sample_data.json'), 'r') as json_file:
+    with open(path.join(path.dirname(__file__), 'test_data.json'), 'r') as json_file:
         yield load(json_file)
 
 
@@ -60,22 +60,28 @@ def test_process_table_content(setup_queue_event, test_data, create_table_mock, 
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_employees',
         pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_2'],
-            'guid': ['0000000000000000000000000000000000000000', '0000000000000000000000000000000000000001'],
-            'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
-            'link': ["link1", "link2"],
-            'email': ['navn.a.navnesen@smplcompany.a.no', 'navn.b.navnesen@smplcompany.a.no'],
-            'navn': ['Test Testerson', 'Test Testerson 2'],
-            'telefon': ['+123456', '+123456'],
-            'born_year': [1995, 1985],
-            'nationality': ["Norwegian", "Swedish"],
-            'place_of_residence': ['Oslo', 'Oslo'],
-            'cv_no_pdf': ["cv_no_pdf_key1", "cv_no_pdf_key2"],
-            'cv_int_pdf': ["cv_int_pdf_key1", "cv_int_pdf_key2"],
-            'cv_no_docx': ["cv_no_docx_key1", "cv_no_docx_key2"],
-            'cv_int_docx': ["cv_int_docx_key1", "cv_int_docx_key2"],
-            'image_key': ["image_key1", "image_key2"],
-            'twitter': ["", "twitter2"]
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'guid': ['5d79f8b771cd4921b667f9227aece292213806d6', 'b051b402346144a6cdcceb0027f6e80d29019f50'],
+            'default_cv_id': ['60cc81232e97ff100ca405c7', '60cc7fce68679f0fc4336178'],
+            'link': ['link1', 'link2'],
+            'twitter': ['', ''],
+            'email': ['einar.halvorsen@knowit.no', 'fredrik.arnesen@knowit.no'],
+            'navn': ['Einar Halvorsen', 'Fredrik Arnesen'],
+            'telefon': ['12345678', '87654321'],
+            'born_year': [1975, 1995],
+            'nationality': ["Norwegian", "Norwegian"],
+            'place_of_residence': ['', 'Sandvika'],
+            'title': ['Systemkonsulent', 'Utvikler'],
+            'cv_no_pdf': ["private/cvs/b4945fb6-964e-4cc8-b657-452760a147ca.pdf",
+                          "private/cvs/9c0bcd0d-7999-4c1e-bb62-56b3ee599f92.pdf"],
+            'cv_int_pdf': ["private/cvs/a5fbe569-db17-4a18-8f15-c39cdd534761.pdf",
+                           "private/cvs/880b26a5-d553-4aef-8d6a-a5ac95044d5e.pdf"],
+            'cv_no_docx': ["private/cvs/28b5d63a-e87f-4c1f-88df-581c0c483f5b.docx",
+                           "private/cvs/3c1f070e-9584-46d4-a96f-91be6629662a.docx"],
+            'cv_int_docx': ["private/cvs/436d65c7-7eba-4f4a-9e77-9c8c0b60c00c.docx",
+                            "private/cvs/1c998097-a365-45d6-92ec-aa151aec7fdd.docx"],
+            'image_key': ["public/images/dad875c3-c3d0-47da-b6b9-4c605a803f78.jpg",
+                          "public/images/ac28979d-9694-4537-a299-bf713d1aef79.jpg"]
         }))
 
 
@@ -93,17 +99,17 @@ def test_process_table_content_missing_born_date(setup_queue_event, test_data, c
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_employees',
         pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_2'],
-            'guid': ['0000000000000000000000000000000000000000', '0000000000000000000000000000000000000001'],
-            'default_cv_id': ['user_id_1_cv_id', 'user_id_2_cv_id'],
-            'link': ["link1", "link2"],
-            'navn': ['Test Testerson', 'Test Testerson 2'],
-            'email': ['navn.a.navnesen@smplcompany.a.no', 'navn.b.navnesen@smplcompany.a.no'],
-            'telefon': ['+123456', '+123456'],
-            'born_year': [-1, 1985],
-            'nationality': ["Norwegian", "Swedish"],
-            'place_of_residence': ['Oslo', 'Oslo'],
-            'twitter': ["", "twitter2"]
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'guid': ['5d79f8b771cd4921b667f9227aece292213806d6', 'b051b402346144a6cdcceb0027f6e80d29019f50'],
+            'default_cv_id': ['60cc81232e97ff100ca405c7', '60cc7fce68679f0fc4336178'],
+            'link': ['link1', 'link2'],
+            'navn': ['Einar Halvorsen', 'Fredrik Arnesen'],
+            'email': ['einar.halvorsen@knowit.no', 'fredrik.arnesen@knowit.no'],
+            'telefon': ['12345678', '87654321'],
+            'born_year': [-1, 1995],
+            'nationality': ["Norwegian", "Norwegian"],
+            'place_of_residence': ['', 'Sandvika'],
+            'twitter': ['', '']
         }))
 
 
@@ -117,12 +123,16 @@ def test_process_education_table_content(setup_queue_event, test_data, create_ta
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_education',
         pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
-            'degree': ['Bachelor1', 'Master1', 'Bachelor2', 'Master2'],
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc81232e97ff100ca405c6',
+                        '60cc7fce68679f0fc4336177', '60cc7fce68679f0fc4336177'],
+            'degree': ['Bachelor', 'Master', 'Bachelor', 'Master'],
+            'description': ['Informatikk', 'Informatikk: Kunstig Intelligens',
+                            'Informatikk: Digital Økonomi og Ledelse', 'Informatikk: Digital Økonomi og Ledelse'],
             'month_from': [8, 8, 8, 8],
-            'month_to': [5, 6, 5, 6],
-            'year_from': [2014, 2017, 2014, 2017],
-            'year_to': [2019, 2019, 2019, 2019]
+            'month_to': [7, 6, 6, 6],
+            'school': ['NTNU', 'NTNU', 'Universitetet i Oslo', 'Universitetet i Oslo'],
+            'year_from': [2012, 2015, 2015, 2018],
+            'year_to': [2015, 2017, 2018, 2020]
         }))
 
 
@@ -146,12 +156,14 @@ def test_process_education_table_content_missing(setup_queue_event, test_data,
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_education',
         pd.DataFrame({
-            'user_id': ['user_id_2', 'user_id_2'],
-            'degree': ['Bachelor2', 'Master2'],
+            'user_id': ['60cc7fce68679f0fc4336177', '60cc7fce68679f0fc4336177'],
+            'degree': ['Bachelor', 'Master'],
+            'description': ['Informatikk: Digital Økonomi og Ledelse', 'Informatikk: Digital Økonomi og Ledelse'],
             'month_from': [8, 8],
-            'month_to': [5, 6],
-            'year_from': [2014, 2017],
-            'year_to': [2019, 2019]
+            'month_to': [6, 6],
+            'school': ['Universitetet i Oslo', 'Universitetet i Oslo'],
+            'year_from': [2015, 2018],
+            'year_to': [2018, 2020]
             }))
 
 
@@ -165,15 +177,13 @@ def test_project_experiences_df(setup_queue_event, test_data, create_table_mock,
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_project_experience',
         pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
-            'customer': ['costumer1', 'costumer2', 'costumer3', 'Knowit Objectnet'],
-            'month_from': [1, 6, 8, 12],
-            'year_from': [2015, 2017, 2019, 2019],
-            'project_experience_skills': ["HTML/CSS;Github", "Angular;npm", "Yarn;VS Code", "AWS DynamoDB;Github"],
-            'roles': ["Fullstackutvikler",
-                      "Frontendutvikler",
-                      "Frontendutvikler;Brukeranalyse;DevOps-utvikler",
-                      "Backendutvikler"]
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'customer': ['Eksempelkunde 1', 'Eksempelkunde 2'],
+            'month_from': [1, 8],
+            'year_from': [2015, 2019],
+            'project_experience_skills': ["aws;smidig utvikling;fullstack", "serverless;azure;svelte"],
+            'roles': ["Teamlead;Scrum master",
+                      "Utvikler"]
             }))
 
 
@@ -185,7 +195,7 @@ Case: project skills not defined for a project
 def test_project_experiences_df_project_skills_missing(setup_queue_event, test_data, create_table_mock,
                                                        dynamodb_resource):
     tmp_data = test_data['data']
-    tmp_data[0]['cv']['project_experiences'][1].pop('project_experience_skills', None)
+    tmp_data[0]['cv']['project_experiences'][0].pop('project_experience_skills', None)
 
     event = setup_queue_event(
         schema.Data(
@@ -196,15 +206,13 @@ def test_project_experiences_df_project_skills_missing(setup_queue_event, test_d
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_project_experience',
         pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
-            'customer': ['costumer1', 'costumer2', 'costumer3', 'Knowit Objectnet'],
-            'month_from': [1, 6, 8, 12],
-            'year_from': [2015, 2017, 2019, 2019],
-            'project_experience_skills': ["HTML/CSS;Github", "", "Yarn;VS Code", "AWS DynamoDB;Github"],
-            'roles': ["Fullstackutvikler",
-                      "Frontendutvikler",
-                      "Frontendutvikler;Brukeranalyse;DevOps-utvikler",
-                      "Backendutvikler"]
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'customer': ['Eksempelkunde 1', 'Eksempelkunde 2'],
+            'month_from': [1, 8],
+            'year_from': [2015, 2019],
+            'project_experience_skills': ["", "serverless;azure;svelte"],
+            'roles': ["Teamlead;Scrum master",
+                      "Utvikler"]
             }))
 
 
@@ -226,15 +234,13 @@ def test_project_experiences_df_costumer_missing(setup_queue_event, test_data, c
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_project_experience',
         pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
-            'customer': ["", 'costumer2', 'costumer3', 'Knowit Objectnet'],
-            'month_from': [1, 6, 8, 12],
-            'year_from': [2015, 2017, 2019, 2019],
-            'project_experience_skills': ["HTML/CSS;Github", "Angular;npm", "Yarn;VS Code", "AWS DynamoDB;Github"],
-            'roles': ["Fullstackutvikler",
-                      "Frontendutvikler",
-                      "Frontendutvikler;Brukeranalyse;DevOps-utvikler",
-                      "Backendutvikler"]
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'customer': ['', 'Eksempelkunde 2'],
+            'month_from': [1, 8],
+            'year_from': [2015, 2019],
+            'project_experience_skills': ["aws;smidig utvikling;fullstack", "serverless;azure;svelte"],
+            'roles': ["Teamlead;Scrum master",
+                      "Utvikler"]
             }))
 
 
@@ -247,7 +253,7 @@ def test_work_experiences_df_missing(setup_queue_event, test_data,
                                      create_table_mock, dynamodb_resource):
 
     tmp_data = test_data['data']
-    tmp_data[1]['cv']['work_experiences'][0].pop('month_from', None)
+    tmp_data[0]['cv']['work_experiences'][1].pop('month_from', None)
 
     event = setup_queue_event(
         schema.Data(
@@ -255,8 +261,8 @@ def test_work_experiences_df_missing(setup_queue_event, test_data,
             data=tmp_data))
 
     exp_df = pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_1', 'user_id_1', 'user_id_2', 'user_id_2', 'user_id_2'],
-            'month_from': [6, 6, 8, -1, 6, 8]
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'month_from': [6, -1, 11]
             })
 
     handler(event, None)
@@ -274,7 +280,6 @@ def test_tag_value_none(setup_queue_event, test_data,
                         create_table_mock, dynamodb_resource):
 
     tmp_data = test_data['data']
-    print(tmp_data[1]['cv']['technologies'][0]['technology_skills'][0]['tags'])
     tmp_data[1]['cv']['technologies'][0]['technology_skills'][0]['tags']['no'] = None
 
     event = setup_queue_event(
@@ -287,10 +292,10 @@ def test_tag_value_none(setup_queue_event, test_data,
     create_table_mock.assert_table_data(
         'cv_partner_technology_skills',
         pd.DataFrame({
-            'user_id': ['user_id_1', 'user_id_1', 'user_id_1', 'user_id_2', 'user_id_2'],
-            'category': ["", "Programmeringsspråk", "Webutvikling", "Object-Relational Mapping (ORM)",
-                         "Systemutvikling"],
-            'technology_skills': ["", "Java", "Angular;HTML", ";Hibernate", "Android Studio"],
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc81232e97ff100ca405c6',
+                        '60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'category': ["", "Smidig utvikling", "Skytjenester", ""],
+            'technology_skills': ["", "Scrum", "AWS;Microsoft Azure", ";azure;svelte;Java"]
         }))
 
 
@@ -306,6 +311,6 @@ def test_set_guid_from_ad_data(s3_bucket, setup_queue_event, test_data, dynamodb
 
     cv_partner_employees_object = s3_bucket.Object("data/test/structured/cv_partner_employees/part.0.parquet")
     cv_partner_employees = pd.read_parquet(BytesIO(cv_partner_employees_object.get()['Body'].read()))
-    assert cv_partner_employees.loc[cv_partner_employees['user_id'] == "user_id_1"]['guid'][0] \
-           == "0000000000000000000000000000000000000000"
+    assert cv_partner_employees.loc[cv_partner_employees['user_id'] == "60cc81232e97ff100ca405c6"]['guid'][0] \
+           == "5d79f8b771cd4921b667f9227aece292213806d6"
     assert len(cv_partner_employees) == 1
