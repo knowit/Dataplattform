@@ -3,30 +3,24 @@ from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 from datetime import datetime
 import requests
-from os import environ
 
 handler = IngestHandler()
 
 
 @handler.ingest(overwrite=True)
 def ingest(event) -> Data:
-    base_url = 'https://api.kompetanse.knowit.no'
-    stage = environ['STAGE']
-
-    if stage == 'dev':
-        base_url += '/dev'
-
-    api_token = SSM(with_decryption=True).get(f'kompetansekartlegging_api_key_{stage}')
-    users = requests.get(f'{base_url}/users', headers={'x-api-key': api_token}).json()
-    answers = requests.get(f'{base_url}/answers', headers={'x-api-key': api_token}).json()
-    catalogs = requests.get(f'{base_url}/catalogs', headers={'x-api-key': api_token}).json()
+    url = SSM(with_decryption=False).get('kompetansekartlegging_api_url')
+    api_token = SSM(with_decryption=True).get('kompetansekartlegging_api_key')
+    users = requests.get(f'{url}/users', headers={'x-api-key': api_token}).json()
+    answers = requests.get(f'{url}/answers', headers={'x-api-key': api_token}).json()
+    catalogs = requests.get(f'{url}/catalogs', headers={'x-api-key': api_token}).json()
 
     newest_catalog = answers[0]['formDefinitionID']
 
-    categories = requests.get(f'{base_url}/catalogs/{newest_catalog}/categories',
+    categories = requests.get(f'{url}/catalogs/{newest_catalog}/categories',
                               headers={'x-api-key': api_token}).json()
 
-    questions = requests.get(f'{base_url}/catalogs/{newest_catalog}/questions',
+    questions = requests.get(f'{url}/catalogs/{newest_catalog}/questions',
                              headers={'x-api-key': api_token}).json()
 
     return Data(

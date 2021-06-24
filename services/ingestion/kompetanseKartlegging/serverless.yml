@@ -37,7 +37,7 @@ provider:
     name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024
-  timeout: ${self:custom.editable.timeout} # seconds
+  timeout: ${self:custom.editable.timeout}
   tags:
     Project: Dataplattform
     Layer: Ingestion
@@ -229,10 +229,10 @@ resources:
                     - s3:DeleteObjects
                     - s3:DeleteObjectVersion
                   Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /${self:custom.accessPath}*
+                    Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -243,10 +243,10 @@ resources:
                     - s3:ListBucketVersions
                     - s3:GetBucketLocation
                   Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - '*'
+                    Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - '*'
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
