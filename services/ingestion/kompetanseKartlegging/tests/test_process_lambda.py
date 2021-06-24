@@ -56,9 +56,9 @@ def test_process_users_content(create_table_mock):
     create_table_mock.assert_table_data_contains_df(
         'kompetansekartlegging_users',
         pd.DataFrame({
-            'username': ['2c54bb77-190a-4651-9009-7c9fab39a03a', '3c2af0ad-19f0-4f0d-b6dc-031dfcaa423b'],
-            'email': ['per.nordmann@knowit.no', 'kari.nordmann@knowit.no'],
-            'guid': ['20dbbfa18380233aa643575720b893fac5137699', '491b9fa9bfac17563882b0fdc6f3a8a97417bd99']
+            'username': ['059ef00d-d6af-4517-ad1c-a05c63769c9b', '2f119dc3-02fe-4159-adec-0238d77b18ce'],
+            'email': ['fredrik.arnesen@knowit.no', 'einar.halvorsen@knowit.no'],
+            'guid': ['b051b402346144a6cdcceb0027f6e80d29019f50', '5d79f8b771cd4921b667f9227aece292213806d6']
         })
     )
 
@@ -67,13 +67,13 @@ def test_process_answers_content(create_table_mock):
     create_table_mock.assert_table_data_contains_df(
         'kompetansekartlegging_answers',
         pd.DataFrame({
-            'email': ['per.nordmann@knowit.no'],
-            'questionId': ['d1862cf3-7123-4d35-9cfd-6587e97dc0c8'],
-            'knowledge': [None],
-            'motivation': [None],
-            'updatedAt': [None],
+            'email': ['fredrik.arnesen@knowit.no'],
+            'questionId': ['230473f7-37e1-4f69-a106-2bbc01afe5cb'],
+            'knowledge': [2.6],
+            'motivation': [2.5],
+            'updatedAt': ['2021-06-18T12:00:25.553Z'],
             'customScaleValue': [None],
-            'guid': ['20dbbfa18380233aa643575720b893fac5137699']
+            'guid': ['b051b402346144a6cdcceb0027f6e80d29019f50']
         })
     )
 
@@ -82,8 +82,9 @@ def test_process_catalogs_content(create_table_mock):
     create_table_mock.assert_table_data_contains_df(
         'kompetansekartlegging_catalogs',
         pd.DataFrame({
-            'id': ['fb9e8f06-4cfa-463e-9e8f-cc0853464070', '63371236-3116-4e6d-85aa-168f6d34d18b', None],
-            'label': ['2021V', None, 'no_id']
+            'id': ['8495bb25-db94-4ef6-9650-3fb46dc252da', 'fb9e8f06-4cfa-463e-9e8f-cc0853464070',
+                   '63371236-3116-4e6d-85aa-168f6d34d18b', '603451e8-5f80-4199-82aa-97999cdb4d53'],
+            'label': ['test1', '2021V', None, 'ax']
         })
     )
 
@@ -92,10 +93,9 @@ def test_process_categories_content(create_table_mock):
     create_table_mock.assert_table_data_contains_df(
         'kompetansekartlegging_categories',
         pd.DataFrame({
-            'index': [5, 8],
-            'text': ['AI og Data Engineering', 'Smidig metodikk og produktledelse'],
-            'description': ['ML og datadrevne loesninger', 'Smidig metodikk og produktledelse'],
-            'id': ['84baa82a-bbad-4fed-9bd1-85c9f50fdcfc', 'e99c1908-3da3-4e29-95e9-cfd5bfc41a57']
+            'index': [5, 4],
+            'text': ['AI og Data Engineering', 'Backend'],
+            'id': ['84baa82a-bbad-4fed-9bd1-85c9f50fdcfc', '5faf0519-809d-4d02-a8a0-9862024170bc']
         })
     )
 
@@ -104,11 +104,15 @@ def test_process_questions_content(create_table_mock):
     create_table_mock.assert_table_data_contains_df(
         'kompetansekartlegging_questions',
         pd.DataFrame({
-            'index': [92, 76],
-            'text': ['Microsoft Azure', 'Rammeverk som tensorflow, keras, pytorch, mm'],
-            'id': ['9f40d807-3fa6-4446-bdc2-7681ca136b3b', 'be02bf31-e082-41c9-a9eb-eb4c60c77f8c'],
-            'topic': ['Azure', 'ML-rammeverk'],
-            'categoryID': ['3efffcf3-b458-467d-bdac-e4ae08b3f040', '84baa82a-bbad-4fed-9bd1-85c9f50fdcfc'],
-            'type': ['knowledgeMotivation', 'knowledgeMotivation']
+            'index': [116, 43],
+            'text': ['Programmering mot ESP32/ ESP8266 ved bruk av IDF eller Arduinorammeverket',
+                     'Minst en kjøreomgivelse (runtime environment) basert på Javascript (Node, Deno)'],
+            'id': ['d1862cf3-7123-4d35-9cfd-6587e97dc0c8', 'aed2b4ec-dc31-4236-a97d-2b840536373d'],
+            'topic': ['ESP32', 'Kjøreomgivelser'],
+            'categoryID': ['a79de551-d88e-40c6-808f-ce0d2d07a242', 'b76e0d72-aeab-4cd2-9278-c64ec3314b4c'],
+            'type': ['knowledgeMotivation', 'knowledgeMotivation'],
+            'scaleStart': [None, None],
+            'scaleEnd': [None, None],
+            'scaleMiddle': [None, None]
         })
     )
