@@ -7,20 +7,18 @@ import requests
 from uuid import uuid4
 from os import environ
 
-url = 'https://knowit.cvpartner.com/api/v3'
-url_v1 = 'https://knowit.cvpartner.com/api/v1'
 offset_size = 1000
 handler = IngestHandler()
 
 
 @handler.ingest(overwrite=True)
 def ingest(event) -> Data:
-
+    url = SSM(with_decryption=False).get('cv_partner_url')
     objectnet_id = SSM(with_decryption=False).get('cv_partner_objectnet_id')
     sor_id = SSM(with_decryption=False).get('cv_partner_sor_id')
     api_token = SSM(with_decryption=True).get('cv_partner_api_token')
 
-    res = requests.get(f'{url}/search?office_ids[]={objectnet_id}&office_ids[]={sor_id}&offset=0&size={offset_size}',
+    res = requests.get(f'{url}/v3/search?office_ids[]={objectnet_id}&office_ids[]={sor_id}&offset=0&size={offset_size}',
                        headers={'Authorization': f'Bearer {api_token}'})
 
     data_json = res.json()
@@ -45,7 +43,7 @@ def ingest(event) -> Data:
         return {new_key: filename}
 
     def get_cv_link(user_id, cv_id, language: str = 'no', ext: str = 'pdf'):
-        return url_v1 + f"/cvs/download/{user_id}/{cv_id}/{language}/{ext}/"
+        return f'{url}/v1/cvs/download/{user_id}/{cv_id}/{language}/{ext}/'
 
     def get_person(person):
         d = {
@@ -66,7 +64,7 @@ def ingest(event) -> Data:
         return d
 
     def get_cv(user_id, cv_id):
-        cv = requests.get(url + f'/cvs/{user_id}/{cv_id}',
+        cv = requests.get(f'{url}/v3/cvs/{user_id}/{cv_id}',
                           headers={'Authorization': f'Bearer {api_token}'})
         return cv.json()
 

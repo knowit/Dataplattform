@@ -1,1466 +1,1024 @@
 {
-    "metadata": {
-        "timestamp": 1597922278.718713
-    },
-    "data": [
-        {
-            "user_id": "user_id_1",
-            "default_cv_id": "user_id_1_cv_id",
-            "image_key": "image_key1",
-            "cv_no_pdf": "cv_no_pdf_key1",
-            "cv_int_pdf": "cv_int_pdf_key1",
-            "cv_no_docx": "cv_no_docx_key1",
-            "cv_int_docx": "cv_int_docx_key1",
-            "cv_link": "link1",
-            "cv": {
-                "_id": "user_id_1_cv_id",
-                "blogs": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-08-15T10:10:16.282Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "long_description": {
-                            "no": "",
-                            "int": "desc1"
-                        },
-                        "modifier_id": null,
-                        "month": "05",
-                        "name": {
-                            "no": "",
-                            "int": "blog1"
-                        },
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T10:34:05.389Z",
-                        "url": "N/A",
-                        "version": 21,
-                        "year": "2017"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-08-15T10:17:25.323Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "long_description": {
-                            "no": "",
-                            "int": "dess2"
-                        },
-                        "modifier_id": null,
-                        "month": "06",
-                        "name": {
-                            "no": "",
-                            "int": "blog2"
-                        },
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T10:33:00.844Z",
-                        "url": "TBA",
-                        "version": 137,
-                        "year": "2019"
-                    }
-                ],
-                "born_day": 1,
-                "born_month": 1,
-                "born_year": 1995,
-                "bruker_id": "user_id_1",
-                "courses": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2020-02-09T15:36:44.886Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "long_description": {
-                            "no": "course1",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month": "02",
-                        "name": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "order": 0,
-                        "origin_id": null,
-                        "program": {
-                            "no": "course facility 1",
-                            "int": ""
-                        },
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2020-02-09T15:40:01.000Z",
-                        "version": 53,
-                        "year": "2020"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2020-02-09T15:36:44.886Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "long_description": {
-                            "no": "course2",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month": "02",
-                        "name": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "order": 0,
-                        "origin_id": null,
-                        "program": {
-                            "no": "course facility 2",
-                            "int": ""
-                        },
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2020-02-09T15:40:01.000Z",
-                        "version": 53,
-                        "year": "2020"
-                    }
-                ],
-                "created_at": "2019-05-29T09:43:07.645Z",
-                "custom_tag_ids": [],
-                "default": true,
-                "educations": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:34:20.670Z",
-                        "degree": {
-                            "no": "Bachelor1",
-                            "int": "Bachelor1_int"
-                        },
-                        "description": {
-                            "no": "Bachelor_desc_1",
-                            "int": "Bachelor_desc_1_int"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "modifier_id": null,
-                        "month_from": "08",
-                        "month_to": "05",
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "school": {
-                            "no": "School1",
-                            "int": "School1_int"
-                        },
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:40:49.176Z",
-                        "version": 67,
-                        "year_from": "2014",
-                        "year_to": "2019"
-                    },
-                    {
-                        "_id": "123457",
-                        "created_at": "2019-05-30T17:40:57.028Z",
-                        "degree": {
-                            "no": "Master1",
-                            "int": "Master1_int"
-                        },
-                        "description": {
-                            "no": "Master_desc_1",
-                            "int": "Master_desc_1_int"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "modifier_id": null,
-                        "month_from": "08",
-                        "month_to": "06",
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "school": {
-                            "no": "School2",
-                            "int": "School2_int"
-                        },
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:46:17.033Z",
-                        "version": 56,
-                        "year_from": "2017",
-                        "year_to": "2019"
-                    }
-                ],
-                "key_qualifications": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-06-04T13:01:53.716Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "label": {
-                            "no": "Sammendrag",
-                            "int": "Abstract"
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "tag_line": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "updated_at": "2019-11-28T15:27:21.683Z",
-                        "version": 1540
-                    }
-                ],
-                "landline": null,
-                "languages": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:33:10.986Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "level": {
-                            "no": "",
-                            "int": "Mother tongue"
-                        },
-                        "modifier_id": null,
-                        "name": {
-                            "no": "Norsk",
-                            "int": "Norwegian",
-                            "se": "Norska"
-                        },
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:33:42.806Z",
-                        "version": 12
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:33:48.061Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "level": {
-                            "no": "",
-                            "int": "Fluent",
-                            "se": "Flytande"
-                        },
-                        "modifier_id": null,
-                        "name": {
-                            "no": "Engelsk",
-                            "int": "English",
-                            "se": "Engelska"
-                        },
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:34:02.086Z",
-                        "version": 7
-                    }
-                ],
-                "last_instigator": null,
-                "last_message_id": null,
-                "level": null,
-                "locked_at": null,
-                "locked_until": null,
-                "modifier_id": null,
-                "name_multilang": {},
-                "nationality": {
-                    "no": "Norsk",
-                    "int": "Norwegian"
-                },
-                "navn": "Test Testerson",
-                "order": null,
-                "owner_updated_at": "2020-02-09T15:40:00.995Z",
-                "owner_updated_at_significant": "2020-02-09T15:36:44.875Z",
-                "place_of_residence": {
-                    "no": "Oslo",
-                    "int": "Oslo"
-                },
-                "project_experiences": [
-                    {
-                        "_id": "123456",
-                        "area_amt": null,
-                        "area_unit": null,
-                        "created_at": "2019-08-15T10:45:37.507Z",
-                        "customer": {
-                            "no": "costumer1",
-                            "int": "costumer1_int"
-                        },
-                        "customer_description": {},
-                        "customer_value_proposition": {},
-                        "description": {
-                            "no": "costumer1_desc",
-                            "int": "costumer1_int_desc"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "exclude_tags": null,
-                        "expected_roll_off_date": null,
-                        "extent_hours": "",
-                        "industry": {
-                            "no": "Offentlig sektor",
-                            "int": "Public sector",
-                            "se": "Offentligt"
-                        },
-                        "long_description": {
-                            "no": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "01",
-                        "month_to": "01",
-                        "order": 10,
-                        "origin_id": null,
-                        "percent_allocated": "100",
-                        "project_experience_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 1,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "HTML/CSS"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            },
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 6,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Github",
-                                    "int": "Github",
-                                    "se": "Github"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            }
-                        ],
-                        "project_extent_amt": "",
-                        "project_extent_currency": "",
-                        "project_extent_hours": "",
-                        "project_type": {},
-                        "recently_added": false,
-                        "related_work_experience_id": null,
-                        "roles": [
-                            {
-                                "_id": "123456",
-                                "created_at": null,
-                                "disabled": false,
-                                "diverged_from_master": false,
-                                "long_description": {
-                                    "no": "",
-                                    "int": ""
-                                },
-                                "modifier_id": null,
-                                "name": {
-                                    "no": "Fullstackutvikler",
-                                    "int": "Full-stack Developer",
-                                    "se": "Fullstackutvecklare"
-                                },
-                                "order": 0,
-                                "origin_id": null,
-                                "recently_added": false,
-                                "starred": false,
-                                "summary": {},
-                                "updated_at": "2019-08-15T19:30:26.855Z",
-                                "version": 46
-                            }
-                        ],
-                        "starred": false,
-                        "total_extent_amt": "",
-                        "total_extent_currency": "",
-                        "total_extent_hours": "",
-                        "updated_at": "2020-06-06T10:21:06.440Z",
-                        "version": 78,
-                        "year_from": "2015",
-                        "year_to": "2015",
-                        "images": []
-                    },
-                    {
-                        "_id": "123456",
-                        "area_amt": null,
-                        "area_unit": null,
-                        "created_at": "2019-08-15T11:00:12.869Z",
-                        "customer": {
-                            "no": "costumer2",
-                            "int": ""
-                        },
-                        "customer_description": {},
-                        "customer_value_proposition": {},
-                        "description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "exclude_tags": null,
-                        "expected_roll_off_date": null,
-                        "extent_hours": "",
-                        "industry": {
-                            "no": "Privat",
-                            "int": "Private"
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "06",
-                        "month_to": "08",
-                        "order": 6,
-                        "origin_id": null,
-                        "percent_allocated": "100",
-                        "project_experience_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 1,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Angular"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            },
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 2,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "npm",
-                                    "int": "npm",
-                                    "se": "npm"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            }
-                        ],
-                        "project_extent_amt": "",
-                        "project_extent_currency": "",
-                        "project_extent_hours": "",
-                        "project_type": {},
-                        "recently_added": false,
-                        "related_work_experience_id": null,
-                        "roles": [
-                            {
-                                "_id": "123456",
-                                "created_at": null,
-                                "disabled": false,
-                                "diverged_from_master": false,
-                                "long_description": {
-                                    "no": "",
-                                    "int": ""
-                                },
-                                "modifier_id": null,
-                                "name": {
-                                    "no": "Frontendutvikler",
-                                    "int": "Front end developer",
-                                    "se": "Frontendutvecklare"
-                                },
-                                "order": 0,
-                                "origin_id": null,
-                                "recently_added": false,
-                                "starred": false,
-                                "summary": {},
-                                "updated_at": null,
-                                "version": 56
-                            }
-                        ],
-                        "starred": false,
-                        "total_extent_amt": "",
-                        "total_extent_currency": "",
-                        "total_extent_hours": "",
-                        "updated_at": "2019-08-15T19:32:51.230Z",
-                        "version": 27,
-                        "year_from": "2017",
-                        "year_to": "2017",
-                        "images": []
-                    }
-                ],
-                "technologies": [
-                    {
-                        "_id": "123456",
-                        "category": {},
-                        "created_at": null,
-                        "disabled": true,
-                        "diverged_from_master": false,
-                        "exclude_tags": [],
-                        "modifier_id": null,
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "technology_skills": [],
-                        "uncategorized": true,
-                        "updated_at": null,
-                        "version": 1
-                    },
-                    {
-                        "_id": "123456",
-                        "category": {
-                            "no": "Programmeringsspr\u00e5k",
-                            "int": "Programming Languages"
-                        },
-                        "created_at": "2019-08-15T08:28:53.454Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "exclude_tags": null,
-                        "modifier_id": null,
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "technology_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 2,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Java"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 6
-                            }
-                        ],
-                        "uncategorized": false,
-                        "updated_at": "2020-05-01T00:03:31.107Z",
-                        "version": 13
-                    },
-                    {
-                        "_id": "123456",
-                        "category": {
-                            "no": "Webutvikling",
-                            "int": "Web development"
-                        },
-                        "created_at": "2019-08-15T08:33:42.575Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "exclude_tags": null,
-                        "modifier_id": null,
-                        "order": 3,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "technology_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 1,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 1,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Angular"
-                                },
-                                "total_duration_in_years": 1,
-                                "version": 2
-                            },
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 1,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 2,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "HTML",
-                                    "int": "HTML",
-                                    "se": "HTML"
-                                },
-                                "total_duration_in_years": 1,
-                                "version": 2
-                            }
-                        ],
-                        "uncategorized": false,
-                        "updated_at": "2020-05-01T00:03:31.107Z",
-                        "version": 16
-                    }
-                ],
-                "telefon": "+123456",
-                "tilbud_id": null,
-                "title": {
-                    "no": "Systemkonsulent",
-                    "int": "System consultant"
-                },
-                "updated_at": "2020-08-01T00:03:19.690Z",
-                "version": 25,
-                "work_experiences": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:47:36.722Z",
-                        "description": {
-                            "no": "sommerjobb, programmerer",
-                            "int": "summer internship, programmer"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "employer": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "06",
-                        "month_to": "08",
-                        "order": 2,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T12:26:10.782Z",
-                        "version": 62,
-                        "year_from": "2017",
-                        "year_to": "2017"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:54:28.028Z",
-                        "description": {
-                            "no": "sommerjobb, programmerer",
-                            "int": "summer internship, programmer"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "employer": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "long_description": {
-                            "no": "Sommerjobb som utvikler hos .",
-                            "int": "Summer intership as developer for ."
-                        },
-                        "modifier_id": null,
-                        "month_from": "06",
-                        "month_to": "07",
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T12:25:41.859Z",
-                        "version": 158,
-                        "year_from": "2018",
-                        "year_to": "2018"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-08-15T10:36:07.250Z",
-                        "description": {
-                            "no": "Systemkonsulent",
-                            "int": "System Consultant"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "employer": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "08",
-                        "month_to": "",
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T10:43:06.788Z",
-                        "version": 62,
-                        "year_from": "2019",
-                        "year_to": ""
-                    }
-                ],
-                "name": "Test Testerson",
-                "user_id": "user_id_1",
-                "company_id": "12345",
-                "external_unique_id": "per.nordmann@knowit.no",
-                "email": "per.nordmann@knowit.no",
-                "country_code": "no",
-                "language_code": "no",
-                "language_codes": [
-                    "no",
-                    "int",
-                    "dk",
-                    "se"
-                ],
-                "proposal": null,
-                "custom_tags": [],
-                "updated_ago": "N/A",
-                "template_document_type": "doc",
-                "default_word_template_id": "123456",
-                "default_ppt_template_id": null,
-                "image": {
-                    "url": "",
-                    "thumb": {
-                        "url": ""
-                    },
-                    "fit_thumb": {
-                        "url": ""
-                    },
-                    "large": {
-                        "url": ""
-                    },
-                    "small_thumb": {
-                        "url": ""
-                    }
-                },
-                "can_write": false
-            }
+  "metadata": {
+    "timestamp": 1624446179.0895
+  },
+  "data": [
+    {
+      "user_id": "60cc81232e97ff100ca405c6",
+      "default_cv_id": "60cc81232e97ff100ca405c7",
+      "cv_link": "link1",
+      "image_key": "public/images/dad875c3-c3d0-47da-b6b9-4c605a803f78.jpg",
+      "cv_no_pdf": "private/cvs/b4945fb6-964e-4cc8-b657-452760a147ca.pdf",
+      "cv_int_pdf": "private/cvs/a5fbe569-db17-4a18-8f15-c39cdd534761.pdf",
+      "cv_no_docx": "private/cvs/28b5d63a-e87f-4c1f-88df-581c0c483f5b.docx",
+      "cv_int_docx": "private/cvs/436d65c7-7eba-4f4a-9e77-9c8c0b60c00c.docx",
+      "cv": {
+        "_id": "60cc81232e97ff100ca405c7",
+        "blogs": [
+          {
+            "_id": "60d2ece8836eb40fca87e6f3",
+            "created_at": "2021-06-23T08:12:24.559Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "long_description": {
+              "no": "Morbi gravida ex eu congue porta. Maecenas velit metus, hendrerit quis tortor et, hendrerit tincidunt sapien. Praesent metus turpis, pretium a nisl quis, eleifend faucibus leo. Duis vulputate justo vel porta congue.",
+              "int": "Morbi gravida ex eu congue porta. Maecenas velit metus, hendrerit quis tortor et, hendrerit tincidunt sapien. Praesent metus turpis, pretium a nisl quis, eleifend faucibus leo. Duis vulputate justo vel porta congue."
+            },
+            "modifier_id": null,
+            "month": "06",
+            "name": {
+              "no": "Utgivelse 1",
+              "int": "Blog 1"
+            },
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-23T08:15:53.296Z",
+            "url": "https://sampleapp.web.com",
+            "version": 20,
+            "year": "2019"
+          }
+        ],
+        "born_day": 1,
+        "born_month": 1,
+        "born_year": 1975,
+        "bruker_id": "60cc81232e97ff100ca405c6",
+        "certifications": [
+          {
+            "_id": "60d045601fc1790ff2cf0a99",
+            "created_at": "2021-06-21T07:53:04.896Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "long_description": {
+              "no": "",
+              "int": "The AWS Certified Cloud Practitioner examination is intended for individuals who have the knowledge and skills necessary to effectively demonstrate an overall understanding of the AWS Cloud, independent of specific technical roles addressed by other AWS Certifications. The exam can be taken at a testing center or from the comfort and convenience of a home or office location as an online proctored exam."
+            },
+            "modifier_id": null,
+            "month": "02",
+            "month_expire": "02",
+            "name": {
+              "no": "AWS Certified Cloud Practitioner",
+              "int": ""
+            },
+            "order": 0,
+            "organiser": {
+              "no": "AWS",
+              "int": ""
+            },
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-21T07:55:47.314Z",
+            "version": 7,
+            "year": "2020",
+            "year_expire": "2025"
+          }
+        ],
+        "courses": [
+          {
+            "_id": "60d0460fbfcb4f100c8bfb2f",
+            "created_at": "2021-06-21T07:55:59.182Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla tempor faucibus nisi ut dapibus.",
+              "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla tempor faucibus nisi ut dapibus."
+            },
+            "modifier_id": null,
+            "month": "06",
+            "name": {
+              "no": "React: Frontend-kurs",
+              "int": "React: Frontend course"
+            },
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "program": {
+              "no": "Knowit",
+              "int": ""
+            },
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-21T08:00:31.916Z",
+            "version": 17,
+            "year": "2020"
+          }
+        ],
+        "created_at": "2021-06-18T11:18:59.791Z",
+        "custom_tag_ids": [],
+        "default": true,
+        "educations": [
+          {
+            "_id": "60cc851981d5f30fb9536518",
+            "created_at": "2021-06-18T11:35:53.399Z",
+            "degree": {
+              "no": "Bachelor",
+              "int": ""
+            },
+            "description": {
+              "no": "Informatikk",
+              "int": "Computer science"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "modifier_id": null,
+            "month_from": "8",
+            "month_to": "7",
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "school": {
+              "no": "NTNU",
+              "int": ""
+            },
+            "starred": false,
+            "updated_at": "2021-06-23T10:51:33.736Z",
+            "version": 20,
+            "year_from": "2012",
+            "year_to": "2015"
+          },
+          {
+            "_id": "60d31239bf661e0fc7be22ae",
+            "created_at": "2021-06-23T10:51:37.129Z",
+            "degree": {
+              "no": "Master",
+              "int": ""
+            },
+            "description": {
+              "no": "Informatikk: Kunstig Intelligens",
+              "int": "Computer Science: Artificial Intelligence"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "modifier_id": null,
+            "month_from": "8",
+            "month_to": "6",
+            "order": 1,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "school": {
+              "no": "NTNU",
+              "int": ""
+            },
+            "starred": false,
+            "updated_at": "2021-06-23T10:52:56.500Z",
+            "version": 16,
+            "year_from": "2015",
+            "year_to": "2017"
+          }
+        ],
+        "key_qualifications": [
+          {
+            "_id": "60cc846681d5f30fb45365fa",
+            "created_at": "2021-06-18T11:32:54.108Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "label": {
+              "no": "N\u00f8kkelkvalifikasjoner",
+              "int": "Key qualifications"
+            },
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla tempor faucibus nisi ut dapibus. Donec at quam laoreet, placerat ante nec, vestibulum dolor. In sit amet bibendum tortor, at eleifend sapien. Nam aliquet erat et cursus convallis. Integer molestie leo tellus, commodo aliquet enim sagittis ut. Vestibulum lectus nibh, porttitor non dolor at, aliquam malesuada orci.",
+              "int": "Suspendisse potenti. Proin consectetur semper dui, et iaculis enim cursus a. Maecenas auctor imperdiet nisi ac elementum. Nulla ultrices, magna id porttitor porta, mauris diam posuere justo, eu rhoncus mauris risus aliquet massa. Nullam pretium ac arcu et semper. Nam bibendum nulla lorem. Integer in ultricies sapien, id elementum justo. Sed blandit enim mi, id ultricies mauris finibus nec."
+            },
+            "modifier_id": null,
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "tag_line": {},
+            "updated_at": "2021-06-21T08:00:22.286Z",
+            "version": 7
+          }
+        ],
+        "landline": null,
+        "languages": [
+          {
+            "_id": "60cc857c68679f0fc83360fd",
+            "created_at": "2021-06-18T11:37:32.542Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "level": {
+              "no": "Morsm\u00e5l",
+              "int": "Mother tongue"
+            },
+            "modifier_id": null,
+            "name": {
+              "no": "Norsk",
+              "int": "Norwegian"
+            },
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-21T08:01:15.465Z",
+            "version": 6
+          },
+          {
+            "_id": "60cc859768679f0fca3360bc",
+            "created_at": "2021-06-18T11:37:59.023Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "level": {
+              "no": "Flytende",
+              "int": "Fluent"
+            },
+            "modifier_id": null,
+            "name": {
+              "no": "Spansk",
+              "int": "Spanish"
+            },
+            "order": 1,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-21T08:01:25.181Z",
+            "version": 6
+          }
+        ],
+        "level": null,
+        "modifier_id": null,
+        "name_multilang": {},
+        "nationality": {
+          "no": "Norsk",
+          "int": "Norwegian"
         },
-        {
-            "user_id": "user_id_2",
-            "default_cv_id": "user_id_2_cv_id",
-            "image_key": "image_key2",
-            "cv_no_pdf": "cv_no_pdf_key2",
-            "cv_int_pdf": "cv_int_pdf_key2",
-            "cv_no_docx": "cv_no_docx_key2",
-            "cv_int_docx": "cv_int_docx_key2",
-            "cv_link": "link2",
-            "cv": {
-                "_id": "user_id_2_cv_id",
-                "blogs": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-08-15T10:10:16.282Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month": "05",
-                        "name": {
-                            "no": "blog3",
-                            "int": ""
-                        },
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T10:34:05.389Z",
-                        "url": "N/A",
-                        "version": 21,
-                        "year": "2017"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-08-15T10:17:25.323Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month": "06",
-                        "name": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T10:33:00.844Z",
-                        "url": "TBA",
-                        "version": 137,
-                        "year": "2019"
-                    }
-                ],
-                "born_day": 3,
-                "born_month": 1,
-                "born_year": 1985,
-                "bruker_id": "user_id_2",
-                "courses": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2020-02-09T15:36:44.886Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month": "02",
-                        "name": {
-                            "no": "course2",
-                            "int": ""
-                        },
-                        "order": 0,
-                        "origin_id": null,
-                        "program": {
-                            "no": "program_name2",
-                            "int": ""
-                        },
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2020-02-09T15:40:01.000Z",
-                        "version": 53,
-                        "year": "2020"
-                    }
-                ],
-                "created_at": "2019-05-29T09:43:07.645Z",
-                "custom_tag_ids": [],
-                "default": true,
-                "educations": [
-                    {
-                        "_id": "123458",
-                        "created_at": "2019-05-30T17:34:20.670Z",
-                        "degree": {
-                            "no": "Bachelor2",
-                            "int": "Bachelor2_int"
-                        },
-                        "description": {
-                            "no": "Bachelor_desc_2",
-                            "int": "Bachelor_desc_2_int"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "modifier_id": null,
-                        "month_from": "08",
-                        "month_to": "05",
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "school": {
-                            "no": "School3",
-                            "int": "School3_int"
-                        },
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:40:49.176Z",
-                        "version": 67,
-                        "year_from": "2014",
-                        "year_to": "2019"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:40:57.028Z",
-                        "degree": {
-                            "no": "Master2",
-                            "int": "Master2_int"
-                        },
-                        "description": {
-                            "no": "Master_desc_2",
-                            "int": "Master_desc_2_int"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "modifier_id": null,
-                        "month_from": "08",
-                        "month_to": "06",
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "school": {
-                            "no": "School4",
-                            "int": "School4_int"
-                        },
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:46:17.033Z",
-                        "version": 56,
-                        "year_from": "2017",
-                        "year_to": "2019"
-                    }
-                ],
-                "key_qualifications": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-06-04T13:01:53.716Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "label": {
-                            "no": "Sammendrag",
-                            "int": "Abstract"
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "tag_line": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "updated_at": "2019-11-28T15:27:21.683Z",
-                        "version": 1540
-                    }
-                ],
-                "landline": null,
-                "languages": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:33:10.986Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "level": {
-                            "no": "",
-                            "int": "Mother tongue"
-                        },
-                        "modifier_id": null,
-                        "name": {
-                            "no": "Norsk",
-                            "int": "Norwegian",
-                            "se": "Norska"
-                        },
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:33:42.806Z",
-                        "version": 12
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:33:48.061Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "level": {
-                            "no": "",
-                            "int": "Fluent",
-                            "se": "Flytande"
-                        },
-                        "modifier_id": null,
-                        "name": {
-                            "no": "Engelsk",
-                            "int": "English",
-                            "se": "Engelska"
-                        },
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-05-30T17:34:02.086Z",
-                        "version": 7
-                    }
-                ],
-                "last_instigator": null,
-                "last_message_id": null,
-                "level": null,
-                "locked_at": null,
-                "locked_until": null,
+        "navn": "Einar Halvorsen",
+        "order": null,
+        "owner_updated_at": null,
+        "owner_updated_at_significant": null,
+        "place_of_residence": {
+          "no": "Drammen",
+          "int": ""
+        },
+        "project_experiences": [
+          {
+            "_id": "60cc84ac81d5f30fba5362e2",
+            "area_amt": null,
+            "area_unit": null,
+            "created_at": "2021-06-18T11:34:04.083Z",
+            "customer": {
+              "no": "Eksempelkunde 1",
+              "int": "Eksempelkunde 1"
+            },
+            "customer_anonymized": {},
+            "customer_description": {},
+            "customer_selected": "customer",
+            "customer_value_proposition": {},
+            "description": {
+              "no": "Prosjekt 1",
+              "int": "Prosjekt 1"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "exclude_tags": [],
+            "expected_roll_off_date": null,
+            "extent_hours": null,
+            "external_unique_id": null,
+            "industry": {
+              "no": "Offentlig",
+              "int": ""
+            },
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+              "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
+            },
+            "modifier_id": null,
+            "month_from": "1",
+            "month_to": "3",
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "percent_allocated": null,
+            "project_experience_skills": [
+              {
+                "_id": "60cc84f181d5f30fb55364b8",
+                "base_duration_in_years": 0,
                 "modifier_id": null,
-                "name_multilang": {},
-                "nationality": {
-                    "no": "Svensk",
-                    "int": "Swedish"
+                "offset_duration_in_years": 0,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "aws"
                 },
-                "navn": "Test Testerson 2",
-                "order": null,
-                "owner_updated_at": "2020-02-09T15:40:00.995Z",
-                "owner_updated_at_significant": "2020-02-09T15:36:44.875Z",
-                "place_of_residence": {
-                    "no": "Oslo",
-                    "int": "Oslo"
+                "total_duration_in_years": 0,
+                "version": 1
+              },
+              {
+                "_id": "60cc84f181d5f30fbb5365da",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 0,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "smidig utvikling"
                 },
-                "project_experiences": [
-                    {
-                        "_id": "123456",
-                        "area_amt": null,
-                        "area_unit": null,
-                        "created_at": "2019-11-07T09:54:05.900Z",
-                        "customer": {
-                            "no": "costumer3",
-                            "int": ""
-                        },
-                        "customer_description": {},
-                        "customer_value_proposition": {},
-                        "description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "exclude_tags": null,
-                        "expected_roll_off_date": null,
-                        "extent_hours": "",
-                        "industry": {
-                            "no": "Offentlig",
-                            "int": "Public sector",
-                            "se": "Offentligt"
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "08",
-                        "month_to": "11",
-                        "order": 3,
-                        "origin_id": null,
-                        "percent_allocated": "100",
-                        "project_experience_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 17,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Yarn",
-                                    "int": "Yarn",
-                                    "se": "Yarn"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            },
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 18,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "VS Code"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            }
-                        ],
-                        "project_extent_amt": "",
-                        "project_extent_currency": "",
-                        "project_extent_hours": "",
-                        "project_type": {},
-                        "recently_added": false,
-                        "related_work_experience_id": null,
-                        "roles": [
-                            {
-                                "_id": "123456",
-                                "created_at": null,
-                                "disabled": false,
-                                "diverged_from_master": false,
-                                "long_description": {
-                                    "no": "",
-                                    "int": ""
-                                },
-                                "modifier_id": null,
-                                "name": {
-                                    "no": "Frontendutvikler",
-                                    "int": "Front end developer",
-                                    "se": "Frontendutvecklare"
-                                },
-                                "order": 0,
-                                "origin_id": null,
-                                "recently_added": false,
-                                "starred": false,
-                                "summary": {},
-                                "updated_at": null,
-                                "version": 112
-                            },
-                            {
-                                "_id": "123456",
-                                "created_at": null,
-                                "disabled": false,
-                                "diverged_from_master": false,
-                                "long_description": {
-                                    "no": "",
-                                    "int": ""
-                                },
-                                "modifier_id": null,
-                                "name": {
-                                    "no": "Brukeranalyse",
-                                    "int": "",
-                                    "se": "Anv\u00e4ndar analys"
-                                },
-                                "order": 2,
-                                "origin_id": null,
-                                "recently_added": false,
-                                "starred": false,
-                                "summary": {},
-                                "updated_at": null,
-                                "version": 94
-                            },
-                            {
-                                "_id": "123456",
-                                "created_at": null,
-                                "disabled": false,
-                                "diverged_from_master": false,
-                                "long_description": {
-                                    "no": "",
-                                    "int": ""
-                                },
-                                "modifier_id": null,
-                                "name": {
-                                    "no": "DevOps-utvikler",
-                                    "int": ""
-                                },
-                                "order": 1,
-                                "origin_id": null,
-                                "recently_added": false,
-                                "starred": false,
-                                "summary": {},
-                                "updated_at": null,
-                                "version": 190
-                            }
-                        ],
-                        "starred": false,
-                        "total_extent_amt": "",
-                        "total_extent_currency": "",
-                        "total_extent_hours": "",
-                        "updated_at": "2020-06-06T11:58:44.817Z",
-                        "version": 184,
-                        "year_from": "2019",
-                        "year_to": "2019",
-                        "images": []
-                    },
-                    {
-                        "_id": "123456",
-                        "area_amt": null,
-                        "area_unit": null,
-                        "created_at": "2019-12-10T14:55:18.562Z",
-                        "customer": {
-                            "no": "Knowit Objectnet",
-                            "int": "Knowit Objectnet"
-                        },
-                        "customer_description": {},
-                        "customer_value_proposition": {},
-                        "description": {
-                            "no": "Dataplattform",
-                            "int": "Dataplattform"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "exclude_tags": null,
-                        "expected_roll_off_date": null,
-                        "extent_hours": "",
-                        "industry": {
-                            "no": "IT ",
-                            "int": ""
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "12",
-                        "month_to": "",
-                        "order": 1,
-                        "origin_id": null,
-                        "percent_allocated": "100",
-                        "project_experience_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 1,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "AWS DynamoDB",
-                                    "int": "DynamoDB",
-                                    "se": "DynamoDB"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 2
-                            },
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 2,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Github",
-                                    "int": "Github",
-                                    "se": "Github"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            }
-                        ],
-                        "project_extent_amt": "",
-                        "project_extent_currency": "",
-                        "project_extent_hours": "",
-                        "project_type": {},
-                        "recently_added": false,
-                        "related_work_experience_id": null,
-                        "roles": [
-                            {
-                                "_id": "123456",
-                                "created_at": null,
-                                "disabled": false,
-                                "diverged_from_master": false,
-                                "long_description": {
-                                    "no": "",
-                                    "int": ""
-                                },
-                                "modifier_id": null,
-                                "name": {
-                                    "no": "Backendutvikler",
-                                    "int": "",
-                                    "se": "Backendutvecklare"
-                                },
-                                "order": 0,
-                                "origin_id": null,
-                                "recently_added": false,
-                                "starred": false,
-                                "summary": {},
-                                "updated_at": null,
-                                "version": 133
-                            }
-                        ],
-                        "starred": false,
-                        "total_extent_amt": "",
-                        "total_extent_currency": "",
-                        "total_extent_hours": "",
-                        "updated_at": "2019-12-10T14:56:24.103Z",
-                        "version": 10,
-                        "year_from": "2019",
-                        "year_to": "",
-                        "images": []
-                    }
-                ],
-                "technologies": [
-                    {
-                        "_id": "123456",
-                        "category": {
-                            "no": "Object-Relational Mapping (ORM)",
-                            "int": ""
-                        },
-                        "created_at": "2020-01-17T13:36:23.690Z",
-                        "disabled": true,
-                        "diverged_from_master": false,
-                        "exclude_tags": null,
-                        "modifier_id": null,
-                        "order": 19,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "technology_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 1,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 1,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "SQLAlchemy"
-                                },
-                                "total_duration_in_years": 1,
-                                "version": 1
-                            },
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 2,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Hibernate",
-                                    "int": "Hibernate",
-                                    "se": "Hibernate"
-                                },
-                                "total_duration_in_years": 0,
-                                "version": 1
-                            }
-                        ],
-                        "uncategorized": false,
-                        "updated_at": "2020-05-01T00:03:31.108Z",
-                        "version": 8
-                    },
-                    {
-                        "_id": "123456",
-                        "category": {
-                            "no": "Systemutvikling"
-                        },
-                        "created_at": "2020-06-06T11:50:40.708Z",
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "exclude_tags": [],
-                        "modifier_id": null,
-                        "order": 18,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "technology_skills": [
-                            {
-                                "_id": "123456",
-                                "base_duration_in_years": 0,
-                                "modifier_id": null,
-                                "offset_duration_in_years": 0,
-                                "order": 0,
-                                "proficiency": 0,
-                                "tags": {
-                                    "no": "Android Studio",
-                                    "int": "Android Studio",
-                                    "se": "Android Studio",
-                                    "dk": null
-                                },
-                                "total_duration_in_years": 0,
-                                "version": null
-                            }
-                        ],
-                        "uncategorized": false,
-                        "updated_at": "2020-06-06T11:50:40.708Z",
-                        "version": 1
-                    }
-                ],
-                "telefon": "+123456",
-                "tilbud_id": null,
-                "title": {
-                    "no": "Systemkonsulent",
-                    "int": "System consultant"
+                "total_duration_in_years": 0,
+                "version": 1
+              },
+              {
+                "_id": "60cc84f1d98d7d0ffb574e5b",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 0,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "fullstack"
                 },
-                "twitter": "twitter2",
-                "updated_at": "2020-08-01T00:03:19.690Z",
-                "version": 25,
-                "work_experiences": [
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:47:36.722Z",
-                        "description": {
-                            "no": "sommerjobb, programmerer",
-                            "int": "summer internship, programmer"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "employer": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "06",
-                        "month_to": "08",
-                        "order": 2,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T12:26:10.782Z",
-                        "version": 62,
-                        "year_from": "2017",
-                        "year_to": "2017"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-05-30T17:54:28.028Z",
-                        "description": {
-                            "no": "sommerjobb, programmerer",
-                            "int": "summer internship, programmer"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "employer": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "long_description": {
-                            "no": "Sommerjobb som utvikler hos .",
-                            "int": "Summer intership as developer for ."
-                        },
-                        "modifier_id": null,
-                        "month_from": "06",
-                        "month_to": "07",
-                        "order": 1,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T12:25:41.859Z",
-                        "version": 158,
-                        "year_from": "2018",
-                        "year_to": "2018"
-                    },
-                    {
-                        "_id": "123456",
-                        "created_at": "2019-08-15T10:36:07.250Z",
-                        "description": {
-                            "no": "Systemkonsulent",
-                            "int": "System Consultant"
-                        },
-                        "disabled": false,
-                        "diverged_from_master": false,
-                        "employer": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "long_description": {
-                            "no": "",
-                            "int": ""
-                        },
-                        "modifier_id": null,
-                        "month_from": "08",
-                        "month_to": "",
-                        "order": 0,
-                        "origin_id": null,
-                        "recently_added": false,
-                        "starred": false,
-                        "updated_at": "2019-08-15T10:43:06.788Z",
-                        "version": 62,
-                        "year_from": "2019",
-                        "year_to": ""
-                    }
-                ],
-                "name": "Test Testerson 2",
-                "user_id": "user_id_2",
-                "company_id": "12345",
-                "external_unique_id": "kari.nordmann@knowit.no",
-                "email": "kari.nordmann@knowit.no",
-                "country_code": "no",
-                "language_code": "no",
-                "language_codes": [
-                    "no",
-                    "int",
-                    "dk",
-                    "se"
-                ],
-                "proposal": null,
-                "custom_tags": [],
-                "updated_ago": "N/A",
-                "template_document_type": "doc",
-                "default_word_template_id": "123456",
-                "default_ppt_template_id": null,
-                "image": {
-                    "url": "",
-                    "thumb": {
-                        "url": ""
-                    },
-                    "fit_thumb": {
-                        "url": ""
-                    },
-                    "large": {
-                        "url": ""
-                    },
-                    "small_thumb": {
-                        "url": ""
-                    }
+                "total_duration_in_years": 0,
+                "version": 1
+              }
+            ],
+            "project_extent_amt": null,
+            "project_extent_currency": null,
+            "project_extent_hours": null,
+            "project_type": {},
+            "recently_added": false,
+            "related_work_experience_id": null,
+            "roles": [
+              {
+                "_id": "60cc84f481d5f30faa5362b0",
+                "created_at": "2021-06-18T11:35:16.813Z",
+                "disabled": false,
+                "diverged_from_master": false,
+                "long_description": {
+                  "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+                  "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
                 },
-                "can_write": false
-            }
-        }
-    ]
+                "modifier_id": null,
+                "name": {
+                  "no": "Teamlead",
+                  "int": "Teamlead"
+                },
+                "order": 0,
+                "origin_id": null,
+                "recently_added": false,
+                "starred": false,
+                "summary": {},
+                "updated_at": "2021-06-18T11:35:35.477Z",
+                "version": 5
+              },
+              {
+                "_id": "60d314398d53ad0fb57c8fe1",
+                "created_at": "2021-06-23T11:00:09.213Z",
+                "disabled": false,
+                "diverged_from_master": false,
+                "long_description": {
+                  "no": "Lede daglig standup, samt sprint plannning",
+                  "int": "Daily standup and sprint planning"
+                },
+                "modifier_id": null,
+                "name": {
+                  "no": "Scrum master",
+                  "int": ""
+                },
+                "order": 1,
+                "origin_id": null,
+                "recently_added": false,
+                "starred": false,
+                "summary": {},
+                "updated_at": "2021-06-23T11:00:39.789Z",
+                "version": 9
+              }
+            ],
+            "starred": false,
+            "total_extent_amt": null,
+            "total_extent_currency": null,
+            "total_extent_hours": null,
+            "updated_at": "2021-06-23T11:00:39.807Z",
+            "version": 13,
+            "year_from": "2015",
+            "year_to": "2017",
+            "images": []
+          }
+        ],
+        "technologies": [
+          {
+            "_id": "60cc81232e97ff100ca405c8",
+            "category": {},
+            "created_at": "2021-06-18T11:18:59.781Z",
+            "disabled": true,
+            "diverged_from_master": false,
+            "exclude_tags": [],
+            "external_unique_id": null,
+            "modifier_id": null,
+            "order": null,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "technology_skills": [],
+            "uncategorized": true,
+            "updated_at": "2021-06-21T07:51:54.335Z",
+            "version": 2
+          },
+          {
+            "_id": "60d0448f68679f0fbf336a49",
+            "category": {
+              "no": "Smidig utvikling",
+              "int": "Agile development"
+            },
+            "created_at": "2021-06-21T07:49:35.837Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "exclude_tags": [],
+            "external_unique_id": null,
+            "modifier_id": null,
+            "order": 1,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "technology_skills": [
+              {
+                "_id": "60d044901fc1790fcecf0856",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 3,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "Scrum"
+                },
+                "total_duration_in_years": 3,
+                "version": 3
+              }
+            ],
+            "uncategorized": false,
+            "updated_at": "2021-06-21T08:21:52.981Z",
+            "version": 8
+          },
+          {
+            "_id": "60d044c81fc1790fd1cf094d",
+            "category": {
+              "no": "Skytjenester",
+              "int": "Cloud computing"
+            },
+            "created_at": "2021-06-21T07:50:32.959Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "exclude_tags": [],
+            "external_unique_id": null,
+            "modifier_id": null,
+            "order": 2,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "technology_skills": [
+              {
+                "_id": "60d044c91fc1790fd0cf0d7d",
+                "base_duration_in_years": 2,
+                "modifier_id": null,
+                "offset_duration_in_years": 0,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "AWS"
+                },
+                "total_duration_in_years": 2,
+                "version": 3
+              },
+              {
+                "_id": "60d045275c8d110fe796897b",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 0,
+                "order": 2,
+                "proficiency": 0,
+                "tags": {
+                  "no": "Microsoft Azure"
+                },
+                "total_duration_in_years": 0,
+                "version": 1
+              }
+            ],
+            "uncategorized": false,
+            "updated_at": "2021-06-21T08:21:55.633Z",
+            "version": 5
+          }
+        ],
+        "telefon": "12345678",
+        "tilbud_id": null,
+        "title": {
+          "no": "Systemkonsulent",
+          "int": "Systems consultant"
+        },
+        "twitter": null,
+        "updated_at": "2021-06-23T11:00:39.845Z",
+        "version": 12,
+        "work_experiences": [
+          {
+            "_id": "60cc8552d98d7d1004574def",
+            "created_at": "2021-06-18T11:36:50.466Z",
+            "description": {
+              "no": "Sommerjobber",
+              "int": "Summer Intern"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "employer": {
+              "no": "Knowit Objectnet",
+              "int": ""
+            },
+            "external_unique_id": null,
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+              "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
+            },
+            "modifier_id": null,
+            "month_from": "6",
+            "month_to": "8",
+            "order": 1,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-23T11:53:55.621Z",
+            "version": 14,
+            "year_from": "2017",
+            "year_to": "2017"
+          },
+          {
+            "_id": "60d320d4d6c4f20fcc9caf12",
+            "created_at": "2021-06-23T11:53:56.049Z",
+            "description": {
+              "no": "Konsulent fulltid",
+              "int": ""
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "employer": {
+              "no": "Knowit Objectnet",
+              "int": ""
+            },
+            "external_unique_id": null,
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+              "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
+            },
+            "modifier_id": null,
+            "month_from": "08",
+            "month_to": "02",
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-23T11:54:40.157Z",
+            "version": 11,
+            "year_from": "2017",
+            "year_to": "2020"
+          }
+        ],
+        "name": "Einar Halvorsen",
+        "user_id": "60cc81232e97ff100ca405c6",
+        "company_id": "60cc73f8475a6e000164587b",
+        "external_unique_id": "2f119dc3-02fe-4159-adec-0238d77b18ce",
+        "email": "einar.halvorsen@knowit.no",
+        "country_code": "no",
+        "language_code": "no",
+        "language_codes": [
+          "no",
+          "int"
+        ],
+        "proposal": null,
+        "custom_tags": [],
+        "updated_ago": "N/A",
+        "template_document_type": "doc",
+        "default_word_template_id": null,
+        "default_ppt_template_id": null,
+        "image": {
+          "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc81232e97ff100ca405c6/shrek.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110259Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECEaCWV1LXdlc3QtMSJIMEYCIQC1yAm9Ay6VJVJbl8tDQD1tdyATFH6rGGPo3vbaZpD5JwIhAP25x0zado9yfZzgeibnjDyh2r3RMwYNyvfe2LvoJpB2KoMECOr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgzBMHI%2BEI6vRJ6Ni2wq1wNOTEkw1uGT%2B%2FkT8CuGrvxWrc2%2FxqZtCZz4vjQLeIYQG3X01O%2FeRSI9vrU15nNKLNlIy7B3Is3BJv3C0f2H0czlVjKj6nbjhnef8Xur4%2FQmP0BWguxRQ11TVF1VhDhA3rGVLJifcHF6qpYkLFNZaWl55Dl7cb0daLcX1cy2gVrVjF9L0TJLMf7B%2FfIyv9WUkUloB1saLj6h9i2fqQu6%2F5VENoqSXwgU323Fff9fe7IEuNXsNkTdQCko1g9FTxX1M6axUAsKskMFSg3f97GQ2%2BhTVfr%2FJWvrYtQulIDZahpgJ%2FAI3JkBbK%2FQ5zsIcc3xqOZ%2FsT7Rs4EjXg3ZUWRuodVCtEjPACrzR%2F4C%2BLG7xcZzPmRwTQSX6erWkC2bxWJwp%2FV8E5AqZJgOWXss14S4Iudtc5kehzOILV365pdRmZAXU4I1moDhV71NimC2EmkD%2BbFJ14rEb4KYA74KDwvg20EOtK9mHljXqkRNqqqqbOSRLqU%2FCgl91zGv52EUd%2FeuA2I7gjrVgBm1vEwvxDHAbIKx6FtUDYvmf1UWTjnGyF9ZFKbbF9C1%2BPOEF0s%2B4EbRBgwSgRDKWlHLVQQ8MDHibL4Svyko%2FAe%2FBhH3xr06ZzblByW3y2XE1hYwrvDLhgY6pAEBbdeciuN8Dab8FZ7g6uXgMHSHJO13im95Db2Med2aGiXX2wUEgR0pB%2BJQhdKX98s5FHv%2BqQOJKG9k6L65wtpi%2BxF7oO5VtGyTXoLTxG4QFNwJg%2BfpcqMcnEqg7gS1gCm7QYY%2FOlWI%2B%2Fiq5S0dc72Cyw2zbjCL4lpN9lkO58wYAPE7sHoFfvlnS%2FT9Bqwz%2FTeBdLUPqoqZa3CLGYZz7YxJz6PzCw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KCQP5IKP5%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=28589e8102d919bf58f7ec640b962a97b1599684ce61b4a081c5a4dae3840296",
+          "thumb": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc81232e97ff100ca405c6/thumb_shrek.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110259Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECEaCWV1LXdlc3QtMSJIMEYCIQC1yAm9Ay6VJVJbl8tDQD1tdyATFH6rGGPo3vbaZpD5JwIhAP25x0zado9yfZzgeibnjDyh2r3RMwYNyvfe2LvoJpB2KoMECOr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgzBMHI%2BEI6vRJ6Ni2wq1wNOTEkw1uGT%2B%2FkT8CuGrvxWrc2%2FxqZtCZz4vjQLeIYQG3X01O%2FeRSI9vrU15nNKLNlIy7B3Is3BJv3C0f2H0czlVjKj6nbjhnef8Xur4%2FQmP0BWguxRQ11TVF1VhDhA3rGVLJifcHF6qpYkLFNZaWl55Dl7cb0daLcX1cy2gVrVjF9L0TJLMf7B%2FfIyv9WUkUloB1saLj6h9i2fqQu6%2F5VENoqSXwgU323Fff9fe7IEuNXsNkTdQCko1g9FTxX1M6axUAsKskMFSg3f97GQ2%2BhTVfr%2FJWvrYtQulIDZahpgJ%2FAI3JkBbK%2FQ5zsIcc3xqOZ%2FsT7Rs4EjXg3ZUWRuodVCtEjPACrzR%2F4C%2BLG7xcZzPmRwTQSX6erWkC2bxWJwp%2FV8E5AqZJgOWXss14S4Iudtc5kehzOILV365pdRmZAXU4I1moDhV71NimC2EmkD%2BbFJ14rEb4KYA74KDwvg20EOtK9mHljXqkRNqqqqbOSRLqU%2FCgl91zGv52EUd%2FeuA2I7gjrVgBm1vEwvxDHAbIKx6FtUDYvmf1UWTjnGyF9ZFKbbF9C1%2BPOEF0s%2B4EbRBgwSgRDKWlHLVQQ8MDHibL4Svyko%2FAe%2FBhH3xr06ZzblByW3y2XE1hYwrvDLhgY6pAEBbdeciuN8Dab8FZ7g6uXgMHSHJO13im95Db2Med2aGiXX2wUEgR0pB%2BJQhdKX98s5FHv%2BqQOJKG9k6L65wtpi%2BxF7oO5VtGyTXoLTxG4QFNwJg%2BfpcqMcnEqg7gS1gCm7QYY%2FOlWI%2B%2Fiq5S0dc72Cyw2zbjCL4lpN9lkO58wYAPE7sHoFfvlnS%2FT9Bqwz%2FTeBdLUPqoqZa3CLGYZz7YxJz6PzCw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KCQP5IKP5%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=961c07d8c820344088a2106aee26e514226a5f85a07e7afc0c91ab2a542d8ed6"
+          },
+          "fit_thumb": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc81232e97ff100ca405c6/fit_thumb_shrek.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110259Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECEaCWV1LXdlc3QtMSJIMEYCIQC1yAm9Ay6VJVJbl8tDQD1tdyATFH6rGGPo3vbaZpD5JwIhAP25x0zado9yfZzgeibnjDyh2r3RMwYNyvfe2LvoJpB2KoMECOr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgzBMHI%2BEI6vRJ6Ni2wq1wNOTEkw1uGT%2B%2FkT8CuGrvxWrc2%2FxqZtCZz4vjQLeIYQG3X01O%2FeRSI9vrU15nNKLNlIy7B3Is3BJv3C0f2H0czlVjKj6nbjhnef8Xur4%2FQmP0BWguxRQ11TVF1VhDhA3rGVLJifcHF6qpYkLFNZaWl55Dl7cb0daLcX1cy2gVrVjF9L0TJLMf7B%2FfIyv9WUkUloB1saLj6h9i2fqQu6%2F5VENoqSXwgU323Fff9fe7IEuNXsNkTdQCko1g9FTxX1M6axUAsKskMFSg3f97GQ2%2BhTVfr%2FJWvrYtQulIDZahpgJ%2FAI3JkBbK%2FQ5zsIcc3xqOZ%2FsT7Rs4EjXg3ZUWRuodVCtEjPACrzR%2F4C%2BLG7xcZzPmRwTQSX6erWkC2bxWJwp%2FV8E5AqZJgOWXss14S4Iudtc5kehzOILV365pdRmZAXU4I1moDhV71NimC2EmkD%2BbFJ14rEb4KYA74KDwvg20EOtK9mHljXqkRNqqqqbOSRLqU%2FCgl91zGv52EUd%2FeuA2I7gjrVgBm1vEwvxDHAbIKx6FtUDYvmf1UWTjnGyF9ZFKbbF9C1%2BPOEF0s%2B4EbRBgwSgRDKWlHLVQQ8MDHibL4Svyko%2FAe%2FBhH3xr06ZzblByW3y2XE1hYwrvDLhgY6pAEBbdeciuN8Dab8FZ7g6uXgMHSHJO13im95Db2Med2aGiXX2wUEgR0pB%2BJQhdKX98s5FHv%2BqQOJKG9k6L65wtpi%2BxF7oO5VtGyTXoLTxG4QFNwJg%2BfpcqMcnEqg7gS1gCm7QYY%2FOlWI%2B%2Fiq5S0dc72Cyw2zbjCL4lpN9lkO58wYAPE7sHoFfvlnS%2FT9Bqwz%2FTeBdLUPqoqZa3CLGYZz7YxJz6PzCw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KCQP5IKP5%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=9f1cf15760769a9fe483369622b9a71cb74757d0a505002d65e43873c05fb265"
+          },
+          "large": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc81232e97ff100ca405c6/large_shrek.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110259Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECEaCWV1LXdlc3QtMSJIMEYCIQC1yAm9Ay6VJVJbl8tDQD1tdyATFH6rGGPo3vbaZpD5JwIhAP25x0zado9yfZzgeibnjDyh2r3RMwYNyvfe2LvoJpB2KoMECOr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgzBMHI%2BEI6vRJ6Ni2wq1wNOTEkw1uGT%2B%2FkT8CuGrvxWrc2%2FxqZtCZz4vjQLeIYQG3X01O%2FeRSI9vrU15nNKLNlIy7B3Is3BJv3C0f2H0czlVjKj6nbjhnef8Xur4%2FQmP0BWguxRQ11TVF1VhDhA3rGVLJifcHF6qpYkLFNZaWl55Dl7cb0daLcX1cy2gVrVjF9L0TJLMf7B%2FfIyv9WUkUloB1saLj6h9i2fqQu6%2F5VENoqSXwgU323Fff9fe7IEuNXsNkTdQCko1g9FTxX1M6axUAsKskMFSg3f97GQ2%2BhTVfr%2FJWvrYtQulIDZahpgJ%2FAI3JkBbK%2FQ5zsIcc3xqOZ%2FsT7Rs4EjXg3ZUWRuodVCtEjPACrzR%2F4C%2BLG7xcZzPmRwTQSX6erWkC2bxWJwp%2FV8E5AqZJgOWXss14S4Iudtc5kehzOILV365pdRmZAXU4I1moDhV71NimC2EmkD%2BbFJ14rEb4KYA74KDwvg20EOtK9mHljXqkRNqqqqbOSRLqU%2FCgl91zGv52EUd%2FeuA2I7gjrVgBm1vEwvxDHAbIKx6FtUDYvmf1UWTjnGyF9ZFKbbF9C1%2BPOEF0s%2B4EbRBgwSgRDKWlHLVQQ8MDHibL4Svyko%2FAe%2FBhH3xr06ZzblByW3y2XE1hYwrvDLhgY6pAEBbdeciuN8Dab8FZ7g6uXgMHSHJO13im95Db2Med2aGiXX2wUEgR0pB%2BJQhdKX98s5FHv%2BqQOJKG9k6L65wtpi%2BxF7oO5VtGyTXoLTxG4QFNwJg%2BfpcqMcnEqg7gS1gCm7QYY%2FOlWI%2B%2Fiq5S0dc72Cyw2zbjCL4lpN9lkO58wYAPE7sHoFfvlnS%2FT9Bqwz%2FTeBdLUPqoqZa3CLGYZz7YxJz6PzCw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KCQP5IKP5%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=5af920c1b1c4720292a58861cb9634f4fadbe67433c5a5b4ef84016885cb5582"
+          },
+          "small_thumb": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc81232e97ff100ca405c6/small_thumb_shrek.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110259Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECEaCWV1LXdlc3QtMSJIMEYCIQC1yAm9Ay6VJVJbl8tDQD1tdyATFH6rGGPo3vbaZpD5JwIhAP25x0zado9yfZzgeibnjDyh2r3RMwYNyvfe2LvoJpB2KoMECOr%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgzBMHI%2BEI6vRJ6Ni2wq1wNOTEkw1uGT%2B%2FkT8CuGrvxWrc2%2FxqZtCZz4vjQLeIYQG3X01O%2FeRSI9vrU15nNKLNlIy7B3Is3BJv3C0f2H0czlVjKj6nbjhnef8Xur4%2FQmP0BWguxRQ11TVF1VhDhA3rGVLJifcHF6qpYkLFNZaWl55Dl7cb0daLcX1cy2gVrVjF9L0TJLMf7B%2FfIyv9WUkUloB1saLj6h9i2fqQu6%2F5VENoqSXwgU323Fff9fe7IEuNXsNkTdQCko1g9FTxX1M6axUAsKskMFSg3f97GQ2%2BhTVfr%2FJWvrYtQulIDZahpgJ%2FAI3JkBbK%2FQ5zsIcc3xqOZ%2FsT7Rs4EjXg3ZUWRuodVCtEjPACrzR%2F4C%2BLG7xcZzPmRwTQSX6erWkC2bxWJwp%2FV8E5AqZJgOWXss14S4Iudtc5kehzOILV365pdRmZAXU4I1moDhV71NimC2EmkD%2BbFJ14rEb4KYA74KDwvg20EOtK9mHljXqkRNqqqqbOSRLqU%2FCgl91zGv52EUd%2FeuA2I7gjrVgBm1vEwvxDHAbIKx6FtUDYvmf1UWTjnGyF9ZFKbbF9C1%2BPOEF0s%2B4EbRBgwSgRDKWlHLVQQ8MDHibL4Svyko%2FAe%2FBhH3xr06ZzblByW3y2XE1hYwrvDLhgY6pAEBbdeciuN8Dab8FZ7g6uXgMHSHJO13im95Db2Med2aGiXX2wUEgR0pB%2BJQhdKX98s5FHv%2BqQOJKG9k6L65wtpi%2BxF7oO5VtGyTXoLTxG4QFNwJg%2BfpcqMcnEqg7gS1gCm7QYY%2FOlWI%2B%2Fiq5S0dc72Cyw2zbjCL4lpN9lkO58wYAPE7sHoFfvlnS%2FT9Bqwz%2FTeBdLUPqoqZa3CLGYZz7YxJz6PzCw%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KCQP5IKP5%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=8d3f2b4ff78ebbcd9dbd9bd5b6921e7cb68c47fd06581a04ee8312a90049ad98"
+          }
+        },
+        "can_write": true
+      }
+    },
+    {
+      "user_id": "60cc7fce68679f0fc4336177",
+      "default_cv_id": "60cc7fce68679f0fc4336178",
+      "cv_link": "link2",
+      "image_key": "public/images/ac28979d-9694-4537-a299-bf713d1aef79.jpg",
+      "cv_no_pdf": "private/cvs/9c0bcd0d-7999-4c1e-bb62-56b3ee599f92.pdf",
+      "cv_int_pdf": "private/cvs/880b26a5-d553-4aef-8d6a-a5ac95044d5e.pdf",
+      "cv_no_docx": "private/cvs/3c1f070e-9584-46d4-a96f-91be6629662a.docx",
+      "cv_int_docx": "private/cvs/1c998097-a365-45d6-92ec-aa151aec7fdd.docx",
+      "cv": {
+        "_id": "60cc7fce68679f0fc4336178",
+        "born_day": 1,
+        "born_month": 1,
+        "born_year": 1995,
+        "bruker_id": "60cc7fce68679f0fc4336177",
+        "created_at": "2021-06-18T11:13:18.651Z",
+        "custom_tag_ids": [],
+        "default": true,
+        "educations": [
+          {
+            "_id": "60cc87d82e97ff100ea4060e",
+            "created_at": "2021-06-18T11:47:36.395Z",
+            "degree": {
+              "no": "Bachelor",
+              "int": ""
+            },
+            "description": {
+              "no": "Informatikk: Digital \u00d8konomi og Ledelse",
+              "int": "Computer Science: Digital Economics and Management"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "modifier_id": null,
+            "month_from": "8",
+            "month_to": "6",
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "school": {
+              "no": "Universitetet i Oslo",
+              "int": "University of Oslo"
+            },
+            "starred": false,
+            "updated_at": "2021-06-23T10:56:17.179Z",
+            "version": 22,
+            "year_from": "2015",
+            "year_to": "2018"
+          },
+          {
+            "_id": "60d31337836eb40fc887e8de",
+            "created_at": "2021-06-23T10:55:51.663Z",
+            "degree": {
+              "no": "Master",
+              "int": ""
+            },
+            "description": {
+              "no": "Informatikk: Digital \u00d8konomi og Ledelse",
+              "int": "Computer Science: Digital Economics and Management"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "modifier_id": null,
+            "month_from": "08",
+            "month_to": "06",
+            "order": 1,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "school": {
+              "no": "Universitetet i Oslo",
+              "int": "University of Oslo"
+            },
+            "starred": false,
+            "updated_at": "2021-06-23T10:56:39.611Z",
+            "version": 10,
+            "year_from": "2018",
+            "year_to": "2020"
+          }
+        ],
+        "key_qualifications": [
+          {
+            "_id": "60cc87382e97ff100da4077e",
+            "created_at": "2021-06-18T11:44:56.799Z",
+            "disabled": false,
+            "diverged_from_master": false,
+            "external_unique_id": null,
+            "label": {
+              "no": "N\u00f8kkelkvalifikasjoner",
+              "int": "Key qualifications"
+            },
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+              "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
+            },
+            "modifier_id": null,
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "tag_line": {},
+            "updated_at": "2021-06-18T11:45:16.734Z",
+            "version": 9
+          }
+        ],
+        "landline": null,
+        "level": null,
+        "modifier_id": null,
+        "name_multilang": {},
+        "nationality": {
+          "no": "Norsk",
+          "int": "Norwegian"
+        },
+        "navn": "Fredrik Arnesen",
+        "order": null,
+        "owner_updated_at": null,
+        "owner_updated_at_significant": null,
+        "place_of_residence": {
+          "no": "Sandvika",
+          "int": "Sandvika"
+        },
+        "project_experiences": [
+          {
+            "_id": "60cc874f1fc1790fcbcf03cb",
+            "area_amt": null,
+            "area_unit": null,
+            "created_at": "2021-06-18T11:45:19.042Z",
+            "customer": {
+              "no": "Eksempelkunde 2",
+              "int": "Eksempelkunde 2"
+            },
+            "customer_anonymized": {},
+            "customer_description": {},
+            "customer_selected": "customer",
+            "customer_value_proposition": {},
+            "description": {
+              "no": "Eksempelprosjekt 2",
+              "int": "Eksempelprosjekt 2"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "exclude_tags": [],
+            "expected_roll_off_date": null,
+            "extent_hours": null,
+            "external_unique_id": null,
+            "industry": {
+              "no": "Privat",
+              "int": "Private sector"
+            },
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+              "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
+            },
+            "modifier_id": null,
+            "month_from": "8",
+            "month_to": "4",
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "percent_allocated": null,
+            "project_experience_skills": [
+              {
+                "_id": "60cc87ac68679f0fca3360cf",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 0,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "serverless"
+                },
+                "total_duration_in_years": 0,
+                "version": 1
+              },
+              {
+                "_id": "60cc87ac1fc1790fcbcf03cf",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 0,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "azure"
+                },
+                "total_duration_in_years": 0,
+                "version": 1
+              },
+              {
+                "_id": "60cc87acd98d7d0ff3574cef",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 0,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "svelte"
+                },
+                "total_duration_in_years": 0,
+                "version": 1
+              }
+            ],
+            "project_extent_amt": null,
+            "project_extent_currency": null,
+            "project_extent_hours": null,
+            "project_type": {},
+            "recently_added": false,
+            "related_work_experience_id": null,
+            "roles": [
+              {
+                "_id": "60cc878181d5f30fb653637e",
+                "created_at": "2021-06-18T11:46:09.909Z",
+                "disabled": false,
+                "diverged_from_master": false,
+                "long_description": {
+                  "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+                  "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
+                },
+                "modifier_id": null,
+                "name": {
+                  "no": "Utvikler",
+                  "int": "Developer"
+                },
+                "order": 0,
+                "origin_id": null,
+                "recently_added": false,
+                "starred": false,
+                "summary": {},
+                "updated_at": "2021-06-18T11:46:41.244Z",
+                "version": 8
+              }
+            ],
+            "starred": false,
+            "total_extent_amt": null,
+            "total_extent_currency": null,
+            "total_extent_hours": null,
+            "updated_at": "2021-06-23T00:53:41.558Z",
+            "version": 19,
+            "year_from": "2019",
+            "year_to": "2021",
+            "images": []
+          }
+        ],
+        "technologies": [
+          {
+            "_id": "60cc7fce68679f0fc4336179",
+            "category": {},
+            "created_at": "2021-06-18T11:13:18.642Z",
+            "disabled": true,
+            "diverged_from_master": false,
+            "exclude_tags": [],
+            "external_unique_id": null,
+            "modifier_id": null,
+            "order": null,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "technology_skills": [
+              {
+                "_id": "60cc87ac2e97ff1041a40938",
+                "base_duration_in_years": 2,
+                "modifier_id": null,
+                "offset_duration_in_years": 2,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "serverless"
+                },
+                "total_duration_in_years": 4,
+                "version": 3
+              },
+              {
+                "_id": "60cc87ac1fc1791005cf0584",
+                "base_duration_in_years": 2,
+                "modifier_id": null,
+                "offset_duration_in_years": 2,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "azure"
+                },
+                "total_duration_in_years": 4,
+                "version": 2
+              },
+              {
+                "_id": "60cc87acd98d7d1001574d18",
+                "base_duration_in_years": 2,
+                "modifier_id": null,
+                "offset_duration_in_years": 1,
+                "order": 1,
+                "proficiency": 0,
+                "tags": {
+                  "no": "svelte"
+                },
+                "total_duration_in_years": 3,
+                "version": 2
+              },
+              {
+                "_id": "60cc87cc68679f0fc8336112",
+                "base_duration_in_years": 0,
+                "modifier_id": null,
+                "offset_duration_in_years": 1,
+                "order": 2,
+                "proficiency": 0,
+                "tags": {
+                  "no": "Java"
+                },
+                "total_duration_in_years": 1,
+                "version": 2
+              }
+            ],
+            "uncategorized": true,
+            "updated_at": "2021-06-18T11:48:20.461Z",
+            "version": 2
+          }
+        ],
+        "telefon": "87654321",
+        "tilbud_id": null,
+        "title": {
+          "no": "Utvikler",
+          "int": "Developer"
+        },
+        "twitter": null,
+        "updated_at": "2021-06-23T10:56:39.666Z",
+        "version": 15,
+        "work_experiences": [
+          {
+            "_id": "60d3213c8d53ad0fb47c9365",
+            "created_at": "2021-06-23T11:55:40.779Z",
+            "description": {
+              "no": "Softwarearkitekt",
+              "int": "Software Architect"
+            },
+            "disabled": false,
+            "diverged_from_master": false,
+            "employer": {
+              "no": "KO Consulting",
+              "int": ""
+            },
+            "external_unique_id": null,
+            "long_description": {
+              "no": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. ",
+              "int": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent eu lectus sit amet diam tempor imperdiet ac ac tellus. Aenean vel sapien vitae ipsum consequat lobortis dapibus a urna. "
+            },
+            "modifier_id": null,
+            "month_from": "11",
+            "month_to": "03",
+            "order": 0,
+            "origin_id": null,
+            "owner_updated_at": null,
+            "recently_added": false,
+            "starred": false,
+            "updated_at": "2021-06-23T11:57:09.806Z",
+            "version": 21,
+            "year_from": "2019",
+            "year_to": "2021"
+          }
+        ],
+        "name": "Fredrik Arnesen",
+        "user_id": "60cc7fce68679f0fc4336177",
+        "company_id": "60cc73f8475a6e000164587b",
+        "external_unique_id": "059ef00d-d6af-4517-ad1c-a05c63769c9b",
+        "email": "fredrik.arnesen@knowit.no",
+        "country_code": "no",
+        "language_code": "no",
+        "language_codes": [
+          "no",
+          "int"
+        ],
+        "proposal": null,
+        "custom_tags": [],
+        "updated_ago": "N/A",
+        "template_document_type": "doc",
+        "default_word_template_id": null,
+        "default_ppt_template_id": null,
+        "image": {
+          "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc7fce68679f0fc4336177/donkey.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110300Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECMaCWV1LXdlc3QtMSJIMEYCIQCjA9GZGbYMJyRfHVMl3G741T7WVts7NV%2Fsjl4TxeBYsQIhAMpTF79NbPq8tktuGOxYSm%2FiVVLObbuNynD518kBapVPKoMECOv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgwZxlN9Q91oKiRZjkwq1wPaf3wKRTSA3QpUFyWriW3xLox%2FD9MNZZ1e1XpgUAQcodxDNUoVJo5ug9ycHsacP8Tn4EtaTj395bQNL4peKn5edC1L2Q3%2FP2yyvlB5IqMqfZ4vZTrmsjKDRH2%2BLjkzXkSwRbsDVWNEbqNndF24IEhHbmGN6GoSLTLZnxJB9wpPOFm44%2BFPVIALbnObEalWq9NaKix543VfHQYKtib1tXNTR6bH7BXEEjFSHxqhgaw6%2FNXMBRtD%2BTGQOlGLpz6bQqAk1IEz0%2B3bGETLduZng0etXUg0ahTANgp1vBetX236N6qJB3oqXXDikXg%2BI4KuYzKkhUxfF7%2Bwf3Nt%2F9OLttqNuvktUFEam4fTcT0k1WCWt7sJdEqMllLaSp%2Bjds7QrnhmNDkGzHw%2FkcT2j7HuVVMgm%2B3iI5xAdCM9%2FQZ4oT2zI8WpkeyWpYdQLYpsms%2FJHsQ9mqawKe%2B%2F6c0oyBfnkvNyjHw8BhWz9NY0F92kw9I2KR8%2BPvt6NlA8EbVAsO17D5MFemZL9IN8wVuAi7Qys%2F1X6awSPPLCl2Fa1WEO%2FGkoLn1H7xXX9lZGc8FrKeDo3IyEIxTDj2JNgYOqHSlkzF6HeeV6z9P7rENf3LQB9pgSXsk1OrHi89AwvpLMhgY6pAE1IF8CJUCVU5hXHfWJqM8Hi80PEdDy8ocL2Kq5nRAh0Ue3ytDSUuI6XWvbyXMOfLeODLOZdyw1PrG2d8FyoN%2FBOohnbfq3CaH41YFAcLRVvYYruJKKUaD4O4o6XvpgqZYyoMjMefBEZrWUU%2Bm%2BA11pdf4%2BpKk3DJQaiOTrESZF6zD16FPp13B%2FxWuW7ACtZhCuq8EiWtK7X5lQEa4bLexpOStDAA%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KNYGWAXH2%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=93961b0894f144273ac32d52086ff0877e31c702e77ee0fbefa4642cba11a772",
+          "thumb": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc7fce68679f0fc4336177/thumb_donkey.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110300Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECMaCWV1LXdlc3QtMSJIMEYCIQCjA9GZGbYMJyRfHVMl3G741T7WVts7NV%2Fsjl4TxeBYsQIhAMpTF79NbPq8tktuGOxYSm%2FiVVLObbuNynD518kBapVPKoMECOv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgwZxlN9Q91oKiRZjkwq1wPaf3wKRTSA3QpUFyWriW3xLox%2FD9MNZZ1e1XpgUAQcodxDNUoVJo5ug9ycHsacP8Tn4EtaTj395bQNL4peKn5edC1L2Q3%2FP2yyvlB5IqMqfZ4vZTrmsjKDRH2%2BLjkzXkSwRbsDVWNEbqNndF24IEhHbmGN6GoSLTLZnxJB9wpPOFm44%2BFPVIALbnObEalWq9NaKix543VfHQYKtib1tXNTR6bH7BXEEjFSHxqhgaw6%2FNXMBRtD%2BTGQOlGLpz6bQqAk1IEz0%2B3bGETLduZng0etXUg0ahTANgp1vBetX236N6qJB3oqXXDikXg%2BI4KuYzKkhUxfF7%2Bwf3Nt%2F9OLttqNuvktUFEam4fTcT0k1WCWt7sJdEqMllLaSp%2Bjds7QrnhmNDkGzHw%2FkcT2j7HuVVMgm%2B3iI5xAdCM9%2FQZ4oT2zI8WpkeyWpYdQLYpsms%2FJHsQ9mqawKe%2B%2F6c0oyBfnkvNyjHw8BhWz9NY0F92kw9I2KR8%2BPvt6NlA8EbVAsO17D5MFemZL9IN8wVuAi7Qys%2F1X6awSPPLCl2Fa1WEO%2FGkoLn1H7xXX9lZGc8FrKeDo3IyEIxTDj2JNgYOqHSlkzF6HeeV6z9P7rENf3LQB9pgSXsk1OrHi89AwvpLMhgY6pAE1IF8CJUCVU5hXHfWJqM8Hi80PEdDy8ocL2Kq5nRAh0Ue3ytDSUuI6XWvbyXMOfLeODLOZdyw1PrG2d8FyoN%2FBOohnbfq3CaH41YFAcLRVvYYruJKKUaD4O4o6XvpgqZYyoMjMefBEZrWUU%2Bm%2BA11pdf4%2BpKk3DJQaiOTrESZF6zD16FPp13B%2FxWuW7ACtZhCuq8EiWtK7X5lQEa4bLexpOStDAA%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KNYGWAXH2%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=cacb8bce968aacbf80a2bb9b8dae4e30edd9d5dfd4857ead8b35e43901407777"
+          },
+          "fit_thumb": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc7fce68679f0fc4336177/fit_thumb_donkey.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110300Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECMaCWV1LXdlc3QtMSJIMEYCIQCjA9GZGbYMJyRfHVMl3G741T7WVts7NV%2Fsjl4TxeBYsQIhAMpTF79NbPq8tktuGOxYSm%2FiVVLObbuNynD518kBapVPKoMECOv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgwZxlN9Q91oKiRZjkwq1wPaf3wKRTSA3QpUFyWriW3xLox%2FD9MNZZ1e1XpgUAQcodxDNUoVJo5ug9ycHsacP8Tn4EtaTj395bQNL4peKn5edC1L2Q3%2FP2yyvlB5IqMqfZ4vZTrmsjKDRH2%2BLjkzXkSwRbsDVWNEbqNndF24IEhHbmGN6GoSLTLZnxJB9wpPOFm44%2BFPVIALbnObEalWq9NaKix543VfHQYKtib1tXNTR6bH7BXEEjFSHxqhgaw6%2FNXMBRtD%2BTGQOlGLpz6bQqAk1IEz0%2B3bGETLduZng0etXUg0ahTANgp1vBetX236N6qJB3oqXXDikXg%2BI4KuYzKkhUxfF7%2Bwf3Nt%2F9OLttqNuvktUFEam4fTcT0k1WCWt7sJdEqMllLaSp%2Bjds7QrnhmNDkGzHw%2FkcT2j7HuVVMgm%2B3iI5xAdCM9%2FQZ4oT2zI8WpkeyWpYdQLYpsms%2FJHsQ9mqawKe%2B%2F6c0oyBfnkvNyjHw8BhWz9NY0F92kw9I2KR8%2BPvt6NlA8EbVAsO17D5MFemZL9IN8wVuAi7Qys%2F1X6awSPPLCl2Fa1WEO%2FGkoLn1H7xXX9lZGc8FrKeDo3IyEIxTDj2JNgYOqHSlkzF6HeeV6z9P7rENf3LQB9pgSXsk1OrHi89AwvpLMhgY6pAE1IF8CJUCVU5hXHfWJqM8Hi80PEdDy8ocL2Kq5nRAh0Ue3ytDSUuI6XWvbyXMOfLeODLOZdyw1PrG2d8FyoN%2FBOohnbfq3CaH41YFAcLRVvYYruJKKUaD4O4o6XvpgqZYyoMjMefBEZrWUU%2Bm%2BA11pdf4%2BpKk3DJQaiOTrESZF6zD16FPp13B%2FxWuW7ACtZhCuq8EiWtK7X5lQEa4bLexpOStDAA%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KNYGWAXH2%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=f9a6ff95e1e631ae5bb5e35152c9bee3ff3896bd5718b8bcf4940f6997259614"
+          },
+          "large": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc7fce68679f0fc4336177/large_donkey.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110300Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECMaCWV1LXdlc3QtMSJIMEYCIQCjA9GZGbYMJyRfHVMl3G741T7WVts7NV%2Fsjl4TxeBYsQIhAMpTF79NbPq8tktuGOxYSm%2FiVVLObbuNynD518kBapVPKoMECOv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgwZxlN9Q91oKiRZjkwq1wPaf3wKRTSA3QpUFyWriW3xLox%2FD9MNZZ1e1XpgUAQcodxDNUoVJo5ug9ycHsacP8Tn4EtaTj395bQNL4peKn5edC1L2Q3%2FP2yyvlB5IqMqfZ4vZTrmsjKDRH2%2BLjkzXkSwRbsDVWNEbqNndF24IEhHbmGN6GoSLTLZnxJB9wpPOFm44%2BFPVIALbnObEalWq9NaKix543VfHQYKtib1tXNTR6bH7BXEEjFSHxqhgaw6%2FNXMBRtD%2BTGQOlGLpz6bQqAk1IEz0%2B3bGETLduZng0etXUg0ahTANgp1vBetX236N6qJB3oqXXDikXg%2BI4KuYzKkhUxfF7%2Bwf3Nt%2F9OLttqNuvktUFEam4fTcT0k1WCWt7sJdEqMllLaSp%2Bjds7QrnhmNDkGzHw%2FkcT2j7HuVVMgm%2B3iI5xAdCM9%2FQZ4oT2zI8WpkeyWpYdQLYpsms%2FJHsQ9mqawKe%2B%2F6c0oyBfnkvNyjHw8BhWz9NY0F92kw9I2KR8%2BPvt6NlA8EbVAsO17D5MFemZL9IN8wVuAi7Qys%2F1X6awSPPLCl2Fa1WEO%2FGkoLn1H7xXX9lZGc8FrKeDo3IyEIxTDj2JNgYOqHSlkzF6HeeV6z9P7rENf3LQB9pgSXsk1OrHi89AwvpLMhgY6pAE1IF8CJUCVU5hXHfWJqM8Hi80PEdDy8ocL2Kq5nRAh0Ue3ytDSUuI6XWvbyXMOfLeODLOZdyw1PrG2d8FyoN%2FBOohnbfq3CaH41YFAcLRVvYYruJKKUaD4O4o6XvpgqZYyoMjMefBEZrWUU%2Bm%2BA11pdf4%2BpKk3DJQaiOTrESZF6zD16FPp13B%2FxWuW7ACtZhCuq8EiWtK7X5lQEa4bLexpOStDAA%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KNYGWAXH2%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=0e722b55f24eec4f53f9679b01da167b9c528622e0acfacc55535356e2a0f348"
+          },
+          "small_thumb": {
+            "url": "https://cvpartner-images.s3.eu-west-1.amazonaws.com/uploads/production/bruker/image/60cc7fce68679f0fc4336177/small_thumb_donkey.jpeg?X-Amz-Expires=1200&X-Amz-Date=20210623T110300Z&X-Amz-Security-Token=IQoJb3JpZ2luX2VjECMaCWV1LXdlc3QtMSJIMEYCIQCjA9GZGbYMJyRfHVMl3G741T7WVts7NV%2Fsjl4TxeBYsQIhAMpTF79NbPq8tktuGOxYSm%2FiVVLObbuNynD518kBapVPKoMECOv%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FwEQABoMNTcxNTgwMDEwMTMyIgwZxlN9Q91oKiRZjkwq1wPaf3wKRTSA3QpUFyWriW3xLox%2FD9MNZZ1e1XpgUAQcodxDNUoVJo5ug9ycHsacP8Tn4EtaTj395bQNL4peKn5edC1L2Q3%2FP2yyvlB5IqMqfZ4vZTrmsjKDRH2%2BLjkzXkSwRbsDVWNEbqNndF24IEhHbmGN6GoSLTLZnxJB9wpPOFm44%2BFPVIALbnObEalWq9NaKix543VfHQYKtib1tXNTR6bH7BXEEjFSHxqhgaw6%2FNXMBRtD%2BTGQOlGLpz6bQqAk1IEz0%2B3bGETLduZng0etXUg0ahTANgp1vBetX236N6qJB3oqXXDikXg%2BI4KuYzKkhUxfF7%2Bwf3Nt%2F9OLttqNuvktUFEam4fTcT0k1WCWt7sJdEqMllLaSp%2Bjds7QrnhmNDkGzHw%2FkcT2j7HuVVMgm%2B3iI5xAdCM9%2FQZ4oT2zI8WpkeyWpYdQLYpsms%2FJHsQ9mqawKe%2B%2F6c0oyBfnkvNyjHw8BhWz9NY0F92kw9I2KR8%2BPvt6NlA8EbVAsO17D5MFemZL9IN8wVuAi7Qys%2F1X6awSPPLCl2Fa1WEO%2FGkoLn1H7xXX9lZGc8FrKeDo3IyEIxTDj2JNgYOqHSlkzF6HeeV6z9P7rENf3LQB9pgSXsk1OrHi89AwvpLMhgY6pAE1IF8CJUCVU5hXHfWJqM8Hi80PEdDy8ocL2Kq5nRAh0Ue3ytDSUuI6XWvbyXMOfLeODLOZdyw1PrG2d8FyoN%2FBOohnbfq3CaH41YFAcLRVvYYruJKKUaD4O4o6XvpgqZYyoMjMefBEZrWUU%2Bm%2BA11pdf4%2BpKk3DJQaiOTrESZF6zD16FPp13B%2FxWuW7ACtZhCuq8EiWtK7X5lQEa4bLexpOStDAA%3D%3D&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=ASIAYKFGSZ2KNYGWAXH2%2F20210623%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=dea8022956fa0593b78486dba0c94049d9d430e85de373bbfbcf11546713831c"
+          }
+        },
+        "can_write": true
+      }
+    }
+  ]
 }
