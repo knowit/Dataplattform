@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "serverless-pseudo-parameters": "^2.5.0",
-    "serverless-python-requirements": "knowit/serverless-python-requirements"
+    "serverless-python-requirements": "knowit/serverless-python-requirements",
+    "serverless-plugin-conditional-functions": "^1.0.5"
   }
 }

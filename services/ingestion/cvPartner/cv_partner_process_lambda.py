@@ -130,17 +130,25 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         tmp_col = df[col_name].copy()
         tmp_col = tmp_col.apply(lambda x: {} if pd.isna(x) else x)
         tmp = pd.json_normalize(tmp_col.copy())
+
+        if tag not in tmp.columns:
+            return pd.Series(name=col_name)
+
         col1 = tmp[tag].to_numpy()
         col1_series = pd.Series(col1, name=col_name)
-        col1_series.replace(np.nan, '', regex=True, inplace=True)
         return col1_series
 
     def create_df(df, sub_cat, cols, normalizable_cols):
+        if f'cv.{sub_cat}' not in df.columns:
+            return pd.DataFrame(columns=cols)
+
         cat_dict = df['cv.' + sub_cat].copy()
         user_ids = df['user_id'].copy()
         tmp_df = create_from_topic('user_id', user_ids, cat_dict)[cols].copy()
+
         for col in normalizable_cols:
             tmp_df[col] = normalize_coloums(tmp_df, col, 'no')
+            tmp_df[col].replace(np.nan, '', regex=True, inplace=True)
 
         return tmp_df
 
@@ -185,39 +193,39 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         education_df_coloums = ['user_id', 'degree', 'description', 'month_from',
                                 'month_to', 'school', 'year_from', 'year_to']
         edu_normalizable_cols = ['degree', 'description', 'school']
-        tmp = create_df(df, 'educations', education_df_coloums, edu_normalizable_cols)
-        tmp['month_to'] = column_type_to_int(tmp['month_to'])
-        tmp['year_to'] = column_type_to_int(tmp['year_to'])
-        tmp['month_from'] = column_type_to_int(tmp['month_from'])
-        tmp['year_from'] = column_type_to_int(tmp['year_from'])
+        education_df = create_df(df, 'educations', education_df_coloums, edu_normalizable_cols)
+        education_df['month_to'] = column_type_to_int(education_df['month_to'])
+        education_df['year_to'] = column_type_to_int(education_df['year_to'])
+        education_df['month_from'] = column_type_to_int(education_df['month_from'])
+        education_df['year_from'] = column_type_to_int(education_df['year_from'])
 
-        return tmp
+        return education_df
 
     def create_blogs_df(df):
         blogs_df_columns = ['user_id', 'long_description', 'month', 'name', 'url', 'year']
         normalizable_cols = ['long_description', 'name']
-        tmp = create_df(df, 'blogs', blogs_df_columns, normalizable_cols)
-        tmp['month'] = column_type_to_int(tmp['month'])
-        tmp['year'] = column_type_to_int(tmp['year'])
-        return tmp
+        blogs_df = create_df(df, 'blogs', blogs_df_columns, normalizable_cols)
+        blogs_df['month'] = column_type_to_int(blogs_df['month'])
+        blogs_df['year'] = column_type_to_int(blogs_df['year'])
+        return blogs_df
 
     def create_courses_df(df):
         courses_df_columns = ['user_id', 'long_description', 'name', 'program', 'year']
         normalizable_cols = ['long_description', 'name', 'program']
-        tmp = create_df(df, 'courses', courses_df_columns, normalizable_cols)
-        return tmp
+        courses_df = create_df(df, 'courses', courses_df_columns, normalizable_cols)
+        return courses_df
 
     def create_key_qualification_df(df):
         df_columns = ['user_id', 'long_description', 'label', 'tag_line']
         normalizable_cols = ['long_description', 'label', 'tag_line']
-        tmp = create_df(df, 'key_qualifications', df_columns, normalizable_cols)
-        return tmp
+        key_qualification_df = create_df(df, 'key_qualifications', df_columns, normalizable_cols)
+        return key_qualification_df
 
     def create_languages_df(df):
         df_columns = ['user_id', 'name', 'level']
         normalizable_cols = ['name', 'level']
-        tmp = create_df(df, 'languages', df_columns, normalizable_cols)
-        return tmp
+        languages_df = create_df(df, 'languages', df_columns, normalizable_cols)
+        return languages_df
 
     def create_project_experiences_df(df):
         df_columns = ['user_id', 'customer', 'description', 'long_description', 'industry',
@@ -225,34 +233,43 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                       'year_to', 'month_from', 'month_to']
         normalizable_cols = ['customer', 'long_description', 'description', 'industry']
 
-        tmp = create_df(df, 'project_experiences', df_columns, normalizable_cols)
-        tmp['month_to'] = column_type_to_int(tmp['month_to'])
-        tmp['year_to'] = column_type_to_int(tmp['year_to'])
-        tmp['month_from'] = column_type_to_int(tmp['month_from'])
-        tmp['year_from'] = column_type_to_int(tmp['year_from'])
-        tmp['percent_allocated'] = column_type_to_int(tmp['percent_allocated'])
-        tmp = make_custom_lists(tmp, tmp['project_experience_skills'], 'project_experience_skills', 'tags', 'no')
-        tmp = make_custom_lists(tmp, tmp['roles'], 'roles', 'name', 'no')
-        return tmp
+        project_experiences_df = create_df(df, 'project_experiences', df_columns, normalizable_cols)
+        project_experiences_df['month_to'] = column_type_to_int(project_experiences_df['month_to'])
+        project_experiences_df['year_to'] = column_type_to_int(project_experiences_df['year_to'])
+        project_experiences_df['month_from'] = column_type_to_int(project_experiences_df['month_from'])
+        project_experiences_df['year_from'] = column_type_to_int(project_experiences_df['year_from'])
+        project_experiences_df['percent_allocated'] = column_type_to_int(project_experiences_df['percent_allocated'])
+
+        project_experiences_df = make_custom_lists(
+            project_experiences_df,
+            project_experiences_df['project_experience_skills'], 'project_experience_skills', 'tags', 'no')
+
+        project_experiences_df = make_custom_lists(
+            project_experiences_df,
+            project_experiences_df['roles'], 'roles', 'name', 'no')
+
+        return project_experiences_df
 
     def create_technologies_df(df):
         df_columns = ['user_id', 'category', 'technology_skills']
         normalizable_cols = ['category']
-        tmp = create_df(df, 'technologies', df_columns, normalizable_cols)
-        tmp = make_custom_lists(tmp, tmp['technology_skills'], 'technology_skills', 'tags', 'no')
-        return tmp
+        technologies_df = create_df(df, 'technologies', df_columns, normalizable_cols)
+        technologies_df = make_custom_lists(technologies_df,
+                                            technologies_df['technology_skills'],
+                                            'technology_skills', 'tags', 'no')
+        return technologies_df
 
     def create_work_experiences_df(df):
         df_columns = ['user_id', 'description', 'employer', 'month_from', 'month_to', 'year_from',
                       'year_to', 'long_description']
         work_normalizable_cols = ['description', 'employer', 'long_description']
-        tmp = create_df(df, 'work_experiences', df_columns, work_normalizable_cols)
-        tmp['month_to'] = column_type_to_int(tmp['month_to'])
-        tmp['month_from'] = column_type_to_int(tmp['month_from'])
-        tmp['year_to'] = column_type_to_int(tmp['year_to'])
-        tmp['year_from'] = column_type_to_int(tmp['year_from'])
+        work_experiences_df = create_df(df, 'work_experiences', df_columns, work_normalizable_cols)
+        work_experiences_df['month_to'] = column_type_to_int(work_experiences_df['month_to'])
+        work_experiences_df['month_from'] = column_type_to_int(work_experiences_df['month_from'])
+        work_experiences_df['year_to'] = column_type_to_int(work_experiences_df['year_to'])
+        work_experiences_df['year_from'] = column_type_to_int(work_experiences_df['year_from'])
 
-        return tmp
+        return work_experiences_df
 
     return {
         'cv_partner_employees': employee_df,
