@@ -21,6 +21,9 @@ provider:
   timeout: 25
   deploymentBucket:
     name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+  environment:
+    CLIENTID: !ImportValue ${self:custom.stage}-cognito-userPoolClientId
+    APIURL: ${ssm:/${self:custom.stage}/cloudfront-api-dist/distributionAlias
 
 resources:
   Resources:
