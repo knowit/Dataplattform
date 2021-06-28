@@ -280,8 +280,6 @@ resources:
         ContentBasedDeduplication: true
 
 
-  Outputs:
-
 plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
