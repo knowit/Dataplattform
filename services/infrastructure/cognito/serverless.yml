@@ -43,7 +43,7 @@ resources:
           UnusedAccountValidityDays: 7
         AutoVerifiedAttributes:
           - email
-        UsernameAttributes: 
+        UsernameAttributes:
           - email
         UsernameConfiguration:
           CaseSensitive: true
@@ -63,10 +63,10 @@ resources:
         ExplicitAuthFlows:
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
-        PreventUserExistenceErrors: ENABLED 
+        PreventUserExistenceErrors: ENABLED
 
-    UserPoolDomain: 
-      Type: AWS::Cognito::UserPoolDomain 
+    UserPoolDomain:
+      Type: AWS::Cognito::UserPoolDomain
       Properties:
         UserPoolId: !Ref CognitoUserPool
         Domain: ${self:custom.stage}-dataplattform-userpooldomain
