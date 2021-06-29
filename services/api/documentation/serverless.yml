@@ -11,6 +11,8 @@ custom:
     - ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
     - doc.${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
+  cognitoClientId: ${ssm:/${self:custom.stage}/cognito/UserPoolClientId}
+  apiUrl: ${ssm:/${self:custom.stage}/cloudfront-api-dist/distributionAlias}
 
 provider:
   name: aws

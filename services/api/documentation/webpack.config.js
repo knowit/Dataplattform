@@ -3,8 +3,15 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { DefinePlugin } = require('webpack')
+const fs = require("fs")
 
 const outputPath = path.resolve(__dirname, 'dist');
+
+
+const serverlessState = JSON.parse(fs.readFileSync(".serverless/serverless-state.json", "utf-8"))
+
+const { cognitoClientId, apiUrl } = serverlessState.service.custom
+
 
 module.exports = {
   mode: 'development',
@@ -45,9 +52,8 @@ module.exports = {
       template: 'index.html'
     }),
     new DefinePlugin({
-      API_URL: JSON.stringify('api.new-dev.dataplattform.knowit.no'), //TODO: Ref
-      DEMO_CLIENT_ID: JSON.stringify('5dk4t7d9ad5l3hcmo2fq14is81') // TODO: Ref
-      //DEMO_CLIENT_ID: JSON.stringify('27g4krd7m209soqhk050hoa0bn')
+      API_URL: JSON.stringify(apiUrl),
+      DEMO_CLIENT_ID: JSON.stringify(cognitoClientId)
     })
   ],
   output: {

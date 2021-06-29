@@ -165,4 +165,7 @@ resources:
       Value: !Ref CognitoUserPool
       Export:
         Name: ${self:custom.stage}-cognito-userPoolId
-    
+    CognitoUserPoolClientId:
+      Value: !Ref CognitoUserPoolClient
+      Export:
+        Name: ${self:custom.stage}-cognito-userPoolClientId
