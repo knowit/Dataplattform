@@ -1,15 +1,36 @@
 service: cognito
 
+plugins:
+  - serverless-pseudo-parameters
+
 custom:
   stage: ${opt:stage, self:provider.stage}
-  policies: ${file(./policies.js)}    
+  policies: ${file(./policies.js)}
+  ssmParamName: /${self:custom.stage}/${self:service}/CognitoUserPoolClientId
+  editable:
+    configureDescription: "Perform necessary post-deployment configurations for cognito to function properly."
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
+  runtime: python3.7
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+
+functions:
+  configure:
+    name: ${self:custom.stage}-${self:service}-configure
+    description: ${self:custom.editable.configureDescription}
+    handler: handler.configure
+    role: !GetAtt ConfigureLambdaRole.Arn
+    package:
+      include:
+        - "*.py"
+    environment:
+      SSM_PARAM_NAME_CLIENT_ID: ${self:custom.ssmParamName}
+      CLIENT_ID: !Ref CognitoUserPoolClient
+
 
 resources:
   Resources:
@@ -151,6 +172,36 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies: ${self:custom.policies.level3}
+
+    ConfigureLambdaAccess:
+      Type: AWS::IAM::ManagedPolicy
+      Properties:
+        Description: "Allows the configure lambda to put ssm parameters."
+        ManagedPolicyName: ${self:custom.stage}-cognito-configure-policy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:PutParameter
+              Resource: arn:aws:ssm:eu-central-1:#{AWS::AccountId}:parameter${self:custom.ssmParamName}
+
+    ConfigureLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-configure-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - !Ref ConfigureLambdaAccess
 
   Outputs:
     CognitoUserPoolOutput:
