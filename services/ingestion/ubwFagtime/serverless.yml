@@ -173,9 +173,9 @@ resources:
                   - lambda.amazonaws.com
               Action: sts:AssumeRole
         ManagedPolicyArns:
-         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-         - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-         - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
@@ -361,3 +361,4 @@ plugins:
   - serverless-pseudo-parameters
   - serverless-disable-functions
   - serverless-plugin-conditional-functions
+
