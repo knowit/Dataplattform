@@ -381,3 +381,4 @@ plugins:
   - serverless-pseudo-parameters
   - serverless-plugin-conditional-functions
   - serverless-disable-functions
+  -
