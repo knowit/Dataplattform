@@ -72,4 +72,3 @@ jobs:
         run: |
           dataplattform register-table slack
           dataplattform database -a 2 update-tables
-
