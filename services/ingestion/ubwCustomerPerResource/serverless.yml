@@ -10,8 +10,8 @@ custom:
     scheduleRate: rate(7 days)
     accessLevel: level-3
     dataFolder: ubw/customer_per_resource
-    mockIngestHandlerFile: ubw_costumer_per_resource_mock_ingest_lambda
-    mockDescription: Mock data for costumer_per_resource_mock_ingest table
+    mockIngestHandlerFile: ubw_customer_per_resource_mock_ingest_lambda
+    mockDescription: Mock data for ubw_customer_per_resource table
     mockRate: rate(7 days)
   mockEnabled:
     prod: false
@@ -92,7 +92,7 @@ functions:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
   ingest: # A Function
-    enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
+    enabled: ${self:custom.ingestEnabled.${self:custom.stage}}
     handler: ${self:custom.editable.ingestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
@@ -380,4 +380,6 @@ plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
   - serverless-plugin-conditional-functions
+  - serverless-disable-functions
+
 
