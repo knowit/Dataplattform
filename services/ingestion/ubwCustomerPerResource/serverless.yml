@@ -92,7 +92,7 @@ functions:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
   ingest: # A Function
-    enabled: ${self:custom.ingestEnabled.${self:custom.stage}}
+    enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
     handler: ${self:custom.editable.ingestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
