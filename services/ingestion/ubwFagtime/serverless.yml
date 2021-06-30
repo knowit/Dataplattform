@@ -359,4 +359,5 @@ resources:
 plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
+  - serverless-disable-functions
   - serverless-plugin-conditional-functions
