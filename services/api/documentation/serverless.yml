@@ -36,6 +36,14 @@ resources:
           IndexDocument: index.html
           ErrorDocument: index.html
 
+    docDNSRecord:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        AliasTarget: Outputs.DistributionOutput
+        HostedZoneId: Z0615768642V5NGW5233
+        Name: doc.new-dev.dataplattform.knowit.no
+        Type: A
+
     StaticS3BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
