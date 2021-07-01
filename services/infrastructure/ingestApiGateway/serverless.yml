@@ -33,6 +33,20 @@ resources:
       Properties:
         Name: ${self:custom.stage}-ingestApiGateway
         Description: main input api gateway
+    ingestDNSRecord:
+      Type: AWS::Route53::RecordSetGroup
+      Properties:
+        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        RecordSets:
+          - Name: ingest.${ssm:/${self:custom.stage}/routes/domain_name}
+            Type: A
+            AliasTarget:
+              DNSName:
+                Fn::Join:
+                  - "."
+                  - - Ref: ingestApiGateway
+                    - "execute-api.eu-central-1.amazonaws.com."
+              HostedZoneId: Z1U9ULNL0V5AJ3
 
   Outputs:
     apiGatewayRestApiId:

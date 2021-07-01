@@ -50,32 +50,16 @@ pythonRequirements:
 
 provider:
   name: aws
-  region: us-east-1
+  region: eu-central-1
   stackName: ${self:custom.service}
   runtime: python3.7
 
 resources:
   Resources:
-    EdgeLambdaRole:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: ${self:custom.stage}-${self:service}-edgelambda-role
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - edgelambda.amazonaws.com
-                  - lambda.amazonaws.com
-              Action:
-                - sts:AssumeRole
-        ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
     storageDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        HostedZoneId: ${ssm:/${self:custom.stage}/routes/hostedzoneid}
+        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
         RecordSets:
           - Name: storage.${ssm:/${self:custom.stage}/routes/domain_name}
             Type: A
