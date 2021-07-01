@@ -69,7 +69,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table ubw-fagtime
+          dataplattform register-table ubw_fagtime
           dataplattform database -a 2 update-tables
 
       - name: Registrer and update glue tables dev
@@ -79,5 +79,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table ubw-fagtime
+          dataplattform register-table ubw_fagtime
           dataplattform database -a 2 update-tables

@@ -68,8 +68,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table google-event
-          dataplattform database -a 2 update-tables
+          dataplattform register-table google_event
+          dataplattform database -a 2 updatetables
 
       - name: Registrer and update glue tables dev
         if: github.base_ref != "master" && github.base_ref != "refs/heads/master"
@@ -78,5 +78,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table google-event
+          dataplattform register-table google_event
           dataplattform database -a 2 update-tables
