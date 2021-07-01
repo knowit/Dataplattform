@@ -32,8 +32,7 @@ def add_parameter_recursively(config: dict, path: str = ""):
                         Tier='Standard'
                     )
                     print(
-                        "Parameter set successfully: " + full_name + "\nValue: " + value[
-                            "Value"] + "\nType: " + param_type)
+                        "Parameter set successfully: " + full_name)
                 except Exception as e:
                     print("Failed to set SSM-parameter. Stack trace:\n" + str(e))
 
