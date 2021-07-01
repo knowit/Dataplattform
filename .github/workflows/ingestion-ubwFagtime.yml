@@ -6,6 +6,10 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'services/ingestion/ubwFagtime/**'
+      - 'packages/common/**'
+      - 'packages/query/**'
   pull_request:
     branches:
       - master

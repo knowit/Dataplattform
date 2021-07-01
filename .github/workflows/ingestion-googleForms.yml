@@ -5,6 +5,9 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'services/ingestion/googleForms/**'
+      - 'packages/common/**'
   pull_request:
     branches:
       - master
