@@ -6,6 +6,9 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'services/utils/downloadToBucket/**'
+      - 'packages/common/**'
   pull_request:
     branches:
       - master

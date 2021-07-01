@@ -6,6 +6,9 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'services/api/dataApi/**'
+      - 'packages/api/**'
   pull_request:
     branches:
       - master

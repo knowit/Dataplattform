@@ -6,6 +6,8 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'packages/query/**'
   pull_request:
     branches:
       - master
