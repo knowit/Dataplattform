@@ -5,24 +5,40 @@ import yaml
 client = boto3.client('ssm')
 
 
+def dict_is_parameter(config: dict) -> bool:
+    return "Value" in config
+
+
+def get_parameter_type(config: dict) -> str:
+    if "Type" in config:
+        return config["Type"]
+    else:
+        return "String"
+
+
 def add_parameter_recursively(config: dict, path: str = ""):
     for key in config:
         value = config.get(key)
         if type(value) is dict:
-            add_parameter_recursively(value, path + "/" + key)
-        else:
-            name = path + "/" + key
-            try:
-                client.put_parameter(
-                    Name=name,
-                    Value=value,
-                    Type="String",
-                    Overwrite=True,
-                    Tier='Standard'
-                )
-                print("Parameter set successfully: " + name)
-            except Exception as e:
-                print("Failed to set SSM-parameter. Stack trace:\n" + str(e))
+            full_name = path + "/" + key
+            if dict_is_parameter(value):
+                param_type = get_parameter_type(value)
+                try:
+                    client.put_parameter(
+                        Name=full_name,
+                        Value=value["Value"],
+                        Type=param_type,
+                        Overwrite=True,
+                        Tier='Standard'
+                    )
+                    print(
+                        "Parameter set successfully: " + full_name + "\nValue: " + value[
+                            "Value"] + "\nType: " + param_type)
+                except Exception as e:
+                    print("Failed to set SSM-parameter. Stack trace:\n" + str(e))
+
+            else:
+                add_parameter_recursively(value, path=full_name)
 
 
 def init(parser: ArgumentParser):
