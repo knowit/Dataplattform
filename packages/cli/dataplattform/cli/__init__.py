@@ -11,7 +11,8 @@ def main():
         'generate-encrypted-password',
         'setup-datasource',
         'register-table',
-        'database'
+        'database',
+        'set-ssm-parameters'
     ]
 
     parser = ArgumentParser('dataplattform')
