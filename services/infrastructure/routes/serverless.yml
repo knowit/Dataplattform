@@ -1,6 +1,41 @@
 service: routes
 
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
 provider:
   name: aws
   stage: dev
   region: eu-central-1
+
+resources:
+  Resources:
+    BasicZone:
+      Type: AWS::Route53::HostedZone
+      Properties:
+        HostedZoneConfig:
+          HostedZoneConfig
+        HostedZoneTags:
+          - HostedZoneTag
+        Name: testdev.dataplattform.knowit.no
+        QueryLoggingConfig:
+          QueryLoggingConfig
+        VPCs:
+          - VPC
+    BasicRecords:
+      Type: 'AWS::Route53::RecordSetGroup'
+      Properties:
+        HostedZoneId: !Ref myHostedZoneID
+        RecordSets:
+          - Name: testdev.dataplattform.knowit.no
+            Type: A
+            AliasTarget:
+              HostedZoneId: Z2FDTNDATAQYW2
+              DNSName: doc.testdev.dataplattform.knowit.no
+          - Name: testdev.dataplattform.knowit.no
+            Type: A
+            AliasTarget:
+              HostedZoneId: Z2FDTNDATAQYW2
+              DNSName: !GetAtt
+                - myCloudFrontDistribution
+                - DomainName
