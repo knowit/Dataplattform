@@ -34,7 +34,7 @@ def add_parameter_recursively(config: dict, path: str = ""):
                     print(
                         "Parameter set successfully: " + full_name)
                 except Exception as e:
-                    print("Failed to set SSM-parameter. Stack trace:\n" + str(e))
+                    print("Failed to set SSM-parameter: " + full_name + ".\nStack trace:\n" + str(e))
 
             else:
                 add_parameter_recursively(value, path=full_name)
@@ -56,4 +56,4 @@ def run(args: Namespace, _):
         print("Error: No configuration was found for in " + path + " for stage: " + args.stage)
 
     except Exception as e:
-        print("Failed to parse config yaml file: " + path + ". Stack trace:\n" + str(e))
+        print("Failed to parse config yaml file: " + path + ".\nStack trace:\n" + str(e))
