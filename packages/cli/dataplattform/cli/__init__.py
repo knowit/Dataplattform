@@ -12,7 +12,7 @@ def main():
         'setup-datasource',
         'register-table',
         'database',
-        'set-ssm-parameters'
+        'configure'
     ]
 
     parser = ArgumentParser('dataplattform')
