@@ -62,8 +62,39 @@ def db_person_data():
 
         {'guid': '5d79f8b771cd4921b667f9227aece292213806d6', 'email': 'einar.halvorsen@knowit.no',
          'displayName': 'Einar Halvorsen', 'alias': 'einhal', 'company': 'Knowit Experience',
-         'knowitBranch': 'Experience', 'distinguished_name': 'Einar Halvorsen', 'manager': 'Marie Lie'}
+         'knowitBranch': 'Experience', 'distinguished_name': 'Einar Halvorsen', 'manager': 'Marie Lie'},
 
+        {'guid': '0384e3914a44e044687fcdca9d6b18ebd9220780', 'email': 'ola.berge@knowit.no',
+         'displayName': 'Ola Berge', 'alias': 'olaber', 'company': 'Knowit Objectnet',
+         'knowitBranch': 'Objectnet', 'distinguished_name': 'Ola Berge', 'manager': 'Roar Arnesen'},
+
+        {'guid': '792af2fabf0e6da9dc93ab4d647b2777ccb96ab8', 'email': 'daniel.bakke@knowit.no',
+         'displayName': 'Daniel Bakke', 'alias': 'danbak', 'company': 'Knowit Experience',
+         'knowitBranch': 'Experience', 'distinguished_name': 'Daniel Bakke', 'manager': 'Gunn Sandvik'},
+
+        {'guid': '827a6b08afedcc15bc218b34f674b45e47bbf581', 'email': 'helge.engen@knowit.no',
+         'displayName': 'Helge Engen', 'alias': 'heleng', 'company': 'Knowit Experience',
+         'knowitBranch': 'Experience', 'distinguished_name': 'Helge Engen', 'manager': 'Christian Abrahamsen'},
+
+        {'guid': '9880cb96df3cfa08887e497e9530755da4782e25', 'email': 'knut.ahmed@knowit.no',
+         'displayName': 'Knut Ahmed', 'alias': 'knuahm', 'company': 'Knowit Objectnet',
+         'knowitBranch': 'Objectnet', 'distinguished_name': 'Knut Ahmed', 'manager': 'Vegard Rasmussen'},
+
+        {'guid': 'c5832e024008c2fac7a1e61dc56f192d980f660b', 'email': 'sander.ahmed@knowit.no',
+         'displayName': 'Sander Ahmed', 'alias': 'sanahm', 'company': 'Knowit Objectnet',
+         'knowitBranch': 'Objectnet', 'distinguished_name': 'Sander Ahmed', 'manager': 'Mette Antonsen'},
+
+        {'guid': 'c7fd4b22dfce07f039d786be96b6caee5e0a8cf6', 'email': 'tor.amundsen@knowit.no',
+         'displayName': 'Tor Amundsen', 'alias': 'toramu', 'company': 'Knowit Experience',
+         'knowitBranch': 'Experience', 'distinguished_name': 'Tor Amundsen', 'manager': 'Camilla Lund'},
+
+        {'guid': 'e0d071fbba5e8d5a6b7cca357006d2363f96a19a', 'email': 'cathrine.madsen@knowit.no',
+         'displayName': 'Cathrine Madsen', 'alias': 'catmad', 'company': 'Knowit Experience',
+         'knowitBranch': 'Experience', 'distinguished_name': 'Cathrine Madsen', 'manager': 'Tor Gundersen'},
+
+        {'guid': 'faeb1af849a926d21bda012e4b3a971e1107fd0e', 'email': 'cathrine.kristiansen@knowit.no',
+         'displayName': 'Cathrine Kristiansen', 'alias': 'catkri', 'company': 'Knowit Objectnet',
+         'knowitBranch': 'Objectnet', 'distinguished_name': 'Cathrine Kristiansen', 'manager': 'Finn-Pål Myhre'}
     ]
 
 
