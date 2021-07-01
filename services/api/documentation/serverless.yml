@@ -39,9 +39,11 @@ resources:
     docDNSRecord:
       Type: AWS::Route53::RecordSet
       Properties:
-        AliasTarget: Outputs.DistributionOutput
+        AliasTarget:
+          DNSName: dkzgep9wv87yb.cloudfront.net
+          HostedZoneId: Z2FDTNDATAQYW2
         HostedZoneId: Z0615768642V5NGW5233
-        Name: doc.new-dev.dataplattform.knowit.no
+        Name: testdoc.new-dev.dataplattform.knowit.no
         Type: A
 
     StaticS3BucketPolicy:
@@ -98,3 +100,8 @@ resources:
     DistributionOutput:
       Value:
         "Fn::GetAtt": [Distribution, DomainName]
+    DistributionOutputUrl:
+      Value:
+        "Fn::GetAtt": [Distribution, DomainName]
+      Export:
+        Name: ${self:custom.stage}-api-documentation-url

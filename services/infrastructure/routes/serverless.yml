@@ -1,0 +1,6 @@
+service: routes
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
