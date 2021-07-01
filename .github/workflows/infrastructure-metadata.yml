@@ -1,0 +1,33 @@
+name: Dataplattform - infrastructure - metadata
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'services/infrastructure/metadata/**'
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'services/infrastructure/metadata/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --config=./.config/.flake8 ./services/infrastructure/metadata
+      - name: Lint with yamllint
+        run: |
+          pip install yamllint
+          yamllint -c ./.config/.yamllint ./services/infrastructure/metadata
