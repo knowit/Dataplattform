@@ -1,20 +1,17 @@
-# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: downloadToBucket
 
 custom:
-  #Edit these variables###########################
   editable:
     timeout: 900
     handlerFile: download_to_bucket
     description: Downloads documents to a either a private or a public raw storage bucket
-  ################################################
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3 # Default in lambda rt
+      - boto3
       - botocore
-      - pandas # Layer
+      - pandas
       - pytz
       - numpy
       - numpy.libs
@@ -28,35 +25,35 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: |-
+      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
+      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
-  memorySize: 1024 # MB
-  timeout: ${self:custom.editable.timeout} # seconds
-  
+  memorySize: 1024
+  timeout: ${self:custom.editable.timeout}
 package:
   individually: true
   exclude:
-    - "./**" # Exclude everything and include what you need in the functions below
+    - "./**"
 
 functions:
   downloadToBucket:
-    handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    handler: ${self:custom.editable.handlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service} # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - '*.py'
+    environment:
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
       PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
-    tags: # Tag for this function. Every function are tagged with stage by default
-  
-resources: # The resources your functions use
+
+resources:
   Resources:
     S3Access:
       Type: AWS::IAM::Role
@@ -86,9 +83,9 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-privateBucketArn
-                        - /*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-privateBucketArn
+                          - /*
           - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -102,10 +99,9 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-publicBucketArn
-                        - /*
-      
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - /*
   Outputs:
     DownloadToBucketLambdaFunctionArn:
       Export:
