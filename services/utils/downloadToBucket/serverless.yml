@@ -1,5 +1,13 @@
 service: downloadToBucket
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/storage
+
 custom:
   editable:
     timeout: 900

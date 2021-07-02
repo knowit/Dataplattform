@@ -1,5 +1,9 @@
 service: raw-storage-for-dataplattform
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+
 plugins:
   - serverless-pseudo-parameters
 

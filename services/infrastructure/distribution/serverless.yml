@@ -1,5 +1,11 @@
 service: cloudfront-api-dist
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../../api/dataApi
+    - ../../ingestion/cvPartner
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   allowedMethods:
