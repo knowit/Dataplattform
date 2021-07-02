@@ -13,29 +13,21 @@ resources:
     BasicZone:
       Type: AWS::Route53::HostedZone
       Properties:
-        HostedZoneConfig:
-          HostedZoneConfig
-        HostedZoneTags:
-          - HostedZoneTag
         Name: testdev.dataplattform.knowit.no
-        QueryLoggingConfig:
-          QueryLoggingConfig
-        VPCs:
-          - VPC
-    BasicRecords:
-      Type: 'AWS::Route53::RecordSetGroup'
-      Properties:
-        HostedZoneId: !Ref myHostedZoneID
-        RecordSets:
-          - Name: testdev.dataplattform.knowit.no
-            Type: A
-            AliasTarget:
-              HostedZoneId: Z2FDTNDATAQYW2
-              DNSName: doc.testdev.dataplattform.knowit.no
-          - Name: testdev.dataplattform.knowit.no
-            Type: A
-            AliasTarget:
-              HostedZoneId: Z2FDTNDATAQYW2
-              DNSName: !GetAtt
-                - myCloudFrontDistribution
-                - DomainName
+    #BasicRecords:
+      #Type: 'AWS::Route53::RecordSetGroup'
+      #Properties:
+        #HostedZoneId:
+          #Ref: BasicZone
+        #RecordSets:
+          #- Name: testdev.dataplattform.knowit.no
+            #Type: A
+            #AliasTarget:
+              #HostedZoneId: !Ref BasicZone
+              #DNSName: doc.testdev.dataplattform.knowit.no
+
+Outputs:
+  routesZoneId:
+    Value: !Ref BasicZone
+    Export:
+      Name: ${self:custom.stage}-routes-zoneid
