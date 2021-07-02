@@ -1,4 +1,4 @@
-name: Dataplattform - infrastructure - layers
+name: Dataplattform - infrastructure - layers - pandas
 
 on:
   push:
@@ -6,13 +6,13 @@ on:
       - master
       - develop
     paths:
-      - 'services/infrastructure/layers/**'
+      - 'services/infrastructure/layers/pandas/**'
   pull_request:
     branches:
       - master
       - develop
     paths:
-      - 'services/infrastructure/layers/**'
+      - 'services/infrastructure/layers/pandas/**'
 
 jobs:
   lint:
@@ -23,11 +23,7 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Lint with flake8
-        run: |
-          pip install flake8
-          flake8 --config=./.config/.flake8 ./services/infrastructure/layers
       - name: Lint with yamllint
         run: |
           pip install yamllint
-          yamllint -c ./.config/.yamllint ./services/infrastructure/layers
+          yamllint -c ./.config/.yamllint ./services/infrastructure/layers/pandas

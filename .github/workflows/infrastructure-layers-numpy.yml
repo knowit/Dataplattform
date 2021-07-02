@@ -1,4 +1,4 @@
-name: Dataplattform - infrastructure - glue
+name: Dataplattform - infrastructure - layers - numpy
 
 on:
   push:
@@ -6,13 +6,13 @@ on:
       - master
       - develop
     paths:
-      - 'services/infrastructure/glue/**'
+      - 'services/infrastructure/layers/numpy/**'
   pull_request:
     branches:
       - master
       - develop
     paths:
-      - 'services/infrastructure/glue/**'
+      - 'services/infrastructure/layers/numpy/**'
 
 jobs:
   lint:
@@ -26,4 +26,4 @@ jobs:
       - name: Lint with yamllint
         run: |
           pip install yamllint
-          yamllint -c ./.config/.yamllint ./services/infrastructure/glue
+          yamllint -c ./.config/.yamllint ./services/infrastructure/layers/numpy
