@@ -1,5 +1,11 @@
 service: api-documentation
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/distribution
+    - ../../infrastructure/cognito
+
 plugins:
   - serverless-pseudo-parameters
 

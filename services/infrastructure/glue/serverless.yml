@@ -1,5 +1,10 @@
 service: glue
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../datalake
+
 custom:
   stage: ${opt:stage, self:provider.stage}
 

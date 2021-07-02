@@ -1,5 +1,9 @@
 service: fastparquetDepLayer
 
+dataplattform:
+  dependencies:
+    - ../../deploymentBucket
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   project: dataplattform-${self:custom.stage}
