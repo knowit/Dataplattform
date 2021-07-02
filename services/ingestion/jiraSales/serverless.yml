@@ -1,7 +1,6 @@
 service: jiraSalesWebhook
 
 custom:
-  #Edit these variables###########################
   editable:
     timeout: 12
     webhookIngestHandlerFile: jira_webhook_ingest_lambda
@@ -12,19 +11,19 @@ custom:
     accessLevel: level-2
     dataFolder: jira/sales
     scheduleRate: cron(0 8 1 1 ? *) # cron(minute hour day-of-month month day-of-week year)
-  ################################################
+
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service} #this service definition includes stage
+  service: ${self:custom.stage}-${self:service}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3 # Default in lambda rt
+      - boto3
       - botocore
-      - pandas # Layer
+      - pandas
       - pytz
       - numpy
       - numpy.libs
@@ -38,12 +37,14 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: |-
+      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName,
+      file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
 
-  #imports api gateway resources exported by ingestApiGateway service
+  # imports api gateway resources exported by ingestApiGateway service
   apiGateway:
     restApiId:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
@@ -69,18 +70,18 @@ package:
     - "./**"
 
 functions:
-  pollerIngest: 
+  pollerIngest:
     handler: ${self:custom.editable.pollerIngestHandlerFile}.handler
     layers:
-        - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-        - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-poller-ingest 
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-poller-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-          - '*.py' # Files to include in deployment
-    environment: # Environment variables
+        - '*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -88,25 +89,24 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-    tags: # Tag for this function. Every function are tagged with stage by default
     events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
-  webhookIngest: 
+  webhookIngest:
     handler: ${self:custom.editable.webhookIngestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-webhook-ingest 
+    name: ${self:custom.stage}-${self:service}-webhook-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
-    environment: # Environment variables
+        - '*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -114,16 +114,15 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-    tags: # Tag for this function. Every function are tagged with stage by default
     events:
       - http:
           path: jira-sales-webhook/{secret}
           method: post
-          private: false #if true API key is needed
+          private: false # if true API key is needed
 
-  process: # A Function
+  process:
     handler: ${self:custom.editable.processHandlerFile}.handler
-    events: # The Events that trigger this Function
+    events:
       - sqs:
           arn:
             Fn::GetAtt:
@@ -135,13 +134,13 @@ functions:
       - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - '*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -149,9 +148,8 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
-    tags: # Tag for this function. Every function are tagged with stage by default
 
-resources: # The resources your functions use
+resources:
   Resources:
     IngestLambdaRole:
       Type: AWS::IAM::Role
@@ -182,18 +180,18 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                   - sqs:GetQueueUrl
-                   - sqs:SendMessageBatch
-                   - sqs:SendMessage
+                    - sqs:GetQueueUrl
+                    - sqs:SendMessageBatch
+                    - sqs:SendMessage
                   Resource: !GetAtt EventQueue.Arn
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
@@ -202,7 +200,9 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: |-
+                    !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:
+                    parameter/${self:custom.stage}/${self:service}/*'
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -233,9 +233,9 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -246,9 +246,9 @@ resources: # The resources your functions use
                     - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - '*'
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - '*'
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
@@ -267,18 +267,20 @@ resources: # The resources your functions use
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueName}
-        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
+        ContentBasedDeduplication: true # Assume all message bodies are unique, by design given as an uuid1
         VisibilityTimeout: ${self:custom.editable.timeout}
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
-          maxReceiveCount: 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
+          # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
+          maxReceiveCount: 1
 
-    EventQueueDL: #Messages that fail are put here
+
+    EventQueueDL: # Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
-        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
+        ContentBasedDeduplication: true # Assume all message bodies are unique, by design given as an uuid1
 
 plugins:
   - serverless-python-requirements
