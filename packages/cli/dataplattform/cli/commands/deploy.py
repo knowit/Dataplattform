@@ -75,20 +75,6 @@ def remove_path(path_list: list, path: str) -> bool:
     raise IndexError('Path list does not include element: ' + path + "\n" + str(path_list))
 
 
-def path_index_of(path_list: list, path: str) -> int:
-    for item in path_list:
-        if os.path.samefile(item, path):
-            return path_list.index(item)
-    raise IndexError('Path list does not include element: ' + path)
-
-
-def key_from_path(source: dict, path: str) -> str:
-    for key in source.keys():
-        if os.path.samefile(key, str):
-            return key
-    raise IndexError('Dict does not include key: ' + path)
-
-
 def topological_sort(source: dict) -> list:
     a = copy.deepcopy(source)
     keys_list = list(a)
@@ -127,6 +113,5 @@ def topological_sort(source: dict) -> list:
 def run(args: Namespace, _):
     search(args.target)
 
-    print("\n\n")
     for path in topological_sort(targets):
-        print("\n" + path + "\n" + str(targets[path]))
+        print(path)
