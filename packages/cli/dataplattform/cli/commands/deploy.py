@@ -8,7 +8,8 @@ ignore = [
     'node_modules',
     '.serverless',
     'tests',
-    'dist'
+    'dist',
+    'templates'
 ]
 
 
@@ -56,12 +57,22 @@ def search(target: str):
 
 
 def contains_path(path_list: list, path: str) -> bool:
-    result = False
     for item in path_list:
         if os.path.samefile(item, path):
-            result = True
-            break
-    return result
+            return True
+    return False
+
+
+def remove_path(path_list: list, path: str) -> bool:
+    i = 0
+    while i < len(path_list):
+        item = path_list[i]
+        if os.path.samefile(item, path):
+            path_list.remove(item)
+            return
+        else:
+            i += 1
+    raise IndexError('Path list does not include element: ' + path + "\n" + str(path_list))
 
 
 def path_index_of(path_list: list, path: str) -> int:
@@ -82,7 +93,7 @@ def topological_sort(source: dict) -> list:
     a = copy.deepcopy(source)
     keys_list = list(a)
 
-    for path in a.keys():
+    for path in keys_list:
         deps = a[path]
         rem = []
         for dep in deps:
@@ -102,9 +113,10 @@ def topological_sort(source: dict) -> list:
             result.append(key)
             keys_list.remove(key)
             a.pop(key)
-            for k in a.keys():
-                if key in a[k]:
-                    a[k].remove(key)
+
+            for k in keys_list:
+                if contains_path(a[k], key):
+                    remove_path(a[k], key)
             if len(keys_list) == 0:
                 return result
         else:
@@ -117,4 +129,4 @@ def run(args: Namespace, _):
 
     print("\n\n")
     for path in topological_sort(targets):
-        print(path)
+        print("\n" + path + "\n" + str(targets[path]))
