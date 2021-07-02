@@ -7,14 +7,12 @@ on:
       - develop
     paths:
       - 'services/api/documentation/**'
-      - 'packages/api/**'
   pull_request:
     branches:
       - master
       - develop
     paths:
       - 'services/api/documentation/**'
-      - 'packages/api/**'
 
 jobs:
   lint:
