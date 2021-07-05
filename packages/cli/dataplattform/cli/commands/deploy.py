@@ -115,14 +115,14 @@ def inverse_path(path: str) -> str:
 
 
 def run(args: Namespace, _):
+
+    # TODO: Configure SSM-parameters
+
     search(args.target)
     paths = topological_sort(targets)
-    i = 0
-    path = paths[i]
-    inv_path = inverse_path(path)
-    os.system('cd ' + path + ' && serverless deploy --aws-profile sandbox && cd ' + inv_path)
-#    while i < len(paths):
-#        path = paths[i]
-#        inv_path = inverse_path(path)
-#        os.system('echo ' + path)
-#        i += 1
+    for path in paths:
+        os.system('cd ' + path + ' && serverless deploy --aws-profile sandbox && cd ' + inverse_path(path))
+
+    # TODO: Register all Glue tables
+
+    # TODO: Update Glue tables
