@@ -110,8 +110,19 @@ def topological_sort(source: dict) -> list:
     raise Exception('Dataplattform dependency graph has a cycle:\n' + str(keys_list))
 
 
+def inverse_path(path: str) -> str:
+    return os.path.relpath(os.path.curdir, path)
+
+
 def run(args: Namespace, _):
     search(args.target)
-
-    for path in topological_sort(targets):
-        print(path)
+    paths = topological_sort(targets)
+    i = 0
+    path = paths[i]
+    inv_path = inverse_path(path)
+    os.system('cd ' + path + ' && serverless deploy --aws-profile sandbox && cd ' + inv_path)
+#    while i < len(paths):
+#        path = paths[i]
+#        inv_path = inverse_path(path)
+#        os.system('echo ' + path)
+#        i += 1
