@@ -1,0 +1,29 @@
+name: Dataplattform - infrastructure - storage
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'services/infrastructure/storage/**'
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'services/infrastructure/storage/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - name: Lint with yamllint
+        run: |
+          pip install yamllint
+          yamllint -c ./.config/.yamllint ./services/infrastructure/storage
