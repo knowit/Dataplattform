@@ -10,10 +10,12 @@ def dict_is_parameter(config: dict) -> bool:
 
 
 def get_parameter_type(config: dict) -> str:
-    if "Type" in config:
-        return config["Type"]
+    types = ["String", "StringList", "SecureString"]
+    type = config.get("Type", "String")
+    if type not in types:
+        raise ValueError('Invalid parameter type: ' + type + ". Must be one of the following: " + str(types))
     else:
-        return "String"
+        return type
 
 
 def add_parameter_recursively(config: dict, path: str = ""):
