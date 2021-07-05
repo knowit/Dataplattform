@@ -6,6 +6,9 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master

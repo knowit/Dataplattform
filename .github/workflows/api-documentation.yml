@@ -7,6 +7,8 @@ on:
       - develop
     paths:
       - 'services/api/documentation/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master

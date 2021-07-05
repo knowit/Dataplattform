@@ -7,6 +7,7 @@ on:
       - develop
     paths:
       - 'services/infrastructure/distribution/**'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master

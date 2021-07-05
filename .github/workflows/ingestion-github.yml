@@ -9,6 +9,8 @@ on:
     paths:
       - 'services/ingestion/gitHub/**'
       - 'packages/common/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
