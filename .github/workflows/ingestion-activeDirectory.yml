@@ -18,6 +18,8 @@ on:
     paths:
       - 'services/ingestion/activeDirectory/**'
       - 'packages/common/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

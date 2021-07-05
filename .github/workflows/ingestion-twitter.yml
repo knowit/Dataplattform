@@ -20,7 +20,8 @@ on:
       - 'services/ingestion/twitter/**'
       - 'packages/common/**'
       - 'packages/query/**'
-
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

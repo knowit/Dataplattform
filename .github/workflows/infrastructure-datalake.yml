@@ -7,7 +7,6 @@ on:
       - develop
     paths:
       - 'services/infrastructure/datalake/**'
-      - '.config/.flake8'
       - '.config/.yamllint'
   pull_request:
     branches:
@@ -15,6 +14,7 @@ on:
       - develop
     paths:
       - 'services/infrastructure/datalake/**'
+      - '.config/.yamllint'
 
 jobs:
   lint:
@@ -25,10 +25,6 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.7
-      - name: Lint with flake8
-        run: |
-          pip install flake8
-          flake8 --config=./.config/.flake8 ./services/infrastructure/datalake
       - name: Lint with yamllint
         run: |
           pip install yamllint

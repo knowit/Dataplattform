@@ -15,7 +15,8 @@ on:
       - develop
     paths:
       - 'services/infrastructure/metadata/**'
-
+      - '.config/.flake8'
+      - '.config/.yamllint'
 jobs:
   lint:
     runs-on: ubuntu-latest

@@ -14,6 +14,7 @@ on:
       - develop
     paths:
       - 'services/infrastructure/storage/**'
+      - '.config/.yamllint'
 
 jobs:
   lint:

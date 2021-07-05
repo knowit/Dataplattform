@@ -14,6 +14,7 @@ on:
       - develop
     paths:
       - 'services/infrastructure/layers/fastparquet/**'
+      - '.config/.yamllint'
 
 jobs:
   lint:

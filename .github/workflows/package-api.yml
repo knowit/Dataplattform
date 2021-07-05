@@ -16,6 +16,8 @@ on:
       - develop
     paths:
       - 'packages/api/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

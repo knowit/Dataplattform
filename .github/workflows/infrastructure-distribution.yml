@@ -14,6 +14,7 @@ on:
       - develop
     paths:
       - 'services/infrastructure/distribution/**'
+      - '.config/.yamllint'
 
 jobs:
   lint:
