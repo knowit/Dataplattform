@@ -67,6 +67,19 @@ resources:
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 
+    apiDNSRecord:
+      Type: AWS::Route53::RecordSetGroup
+      Properties:
+        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        RecordSets:
+          - Name: api.${ssm:/${self:custom.stage}/routes/domain_name}
+            Type: A
+            AliasTarget:
+              DNSName:
+                "Fn::GetAtt": [APIDistribution, DomainName]
+              HostedZoneId: Z2FDTNDATAQYW2
+
+
   Outputs:
     APIDistributionOutput:
       Value:

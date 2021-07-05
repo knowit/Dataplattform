@@ -13,21 +13,11 @@ resources:
     BasicZone:
       Type: AWS::Route53::HostedZone
       Properties:
-        Name: testdev.dataplattform.knowit.no
-    #BasicRecords:
-      #Type: 'AWS::Route53::RecordSetGroup'
-      #Properties:
-        #HostedZoneId:
-          #Ref: BasicZone
-        #RecordSets:
-          #- Name: testdev.dataplattform.knowit.no
-            #Type: A
-            #AliasTarget:
-              #HostedZoneId: !Ref BasicZone
-              #DNSName: doc.testdev.dataplattform.knowit.no
+        Name: ${ssm:/${self:custom.stage}/routes/domain_name}
 
-Outputs:
-  routesZoneId:
-    Value: !Ref BasicZone
-    Export:
-      Name: ${self:custom.stage}-routes-zoneid
+  Outputs:
+    routesZoneId:
+      Value:
+        "Ref": BasicZone
+      Export:
+        Name: ${self:custom.stage}-routes-zoneid

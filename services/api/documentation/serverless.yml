@@ -37,14 +37,22 @@ resources:
           ErrorDocument: index.html
 
     docDNSRecord:
-      Type: AWS::Route53::RecordSet
+      Type: AWS::Route53::RecordSetGroup
       Properties:
-        AliasTarget:
-          DNSName: dkzgep9wv87yb.cloudfront.net
-          HostedZoneId: Z2FDTNDATAQYW2
-        HostedZoneId: Z0615768642V5NGW5233
-        Name: testdoc.new-dev.dataplattform.knowit.no
-        Type: A
+        DependsOn: Distribution
+        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        RecordSets:
+          - Name: doc.${ssm:/${self:custom.stage}/routes/domain_name}
+            Type: A
+            AliasTarget:
+              DNSName:
+                "Fn::GetAtt": [Distribution, DomainName]
+              HostedZoneId: Z2FDTNDATAQYW2
+          - Name: ${ssm:/${self:custom.stage}/routes/domain_name}
+            Type: A
+            AliasTarget:
+              DNSName: doc.${ssm:/${self:custom.stage}/routes/domain_name}
+              HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
 
     StaticS3BucketPolicy:
       Type: AWS::S3::BucketPolicy
