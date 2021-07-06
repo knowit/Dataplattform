@@ -7,6 +7,7 @@ on:
       - master
     paths:
       - "services/infrastructure/distribution/**"
+      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -20,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v1
 
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
       - name: Serverless AWS authentication
         run: |

@@ -9,6 +9,7 @@ on:
       - 'services/ingestion/ubwFagtime/**'
       - 'packages/common/**'
       - 'packages/query/**'
+      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -26,7 +27,7 @@ jobs:
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
       - name: Install dependencies
         run: npm install
