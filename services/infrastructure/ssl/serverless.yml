@@ -1,0 +1,20 @@
+service: ssl
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: us-east-1
+
+resources:
+  Resources:
+    SSLCertificate:
+      Type: AWS::CertificateManager::Certificate
+      Properties:
+        CertificateAuthorityArn: String
+        DomainName: \*.${ssm:/${self:custom.stage}/routes/domain_name}
+        SubjectAlternativeNames:
+          - ${ssm:/${self:custom.stage}/routes/domain_name}
+        ValidationMethod: DNS

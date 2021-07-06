@@ -89,8 +89,7 @@ resources:
     storageDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        DependsOn: CloudFrontDistribution
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: Z0773354Y3S0MNE70RUX    #!ImportValue ${self:custom.stage}-routes-zoneid
         RecordSets:
           - Name: storage.${ssm:/${self:custom.stage}/routes/domain_name}
             Type: A
