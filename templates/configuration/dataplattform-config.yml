@@ -32,11 +32,22 @@ dev:
     distributionAlias:
       Value:
       Type: String
+      Regions:
+        - eu-central-1
+        - us-east-1
+    sslIdentifier:
+      Value:
+      Type: String
+      Regions:
+        - us-east-1
 
   routes:
     domain_name:
       Value:
       Type: String
+      Regions:
+        - eu-central-1
+        - us-east-1
 
   cvPartnerPoller:
     cv_partner_api_token:

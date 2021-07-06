@@ -43,7 +43,7 @@ def add_parameter_recursively(config: dict, path: str = ""):
                     try:
                         client.put_parameter(
                             Name=full_name,
-                            Value=value["Value"],
+                            Value=str(value["Value"]),
                             Type=param_type,
                             Overwrite=True,
                             Tier='Standard'
