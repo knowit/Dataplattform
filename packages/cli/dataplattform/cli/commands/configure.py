@@ -2,7 +2,20 @@ from argparse import ArgumentParser, Namespace
 import boto3
 import yaml
 
-client = boto3.client('ssm')
+default_client = boto3.client('ssm')
+default_region = default_client.meta.region_name
+regional_clients = dict({str(default_region): default_client})
+
+
+def get_client(region: str):
+    r = default_region if region is None else region
+    if r not in regional_clients.keys():
+        regional_clients[r] = boto3.client('ssm', region_name=r)
+    return regional_clients[r]
+
+
+def get_regions(config: dict) -> list:
+    return config.get("Regions", [default_region])
 
 
 def dict_is_parameter(config: dict) -> bool:
@@ -11,11 +24,11 @@ def dict_is_parameter(config: dict) -> bool:
 
 def get_parameter_type(config: dict) -> str:
     types = ["String", "StringList", "SecureString"]
-    type = config.get("Type", "SecureString")
-    if type not in types:
-        raise ValueError('Invalid parameter type: ' + type + ". Must be one of the following: " + str(types))
+    param_type = config.get("Type", "SecureString")
+    if param_type not in types:
+        raise ValueError('Invalid parameter type: ' + param_type + ". Must be one of the following: " + str(types))
     else:
-        return type
+        return param_type
 
 
 def add_parameter_recursively(config: dict, path: str = ""):
@@ -25,18 +38,20 @@ def add_parameter_recursively(config: dict, path: str = ""):
             full_name = path + "/" + key
             if dict_is_parameter(value):
                 param_type = get_parameter_type(value)
-                try:
-                    client.put_parameter(
-                        Name=full_name,
-                        Value=value["Value"],
-                        Type=param_type,
-                        Overwrite=True,
-                        Tier='Standard'
-                    )
-                    print(
-                        "Parameter set successfully: " + full_name)
-                except Exception as e:
-                    print("Failed to set SSM-parameter: " + full_name + ".\nStack trace:\n" + str(e))
+                for region in get_regions(value):
+                    client = get_client(region)
+                    try:
+                        client.put_parameter(
+                            Name=full_name,
+                            Value=value["Value"],
+                            Type=param_type,
+                            Overwrite=True,
+                            Tier='Standard'
+                        )
+                        print(
+                            "(" + region + ") - Parameter set successfully: " + full_name)
+                    except Exception as e:
+                        print("Failed to set SSM-parameter: " + full_name + ".\nStack trace:\n" + str(e))
 
             else:
                 add_parameter_recursively(value, path=full_name)
