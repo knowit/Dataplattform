@@ -11,7 +11,7 @@ def dict_is_parameter(config: dict) -> bool:
 
 def get_parameter_type(config: dict) -> str:
     types = ["String", "StringList", "SecureString"]
-    type = config.get("Type", "String")
+    type = config.get("Type", "SecureString")
     if type not in types:
         raise ValueError('Invalid parameter type: ' + type + ". Must be one of the following: " + str(types))
     else:
