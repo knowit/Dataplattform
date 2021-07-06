@@ -78,12 +78,6 @@ dev:
     credentials:
       Value:
       Type: SecureString
-    last_poll_time_knowit.no_63rtu1seerufqsdhc4avduoggk-group.calendar.google.com:
-      Value:
-      Type: String
-    last_poll_time_knowit.no_rsgaebrj8ihghga8scoqu5i6c0-group.calendar.google.com:
-      Value:
-      Type: String
 
   jiraSalesWebhook:
     jira_sales_password:
