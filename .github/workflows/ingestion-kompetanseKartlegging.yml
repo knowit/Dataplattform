@@ -7,6 +7,8 @@ on:
       - master
       - develop
     paths:
+      - 'services/ingestion/kompetanseKartlegging/**'
+      - 'packages/common/**'
       - '.config/.flake8'
       - '.config/.yamllint'
   pull_request:
