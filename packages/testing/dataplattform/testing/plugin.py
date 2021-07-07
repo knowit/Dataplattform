@@ -28,12 +28,10 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('SERVICE', 'testService'),
         ('SQS_QUEUE_NAME', 'test.fifo'),
         ('SQS_MESSAGE_GROUP_ID', 'test_groud_id'),
-        ('PRIVATE_BUCKET', 'private_test_bucket'),
         ('PUBLIC_BUCKET', 'public_test_bucket'),
         ('DOWNLOAD_LAMBDA', 'test_download_lambda'),
         ('SNS_TOPIC_NAME', 'test_sns_topic'),
         ('PUBLIC_PREFIX', 'public/images'),
-        ('PRIVATE_PREFIX', 'private/cvs'),
         ('ACCESS_LEVEL', 'level-1'),
         ('PERSON_DATA_TABLE', 'my_test_person_data_table'),
         ('AWS_XRAY_SDK_ENABLED', 'false')
@@ -49,9 +47,11 @@ def db_person_data():
         {'guid': '20dbbfa18380233aa643575720b893fac5137699', 'email': 'per.nordmann@knowit.no',
          'displayName': 'Per Nordmann', 'alias': 'pernord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
          'distinguished_name': 'Per Nordmann', 'manager': 'Olav Nordmann'},
+
         {'guid': '491b9fa9bfac17563882b0fdc6f3a8a97417bd99', 'email': 'kari.nordmann@knowit.no',
          'displayName': 'Kari Nordmann', 'alias': 'karnord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
          'distinguished_name': 'Kari Nordmann', 'manager': 'Olav Nordmann'},
+
         {'guid': '5edbcdf460809039eb4897ccf8ce3bb5e501884d', 'email': 'lisa.nordmann@knowit.no',
          'displayName': 'Lisa Nordmann', 'alias': 'lisnord', 'company': 'Knowit Objectnet', 'knowitBranch': 'Solutions',
          'distinguished_name': 'Lisa Nordmann', 'manager': 'Per Nordmann'},
@@ -149,11 +149,9 @@ def s3_buckets():
     with mock_s3():
         s3 = resource('s3')
         s3.create_bucket(Bucket=environ.get('DATALAKE'))
-        s3.create_bucket(Bucket=environ.get('PRIVATE_BUCKET'))
         s3.create_bucket(Bucket=environ.get('PUBLIC_BUCKET'))
         yield {
                 "datalake": s3.Bucket(environ.get('DATALAKE')),
-                "private_bucket": s3.Bucket(environ.get('PRIVATE_BUCKET')),
                 "public_bucket": s3.Bucket(environ.get('PUBLIC_BUCKET'))
               }
 
@@ -166,11 +164,6 @@ def s3_bucket(s3_buckets):
 @fixture
 def s3_public_bucket(s3_buckets):
     yield s3_buckets['public_bucket']
-
-
-@fixture
-def s3_private_bucket(s3_buckets):
-    yield s3_buckets['private_bucket']
 
 
 @fixture(autouse=True)

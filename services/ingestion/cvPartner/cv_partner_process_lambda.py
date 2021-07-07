@@ -43,10 +43,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv.place_of_residence.int',
         'cv.twitter',
         'cv.title.no',
-        'cv_no_pdf',
-        'cv_int_pdf',
-        'cv_no_docx',
-        'cv_int_docx',
         'image_key'
         ]
 

@@ -8,10 +8,6 @@
       "default_cv_id": "60cc81232e97ff100ca405c7",
       "cv_link": "link1",
       "image_key": "public/images/dad875c3-c3d0-47da-b6b9-4c605a803f78.jpg",
-      "cv_no_pdf": "private/cvs/b4945fb6-964e-4cc8-b657-452760a147ca.pdf",
-      "cv_int_pdf": "private/cvs/a5fbe569-db17-4a18-8f15-c39cdd534761.pdf",
-      "cv_no_docx": "private/cvs/28b5d63a-e87f-4c1f-88df-581c0c483f5b.docx",
-      "cv_int_docx": "private/cvs/436d65c7-7eba-4f4a-9e77-9c8c0b60c00c.docx",
       "cv": {
         "_id": "60cc81232e97ff100ca405c7",
         "blogs": [
@@ -629,10 +625,6 @@
       "default_cv_id": "60cc7fce68679f0fc4336178",
       "cv_link": "link2",
       "image_key": "public/images/ac28979d-9694-4537-a299-bf713d1aef79.jpg",
-      "cv_no_pdf": "private/cvs/9c0bcd0d-7999-4c1e-bb62-56b3ee599f92.pdf",
-      "cv_int_pdf": "private/cvs/880b26a5-d553-4aef-8d6a-a5ac95044d5e.pdf",
-      "cv_no_docx": "private/cvs/3c1f070e-9584-46d4-a96f-91be6629662a.docx",
-      "cv_int_docx": "private/cvs/1c998097-a365-45d6-92ec-aa151aec7fdd.docx",
       "cv": {
         "_id": "60cc7fce68679f0fc4336178",
         "born_day": 1,

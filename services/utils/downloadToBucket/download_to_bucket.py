@@ -23,16 +23,12 @@ def handler(event, context):
     for (header, value) in headers.items():
         req.add_header(header, value)
 
-    private = event.get('private', True)
-    if private:
-        bucket = environ.get('PRIVATE_BUCKET')
-    else:
-        bucket = environ.get('PUBLIC_BUCKET')
+    bucket = environ.get('PUBLIC_BUCKET')
 
     response = request.urlopen(req)
     content_type = response.getheader('Content-Type')
     if content_type == valid_content_types[filetype]:
-        if (response.status == 200 and response.readable()):
+        if response.status == 200 and response.readable():
             write_file_to_bucket(data=response.read(),
                                  filename=event['filename'],
                                  bucket=bucket)
