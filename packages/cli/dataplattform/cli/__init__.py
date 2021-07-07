@@ -12,7 +12,8 @@ def main():
         'setup-datasource',
         'register-table',
         'database',
-        'deploy'
+        'deploy',
+        'configure'
     ]
 
     parser = ArgumentParser('dataplattform')
