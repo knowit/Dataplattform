@@ -3,6 +3,7 @@ import os
 import yaml
 import copy
 import subprocess
+import traceback
 
 targets = dict()
 ignore = [
@@ -140,49 +141,38 @@ def get_remove_commands(path: str) -> list:
     return ['cd ' + path, 'sls remove --aws-profile sandbox', 'cd ' + inverse_path(path)]
 
 
-def run_commands(commands: list, error_message: str):
-    try:
-        retcode = subprocess.call(' && '.join(commands), shell=True)
-        if retcode is not 0:
-            raise Exception(error_message)
-    except OSError as e:
-        print("OSError: " + e)
+def print_status(status: str = None):
+    if status is not None:
+        message = "\nDataplattform: " + status
+        line = '\n' + ''.join(['-' * (len(message) - 1)])
+        print("\n" + line + message + line)
 
 
-def print_status(status: str):
-    message = "\nDataplattform: " + status
-    line = '\n' + ''.join(['-'*(len(message)-1)])
-    print("\n" + line + message + line)
+def run_process_per_path(
+        paths: list,
+        get_cmd_func,
+        start_message: str = None,
+        failed_message: str = None,
+        complete_message: str = None) -> None:
 
-
-def deploy(paths):
-    print_status("Starting deployment")
+    print_status(start_message)
     success = True
+
     for path in paths:
-        print("\n\nDeploying service: " + path)
+        commands = get_cmd_func(path)
         try:
-            run_commands(get_deployment_commands(path), "An error occured when deploying service: " + path)
+            retcode = subprocess.call(' && '.join(commands), shell=True)
+            print("Return code: " + str(retcode))
+            if retcode < 0:
+                print("Error")
+                subprocess.check_output()
         except Exception as e:
-            print("\n\n" + str(e))
+            print(e)
+            traceback.print_stack()
             success = False
             break
 
-    print_status("Deployment complete" if success else "Deployment stopped")
-
-
-def remove(paths):
-    print_status("Starting removal")
-    success = True
-    for path in paths:
-        print("\n\nRemoving service: " + path)
-        try:
-            run_commands(get_remove_commands(path), "An error occured when removing service: " + path)
-        except Exception as e:
-            print("\n\n" + str(e))
-            success = False
-            break
-
-    print_status("Removal complete" if success else "Removal stopped")
+    print_status(complete_message if success else failed_message)
 
 
 def init(parser: ArgumentParser):
@@ -193,7 +183,6 @@ def init(parser: ArgumentParser):
 
 
 def run(args: Namespace, _):
-
     # TODO: Configure SSM-parameters
 
     for target in args.services:
@@ -201,12 +190,15 @@ def run(args: Namespace, _):
 
     paths = topological_sort(targets)
 
-    if args.remove:
-        paths.reverse()
-        remove(paths)
-    else:
-        deploy(paths)
+    if args.config_file is not None:
+        run_process_per_path(
+            paths=[''],
+            get_cmd_func=lambda path: ["dataplattform configure --config-file " + args.config_file],
+            start_message="Configuring parameters",
+            failed_message="Parameter configuraiton stopped",
+            complete_message="Parameter configuration complete"
+        )
 
-    # TODO: Register all Glue tables
+# TODO: Register all Glue tables
 
-    # TODO: Update Glue tables
+# TODO: Update Glue tables
