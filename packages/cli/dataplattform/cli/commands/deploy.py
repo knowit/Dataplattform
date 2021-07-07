@@ -1,11 +1,14 @@
-from argparse import ArgumentParser, Namespace
-import os
-import yaml
 import copy
+import os
 import subprocess
 import traceback
+from argparse import ArgumentParser, Namespace
+
+import yaml
 
 targets = dict()
+
+# Do not search these directories for serverless.yml files
 ignore = [
     'node_modules',
     '.serverless',
@@ -14,6 +17,7 @@ ignore = [
     'templates'
 ]
 
+# Pre-deployment commands upon detected config files
 install_commands = dict({
     'requirements.txt': 'pip install -r requirements.txt',
     'package.json': 'npm install',
@@ -21,6 +25,7 @@ install_commands = dict({
 })
 
 
+# Yaml-parser that will ignore Serverless tags
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node):
         return None
@@ -34,9 +39,11 @@ def parse_yaml(path: str) -> dict:
         return yaml.load(open(path), Loader=SafeLoaderIgnoreUnknown)
     except Exception as e:
         print("Failed to parse yaml file: " + path + "\n" + str(e))
+        raise e
 
 
-def resolve_dependencies(path: str, filename: str):
+# Search a Dataplattform service for dependencies on other Dataplattform services
+def resolve_dependencies(path: str, filename: str) -> list:
     config = parse_yaml(filename)
     if 'dataplattform' in config.keys() and 'dependencies' in config['dataplattform'].keys():
         result = []
@@ -49,6 +56,7 @@ def resolve_dependencies(path: str, filename: str):
         return []
 
 
+# Check if a list of paths contain a path that refers to the same file
 def contains_path(path_list: list, path: str) -> bool:
     i = 0
     while i < len(path_list):
@@ -57,7 +65,7 @@ def contains_path(path_list: list, path: str) -> bool:
         try:
             exists = os.path.samefile(item, path)
         except OSError as e:
-            print(e)
+            raise e
         finally:
             if exists:
                 return True
@@ -66,7 +74,8 @@ def contains_path(path_list: list, path: str) -> bool:
     return False
 
 
-def remove_path(path_list: list, path: str):
+# Remove any path from the list that refers to the same file
+def remove_path(path_list: list, path: str) -> None:
     i = 0
     while i < len(path_list):
         item = path_list[i]
@@ -78,6 +87,18 @@ def remove_path(path_list: list, path: str):
     raise IndexError('Path list does not include element: ' + path + "\n" + str(path_list))
 
 
+# Find all service directories
+def search(target: str) -> None:
+    for entry in os.scandir(target):
+        if entry.is_file():
+            if entry.name == 'serverless.yml' or entry.name == 'serverless.yaml':
+                if not contains_path(list(targets), target):
+                    targets[target] = resolve_dependencies(target, entry.path)
+        elif entry.name not in ignore:
+            search(entry.path)
+
+
+# Sort services topologically by their dependencies
 def topological_sort(source: dict) -> list:
     a = copy.deepcopy(source)
     keys_list = list(a)
@@ -90,6 +111,7 @@ def topological_sort(source: dict) -> list:
                 rem.append(dep)
         for dep in rem:
             deps.remove(dep)
+            print("Warning: Service " + path + " depends on a service that is not within the working directory: " + dep)
 
     keys_list.sort(key=lambda j: len(a[j]))
 
@@ -113,39 +135,32 @@ def topological_sort(source: dict) -> list:
     raise Exception('Dataplattform dependency graph has a cycle:\n' + str(keys_list))
 
 
-def search(target: str):
-    for entry in os.scandir(target):
-        if entry.is_file():
-            if entry.name == 'serverless.yml' or entry.name == 'serverless.yaml':
-                if not contains_path(list(targets), target):
-                    targets[target] = resolve_dependencies(target, entry.path)
-        elif entry.name not in ignore:
-            search(entry.path)
-
-
-def inverse_path(path: str) -> str:
-    return os.path.relpath(os.path.curdir, path)
-
-
-def get_deployment_commands(path: str) -> list:
-    commands = ['cd ' + path]
-    for file in os.listdir(path):
-        if file in install_commands.keys():
-            commands.append(install_commands[file])
-    commands.append('sls deploy --aws-profile sandbox')
-    commands.append('cd ' + inverse_path(path))
-    return commands
-
-
-def get_remove_commands(path: str) -> list:
-    return ['cd ' + path, 'sls remove --aws-profile sandbox', 'cd ' + inverse_path(path)]
-
-
-def print_status(status: str = None):
+def print_status(status: str = None) -> None:
     if status is not None:
         message = "\nDataplattform: " + status
         line = '\n' + ''.join(['-' * (len(message) - 1)])
         print("\n" + line + message + line)
+
+
+def get_deployment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
+    message = "Deploying service: " + path
+    commands = ['echo ' + message,  'cd ' + path]
+    for file in os.listdir(path):
+        if file in install_commands.keys():
+            commands.append(install_commands[file])
+    commands.append('sls deploy'
+                    + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
+                    + ((" --stage " + stage) if stage is not None else ""))
+    return commands
+
+
+def get_remove_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
+    message = "Removing service: " + path
+    return ['echo ' + message,
+            'cd ' + path,
+            'sls remove'
+            + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
+            + ((" --stage " + stage) if stage is not None else "")]
 
 
 def run_process_per_path(
@@ -180,25 +195,43 @@ def init(parser: ArgumentParser):
     parser.add_argument('-e', '--stage', default='dev', choices=['dev', 'test', 'prod'])
     parser.add_argument('-c', '--config-file', default=None, dest='config_file')
     parser.add_argument('-r', '--remove', default=False, action='store_true')
+    parser.add_argument('-p', '--aws-profile', default=None, type=str, dest='aws_profile')
 
 
 def run(args: Namespace, _):
-    # TODO: Configure SSM-parameters
-
+    print("")
     for target in args.services:
         search(target)
 
     paths = topological_sort(targets)
 
-    if args.config_file is not None:
+    if args.remove:
+        paths.reverse()
+        # Remove all specified services
         run_process_per_path(
-            paths=[''],
-            get_cmd_func=lambda path: ["dataplattform configure --config-file " + args.config_file],
-            start_message="Configuring parameters",
-            failed_message="Parameter configuraiton stopped",
-            complete_message="Parameter configuration complete"
+            paths=paths,
+            get_cmd_func=lambda path: get_remove_commands(path, args.aws_profile, args.stage),
+            start_message="Starting service removal",
+            failed_message="Service removal stopped",
+            complete_message="Service removal complete"
         )
 
-# TODO: Register all Glue tables
+    else:
+        if args.config_file is not None:
+            # Configure specified SSM-parameters
+            run_process_per_path(
+                paths=[''],
+                get_cmd_func=lambda path: ["dataplattform configure --config-file " + args.config_file],
+                start_message="Configuring parameters",
+                failed_message="Parameter configuraiton stopped",
+                complete_message="Parameter configuration complete"
+            )
 
-# TODO: Update Glue tables
+        # Deploy all specified services
+        run_process_per_path(
+            paths=paths,
+            get_cmd_func=lambda path: get_deployment_commands(path, args.aws_profile, args.stage),
+            start_message="Starting service deployment",
+            failed_message="Service deployment stopped",
+            complete_message="Service deployment complete"
+        )
