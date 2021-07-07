@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, Namespace
 import boto3
 import yaml
+import traceback
 
 default_client = boto3.client('ssm')
 default_region = default_client.meta.region_name
@@ -70,10 +71,12 @@ def run(args: Namespace, _):
         config_path = "/" + args.stage
         add_parameter_recursively(config[args.stage], path=config_path)
 
-    except KeyError:
-        print("Error: No configuration was found for in " + path + " for stage: " + args.stage)
-        pass
+    except KeyError as e:
+        print("\nError: No configuration was found for in " + path + " for stage: " + args.stage)
+        traceback.print_stack()
+        raise e
 
     except Exception as e:
-        print("Failed to parse config yaml file: " + path + ".\nStack trace:\n" + str(e))
-        pass
+        print("\nFailed to parse config yaml file: " + path)
+        traceback.print_stack()
+        raise e

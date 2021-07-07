@@ -162,10 +162,10 @@ def run_process_per_path(
         commands = get_cmd_func(path)
         try:
             retcode = subprocess.call(' && '.join(commands), shell=True)
-            print("Return code: " + str(retcode))
-            if retcode < 0:
-                print("Error")
-                subprocess.check_output()
+            if retcode is not 0:
+                raise Exception(str("\nAn error occurred while running a subprocess at " + path) if len(path) > 0
+                                else "\nAn error occurred while running a subprocess")
+
         except Exception as e:
             print(e)
             traceback.print_stack()
