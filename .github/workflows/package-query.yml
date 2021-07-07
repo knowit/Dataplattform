@@ -8,13 +8,16 @@ on:
       - develop
     paths:
       - 'packages/query/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
       - develop
     paths:
       - 'packages/query/**'
-
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:
