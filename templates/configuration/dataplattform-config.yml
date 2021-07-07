@@ -1,0 +1,166 @@
+dev:
+  DataAPI:
+    cognitoAuthUrl:
+      Value:
+      Type: String
+
+  api-documentation:
+    distributionAlias:
+      Value:
+      Type: String
+
+  cloudfront-api-dist:
+    distributionAlias:
+      Value:
+      Type: String
+
+  cognito:
+    CognitoUserPoolClientId:
+      Value:
+      Type: String
+    UserPoolClientId:
+      Value:
+      Type: String
+
+  USEA1:
+    sslIdentifier:
+      Value:
+      Type: String
+
+
+  cloudfront-raw-storage:
+    distributionAlias:
+      Value:
+      Type: String
+      Regions:
+        - eu-central-1
+        - us-east-1
+    sslIdentifier:
+      Value:
+      Type: String
+      Regions:
+        - us-east-1
+
+  routes:
+    domain_name:
+      Value:
+      Type: String
+      Regions:
+        - eu-central-1
+        - us-east-1
+
+  cvPartnerPoller:
+    cv_partner_api_token:
+      Value:
+      Type: SecureString
+    cv_partner_objectnet_id:
+      Value:
+      Type: String
+    cv_partner_sor_id:
+      Value:
+      Type: String
+    cv_partner_url:
+      Value:
+      Type: String
+
+  github:
+    github_api_token:
+      Value:
+      Type: SecureString
+    github_shared_secret:
+      Value:
+      Type: SecureString
+
+  googleEventPoller:
+    calendarIds:
+      Value:
+      Type: StringList
+    credentials:
+      Value:
+      Type: SecureString
+
+  jiraSalesWebhook:
+    jira_sales_password:
+      Value:
+      Type: SecureString
+    jira_sales_search_url:
+      Value:
+      Type: String
+    jira_sales_username:
+      Value:
+      Type: SecureString
+    jira_sales_webhook_url:
+      Value:
+      Type: String
+    jira_sales_webhook_secret:
+      Value:
+      Type: SecureString
+
+  kompetansekartlegging:
+    kompetansekartlegging_api_key:
+      Value:
+      Type: SecureString
+    kompetansekartlegging_api_url:
+      Value:
+      Type: String
+
+  slackWebhook:
+    slack_app_token:
+      Value:
+      Type: SecureString
+    slack_signing_secret:
+      Value:
+      Type: SecureString
+
+  twitterPoller:
+    twitter_access_secret:
+      Value:
+      Type: SecureString
+    twitter_access_token:
+      Value:
+      Type: SecureString
+    twitter_consumer_key:
+      Value:
+      Type: SecureString
+    twitter_consumer_secret:
+      Value:
+      Type: SecureString
+
+  ubwCustomerPerResource:
+    UBW_CLIENT:
+      Value:
+      Type: SecureString
+    UBW_PASSWORD:
+      Value:
+      Type: SecureString
+    UBW_TEMPLATE_ID:
+      Value:
+      Type: SecureString
+    UBW_URL:
+      Value:
+      Type: String
+    UBW_USERNAME:
+      Value:
+      Type: String
+
+  ubwFagtimePoller:
+    UBW_CLIENT:
+      Value:
+      Type: SecureString
+    UBW_PASSWORD:
+      Value:
+      Type: SecureString
+    UBW_TEMPLATE_ID:
+      Value:
+      Type: SecureString
+    UBW_URL:
+      Value:
+      Type: String
+    UBW_USERNAME:
+      Value:
+      Type: String
+
+  slackAlarmForwarder:
+    slack_callback_url:
+      Value:
+      Type: String
