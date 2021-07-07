@@ -3,7 +3,6 @@ import os
 import subprocess
 import traceback
 from argparse import ArgumentParser, Namespace
-
 import yaml
 
 targets = dict()
