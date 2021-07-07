@@ -7,12 +7,16 @@ on:
       - develop
     paths:
       - 'services/infrastructure/deploymentBucket/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
       - develop
     paths:
       - 'services/infrastructure/deploymentBucket/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

@@ -8,12 +8,16 @@ on:
       - develop
     paths:
       - 'services/api/fileStorageDistribution/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
       - develop
     paths:
       - 'services/api/fileStorageDistribution/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:
