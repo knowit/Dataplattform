@@ -70,7 +70,7 @@ resources:
     apiDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: ${ssm:/${self:custom.stage}/routes/hostedzoneid}
         RecordSets:
           - Name: api.${ssm:/${self:custom.stage}/routes/domain_name}
             Type: A

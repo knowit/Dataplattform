@@ -38,7 +38,7 @@ resources:
     docDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: ${ssm:/${self:custom.stage}/routes/hostedzoneid}
         RecordSets:
           - Name: doc.${ssm:/${self:custom.stage}/routes/domain_name}
             Type: A
@@ -51,13 +51,13 @@ resources:
       Type: AWS::Route53::RecordSetGroup
       DependsOn: docDNSRecord
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: ${ssm:/${self:custom.stage}/routes/hostedzoneid}
         RecordSets:
           - Name: ${ssm:/${self:custom.stage}/routes/domain_name}
             Type: A
             AliasTarget:
               DNSName: doc.${ssm:/${self:custom.stage}/routes/domain_name}
-              HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+              HostedZoneId: ${ssm:/${self:custom.stage}/routes/hostedzoneid}
 
     StaticS3BucketPolicy:
       Type: AWS::S3::BucketPolicy
