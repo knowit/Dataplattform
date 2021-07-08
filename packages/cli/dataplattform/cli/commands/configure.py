@@ -52,7 +52,8 @@ def add_parameter_recursively(config: dict, path: str = ""):
                         print(
                             "(" + region + ") - Parameter set successfully: " + full_name)
                     except Exception as e:
-                        print("Failed to set SSM-parameter: " + full_name + ".\nStack trace:\n" + str(e))
+                        print("\nFailed to set SSM-parameter: " + full_name)
+                        traceback.print_stack()
                         raise e
 
             else:
