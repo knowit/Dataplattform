@@ -28,4 +28,4 @@ jobs:
       - name: Lint with yamllint
         run: |
           pip install yamllint
-          yamllint -c ./.config/.yamllint ./services/infrastructure/dataApi
+          yamllint -c ./.config/.yamllint ./services/api/documentation

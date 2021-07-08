@@ -33,7 +33,7 @@ provider:
 resources:
   Outputs:
     LayerArn:
-      Value: { Ref: PythonRequirementsLambdaLayer }
+      Value: {Ref: PythonRequirementsLambdaLayer}
       Export:
         Name: ${self:custom.stage}-${self:service}-arn
 
