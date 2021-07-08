@@ -11,6 +11,8 @@ custom:
     - ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
     - doc.${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
+  cognitoClientId: ${ssm:/${self:custom.stage}/cognito/UserPoolClientId}
+  apiUrl: ${ssm:/${self:custom.stage}/cloudfront-api-dist/distributionAlias}
 
 provider:
   name: aws
@@ -21,9 +23,6 @@ provider:
   timeout: 25
   deploymentBucket:
     name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
-  environment:
-    CLIENTID: !ImportValue ${self:custom.stage}-cognito-userPoolClientId
-    APIURL: ${ssm:/${self:custom.stage}/cloudfront-api-dist/distributionAlias
 
 resources:
   Resources:
@@ -39,7 +38,6 @@ resources:
     docDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        DependsOn: Distribution
         HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
         RecordSets:
           - Name: doc.${ssm:/${self:custom.stage}/routes/domain_name}
@@ -48,6 +46,13 @@ resources:
               DNSName:
                 "Fn::GetAtt": [Distribution, DomainName]
               HostedZoneId: Z2FDTNDATAQYW2
+
+    baseDNSRecord:
+      Type: AWS::Route53::RecordSetGroup
+      DependsOn: docDNSRecord
+      Properties:
+        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        RecordSets:
           - Name: ${ssm:/${self:custom.stage}/routes/domain_name}
             Type: A
             AliasTarget:
