@@ -9,6 +9,7 @@ custom:
     packRequirements: false
     pythonBin: python
   pythonRequirements:
+    invalidateCaches: true
     dockerizePip: non-linux
     slim: true
     slimPatternsAppendDefaults: false
