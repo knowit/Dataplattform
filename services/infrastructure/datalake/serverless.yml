@@ -17,7 +17,7 @@ custom:
   level3ReportDir: reports/level-3/
   level2ReportDir: reports/level-2/
   level1ReportDir: reports/level-1/
-  
+
 
 provider:
   name: aws
@@ -35,7 +35,7 @@ provider:
     layer: infrastructure
 
 resources:
-  Resources: 
+  Resources:
     LogBucket:
       Type: AWS::S3::Bucket
       Properties:
@@ -83,7 +83,7 @@ resources:
             - NoncurrentVersionExpirationInDays: 1
               Prefix: ${self:custom.level1ReportDir}
               Status: Enabled
-        
+
         LoggingConfiguration:
           DestinationBucketName: ${self:resources.Resources.LogBucket.Properties.BucketName}
           LogFilePrefix: ${self:resources.Resources.LogBucket.Properties.BucketName}

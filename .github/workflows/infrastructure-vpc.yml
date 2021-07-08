@@ -7,12 +7,14 @@ on:
       - develop
     paths:
       - 'services/infrastructure/vpc/**'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
       - develop
     paths:
       - 'services/infrastructure/vpc/**'
+      - '.config/.yamllint'
 
 jobs:
   lint:

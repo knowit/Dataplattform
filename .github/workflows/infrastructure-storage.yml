@@ -7,12 +7,14 @@ on:
       - develop
     paths:
       - 'services/infrastructure/storage/**'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
       - develop
     paths:
       - 'services/infrastructure/storage/**'
+      - '.config/.yamllint'
 
 jobs:
   lint:

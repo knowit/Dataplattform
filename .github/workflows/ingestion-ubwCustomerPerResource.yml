@@ -8,6 +8,8 @@ on:
     paths:
       - "services/ingestion/ubwCustomerPerResource/**"
       - "packages/common/**"
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
@@ -15,7 +17,8 @@ on:
     paths:
       - "services/ingestion/ubwCustomerPerResource/**"
       - "packages/common/**"
-
+      - '.config/.flake8'
+      - '.config/.yamllint'
 jobs:
   lint:
     runs-on: ubuntu-latest

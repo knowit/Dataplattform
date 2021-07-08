@@ -9,6 +9,8 @@ on:
     paths:
       - 'services/api/dataApi/**'
       - 'packages/api/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
@@ -16,6 +18,8 @@ on:
     paths:
       - 'services/api/dataApi/**'
       - 'packages/api/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

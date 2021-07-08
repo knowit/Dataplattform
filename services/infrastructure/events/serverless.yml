@@ -18,13 +18,13 @@ resources:
   Resources:
     NewReportTopic:
       Type: AWS::SNS::Topic
-      Properties: 
+      Properties:
         DisplayName: NewReport
         TopicName: ${self:custom.stage}-NewReport
 
     DataUpdateTopic:
       Type: AWS::SNS::Topic
-      Properties: 
+      Properties:
         DisplayName: DataUpdated
         TopicName: ${self:custom.stage}-DataUpdate
 
@@ -42,7 +42,7 @@ resources:
 
     TopicPolicy:
       Type: AWS::SNS::TopicPolicy
-      Properties: 
+      Properties:
         PolicyDocument:
           Id: ${self:custom.stage}-SystemTopicPolicy
           Version: '2012-10-17'
@@ -51,7 +51,7 @@ resources:
               Effect: Allow
               Principal:
                 Service: lambda.amazonaws.com
-              Action: 
+              Action:
                 - sns:Publish
                 - sns:Subscribe
                 - sns:Receive
@@ -69,13 +69,13 @@ resources:
               Condition:
                 StringEquals:
                   AWS:SourceOwner: !Ref AWS::AccountId
-        
-        Topics: 
+
+        Topics:
           - !Ref NewReportTopic
           - !Ref DataUpdateTopic
           - !Ref DeleteReportTopic
           - !Ref AlarmTopic
-    
+
     ProcessTopicPolicy:
       Type: AWS::IAM::ManagedPolicy
       Properties:
@@ -118,4 +118,3 @@ resources:
         Ref: ProcessTopicPolicy
       Export:
         Name: ${self:custom.stage}-process-lambda-topic-access-role
-    
