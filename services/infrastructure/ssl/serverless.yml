@@ -23,4 +23,4 @@ resources:
       Value:
         "Ref": SSLCertificate
       Export:
-        Name: ${self:custom.stage}-ssl-certificateID
+        Name: ${self:custom.stage}-ssl-certificateID #TODO: Make this globally available
