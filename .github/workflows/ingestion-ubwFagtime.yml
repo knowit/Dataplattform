@@ -6,6 +6,12 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'services/ingestion/ubwFagtime/**'
+      - 'packages/common/**'
+      - 'packages/query/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
@@ -14,7 +20,8 @@ on:
       - 'services/ingestion/ubwFagtime/**'
       - 'packages/common/**'
       - 'packages/query/**'
-
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

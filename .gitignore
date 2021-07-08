@@ -125,3 +125,6 @@ dp/
 
 # Deploymentbucket config
 services/infrastructure/deploymentBucket/config.yml
+
+# SSM-parameters config
+**/ssm-parameters.yml

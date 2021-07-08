@@ -1,8 +1,6 @@
-# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: activeDirectory
 
 custom:
-  #Edit these variables###########################
   editable:
     timeout: 60
     ingestHandlerFile: active_directory_ingest_lambda
@@ -10,14 +8,13 @@ custom:
     description: Active directory output is saved to encrypted dynamoDB table
     scheduleRate: rate(7 days)
 
-  ################################################
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3 # Default in lambda rt
+      - boto3
       - botocore
-      - pandas # Layer
+      - pandas
       - pytz
       - numpy
       - numpy.libs
@@ -31,17 +28,17 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: |-
+      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
+      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
-  memorySize: 1024 # MB
-  timeout: ${self:custom.editable.timeout} # seconds
-  tags: # Tags that will be added to each of the deployment resources.
-    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    Layer: Ingestion # ingestion, processing, restApi, infrastructure
-    Ingestion: Pollers #webHooks, Pollers, iot
-  stackTags: # Tags for cloud formation
-    # key: value
-  environment: # Environment variables, ofthen stored in SSM
+  memorySize: 1024
+  timeout: ${self:custom.editable.timeout}
+  tags:
+    Project: Dataplattform
+    Layer: Ingestion
+    Ingestion: Pollers
+  environment:
   tracing:
     apiGateway: true
     lambda: true
@@ -49,15 +46,15 @@ provider:
 package:
   individually: true
   exclude:
-    - "./**" # Exclude everything and include what you need in the functions below
+    - "./**"
 
 functions:
-  ingest: # A Function
+  ingest:
     handler: ${self:custom.editable.ingestHandlerFile}.handler
     layers:
       - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
       - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     vpc:
@@ -68,22 +65,21 @@ functions:
         - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
     package:
       include:
-        - "*.py" # Files to include in deployment
+        - "*.py"
         - "*.json"
-    environment: # Environment variables, often stored in SSM
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
-    tags: # Tag for this function. Every function are tagged with stage by default
 
-    events: # The Events that trigger this Function
+    events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
 
-resources: # The resources your functions use
+resources:
   Resources:
     IngestLambdaRole:
       Type: AWS::IAM::Role

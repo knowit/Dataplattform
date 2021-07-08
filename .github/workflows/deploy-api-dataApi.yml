@@ -8,6 +8,7 @@ on:
     paths:
       - "services/api/dataApi/**"
       - "packages/api/**"
+      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -25,7 +26,7 @@ jobs:
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
       - name: Install dependencies
         run: npm install
@@ -37,6 +38,9 @@ jobs:
           else
             sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
           fi
+
+      - name: Clean requirements cache
+        run: sls requirements clean --aws-profile deployment && sls requirements cleanCache --aws-profile deployment
 
       - name: Run serverless deploy
         run: |

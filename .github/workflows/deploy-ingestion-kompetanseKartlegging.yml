@@ -1,0 +1,75 @@
+name: Deploy ingestion - kompetanseKartlegging
+
+on:
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - "services/ingestion/kompetanseKartlegging/**"
+      - "packages/common/**"
+      - ".config/.serverless"
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/ingestion/kompetanseKartlegging
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
+
+      - name: Install Serverless Framework
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install packages/*
+        run: |
+          pip install -e ../../../packages/cli
+          pip install -e ../../../packages/common
+          pip install -e ../../../packages/query
+          pip install -e ../../../packages/testing
+
+      - name: Serverless AWS authentication
+        run: |
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
+          else
+            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
+          fi
+
+      - name: Run serverless deploy
+        run: |
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment
+          else
+            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment
+          fi
+
+      - name: Registrer and update glue tables prod
+        if: github.base_ref == "master" || github.base_ref == "refs/heads/master"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          dataplattform register-table kompetanse_kartlegging
+          dataplattform database -a 3 update-tables
+
+      - name: Registrer and update glue tables dev
+        if: github.base_ref != "master" && github.base_ref != "refs/heads/master"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          dataplattform register-table kompetanse_kartlegging
+          dataplattform database -a 1 update-tables

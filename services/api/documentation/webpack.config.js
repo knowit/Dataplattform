@@ -11,6 +11,7 @@ const serverlessState = JSON.parse(fs.readFileSync(".serverless/serverless-state
 
 const { cognitoClientId, apiUrl } = serverlessState.service.custom
 
+
 module.exports = {
   mode: 'development',
   entry: {
@@ -52,7 +53,6 @@ module.exports = {
     new DefinePlugin({
       API_URL: JSON.stringify(apiUrl),
       DEMO_CLIENT_ID: JSON.stringify(cognitoClientId)
-      //DEMO_CLIENT_ID: JSON.stringify('5dk4t7d9ad5l3hcmo2fq14is81') // TODO: Ref
     })
   ],
   output: {

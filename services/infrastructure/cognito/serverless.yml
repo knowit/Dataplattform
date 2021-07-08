@@ -1,18 +1,89 @@
 service: cognito
 
+plugins:
+  - serverless-pseudo-parameters
+
 custom:
   stage: ${opt:stage, self:provider.stage}
-  policies: ${file(./policies.js)}    
+  policies: ${file(./policies.js)}
+  ssmParamName: /${self:custom.stage}/${self:service}/CognitoUserPoolClientId
+  editable:
+    configureDescription: "Perform necessary post-deployment configurations for cognito to function properly."
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
+  runtime: python3.7
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+  stackName: ${self:service}-${self:custom.stage}
+  tracing:
+    lambda: true
+
+package:
+  individually: true
+  exclude:
+    - "./**"
+
+functions:
+  configure:
+    name: ${self:custom.stage}-${self:service}-configure
+    description: ${self:custom.editable.configureDescription}
+    handler: handler.configure
+    role: !GetAtt ConfigureLambdaRole.Arn
+    package:
+      include:
+        - "*.py"
+    environment:
+      SSM_PARAM_NAME_CLIENT_ID: ${self:custom.ssmParamName}
+      CLIENT_ID: !Ref CognitoUserPoolClient
+
+  migrate_user:
+    handler: assign_group_to_new_users_lambda.migrate_user
+    environment:
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      USER_POOL_ID: !Ref CognitoUserPool
+    name: ${self:service}-${self:custom.stage}-migrate_user
+    description: Automaticcaly assign new users to level 1 group
+    role: !GetAtt GroupManagementRole.Arn
+    package:
+      include:
+        - '*.py'
+    events:
+      - cognitoUserPool:
+          pool: ${self:custom.stage}-dataplattform-user-pool
+          trigger: PostConfirmation
+          existing: true
+
 
 resources:
   Resources:
+    GroupManagementRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: GroupManagementRole
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+        Policies:
+          - PolicyName: ${self:custom.stage}-GroupManagement-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action: cognito-idp:AdminAddUserToGroup
+                  Resource: !GetAtt CognitoUserPool.Arn
+
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
@@ -22,7 +93,7 @@ resources:
           UnusedAccountValidityDays: 7
         AutoVerifiedAttributes:
           - email
-        UsernameAttributes: 
+        UsernameAttributes:
           - email
         UsernameConfiguration:
           CaseSensitive: true
@@ -42,13 +113,13 @@ resources:
         ExplicitAuthFlows:
           - ALLOW_USER_PASSWORD_AUTH
           - ALLOW_REFRESH_TOKEN_AUTH
-        PreventUserExistenceErrors: ENABLED 
+        PreventUserExistenceErrors: ENABLED
 
-    UserPoolDomain: 
-      Type: AWS::Cognito::UserPoolDomain 
+    UserPoolDomain:
+      Type: AWS::Cognito::UserPoolDomain
       Properties:
         UserPoolId: !Ref CognitoUserPool
-        Domain: ${self:custom.stage}-dataplattform-userpooldomain
+        Domain: ${self:custom.stage}-dataplattform-userpooldomain-#{AWS::AccountId}
 
     CognitoUserPoolGroupLevel1:
       Type: AWS::Cognito::UserPoolGroup
@@ -151,6 +222,36 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies: ${self:custom.policies.level3}
+
+    ConfigureLambdaAccess:
+      Type: AWS::IAM::ManagedPolicy
+      Properties:
+        Description: "Allows the configure lambda to put ssm parameters."
+        ManagedPolicyName: ${self:custom.stage}-cognito-configure-policy
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - ssm:PutParameter
+              Resource: arn:aws:ssm:eu-central-1:#{AWS::AccountId}:parameter${self:custom.ssmParamName}
+
+    ConfigureLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-configure-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - !Ref ConfigureLambdaAccess
 
   Outputs:
     CognitoUserPoolOutput:

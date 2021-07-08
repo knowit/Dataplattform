@@ -6,6 +6,11 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'services/ingestion/cvPartner/**'
+      - 'packages/common/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
@@ -13,6 +18,8 @@ on:
     paths:
       - 'services/ingestion/cvPartner/**'
       - 'packages/common/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

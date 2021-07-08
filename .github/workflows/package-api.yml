@@ -6,12 +6,18 @@ on:
     branches:
       - master
       - develop
+    paths:
+      - 'packages/api/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
       - develop
     paths:
       - 'packages/api/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:

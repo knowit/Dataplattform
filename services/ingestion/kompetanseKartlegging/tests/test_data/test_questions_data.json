@@ -1,0 +1,1232 @@
+[
+    {
+        "index": 116,
+        "text": "Programmering mot ESP32/ ESP8266 ved bruk av IDF eller Arduinorammeverket",
+        "id": "d1862cf3-7123-4d35-9cfd-6587e97dc0c8",
+        "topic": "ESP32",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 43,
+        "text": "Minst en kjøreomgivelse (runtime environment) basert på Javascript (Node, Deno)",
+        "id": "aed2b4ec-dc31-4236-a97d-2b840536373d",
+        "topic": "Kjøreomgivelser",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 92,
+        "text": "Microsoft Azure",
+        "id": "9f40d807-3fa6-4446-bdc2-7681ca136b3b",
+        "topic": "Azure",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 106,
+        "text": "Utvikling og bruk av CI/CD-pipelines",
+        "id": "4a7e2aac-a71a-49d5-97b1-624addbaf218",
+        "topic": "CI/CD",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 76,
+        "text": "Rammeverk som tensorflow, keras, pytorch, mm",
+        "id": "be02bf31-e082-41c9-a9eb-eb4c60c77f8c",
+        "topic": "Maskinlæringsrammeverk",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 133,
+        "text": "Rollen som produkteier for et smidig utviklings - eller produktteam.",
+        "id": "94690eb5-998e-4e26-95eb-1df691996344",
+        "topic": "Produkteier",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 41,
+        "text": "JS uten rammeverk",
+        "id": "48b6f2a0-7428-464c-b9fd-dd24f96f4bbb",
+        "topic": "JS uten dilldall",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 79,
+        "text": "Kjennskap til prinsipper om MLOps og CI/CD for maskinlæringpipelines",
+        "id": "de961a27-8d56-4bf6-9505-05d6ebed0dba",
+        "topic": "MLOps",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 51,
+        "text": "Objektorienterte konsepter og språk-konstruksjoner",
+        "id": "1c16719c-10cf-4976-bfe6-59a3657ffecc",
+        "topic": "Objektorientert programmering",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 9,
+        "text": "Hvor god er du i Sketch eller tilsvarende verktøy",
+        "id": "3a3e1914-f174-474b-aea7-6890c787b50a",
+        "topic": "Sketch",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 37,
+        "text": "Rammeverk/bibliotek",
+        "id": "f6086e2d-147f-449a-9656-ffa243cf05e5",
+        "topic": "Angular",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 61,
+        "text": "Programmeringsspråket Kotlin, hvordan bruke det til nyutvkikling og tilhørende populære rammeverk",
+        "id": "05067178-58bb-4882-98e8-00f0459ff014",
+        "topic": "Kotlin",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 44,
+        "text": "Minst ett verktøy for enhetstesting, for eksempel Jest eller Mocha/Chai.",
+        "id": "b22413ec-7c39-4dd8-b3e5-dc74e8e10a75",
+        "topic": "Enhets-/integrasjonstester",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 103,
+        "text": "'Hva ting koster' grovt sett, hvordan minimere kostnader",
+        "id": "e61073ef-f0bc-4f8d-b1fd-b0dffaa78bf4",
+        "topic": "Driftskostnader",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 102,
+        "text": "Loggsøk, Metrics, Traceability og alarmering",
+        "id": "ccb62d3e-7a56-4ee9-9347-1d04aa4c6a61",
+        "topic": "Systemmonitorering",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 131,
+        "text": "Opplæring av team og organisasjoner i smidig metodikk.",
+        "id": "69c7a510-9302-4bc8-9885-b838f97e9d58",
+        "topic": "Opplæring i smidig",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 148,
+        "text": "Forståelse for drivere i markedet. Hva tenker kundene på? Hva er de opptatt av? Hvilke endrinegr er i ferd med å skje? Hva er premissgivere for endringene?",
+        "id": "5c6e6741-df3c-48f2-ac9d-0c07b111a108",
+        "topic": "Markedsforståelse",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 2,
+        "text": "Her mener vi helheten av Produktutvikling som fagområde med forståelse av alle relevente underområder",
+        "id": "d96691ba-51d4-4af7-8b9e-ad583e64cb1c",
+        "topic": "Produktutvikling",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 11,
+        "text": "Hvor god er du i Adobe Photoshop eller tilsvarende verktøy",
+        "id": "46757916-5762-4b29-901c-736f9dca33af",
+        "topic": "Adobe Photoshop",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 146,
+        "text": "Erfaring med å koordinere og prioritere parallelle produkt- og tjenesteutviklingsløp i sammenheng. Evne til å se konsekvensen av, og forstå risiko ved, forretningsmessige, økonomiske, strategiske og personalmessige prioriteringer på tvers. Erfaring med ROS-analyse (Risiko og sårbarhet), SWOT (Strength, Weakness, Opportunities and Threats) og Gap analyse. Evne til å forstå, visualisere og kommunisere kompliserte oversikter og sammenhenger.",
+        "id": "71c90584-ed6c-4439-952f-ce4534d419de",
+        "topic": "Porteføljestyring",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 40,
+        "text": "Typescript",
+        "id": "c6cb13a4-c034-4849-935b-c49f713d75f3",
+        "topic": "Typescript",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 82,
+        "text": "Kunnskap og/ eller erfaring med XGBoost",
+        "id": "13fff96a-b616-4f0f-881d-6bfe4094adc0",
+        "topic": "xgboost",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 144,
+        "text": "Evne å analysere problemstillinger i et tilbud, bidra til å sette sammen ressurser for å svare dette ut og sette riktige priser, betingelser og kontraktsform.",
+        "id": "f1c97b3b-f9d7-4712-ad7f-c83c74768d38",
+        "topic": "Tilbudsarbeid",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 17,
+        "text": "Hvor godt kjenner du Double Diamond, og tilsvarende metoder som metodikk og tilnærming",
+        "id": "e060b778-dbd1-40ff-867a-1bd96499a1b8",
+        "topic": "Double Diamond metodikk",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 30,
+        "text": "Programmeringsspråket Swift for apputvikling",
+        "id": "230473f7-37e1-4f69-a106-2bbc01afe5cb",
+        "topic": "Swift",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 73,
+        "text": "Henting og bearbeiding av data slik at det er tilgjengelig for maskinlæring",
+        "id": "9fb0e35e-3e68-48e7-a4b2-1a613d0f8189",
+        "topic": "Datainnlasting / ETL",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 72,
+        "text": "Kunnskap om bruk av maskinlæringsmekanismer i skytjenester som f.eks Azure/AWS/Google i tillegg til rene maskinlæringsprodukter som Azure Machine Learning, AWS Sagemaker, etc.",
+        "id": "aa086dae-e7ca-4e14-b17a-707f9f17cb60",
+        "topic": "Skybasert maskinlæring",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 91,
+        "text": "Google Cloud Plattform",
+        "id": "18817a22-0a14-4d12-b310-a50f3ca8460d",
+        "topic": "GCP",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 6,
+        "text": "grafisk, og visuell, design er bruken av verktøy og designkompetanse for å faktisk gi form, farge og innhold til den konkrete utformingen av en tjeneste",
+        "id": "bd14f0ca-a50b-4b42-915b-b8aae30e8d36",
+        "topic": "Grafisk design",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 78,
+        "text": "Bruk av ML direkte på IoT-enheter",
+        "id": "5fe736af-c786-4ebf-9987-e9273c0d71b2",
+        "topic": "ML Edge Computing",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 8,
+        "text": "Hvor god er du i Figma eller tilsvarende verktøy",
+        "id": "52454bc4-4d1d-42a2-91a6-a6965c1cc1ee",
+        "topic": "Figma",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 89,
+        "text": "Docker, Kubernetes GKE, ECS el.lign.",
+        "id": "b5191235-8cae-4961-8f0b-36ca2de58f85",
+        "topic": "Kubernetes",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 1,
+        "scaleStart": "Helt uaktuelt",
+        "topic": "Bytte prosjekt",
+        "categoryID": "841f669e-18d2-4ec9-a543-ed941e6dcf5f",
+        "scaleEnd": "Det er på tide!",
+        "text": "Ønsker du å bytte prosjekt? ",
+        "id": "e176f891-9e96-42d9-92c8-4b5f726c94f8",
+        "scaleMiddle": "",
+        "type": "customScaleLabels"
+    },
+    {
+        "index": 2,
+        "scaleStart": "Helst ikke",
+        "topic": "Nye muligheter for KION",
+        "categoryID": "841f669e-18d2-4ec9-a543-ed941e6dcf5f",
+        "scaleEnd": "Det går helt fint!",
+        "text": "Er du åpen for å bytte prosjekt hvis din kompetanseprofil kan bidra til å skape nye muligheter for KION?",
+        "id": "8b36bcaa-3c0c-4741-b1e1-06e42af62e8e",
+        "scaleMiddle": "",
+        "type": "customScaleLabels"
+    },
+    {
+        "index": 114,
+        "text": "Programmering i C++ for mikrokontrollere",
+        "id": "8636319c-d56b-45d7-838b-19cafb839760",
+        "topic": "C++",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 57,
+        "text": "Type- og grensesnittdesign for APIer med teknologier som REST, gRPC, GraphQL eller SOAP",
+        "id": "77ffd25d-bce9-424e-b33a-b8b2a989d017",
+        "topic": "API-design",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 150,
+        "text": "Hva skal til for å lage et produkt? Støttemiddelapparat? Utfordringer for startuos mv. Helpemidler. Finansiering",
+        "id": "b0a4e40c-f3cc-4d50-8161-50ad53c381b2",
+        "topic": "Produktutvikling",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 98,
+        "text": "Redis, MongoDB, Cassandre eller andre NoSQL-databaser",
+        "id": "d841ef8d-af7e-4f00-ba1b-c3ca272e2028",
+        "topic": "Dokumentdatabaser",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 58,
+        "text": "Bruk av typesystemer i utvikling, herunder modelldrevet utvikling, modellering av relasjonsdatabaser samt utvikling av objektorienterte typesystemer",
+        "id": "5d7d65e9-045e-44be-889a-02b324e8bc92",
+        "topic": "Datamodellering og typeteori",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 151,
+        "text": "Løsningsarkitektur, virksomhetsarkitektur, sikkerhetsakitektur, transisjonsarkitektur/migrasjonsarkitektur - dette hører kanskje ikke hjemme her, men vi finner det ikke noe annet sted heller.",
+        "id": "7ca4b0d7-1a28-4894-8dda-ea07bef99492",
+        "topic": "Arkitektur",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 93,
+        "text": "IBM Cloud",
+        "id": "b449178c-ba98-4af8-9a41-fab5097128b2",
+        "topic": "IBM Cloud",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 85,
+        "text": "Erfaring med programmering i Julia (mange mener dette er det nye python i ML)",
+        "id": "e1712100-a628-4d18-994a-1a529ca1c579",
+        "topic": "Julia",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 13,
+        "text": "Her mener vi kompetanse innen tilrettelegging, best praksis og generelle krav for tilgjengelige tjenester",
+        "id": "bafeb23f-dd11-4bdd-9fa8-aeb420637e86",
+        "topic": "Universell utforming, generelt",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 48,
+        "text": "Automatiserte verktøy for å forhindre dårlig kodekvalitet i kodebasen (Eslint, SonarCloud, Prettier og så videre)",
+        "id": "e00baca6-9d27-4937-9210-7dd387a22f35",
+        "topic": "Automatiserte verktøy for kodekvalitet",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 111,
+        "text": "Bruk av loddebolt til lavspent elektronikk",
+        "id": "148179dc-fb1e-49f2-8a6c-4248391e43ea",
+        "topic": "Loddebolt",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 1,
+        "text": "Her mener vi Tjenestedesign som en overordnet tilnærming for utvikling av helhetlige tjenester",
+        "id": "d01c9720-1db5-4d0f-b5a2-ac783619d90c",
+        "topic": "Tjenestedesign",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 62,
+        "text": "Programmeringsspråket Scala, forstå konsepter og hvordan bruke det til nyutvkikling",
+        "id": "7568ab5d-2153-485c-92ad-5be01b858c07",
+        "topic": "Scala",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 36,
+        "text": "Rammeverk/bibliotek",
+        "id": "60afa23c-4d1f-4b1f-9b0e-135984948b9c",
+        "topic": "Svelte",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 122,
+        "text": "Design av 3D-modeller for produksjon ved hjelp av Blender, Fusion 365, FreeCAD o.l.",
+        "id": "692ca9c3-4481-40e9-af75-2bd3deaf4da6",
+        "topic": "CAD",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 20,
+        "text": "Realm, UIKit, SwiftUI, Best practice (bruksmønster, custom/default-components, etc.)",
+        "id": "5e2aa1be-881a-45f1-a67a-1e1f2ecbbf1c",
+        "topic": "iOS",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 143,
+        "text": "Evne å analysere og komme med skisser til handlingsplaner, råd samt å gi presentasjoner av problemområder som er aktuelle for kunder.",
+        "id": "f56c7ec3-2c60-4a11-ba1a-afbf9b5ae359",
+        "topic": "Rådgivning og pre-salg",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 118,
+        "text": "Utvikling ved hjelp av platform.io",
+        "id": "4b5c9034-c79d-46b7-b837-b2891b5f8c06",
+        "topic": "platform.io",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 18,
+        "text": "Hvor godt kjenner du brukerinvolvering og brukertesting som metode på generelt grunnlag",
+        "id": "cefb3143-61d4-4977-9458-7e78e6428be3",
+        "topic": "Brukertesting generelt",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 69,
+        "text": "Rammeverk for applikasjoner i Java/JVM",
+        "id": "90c516d8-ee7e-433d-9a8b-b916e2eecea3",
+        "topic": "Spring Boot",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 95,
+        "text": "Terraform, Vagrant, Github Actions eller andre infrastructure-as-code verktøy",
+        "id": "844416ca-9c86-4b1f-9d8d-b78e5178cb42",
+        "topic": "Terraform",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 141,
+        "text": "Evne til å organisere en utviklingsavdeling, team, eller annen selvstendig ingeniør-, utviklings- eller innovasjonsenhet. Etablere styrings- og koordineringsrutiner på tvers av flere parallelle utviklingsløp med gjensidige avhengigheter. Legge til rette for hensiktsmessige utviklingsprosesser, med balansert fokus på hastighet, funksjonalitet, skalerbarhet, vedlikeholdbarhet og kvalitet.",
+        "id": "baf26776-aa03-4a65-82e9-69baee5e88ae",
+        "topic": "Teknologiledelse og organisering",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 68,
+        "text": "Rammeverk for Kotlin-applikasjoner",
+        "id": "3e7e29ac-1e38-4397-ba24-2fd8db247420",
+        "topic": "KTor",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 128,
+        "text": "Kunnskap om hva som kjennetegner effektive smidige organisasjoner og hvordan man setter sammen gode autonome produkt- og utviklingsteam",
+        "id": "37559e8b-61c6-4f83-b058-72914f555f93",
+        "topic": "Smidige organisasjoner",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 4,
+        "text": "Interaksjonsdesign er et praktisk fagområde som inkluderer utvikling og design av brukergrensesnitt, i alle former og metodikk for å brukerteste en designs egnethet. mv.",
+        "id": "515afa78-a873-4ac3-81c8-7fcc58db1427",
+        "topic": "Interaksjonsdesign",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 107,
+        "text": "Interaksjon mellom tjeneter på sky og på lokalt datasenter eller lignende",
+        "id": "21224733-64c4-41c8-b5e5-2b701d3da57f",
+        "topic": "Hybridsky",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 50,
+        "text": "Verktøy for datavisualisering (d3.js, Chart.js)",
+        "id": "cc2673d0-912e-4a1b-8604-5c1cf3af12c8",
+        "topic": "Datavisualisering",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 75,
+        "text": "Kunnskap og/eller erfaring med hvilke algoritmer som finnes og velge korrekt algoritme (gitt et problemområde)",
+        "id": "a4078ae1-0e7d-4767-b025-35a7de801b14",
+        "topic": "Maskinlæringsalgoritmer",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 112,
+        "text": "Design og bruk og kvalitetssikring av kretskort, mikrokontrollere og sensorkomponenter. Bruk av designverktøy som Eagle, Fritzing o.l.",
+        "id": "166a1414-4139-4c36-a2a5-e14bb28873f3",
+        "topic": "Kretskort",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 46,
+        "text": "Mikro-frontender (se https://micro-frontends.org/)",
+        "id": "1cb91984-3917-48f8-bf4a-5c762435ab56",
+        "topic": "Mikro-frontend",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 101,
+        "text": "Mikrotjenester, SRP, utskilling av tjenester fra monolitter",
+        "id": "ebbf36cb-f7c4-4fd7-abbd-d6698a3a11df",
+        "topic": "Mikrotjenestearkitektur",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 32,
+        "text": "Programmeringsspråket ObjectiveC for apputvikling",
+        "id": "0f4ed49e-cba9-42fe-9f3b-f3b4fbd8c45f",
+        "topic": "ObjectiveC",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 49,
+        "text": "Difis retningslinjer for universell utforming (altså Wcag 2.0).",
+        "id": "1fd4af21-51ad-4875-9640-bbb727a0623e",
+        "topic": "Universell utforming",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 63,
+        "text": "Programmeringsspråket Clojure, forstå konsepter og hvordan bruke det til nyutvkikling",
+        "id": "71c489d0-1b96-4eb4-9914-b452c026a060",
+        "topic": "Clojure",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 22,
+        "text": "",
+        "id": "67788459-ff90-4c20-adec-1d0727fccbf2",
+        "topic": "React Native",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 35,
+        "text": "Rammeverk/bibliotek",
+        "id": "3f42da99-4874-47b9-8c19-e9c9858d716e",
+        "topic": "Vue",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 24,
+        "text": "MVVM, MVC, MVP, VIPER",
+        "id": "b7b9d6d0-5979-433f-ad26-f03f3c55bd34",
+        "topic": "Arkitektur",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 5,
+        "text": "Utvikling og bruk av wireframes og mockups som generelt verktøy for utvikling av interaksjonsdesign og grafisk design",
+        "id": "34ea1cb9-300a-4f9b-9f52-50d377396108",
+        "topic": "Wireframes og mockups",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 124,
+        "text": "Bruk og utvikling på små maskiner som Raspberry Pi",
+        "id": "345eca5b-a2a6-4e97-ac8e-f6849e96adf2",
+        "topic": "SBC (f.eks Raspberry Pi)",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 134,
+        "text": "Rollen som fasilitator for en Kanban-prosess.",
+        "id": "3a27bde2-a0ae-40f5-ad4e-c324ad3f6e49",
+        "topic": "Kanban fasilitator",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 113,
+        "text": "Oppsett av løsninger for IoT nettverk i skyen, uavhengig av hvilken skyleverandør",
+        "id": "6a2568aa-0f77-4121-84de-beac2471da1f",
+        "topic": "IoT-infrastruktur i skyen",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 115,
+        "text": "Programmering mot Arduino- enheter eller annen bruk av Arduino-rammeverket",
+        "id": "1748b177-8caa-4b7d-95b2-bb5201d0835a",
+        "topic": "Arduino",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 97,
+        "text": "Oppsett og sikring av nettverk i sky",
+        "id": "d18a87b8-6749-4c5a-a293-a40b99e65e8f",
+        "topic": "Skynettverk",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 71,
+        "text": "Kunnskap og/eller praktisk erfaring med å lage gode treningsdata",
+        "id": "7c773ab3-99cb-4c92-bb35-9547ca00cb0f",
+        "topic": "Generering av treningsdata",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 121,
+        "text": "Programmering i Python for mikrokontrollere",
+        "id": "4d48bb83-77bc-4fd7-84f0-36cd5ec550d8",
+        "topic": "Micropython",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 99,
+        "text": "Jenkins eller andre kodebaserte CI-tjenester som CircleCI, Github Actions, Travis osv",
+        "id": "b3d6245a-2903-4b2c-b6d9-193cb8d61aff",
+        "topic": "Jenkins eller andre CI-verktøy",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 52,
+        "text": "Funksjonelle konsepter og språk-konstruksjoner",
+        "id": "70aebf78-6918-4050-a2ef-6ce1b38289f0",
+        "topic": "Funksjonell programmering",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 136,
+        "text": "Fasilitering av workshops og møter for team og organisasjoner",
+        "id": "f308eec8-412b-406f-9aef-47ca298ca116",
+        "topic": "Fasilitering",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 90,
+        "text": "Amazon Web Services",
+        "id": "0f672a91-11b4-4ba2-a69f-764a955f08bd",
+        "topic": "AWS",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 19,
+        "text": "Lifecycle, LiveData, ViewModel, Room, Dagger, Jetpack, Best practice (bruksmønster, custom/default-components, etc.)",
+        "id": "8116c01f-b2e5-4b8c-9220-69f2b0c6c466",
+        "topic": "Android",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 38,
+        "text": "HTML (bygge sider uten å ty til JS).",
+        "id": "18cb5190-ebdb-47db-a097-170fcae0a968",
+        "topic": "HTML",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 129,
+        "text": "Hvordan gjennomføre vellykket teambuilding og godt samarbeidsklima i team",
+        "id": "9d494587-42ec-4ae6-8db4-95db86aa6259",
+        "topic": "Teambuilding",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 66,
+        "text": "Programmeringsspråket Python",
+        "id": "160669c5-9da3-4f5b-b514-5a9e6e6bb3f9",
+        "topic": "Python",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 84,
+        "text": "Kjennskap til hvordan nevrale nettverk fungerer, hvordan man bruker dem og i hvilke situasjoner de når best ytelse",
+        "id": "7cf4f9ef-ee16-4bea-b796-6d4d538457af",
+        "topic": "Nevrale nettverk",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 77,
+        "text": "Bruk av Python og/eller R for maskinlæring",
+        "id": "60f30652-bf6d-482f-b26e-ee79e00438a3",
+        "topic": "Python eller R for ML",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 80,
+        "text": "Kunnskap og/ eller erfaring med TensorFlow",
+        "id": "1a81dbb1-3a46-48cf-8805-0af969c03832",
+        "topic": "TensorFlow",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 14,
+        "text": "Her mener vi kompetanse og kunnskap om WCAG 2.x standarden konkret, kravene dens og retningslinjene som følger",
+        "id": "e14100b9-83f0-4ef2-905f-11bcfb72cdef",
+        "topic": "Universell utforming, WCAG 2.x",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 28,
+        "text": "Automatiske UI tester, Unit-tester",
+        "id": "66e4485e-1795-413f-82b2-5ab5e79192f3",
+        "topic": "Testing",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 16,
+        "text": "Hvor godt kjenner du Design Sprints som metodikk, tilnærming og idé-verktøy",
+        "id": "7af67534-43a4-4f6c-99ac-7691da8d64e9",
+        "topic": "Design Sprint metodikk",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 7,
+        "text": "Hvor flink er du til å tegne, faktisk skisse og tegne ut noe basert på en abstrakt idé eller beskrivelse",
+        "id": "81844517-98b2-4aff-98ec-19a6d51e7648",
+        "topic": "Tegneferdigheter",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 33,
+        "text": "Progressive Web Apps",
+        "id": "5c6a9427-c796-4d2b-a711-66b5b494fd75",
+        "topic": "PWA",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 26,
+        "text": "Objectmapping",
+        "id": "9602309b-1447-4aec-86dc-1afc967756d6",
+        "topic": "REST-API-integrasjon",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 60,
+        "text": "Kunnskap om moderne praksis innen Java-utvikling, interoperabilitet med typiske rammeverk og biblioteker samt. pekepinner til hvordan løse typiske problemer",
+        "id": "7fdeb239-e65b-4990-bc5d-00a703c8f487",
+        "topic": "Java",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 109,
+        "text": "Narrowband Internet of Things (NB-IoT) - trådløs mobilkommunikasjon for IoT- enheter",
+        "id": "eebfae6a-0ccc-45eb-867b-8a11525b5d3d",
+        "topic": "NB-IoT",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 39,
+        "text": "CSS og/eller et CSS-system som Less eller Sass.",
+        "id": "00734822-c920-444a-b893-4ddc97abc8e4",
+        "topic": "CSS",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 105,
+        "text": "Databaser, ikke nødvendigvis på sky",
+        "id": "bed1736f-3eec-451b-931a-4904477e71b2",
+        "topic": "Databasedrift",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 53,
+        "text": "Relasjonsdatabaser som Postgres, Oracle o.l.",
+        "id": "ea4697e9-e2e1-4e69-879d-55c0cda7c110",
+        "topic": "Relasjonsdatabaser",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 47,
+        "text": "Webassembly (middels: Vet hva det er og hva fordelene med det er, topp: Kan kompilere til det fra et annet språk og bruke det i prosjekt).",
+        "id": "bf5aaf80-b8c6-48b2-8b0a-2107b9bc6262",
+        "topic": "Web Assembly",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 3,
+        "text": "Hvor godt kjenner du designledelse og -metodikk på overordnet og helhetlig nivå",
+        "id": "fd126fc5-e15c-4ebe-9647-b7ee4e97ea58",
+        "topic": "Designledelse og metodikk",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 29,
+        "text": "Programmeringsspråket Kotlin for apputvikling",
+        "id": "7eb02605-fcbe-4a86-8f24-062078e48220",
+        "topic": "Kotlin",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 94,
+        "text": "Apache Kafka, RabbitMQ, MQTT, AMQP eller lignende",
+        "id": "12050ca4-9111-459c-9888-2824d36c2d77",
+        "topic": "Køtjenester",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 42,
+        "text": "Minst ett bundling-verktøy. (Webpack, Snowpack, Parcel, Rollup)",
+        "id": "9e949455-3ae3-4913-a2c6-b2ae921b6ea1",
+        "topic": "Bundlere",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 10,
+        "text": "Hvor god er du i Adobe Illustrator eller tilsvarende verktøy",
+        "id": "64520ca0-acc9-41e0-b7e2-2a251f54bdc8",
+        "topic": "Adobe illustrator",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 31,
+        "text": "Programmeringsspråket Java for apputvikling",
+        "id": "40ec580b-352b-4da3-bbba-e5e26a65dd50",
+        "topic": "Java",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 126,
+        "text": "Smidige prinsipper og forskjellige smidige metoder og teknikker som Scrum, Kanban, Design Thinking, Lean Startup, OKR mm.",
+        "id": "ac95f077-faa9-406c-9c50-5c65d99c4210",
+        "topic": "Smidig metodikk",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 67,
+        "text": "Bruk av Node og Javascript/Typescript for å utvikle løsninger",
+        "id": "168dff90-46cf-4d2a-9e9b-76eb7f560089",
+        "topic": "Node backend",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 55,
+        "text": "Prinsipper for organisering av kode og organisering av større programsystemer",
+        "id": "4a551d33-434b-4520-b717-2113734ef128",
+        "topic": "Designprinsipper og patterns",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 100,
+        "text": "AWS Lambda, Google Cloud functions el.lign.",
+        "id": "5d875bd4-8dc4-4dea-8a11-ad334ceb6535",
+        "topic": "Serverless",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 135,
+        "text": "Objectives and Key Results, en smidig metodikk for å sette visjon, og velge konkrete målbare resultater",
+        "id": "726fab4f-24ea-4dea-ace7-aff0359e05b9",
+        "topic": "OKR",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 119,
+        "text": "Programmering i MongooseOS (Operating System for the Internet of Things)",
+        "id": "fb491ef6-e53d-41dc-887a-5999093989c4",
+        "topic": "MongooseOS",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 21,
+        "text": "Dart, BLOC-pattern",
+        "id": "a8235195-66a4-487c-a5c7-f646fa4339fe",
+        "topic": "Flutter",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 70,
+        "text": "Erfaring med notebooks for uforskende bruk av maskinlæring og dataananalyse",
+        "id": "8f3141c6-97d5-43af-b1a7-7789e551e6d4",
+        "topic": "Jupyter Notebook",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 125,
+        "text": "Bruk og design av eletroniske kretser (svakstrøm)",
+        "id": "9e5d805a-fd65-4b93-8dd5-d636e38e7b36",
+        "topic": "Elektronikk svakstrøm",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 96,
+        "text": "Kunnskap om lovlig bruk av persondata, den norske personvernloven, GDPR og retningslinjene fra datatilsynet, digitaliseringsdirektoratet og EDPB",
+        "id": "0f5d8bc4-78b3-431b-ae38-ba8de23837ad",
+        "topic": "GDPR og Personvern",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 139,
+        "text": "Teknikker for konfliktløsning. Hva som kjennetegner et godt arbeidsmiljø.",
+        "id": "db0b7375-9d64-43fc-bc65-05fb4c3f7ae0",
+        "topic": "Konfliktløsning",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 23,
+        "text": "",
+        "id": "853fdc65-0cff-4f03-92b7-d02cf8026de5",
+        "topic": "Xamarin",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 142,
+        "text": "Legge til rette for hensiktsmessig organisering av anskaffelsesprosesser og sourcingstrategi for teknologianskaffelser. Nearshoring.",
+        "id": "9d4c031f-4939-4c08-a0ae-089c6f5b0f66",
+        "topic": "Anskaffelser og sourcing",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 138,
+        "text": "Lede planleggingen, prioriteringen og gjennomføring av produktutvikling.",
+        "id": "ecb14523-4ed9-4b8c-9ccd-972c3152d0af",
+        "topic": "Produktledelse",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 147,
+        "text": "",
+        "id": "e382da8c-0f26-4d24-ad4d-b056467448fd",
+        "topic": "Strategisk ledelse",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 87,
+        "text": "Når man jobber med mye data må man ofte jobbe direkte mot database / datawarehouse og da er SQL essensielt",
+        "id": "10af9bf6-e03d-4298-bc6b-3c4fc885c1c8",
+        "topic": "SQL",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 145,
+        "text": "Evne å håndtere planlegging og oppfølging av prosjekter med gitt scope og budsjett. Forståelse for de vanligste kontraktsformene ved prosjektgjennomføring, herunder varianter av Statens standardavtaler i flere generasjoner, samt forstå hvilke krav til endringshåndtering og dokumentasjon som følger av disse kontraktene.",
+        "id": "a6e34dd1-6a22-4da0-9e5a-ccc6e53f8453",
+        "topic": "Prosjektstyring med kontraktsoppfølging",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 25,
+        "text": "OkHttp, Retrofit, Swift Network, HttpsUrlConnection",
+        "id": "f8b678a1-5226-4eb1-a36c-ea0ddf98bdc3",
+        "topic": "Nettverk",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 54,
+        "text": "NoSQL-databaser i utviklingsprosjekter",
+        "id": "4b1d63ab-04ff-4572-93ce-347bd4cfb5aa",
+        "topic": "NoSQL - databaser",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 108,
+        "text": "Dataflyt i mikrotjenestearkitektur med forskjellige køer og databaser",
+        "id": "e794a78e-1b8e-42b6-b331-a718351f2eab",
+        "topic": "Data flow",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 74,
+        "text": "Grunnleggende kunnskap om matematiske og/eller statistiske metoder som er relevant for maskinlæring",
+        "id": "3067a2a8-a905-4dbf-9e1d-f932096ebb54",
+        "topic": "Statistikk og matematikk",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 127,
+        "text": "Lede og koordinere arbeidet i et smidig utviklingsteam. Fungere i en rolle som team lead.",
+        "id": "489adad0-b537-46de-803c-fc4097b256a2",
+        "topic": "Teamledelse",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 15,
+        "text": "Hvor godt kjenner du Design Thinking som metodikk, tilnærming og designrammeverk",
+        "id": "9c9080dc-7c0f-497e-a89f-b33d2166d974",
+        "topic": "Design Thinking metodikk",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 88,
+        "text": "Forstå kjente output metrics for performance, i tillegg til å kunne forstå svakheter og styrker av modellen i henhold til domenet.",
+        "id": "b29f2f24-bdd6-4ad3-9a15-2deb276a4221",
+        "topic": "Validering av modeller",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 117,
+        "text": "Design og bruk av FPGA (Field-programmable gate array)",
+        "id": "a1f36482-c67f-47d4-a77b-538dcefe2ed5",
+        "topic": "FPGA",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 104,
+        "text": "Asynkron prosessering og købasert infrastruktur",
+        "id": "ebdc0177-61bb-4706-a327-9ab1f2869cdf",
+        "topic": "Asynkron og eventbasert prosessering",
+        "categoryID": "3efffcf3-b458-467d-bdac-e4ae08b3f040",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 12,
+        "text": "Hvor godt kjenner du et eller flere andre verktøy som kan komplettere eller erstatte verktøyene over?",
+        "id": "32e99d2e-44ab-4808-a4d1-a738727dde54",
+        "topic": "Andre tilsvarende verktøy",
+        "categoryID": "287a6f25-f056-4299-ad6a-4dabd831fcc2",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 132,
+        "text": "Rollen som scrum master et smidig utviklingsteam som organiserer arbeidet etter Scrum eller med Scrum-elementer.",
+        "id": "0e4bb43e-a444-43e9-82fb-c083ee45eb09",
+        "topic": "Scrum master",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 56,
+        "text": "Arkitektur og teknologivalg rundt applikasjoner",
+        "id": "e60ffba8-41fd-4a14-a396-a99bce138d43",
+        "topic": "Applikasjonsarkitektur",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 86,
+        "text": "Preprosessering av data til bruk i maskinlæringsalgoritmer (her henter man mest mtp performance for modell)",
+        "id": "c53ba4a5-58b5-4488-bf68-c21201b13d9b",
+        "topic": "Feature Engineering",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 64,
+        "text": "Systemspråk som C, Rust, C++ og anvendelse av disse mm",
+        "id": "48fbcd8e-f5cc-4f75-bb63-f4240d384b3b",
+        "topic": "Systemspråk",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 110,
+        "text": "Produksjon av fysiske gjenstander med 3D- printer, laserkutter, CNC m.m.",
+        "id": "08dd52d3-0946-4009-a634-5f7e898c5e19",
+        "topic": "3D-printing, prototyping og annen produksjon",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 34,
+        "text": "Rammeverk/bibliotek",
+        "id": "1128d383-97d2-44fc-9bd7-a71290d858a5",
+        "topic": "React",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 65,
+        "text": "Utvikling av løsninger på Microsoft tecknologistack",
+        "id": "72300750-2547-45c2-88c6-4ffa316fc089",
+        "topic": "Microsoft tech stack (C# og .NET)",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 45,
+        "text": "Minst ett verktøy for ende-til-ende-testing, for eksempel Cypress, Capybara eller Selenium Webdriver",
+        "id": "0783074c-0941-4104-b441-5cf3a61f0120",
+        "topic": "Ende-til-ende-tester",
+        "categoryID": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 83,
+        "text": "Kunnskap og/ eller erfaring med pytorch",
+        "id": "33e43b6a-92cb-477b-a62f-55f1ac1769da",
+        "topic": "pytorch",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 149,
+        "text": "Forståelse og kunnskap i et domene og verdikjedene innenfor domenet",
+        "id": "b165bff4-edef-49a9-a861-71c7bf2acce1",
+        "topic": "Domeneforståelse",
+        "categoryID": "522b563b-5275-465e-bb1d-cb6a5131059a",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 120,
+        "text": "MQTT som protokoll og infrastruktur for meldinger (pub/sub)",
+        "id": "b23792b0-cda3-42cb-860d-86ec67cb423c",
+        "topic": "MQTT",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 123,
+        "text": "Integrasjon mot analoge og digitale sensorer. Kommunkasjon over I2C, SPI m.m.",
+        "id": "1101ec5a-bee6-4935-bf73-a1a633c82a2e",
+        "topic": "Sensorer og eksterne enheter",
+        "categoryID": "a79de551-d88e-40c6-808f-ce0d2d07a242",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 140,
+        "text": "Regneark, Jira, Confluence, Trello, Miro og andre tilsvarende verktøy.",
+        "id": "2399172c-6528-4610-8ce8-34ec8002aa69",
+        "topic": "Verktøy",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 130,
+        "text": "Bistå enkeltpersoner, team og organsasjonsenheter i innføring eller forbedring av smidige prosesser.",
+        "id": "30bd188f-8818-4372-80df-6074a072da01",
+        "topic": "Smidig coaching",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 137,
+        "text": "Ledelse og oppfølging av enkeltpersoner. Lover og regler for arbeidsliv og personaloppfølging.",
+        "id": "3708d4b2-eb03-45c2-a060-1f2567934eef",
+        "topic": "Personalledelse",
+        "categoryID": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 59,
+        "text": "Kjennskap til JVM og evne å utnytte denne og tilgrensende verktøy i løsninger",
+        "id": "e517ba9a-8a29-4256-82f8-60450cabb606",
+        "topic": "JVM-baserte språk og biblioteker generelt",
+        "categoryID": "5faf0519-809d-4d02-a8a0-9862024170bc",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 27,
+        "text": "Biometrics, kryptering, keystore/keychain, nettverk",
+        "id": "1cb70f51-0d35-4fc5-b02b-bb7e0932dc48",
+        "topic": "Sikkerhet",
+        "categoryID": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca",
+        "type": "knowledgeMotivation"
+    },
+    {
+        "index": 81,
+        "text": "Kunnskap og/ eller erfaring med Keras",
+        "id": "e08dcf03-9aa0-4b3e-8105-abc8cae9391d",
+        "topic": "Keras",
+        "categoryID": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc",
+        "type": "knowledgeMotivation"
+    }
+]
