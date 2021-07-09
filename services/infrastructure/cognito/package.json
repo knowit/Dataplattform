@@ -1,5 +1,7 @@
 {
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
+    "serverless-plugin-scripts": "^1.0.2",
     "serverless-pseudo-parameters": "^2.5.0"
   }
 }

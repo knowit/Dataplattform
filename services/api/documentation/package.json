@@ -5,10 +5,7 @@
   "author": "",
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server --open",
-    "predeploy:dev": "yarn build",
-    "deploy:dev": "aws s3 sync dist s3://dev-api-documentation-staticweb-723164513951",
-    "postdeploy:dev": "aws cloudfront create-invalidation --distribution-id E2V358T6QZ2R2T --paths /"
+    "start": "webpack-dev-server --open"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^1.0.1",
