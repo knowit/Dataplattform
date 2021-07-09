@@ -1,5 +1,9 @@
 service: datalake
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+
 plugins:
   - serverless-pseudo-parameters
 

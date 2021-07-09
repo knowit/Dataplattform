@@ -1,5 +1,19 @@
 service: cvPartnerPoller
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../utils/downloadToBucket
+    - ../../infrastructure/storage
+    - ../../infrastructure/events
+    - ../../infrastructure/metadata
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+
 custom:
   editable:
     timeout: 900

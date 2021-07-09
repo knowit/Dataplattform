@@ -12,6 +12,7 @@ def main():
         'setup-datasource',
         'register-table',
         'database',
+        'deploy',
         'configure'
     ]
 

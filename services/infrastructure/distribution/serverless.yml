@@ -1,5 +1,10 @@
 service: cloudfront-api-dist
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../../api/dataApi
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   allowedMethods:

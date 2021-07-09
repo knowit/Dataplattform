@@ -1,5 +1,10 @@
 service: monitoring
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../events
+
 plugins:
   - serverless-pseudo-parameters
 

@@ -1,6 +1,10 @@
 service: vpc
 frameworkVersion: "2"
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+
 plugins:
   - serverless-pseudo-parameters
 
