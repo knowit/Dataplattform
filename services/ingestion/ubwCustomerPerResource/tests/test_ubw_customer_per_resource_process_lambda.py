@@ -2,6 +2,7 @@ from pytest import fixture
 from ubw_customer_per_resource_process_lambda import handler
 import pandas as pd
 from os import path
+import numpy as np
 from json import load
 from dataplattform.common import schema
 
@@ -97,16 +98,16 @@ def test_process_data_test_dataframe_content(create_table_mock, setup_queue_even
         'ubw_customer_per_resource',
         pd.DataFrame({
             'reg_period': ['202053', '202053', '202053'],
-            'alias': ['pernord', 'pernord', 'karnord'],
+            'alias': ['frearn', 'frearn', 'einhal'],
             'project_type': ['External Projects', 'Local Projects', 'Local Projects'],
             'work_order': ['work order no 2', 'work order no 1', 'work order no 3'],
             'work_order_description': ['Some work order desc.', 'Some work order desc.', 'Some work order desc.'],
             'customer': ['customer 2', 'customer 1', 'customer 3'],
             'time': [0, 0, 0],
             'weigth': [1, 2, 1],
-            'guid': ['20dbbfa18380233aa643575720b893fac5137699',
-                     '20dbbfa18380233aa643575720b893fac5137699',
-                     '491b9fa9bfac17563882b0fdc6f3a8a97417bd99'],
+            'guid': ['b051b402346144a6cdcceb0027f6e80d29019f50',
+                     'b051b402346144a6cdcceb0027f6e80d29019f50',
+                     '5d79f8b771cd4921b667f9227aece292213806d6'],
         }))
 
 
@@ -122,7 +123,7 @@ def test_process_per_project_data_content(create_table_mock, setup_queue_event, 
         pd.DataFrame({
             'customer': ['customer 2', 'customer 1', 'customer 3'],
             'employees': [1, 1, 1],
-            'hours': [6.0, 4.0, 1.0],
+            'hours': np.array([6, 4, 1], dtype=np.float32),
             'reg_period': ["202053", "202053", "202053"],
             'timestamp': [1601294392, 1601294392, 1601294392]
         }))
