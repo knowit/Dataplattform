@@ -2,6 +2,7 @@ from pytest import fixture
 from ubw_customer_per_resource_process_lambda import handler
 import pandas as pd
 from os import path
+import numpy as np
 from json import load
 from dataplattform.common import schema
 
@@ -122,7 +123,7 @@ def test_process_per_project_data_content(create_table_mock, setup_queue_event, 
         pd.DataFrame({
             'customer': ['customer 2', 'customer 1', 'customer 3'],
             'employees': [1, 1, 1],
-            'hours': [6.0, 4.0, 1.0],
+            'hours': np.array([6, 4, 1], dtype=np.float32),
             'reg_period': ["202053", "202053", "202053"],
             'timestamp': [1601294392, 1601294392, 1601294392]
         }))
