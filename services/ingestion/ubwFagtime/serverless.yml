@@ -11,6 +11,9 @@ dataplattform:
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+  glue:
+    tableName: ubw_fagtime
+    accessLevel: 2
 
 custom:
   #Edit these variables###########################

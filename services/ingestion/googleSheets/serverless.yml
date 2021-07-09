@@ -11,6 +11,9 @@ dataplattform:
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
     - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: google_sheets
+    accessLevel: 3
 
 custom:
   editable:

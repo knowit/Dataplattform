@@ -10,6 +10,9 @@ dataplattform:
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+  glue:
+    tableName: ubw_customer_per_resource
+    accessLevel: 3
 
 custom:
   editable:

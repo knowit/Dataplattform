@@ -13,6 +13,9 @@ dataplattform:
     - ../../infrastructure/metadata
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+  glue:
+    tableName: cv_partner
+    accessLevel: 3
 
 custom:
   editable:

@@ -13,6 +13,9 @@ dataplattform:
     - ../../infrastructure/metadata
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+  glue:
+    tableName: active_directory
+    accessLevel: 3
 
 custom:
   #Edit these variables###########################

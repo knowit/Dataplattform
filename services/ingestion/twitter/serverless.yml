@@ -10,6 +10,9 @@ dataplattform:
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+  glue:
+    tableName: twitter
+    accessLevel: 1
 
 custom:
   editable:

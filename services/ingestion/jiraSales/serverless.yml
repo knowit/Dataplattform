@@ -11,6 +11,9 @@ dataplattform:
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
     - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: jira_sales
+    accessLevel: 2
 
 custom:
   editable:
