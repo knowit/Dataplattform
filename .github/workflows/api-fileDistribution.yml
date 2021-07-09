@@ -39,16 +39,3 @@ jobs:
       run: |
         pip install yamllint
         yamllint -c ./.config/.yamllint ./services/api/fileStorageDistribution
-  
-  test:
-    runs-on: ubuntu-latest
-    container:
-      image: lambci/lambda:build-python3.7
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      working-directory: './services/api/fileStorageDistribution'
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
