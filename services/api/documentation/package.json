@@ -5,15 +5,13 @@
   "author": "",
   "scripts": {
     "build": "webpack",
-    "start": "webpack-dev-server --open",
-    "predeploy:dev": "yarn build",
-    "deploy:dev": "aws s3 sync dist s3://dev-api-documentation-staticweb-723164513951",
-    "postdeploy:dev": "aws cloudfront create-invalidation --distribution-id E2V358T6QZ2R2T --paths /"
+    "start": "webpack-dev-server --open"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^1.0.1",
     "copy-webpack-plugin": "^4.6.0",
     "html-webpack-plugin": "^3.2.0",
+    "serverless-plugin-scripts": "^1.0.2",
     "serverless-pseudo-parameters": "^2.5.0",
     "webpack": "^4.29.3",
     "webpack-cli": "^3.2.3"

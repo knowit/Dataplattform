@@ -8,6 +8,7 @@ dataplattform:
 
 plugins:
   - serverless-pseudo-parameters
+  - serverless-plugin-scripts
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -19,6 +20,9 @@ custom:
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
   cognitoClientId: ${ssm:/${self:custom.stage}/cognito/UserPoolClientId}
   apiUrl: ${ssm:/${self:custom.stage}/cloudfront-api-dist/distributionAlias}
+  scripts:
+    hooks:
+      after:deploy:finalize: python postDeploy.py --stack-name ${self:provider.stackName}
 
 provider:
   name: aws
@@ -95,3 +99,5 @@ resources:
     DistributionOutput:
       Value:
         "Fn::GetAtt": [Distribution, DomainName]
+    DistributionId:
+      Value: !Ref Distribution
