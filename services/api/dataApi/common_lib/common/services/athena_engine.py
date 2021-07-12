@@ -41,9 +41,8 @@ def table_map():
 def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
     used_tables = []
     protection_level = 1
-    tmp_sql = sql.split(' ')
     for (_, database, table) in table_map():
-        if table in tmp_sql:
+        if table in sql:
             tmp_database = database
             tmp_str = tmp_database.replace(f'{environ.get("STAGE", "dev")}_level_', '').split('_database')
             protection_level_tmp = int(tmp_str[0])
