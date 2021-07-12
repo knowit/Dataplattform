@@ -11,6 +11,10 @@ dataplattform:
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
     - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: slack
+    accessLevel: 2
+
 
 custom:
   editable:

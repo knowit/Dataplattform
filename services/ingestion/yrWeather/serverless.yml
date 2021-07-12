@@ -11,6 +11,9 @@ dataplattform:
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+  glue:
+    tableName: yr_weather
+    accessLevel: 1
 
 custom:
   #Edit these variables###########################

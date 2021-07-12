@@ -11,6 +11,9 @@ dataplattform:
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
     - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: github
+    accessLevel: 2
 
 custom:
   editable:

@@ -10,6 +10,9 @@ dataplattform:
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+  glue:
+    tableName: kompetansekartlegging
+    accessLevel: 3
 
 custom:
   editable:
