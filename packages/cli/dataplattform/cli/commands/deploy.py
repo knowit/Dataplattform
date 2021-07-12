@@ -5,7 +5,7 @@ import traceback
 from argparse import ArgumentParser, Namespace
 from ..helper import safe_parse_yaml
 
-targets = dict()
+dependencies = dict()
 config_files = dict()
 access_levels = []
 
@@ -86,13 +86,13 @@ def remove_path(path_list: list, path: str) -> None:
 
 
 # Find all service directories
-def search(target: str) -> None:
-    for entry in os.scandir(target):
+def search(path: str) -> None:
+    for entry in os.scandir(path):
         if entry.is_file():
             if entry.name == 'serverless.yml' or entry.name == 'serverless.yaml':
-                if not contains_path(list(targets), target):
-                    targets[target] = resolve_dependencies(target, entry.path)
-                    config_files[target] = entry.path
+                if not contains_path(list(dependencies), path):
+                    dependencies[path] = resolve_dependencies(path, entry.path)
+                    config_files[path] = entry.path
         elif entry.name not in ignore:
             search(entry.path)
 
@@ -234,17 +234,17 @@ def init(parser: ArgumentParser):
 
 def run(args: Namespace, _):
     print("")
-    for target in args.services:
-        search(target)
+    for path in args.services:
+        search(path)
 
-    paths = topological_sort(targets)
+    paths = topological_sort(dependencies)
 
     if args.remove:
         paths.reverse()
         # Remove all specified services
         run_process_per_path(
             paths=paths,
-            get_cmd_func=lambda path: get_remove_commands(path, args.stage),
+            get_cmd_func=lambda p: get_remove_commands(p, args.stage),
             start_message="Starting service removal",
             failed_message="Service removal stopped",
             complete_message="Service removal complete"
@@ -255,7 +255,7 @@ def run(args: Namespace, _):
             # Configure specified SSM-parameters
             run_process_per_path(
                 paths=[''],
-                get_cmd_func=lambda path: ["dataplattform configure --config-file " + args.config_file],
+                get_cmd_func=lambda _: ["dataplattform configure --config-file " + args.config_file],
                 start_message="Configuring parameters",
                 failed_message="Parameter configuraiton stopped",
                 complete_message="Parameter configuration complete"
@@ -264,7 +264,7 @@ def run(args: Namespace, _):
         # Deploy all specified services
         run_process_per_path(
             paths=paths,
-            get_cmd_func=lambda path: get_deployment_commands(path, args.stage) + get_glue_commands(path),
+            get_cmd_func=lambda p: get_deployment_commands(p, args.stage) + get_glue_commands(p),
             start_message="Starting service deployment",
             failed_message="Service deployment stopped",
             complete_message="Service deployment complete"
