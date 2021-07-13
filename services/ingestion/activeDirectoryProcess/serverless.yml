@@ -1,6 +1,22 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: activeDirectoryProcess
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../utils/downloadToBucket
+    - ../../infrastructure/events
+    - ../../infrastructure/metadata
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+  glue:
+    tableName: active_directory
+    accessLevel: 3
+
 custom:
   #Edit these variables###########################
   editable:

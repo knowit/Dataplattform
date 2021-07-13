@@ -1,6 +1,20 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: ubwFagtimePoller
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+  glue:
+    tableName: ubw_fagtime
+    accessLevel: 2
+
 custom:
   #Edit these variables###########################
   editable:

@@ -1,10 +1,18 @@
 service: downloadToBucket
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/storage
+
 custom:
   editable:
     timeout: 900
     handlerFile: download_to_bucket
-    description: Downloads documents to a either a private or a public raw storage bucket
+    description: Downloads documents to a public raw storage bucket
   stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
@@ -51,7 +59,6 @@ functions:
         - '*.py'
     environment:
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
-      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
 
 resources:
   Resources:
@@ -70,22 +77,6 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:PutObject
-                    - s3:ListObjects*
-                    - s3:GetObject
-                    - s3:CopyObject
-                    - s3:DeleteObjects
-                  Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-privateBucketArn
-                          - /*
           - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"

@@ -1,8 +1,7 @@
 from pathlib import Path
 import os
-from subprocess import run
-from json import loads
 import boto3
+import yaml
 
 
 def cloudformation_exports(client=None):
@@ -20,28 +19,40 @@ def find_file(filename):
         return filename
 
 
-def load_serverless_config(path, serverless_cli=None, serverless_file=None):
-    serverless_cli = serverless_cli or 'serverless'
+def safe_parse_yaml(path: str) -> dict:
+    # Yaml-parser that will ignore Serverless tags
+    class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+        def ignore_unknown(self, node):
+            return None
+
+    SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+
+    try:
+        return yaml.load(open(path), Loader=SafeLoaderIgnoreUnknown)
+    except Exception as e:
+        print("\nFailed to parse yaml file: " + path + "\n" + str(e))
+        raise e
+
+
+def load_serverless_config(path, serverless_file=None):
     serverless_file = os.path.relpath(
         serverless_file or find_file('serverless.yml'))
 
-    p = run([
-        serverless_cli, 'print', '--path', path, '--format', 'json', '--config', serverless_file],
-        check=True, capture_output=True, shell=os.name != 'posix', encoding='utf-8')
+    try:
+        config = safe_parse_yaml(serverless_file)
+        if path in config.keys():
+            return config[path]
+        else:
+            raise Exception("\nAttempted to parse property \"" + path + "\" from " + serverless_file
+                            + ", but no such property was found.")
+    except Exception as e:
+        print("\nException occurred when attempting to load serverless config from " + serverless_file)
+        raise e
 
-    index_1 = p.stdout.index('{')
-    index_2 = p.stdout.rindex('}') + 1
 
-    # Remove potential warnings and grab the returned json only
-    config_json_string = p.stdout[index_1: index_2: 1]
-
-    return loads(config_json_string)
-
-
-def serverless_environment(serverless_cli=None, serverless_file=None, serverless_config=None):
+def serverless_environment(serverless_file=None, serverless_config=None):
     config = serverless_config or load_serverless_config(
         'functions',
-        serverless_cli=serverless_cli,
         serverless_file=serverless_file)
 
     return resovle_cloudformation_imports(next(iter(config.values()))['environment'])
@@ -58,8 +69,8 @@ def resovle_cloudformation_imports(environment, exports=None):
     return {k: resolve_imports(v) for k, v in environment.items()}
 
 
-def load_serverless_environment(serverless_cli=None, serverless_file=None, verbose=True):
-    env = serverless_environment(serverless_cli, serverless_file)
+def load_serverless_environment(serverless_file=None, verbose=True):
+    env = serverless_environment(serverless_file)
     for k, v in env.items():
         if verbose:
             print(f'ENVIRONMENT {k}: {v}')

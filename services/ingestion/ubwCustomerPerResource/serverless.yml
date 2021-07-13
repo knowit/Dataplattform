@@ -1,5 +1,19 @@
 service: ubwCustomerPerResource
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+  glue:
+    tableName: ubw_customer_per_resource
+    accessLevel: 3
+
 custom:
   editable:
     timeout: 200

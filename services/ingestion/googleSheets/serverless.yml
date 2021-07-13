@@ -1,5 +1,20 @@
 service: googleSheetsWebhook
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+    - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: google_sheets
+    accessLevel: 3
+
 custom:
   editable:
     timeout: 12

@@ -1,5 +1,19 @@
 service: googleEventPoller
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+  glue:
+    tableName: google_event
+    accessLevel: 2
+
 custom:
   editable:
     timeout: 12

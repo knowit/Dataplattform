@@ -12,16 +12,6 @@ def test_data():
         yield load(json_file)
 
 
-def test_handler_private_bucket(test_data, s3_private_bucket):
-    with patch('urllib.request.urlopen', return_value=FakeResponse(data=b'{}')):
-        test_data['private'] = True
-        event = test_data
-        handler(event, None)
-        response = s3_private_bucket.Object(next(iter(s3_private_bucket.objects.all())).key).get()
-        data = response['Body']
-        assert data is not None
-
-
 def test_handler_public_bucket(test_data, s3_public_bucket):
     with patch('urllib.request.urlopen', return_value=FakeResponse(data=b'{}')):
         test_data['private'] = False

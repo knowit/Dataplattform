@@ -53,18 +53,15 @@ def cv_test_json(cv_id):
     ]
 
 
-def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
-    # add dummy data to the private and public buckets that will be purged by ingest
+def test_initial_ingest(s3_bucket, s3_public_bucket):
     base_url = 'https://knowittest2.cvpartner.com/api'
 
     public_prefix = environ.get('PUBLIC_PREFIX')
-    private_prefix = environ.get('PRIVATE_PREFIX')
     datalake_prefix = environ.get('ACCESS_PATH')+"raw"
-    add_dummy_data(s3_private_bucket, private_prefix)
+
     add_dummy_data(s3_public_bucket, public_prefix)
     add_dummy_data(s3_bucket, datalake_prefix)
 
-    assert len(list(s3_private_bucket.objects.filter(Prefix=private_prefix))) == 6
     assert len(list(s3_public_bucket.objects.filter(Prefix=public_prefix))) == 6
     assert len(list(s3_bucket.objects.filter(Prefix=datalake_prefix))) == 6
 
@@ -84,6 +81,5 @@ def test_initial_ingest(s3_bucket, s3_private_bucket, s3_public_bucket):
     cv_link_correct = f'{base_url}/v1/cvs/download/{user_id}/{cv_id}/{{LANG}}/{{FORMAT}}/'
     assert data['data'][0]['cv_link'] == cv_link_correct
 
-    assert len(list(s3_private_bucket.objects.filter(Prefix=private_prefix))) == 0
     assert len(list(s3_public_bucket.objects.filter(Prefix=public_prefix))) == 0
     assert len(list(s3_bucket.objects.filter(Prefix=datalake_prefix))) == 1

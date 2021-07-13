@@ -1,6 +1,20 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: yrWeatherPoller
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+  glue:
+    tableName: yr_weather
+    accessLevel: 1
+
 custom:
   #Edit these variables###########################
   editable:

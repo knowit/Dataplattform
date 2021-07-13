@@ -1,5 +1,20 @@
 service: github
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+    - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: github
+    accessLevel: 2
+
 custom:
   editable:
     scheduleRate: rate(7 days)

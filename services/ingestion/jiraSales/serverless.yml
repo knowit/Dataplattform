@@ -1,5 +1,20 @@
 service: jiraSalesWebhook
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+    - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: jira_sales
+    accessLevel: 2
+
 custom:
   editable:
     timeout: 12

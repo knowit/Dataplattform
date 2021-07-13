@@ -1,5 +1,9 @@
 service: events
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+
 custom:
   stage: ${opt:stage, self:provider.stage}
 

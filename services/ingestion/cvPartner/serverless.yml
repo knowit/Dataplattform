@@ -1,5 +1,22 @@
 service: cvPartnerPoller
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/datalake
+    - ../../utils/downloadToBucket
+    - ../../infrastructure/storage
+    - ../../infrastructure/events
+    - ../../infrastructure/metadata
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+  glue:
+    tableName: cv_partner
+    accessLevel: 3
+
 custom:
   editable:
     timeout: 900
@@ -12,7 +29,6 @@ custom:
     accessLevel: level-3
     dataFolder: cvpartner
     publicS3Prefix: public/images
-    privateS3Prefix: private/cvs
 
   stage: ${opt:stage, self:provider.stage}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
@@ -79,9 +95,7 @@ functions:
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
       DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
-      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
       PUBLIC_PREFIX: ${self:custom.editable.publicS3Prefix}
-      PRIVATE_PREFIX: ${self:custom.editable.privateS3Prefix}
     tags:
 
     events:
@@ -179,10 +193,6 @@ resources:
                   Resource:
                     - Fn::Join:
                         - ""
-                        - - !ImportValue ${self:custom.stage}-privateBucketArn
-                          - '*'
-                    - Fn::Join:
-                        - ""
                         - - !ImportValue ${self:custom.stage}-datalakeArn
                           - '*'
                     - Fn::Join:
@@ -197,14 +207,10 @@ resources:
                   Action:
                     - s3:DeleteObject
                   Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-privateBucketArn
-                          - /${self:custom.editable.privateS3Prefix}*
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-publicBucketArn
-                          - /${self:custom.editable.publicS3Prefix}*
+                    Fn::Join:
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-publicBucketArn
+                        - /${self:custom.editable.publicS3Prefix}*
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"

@@ -1,5 +1,15 @@
 service: activeDirectory
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/layers/numpy
+    - ../../infrastructure/layers/pandas
+    - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/vpc
+    - ../../infrastructure/metadata
+    - ../../infrastructure/monitoring
+
 custom:
   editable:
     timeout: 60
