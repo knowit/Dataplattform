@@ -72,6 +72,17 @@ resources:
                 - sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+    storageDNSRecord:
+      Type: AWS::Route53::RecordSetGroup
+      Properties:
+        HostedZoneId: ${ssm:/${self:custom.stage}/routes/hostedzoneid}
+        RecordSets:
+          - Name: storage.${ssm:/${self:custom.stage}/routes/domain_name}
+            Type: A
+            AliasTarget:
+              DNSName:
+                "Fn::GetAtt": [CloudFrontDistribution, DomainName]
+              HostedZoneId: Z2FDTNDATAQYW2
 
     CloudFrontDistribution:
       Type: AWS::CloudFront::Distribution

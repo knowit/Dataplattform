@@ -7,7 +7,6 @@ const fs = require("fs")
 
 const outputPath = path.resolve(__dirname, 'dist');
 
-
 const serverlessState = JSON.parse(fs.readFileSync(".serverless/serverless-state.json", "utf-8"))
 
 const { cognitoClientId, apiUrl } = serverlessState.service.custom
