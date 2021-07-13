@@ -80,7 +80,6 @@ functions:
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
-      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}

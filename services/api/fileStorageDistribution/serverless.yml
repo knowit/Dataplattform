@@ -14,23 +14,14 @@ custom:
   service: ${self:custom.stage}-${self:service}
   userPoolRegion: eu-central-1
   publicBucketName: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
-  privateBucketName: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.PrivateRawStorageBucketName}
-  S3PrivateOriginAccessIdentity: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.S3PrivateOriginAccessIdentity}
   S3PublicOriginAccessIdentity: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.S3PublicOriginAccessIdentity}
   publicDomainName: ${self:custom.publicBucketName}.s3.amazonaws.com
-  privateDomainName: ${self:custom.privateBucketName}.s3.amazonaws.com
   publicDomainId: custom/${self:custom.publicDomainName}
-  privateDomainId: custom/${self:custom.privateDomainName}
   publicFrontOrigin:
     DomainName: ${self:custom.publicDomainName}
     Id: ${self:custom.publicDomainId}
     S3OriginConfig:
       OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PublicOriginAccessIdentity}
-  privateFrontOrigin:
-    DomainName: ${self:custom.privateDomainName}
-    Id: ${self:custom.privateDomainId}
-    S3OriginConfig:
-      OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PrivateOriginAccessIdentity}
 
   userPoolId: ${cf.${self:custom.userPoolRegion}:cognito-${self:custom.stage}.CognitoUserPoolId}
   scripts:
@@ -63,20 +54,6 @@ provider:
   stackName: ${self:custom.service}
   runtime: python3.7
 
-functions:
-  edgeLambdaJwtAuthenticator:
-    handler: jwtAuthenticator.handler
-    name: ${self:custom.stage}-${self:service}-jwt-authenticator
-    events:
-      - cloudFront:
-          eventType: viewer-request
-          isDefaultOrigin: false
-          pathPattern: "/private/*"
-          origin: ${self:custom.privateFrontOrigin}
-    role: !GetAtt EdgeLambdaRole.Arn
-    package:
-      include:
-        - "*.py" # Files to include in deployment
 resources:
   Resources:
     EdgeLambdaRole:
@@ -104,18 +81,6 @@ resources:
             - ${self:custom.stage}-${self:custom.distributionAlias}
           Origins:
             - ${self:custom.publicFrontOrigin}
-            - ${self:custom.privateFrontOrigin}
-          CacheBehaviors:
-            - TargetOriginId: ${self:custom.privateDomainId}
-              AllowedMethods:
-                - HEAD
-                - GET
-              ForwardedValues:
-                QueryString: false
-                Headers:
-                  - Authorization
-              PathPattern: "/private/*"
-              ViewerProtocolPolicy: redirect-to-https
           DefaultCacheBehavior:
             AllowedMethods:
               - HEAD

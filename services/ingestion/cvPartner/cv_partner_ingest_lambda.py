@@ -22,18 +22,7 @@ def ingest(event) -> Data:
                        headers={'Authorization': f'Bearer {api_token}'})
 
     data_json = res.json()
-    empty_content_in_path(bucket=environ.get('PRIVATE_BUCKET'), prefix=environ.get('PRIVATE_PREFIX'))
     empty_content_in_path(bucket=environ.get('PUBLIC_BUCKET'), prefix=environ.get('PUBLIC_PREFIX'))
-
-    def write_cv_doc_to_private_bucket(person, language: str = 'no', ext: str = 'pdf'):
-        new_key = f'cv_{language}_{ext}'
-        filename = f'{environ.get("PRIVATE_PREFIX")}/{uuid4()}.{ext}'
-        http_request = {'requestUrl': get_cv_link(person['cv']['user_id'],
-                                                  person['cv']['id'], language=language, ext=ext),
-                        'header': {'Authorization': f'Bearer {api_token}'},
-                        }
-        save_document(http_request, filename=filename, filetype=ext, private=True)
-        return {new_key: filename}
 
     def write_cv_image_to_public_bucket(person, ext: str = 'jpg'):
         new_key = 'image_key'
@@ -56,11 +45,6 @@ def ingest(event) -> Data:
         }
 
         d.update(write_cv_image_to_public_bucket(person))
-        d.update(write_cv_doc_to_private_bucket(person, language='no', ext='pdf'))
-        d.update(write_cv_doc_to_private_bucket(person, language='int', ext='pdf'))
-        d.update(write_cv_doc_to_private_bucket(person, language='no', ext='docx'))
-        d.update(write_cv_doc_to_private_bucket(person, language='int', ext='docx'))
-
         return d
 
     def get_cv(user_id, cv_id):
