@@ -16,6 +16,9 @@ custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service} #this service definition includes stage
+  scripts:
+    hooks:
+      before:package:cleanup: echo Cleaning requirements cache... && sls requirements clean && sls requirements cleanCache
   wsgi:
     app: app.app
     packRequirements: false
@@ -318,5 +321,6 @@ resources:
 
 plugins:
   - serverless-python-requirements
+  - serverless-plugin-scripts
   - serverless-wsgi
   - serverless-pseudo-parameters
