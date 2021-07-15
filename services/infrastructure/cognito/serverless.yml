@@ -12,7 +12,7 @@ plugins:
 custom:
   stage: ${opt:stage, self:provider.stage}
   policies: ${file(./policies.js)}
-  ssmParamName: /${self:custom.stage}/${self:service}/CognitoUserPoolClientId
+  ssmParamName: /${self:custom.stage}/${self:service}/UserPoolClientId
   editable:
     configureDescription: "Perform necessary post-deployment configurations for cognito to function properly."
   scripts:
