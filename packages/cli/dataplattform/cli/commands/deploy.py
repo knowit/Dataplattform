@@ -141,9 +141,19 @@ def print_status(status: str = None) -> None:
         print("\n" + line + message + line)
 
 
+def get_install_commands(path: str) -> list:
+    message = "Installing dependencies for: " + path
+    commands = ['echo ' + message]
+    for file in os.listdir(path):
+        if file in install_commands.keys():
+            commands.append(install_commands[file])
+
+    return commands
+
+
 def get_deployment_commands(path: str, stage: str = None) -> list:
     message = "Deploying service: " + path
-    commands = ['echo ' + message, 'cd ' + path]
+    commands = ['echo ' + message]
     for file in os.listdir(path):
         if file in install_commands.keys():
             commands.append(install_commands[file])
@@ -171,7 +181,6 @@ def get_glue_commands(path: str) -> list:
 def get_remove_commands(path: str, stage: str = None) -> list:
     message = "Removing service: " + path
     return ['echo ' + message,
-            'cd ' + path,
             'sls remove' + ((" --stage " + stage) if stage is not None else "")]
 
 
@@ -244,7 +253,7 @@ def run(args: Namespace, _):
         # Remove all specified services
         run_process_per_path(
             paths=paths,
-            get_cmd_func=lambda p: get_remove_commands(p, args.stage),
+            get_cmd_func=lambda p: ['cd ' + p] + get_install_commands(p) + get_remove_commands(p, args.stage),
             start_message="Starting service removal",
             failed_message="Service removal stopped",
             complete_message="Service removal complete"
@@ -264,7 +273,10 @@ def run(args: Namespace, _):
         # Deploy all specified services
         run_process_per_path(
             paths=paths,
-            get_cmd_func=lambda p: get_deployment_commands(p, args.stage) + get_glue_commands(p),
+            get_cmd_func=lambda p: (['cd ' + p] +
+                                    get_install_commands(p) +
+                                    get_deployment_commands(p, args.stage) +
+                                    get_glue_commands(p)),
             start_message="Starting service deployment",
             failed_message="Service deployment stopped",
             complete_message="Service deployment complete"
