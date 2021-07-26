@@ -24,7 +24,6 @@ custom:
     packRequirements: false
     pythonBin: python
   pythonRequirements:
-    invalidateCaches: true
     dockerizePip: non-linux
     slim: true
     slimPatternsAppendDefaults: false
@@ -36,9 +35,7 @@ custom:
       - botocore
       - numpy
       - numpy.libs
-      - pandas
       - pytz
-      - fastparquet
       - numba
       - llvmlite
   authorizer:
