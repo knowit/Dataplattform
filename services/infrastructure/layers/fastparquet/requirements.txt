@@ -1,4 +1,4 @@
-fastparquet
-numba
-llvmlite
+fastparquet==0.3.2
+numba>=0.52.
+llvmlite==0.36.0
 thrift
