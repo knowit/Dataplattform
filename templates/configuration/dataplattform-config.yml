@@ -15,9 +15,6 @@ dev:
       Type: String
 
   cognito:
-    CognitoUserPoolClientId:
-      Value:
-      Type: String
     UserPoolClientId:
       Value:
       Type: String
