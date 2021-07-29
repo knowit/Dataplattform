@@ -240,17 +240,18 @@ def run_process_per_path(
     print_status(complete_message if success else failed_message)
 
 
-def services_without_dependencies(dependency_graph, paths_copy, iteration):
+def services_without_dependencies(dependency_graph, dependencies, iteration):
     has_no_dependencies = []
 
-    for path in paths_copy.keys():
-        if not any(x in paths_copy.keys() for x in paths_copy.get(path)):
+    for path in dependencies.keys():
+        if not any(x in dependencies.keys() for x in dependencies.get(path)):
             dependency_graph[iteration].append(path)
             has_no_dependencies.append(path)
 
     return has_no_dependencies
 
 
+# Puts services dependent on 'serverless-python-requirements' plugin in an isolated level so they run in sequential
 def separate_sequential_services(dependency_graph, has_no_dependencies, iteration):
     sequential_services = []
     for service in has_no_dependencies:
@@ -269,14 +270,14 @@ def separate_sequential_services(dependency_graph, has_no_dependencies, iteratio
 
 
 def create_dependency_graph():
-    paths_copy = copy.deepcopy(dependencies)
+    dependencies_copy = copy.deepcopy(dependencies)
     dependency_graph = []
     iteration = 0
-    while len(paths_copy) > 0:
+    while len(dependencies_copy) > 0:
         dependency_graph.append([])
 
-        has_no_dependencies = services_without_dependencies(dependency_graph, paths_copy, iteration)
-        [paths_copy.pop(path) for path in has_no_dependencies]
+        has_no_dependencies = services_without_dependencies(dependency_graph, dependencies_copy, iteration)
+        [dependencies_copy.pop(path) for path in has_no_dependencies]
 
         iteration = separate_sequential_services(dependency_graph, has_no_dependencies, iteration)
 
@@ -292,16 +293,26 @@ def catch_stdout(print_stdout, path, start_message=None, complete_message=None, 
 
         sys.stdout = sys.__stdout__
 
-        with open(temp_file_path, 'r') as f:
-            lock.acquire()
-            print_status(start_message)
-            print(f.read().strip("\n"))
-            print_status(complete_message if success else failed_message)
-            lock.release()
+        try:
+            with open(temp_file_path, 'r') as f:
+                lock.acquire()
+                print_status(start_message)
+                print(f.read().strip("\n"))
+                print_status(complete_message if success else failed_message)
+                lock.release()
 
-        os.remove(temp_file_path)
+            os.remove(temp_file_path)
+        except FileNotFoundError as e:
+            print("\nFileNotFoundError occurred when printing stdout ")
+            traceback.print_stack()
+            raise e
     else:
-        sys.stdout = open(temp_file_path, "a")
+        try:
+            sys.stdout = open(temp_file_path, "a")
+        except IOError as e:
+            print("\nIOError occurred when redirecting stdout ")
+            traceback.print_stack()
+            raise e
 
 
 def run_process_for_one_path(
@@ -324,7 +335,6 @@ def run_process_for_one_path(
 
     except Exception as e:
         print(e)
-        traceback.print_stack()
         traceback.print_stack()
         success = False
 
@@ -377,45 +387,33 @@ def run(args: Namespace, _):
 
     paths = topological_sort(dependencies)
 
-    if args.parallel and args.remove:
-        deploy_order_paths = create_dependency_graph()
-        deploy_order_paths.reverse()
-        for paths_in_level in deploy_order_paths:
-            start_processes(paths_in_level, "removal",
-                            lambda p: ['cd ' + p] + get_install_commands(p) + get_remove_commands(p, args.stage))
-
-        print_failed_status(paths, "removals")
-
-    elif args.remove:
-        paths.reverse()
-        # Remove all specified services
+    if args.config_file is not None:
+        # Configure specified SSM-parameters
         run_process_per_path(
-            paths=paths,
-            get_cmd_func=lambda p: ['cd ' + p] + get_install_commands(p) + get_remove_commands(p, args.stage),
-            start_message="Starting service removal",
-            failed_message="Service removal stopped",
-            complete_message="Service removal complete"
+            paths=[''],
+            get_cmd_func=lambda _: ["dataplattform configure --config-file " + args.config_file],
+            start_message="Configuring parameters",
+            failed_message="Parameter configuraiton stopped",
+            complete_message="Parameter configuration complete"
         )
-    else:
-        if args.config_file is not None:
-            # Configure specified SSM-parameters
-            run_process_per_path(
-                paths=[''],
-                get_cmd_func=lambda _: ["dataplattform configure --config-file " + args.config_file],
-                start_message="Configuring parameters",
-                failed_message="Parameter configuraiton stopped",
-                complete_message="Parameter configuration complete"
-            )
-        if args.parallel:
+
+    if args.parallel:
+        deploy_order_paths = create_dependency_graph()
+        if args.remove:
+            deploy_order_paths.reverse()
+            # Remove all specified services in parallel
+            for paths_in_level in deploy_order_paths:
+                start_processes(paths_in_level, "removal",
+                                lambda p: ['cd ' + p] + get_install_commands(p) + get_remove_commands(p, args.stage))
+
+            print_failed_status(paths, "removals")
+        else:
             deploy_order_paths = create_dependency_graph()
             # Deploy all specified services in parallel
             for paths_in_level in deploy_order_paths:
                 start_processes(paths_in_level, "deployment", lambda p: (['cd ' + p] +
                                                                          get_install_commands(p) +
                                                                          get_deployment_commands(p, args.stage)))
-
-            print_failed_status("deployments", paths)
-
             # Run glue commands
             run_process_per_path(
                 paths=successful_services,
@@ -424,6 +422,19 @@ def run(args: Namespace, _):
                 start_message="Starting glue commands",
                 failed_message="Failed glue commands",
                 complete_message="Completed glue commands"
+            )
+
+            print_failed_status("deployments", paths)
+    else:
+        if args.remove:
+            paths.reverse()
+            # Remove all specified services
+            run_process_per_path(
+                paths=paths,
+                get_cmd_func=lambda p: ['cd ' + p] + get_install_commands(p) + get_remove_commands(p, args.stage),
+                start_message="Starting service removal",
+                failed_message="Service removal stopped",
+                complete_message="Service removal complete"
             )
         else:
             # Deploy all specified services sequentially
@@ -438,5 +449,5 @@ def run(args: Namespace, _):
                 complete_message="Service deployment complete"
             )
 
-        if len(access_levels) > 0:
-            update_database()
+    if len(access_levels) > 0:
+        update_database()
