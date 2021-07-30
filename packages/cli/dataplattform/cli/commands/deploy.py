@@ -359,7 +359,7 @@ def start_processes(paths_in_level, action, commands):
         process.join()
 
 
-def print_failed_status(paths, action):
+def print_success_status(paths, action):
     service_status = "Number of successfull " + action + ": " + str(len(successful_services)) + "/" + str(
         len(paths))
 
@@ -367,7 +367,7 @@ def print_failed_status(paths, action):
         service_status += "\nThe following services failed: "
         for service in paths:
             if service not in successful_services:
-                service_status += "\n" + service
+                service_status += "\n- " + service
 
     print_status(service_status)
 
@@ -406,7 +406,7 @@ def run(args: Namespace, _):
                 start_processes(paths_in_level, "removal",
                                 lambda p: ['cd ' + p] + get_install_commands(p) + get_remove_commands(p, args.stage))
 
-            print_failed_status(paths, "removals")
+            print_success_status(paths, "removals")
         else:
             deploy_order_paths = create_dependency_graph()
             # Deploy all specified services in parallel
@@ -424,7 +424,7 @@ def run(args: Namespace, _):
                 complete_message="Completed glue commands"
             )
 
-            print_failed_status("deployments", paths)
+            print_success_status(paths, "deployments")
     else:
         if args.remove:
             paths.reverse()
