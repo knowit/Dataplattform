@@ -5,6 +5,7 @@ dataplattform:
     - ../../infrastructure/deploymentBucket
     - ../../infrastructure/distribution
     - ../../infrastructure/cognito
+    - ../../infrastructure/routes
 
 plugins:
   - serverless-pseudo-parameters
