@@ -8,6 +8,7 @@ dataplattform:
     - ../../infrastructure/layers/numpy
     - ../../infrastructure/layers/pandas
     - ../../infrastructure/layers/fastparquet
+    - ../../infrastructure/routes
 
 custom:
   stage: ${opt:stage, self:provider.stage}

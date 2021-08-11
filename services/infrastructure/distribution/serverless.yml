@@ -4,6 +4,7 @@ dataplattform:
   dependencies:
     - ../deploymentBucket
     - ../../api/dataApi
+    - ../routes
 
 custom:
   stage: ${opt:stage, self:provider.stage}
