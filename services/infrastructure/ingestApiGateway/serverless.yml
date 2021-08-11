@@ -3,7 +3,7 @@ service: ingestApiGateway
 dataplattform:
   dependencies:
     - ../deploymentBucket
-    - ../infrastructure/routes
+    - ../routes
 
 custom:
   stage: ${opt:stage, self:provider.stage}
