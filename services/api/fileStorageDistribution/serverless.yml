@@ -28,7 +28,7 @@ custom:
   scripts:
     hooks:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
-  distributionAlias: ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
+  distributionAlias: storage.${ssm:/${self:custom.stage}/routes/domain_name}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
 
 package:

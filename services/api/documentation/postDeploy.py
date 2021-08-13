@@ -4,7 +4,7 @@ import subprocess
 import traceback
 
 
-client = boto3.client('cloudformation')
+client = boto3.client('cloudformation', region_name='eu-central-1')
 
 
 def get_cf_outputs(stack_name: str) -> dict:
