@@ -97,7 +97,7 @@ resources:
 
     MockMetadataLambdaRole:
       Type: AWS::IAM::Role
-      Condition: CreateMetadataMockLambdaRole
+      # Condition: CreateMetadataMockLambdaRole #TODO fix move mock to active directory
       Properties:
         RoleName: ${self:custom.stage}-${self:service}-role
         AssumeRolePolicyDocument:
