@@ -16,9 +16,6 @@ custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service} #this service definition includes stage
-  scripts:
-    hooks:
-      before:package:cleanup: echo Cleaning requirements cache... && sls requirements clean && sls requirements cleanCache
   wsgi:
     app: app.app
     packRequirements: false
@@ -89,7 +86,7 @@ functions:
     environment:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
-      AUTHURL: ${ssm:/${self:custom.stage}/${self:service}/cognitoAuthUrl}
+      AUTHURL: auth.${ssm:/${self:custom.stage}/routes/domain_name}
 
       NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
       DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn

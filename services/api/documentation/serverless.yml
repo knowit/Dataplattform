@@ -16,11 +16,11 @@ custom:
   service: ${self:custom.stage}-${self:service}
   bucketName: ${self:custom.service}-staticweb-#{AWS::AccountId}
   distributionAlias:
-    - ${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
-    - doc.${ssm:/${self:custom.stage}/${self:service}/distributionAlias}
+    - ${ssm:/${self:custom.stage}/routes/domain_name}
+    - doc.${ssm:/${self:custom.stage}/routes/domain_name}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
   cognitoClientId: ${ssm:/${self:custom.stage}/cognito/UserPoolClientId}
-  apiUrl: ${ssm:/${self:custom.stage}/cloudfront-api-dist/distributionAlias}
+  apiUrl: api.${ssm:/${self:custom.stage}/routes/domain_name}
   scripts:
     hooks:
       after:deploy:finalize: python postDeploy.py --stack-name ${self:provider.stackName}
