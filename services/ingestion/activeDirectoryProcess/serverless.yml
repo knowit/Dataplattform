@@ -8,7 +8,6 @@ dataplattform:
     - ../../infrastructure/layers/pandas
     - ../../infrastructure/layers/fastparquet
     - ../../infrastructure/datalake
-    - ../../utils/downloadToBucket
     - ../../infrastructure/events
     - ../../infrastructure/metadata
     - ../../infrastructure/monitoring
@@ -97,7 +96,6 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-      DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
     tags: # Tag for this function. Every function are tagged with stage by default
 
     events: # The Events that trigger this Function
@@ -155,14 +153,6 @@ resources: # The resources your functions use
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
           - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
-          - PolicyName: ${self:custom.stage}-InvokePublicDownloadLambda-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - lambda:invokeFunction
-                  Resource: !ImportValue ${self:custom.stage}-downloadToBucketArn
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -284,7 +274,7 @@ resources: # The resources your functions use
         ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
         VisibilityTimeout: ${self:custom.editable.timeout}
         RedrivePolicy:
-          deadLetterTargetArn : !GetAtt EventQueueDL.Arn
+          deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           maxReceiveCount : 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
 
     EventQueueDL: #Messages that fail are put here
@@ -293,7 +283,6 @@ resources: # The resources your functions use
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
-
 
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
