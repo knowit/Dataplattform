@@ -4,9 +4,6 @@ service: activeDirectoryProcess
 dataplattform:
   dependencies:
     - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/layers/numpy
-    - ../../infrastructure/layers/pandas
-    - ../../infrastructure/layers/fastparquet
     - ../../infrastructure/datalake
     - ../../utils/downloadToBucket
     - ../../infrastructure/events
@@ -39,13 +36,6 @@ custom:
     noDeploy:
       - boto3 # Default in lambda rt
       - botocore
-      - pandas # Layer
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
 provider:
   name: aws
@@ -80,9 +70,6 @@ package:
 functions:
   ingest: # A Function
     handler: ${self:custom.editable.ingestHandlerFile}.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
@@ -116,10 +103,6 @@ functions:
               - Arn
           batchSize: 1
 
-    layers:
-      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
