@@ -1,9 +1,0 @@
-{
-  "name": "numpyDepLayer",
-  "description": "",
-  "version": "0.1.0",
-  "devDependencies": {
-    "serverless-plugin-scripts": "^1.0.2",
-    "serverless-python-requirements": "^5.1.0"
-  }
-}
