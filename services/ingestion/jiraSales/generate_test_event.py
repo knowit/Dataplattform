@@ -1,9 +1,12 @@
 import json 
 import os
-from dataplattform.common.aws import SSM
-
+# must be done before dataplattform.common.aws is imported
+os.environ["AWS_XRAY_SDK_ENABLED"] = "false"
 os.environ["STAGE"] = "dev"
 os.environ["SERVICE"] = "jiraSalesWebhook"
+
+from dataplattform.common.aws import SSM
+
 
 secret = SSM(with_decryption=True).get("jira_webhook_secret")
 
