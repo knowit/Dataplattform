@@ -3,9 +3,6 @@ service: twitterPoller
 dataplattform:
   dependencies:
     - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/layers/numpy
-    - ../../infrastructure/layers/pandas
-    - ../../infrastructure/layers/fastparquet
     - ../../infrastructure/datalake
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
@@ -34,13 +31,6 @@ custom:
     noDeploy:
       - boto3
       - botocore
-      - pandas
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
 provider:
   name: aws
@@ -71,9 +61,6 @@ package:
 functions:
   ingest:
     handler: ${self:custom.editable.ingestHandlerFile}.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
@@ -105,10 +92,6 @@ functions:
               - Arn
           batchSize: 1
 
-    layers:
-      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn

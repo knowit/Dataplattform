@@ -30,6 +30,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                             'default_branch',
                             'time']
 
+
     repos_status_table_coloumns = ['id',
                                    'updated_at',
                                    'pushed_at',
@@ -38,6 +39,8 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                                    'time']
 
     github_dataframe = pd.concat([make_dataframe(d) for d in data])
+    repos_table = github_dataframe.loc[:, repos_table_coloumns]
+    repos_status_table = github_dataframe.loc[:, repos_status_table_coloumns]
 
     try:
         reg_ids_df = ath.from_('github_knowit_repos').select(
