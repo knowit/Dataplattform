@@ -1,7 +1,6 @@
 import json 
 import hmac
 from hashlib import sha1
-from json import dumps
 import os
 # must be done before dataplattform.common.aws is imported
 os.environ["AWS_XRAY_SDK_ENABLED"] = "false"
