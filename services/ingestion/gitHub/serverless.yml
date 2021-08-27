@@ -3,9 +3,6 @@ service: github
 dataplattform:
   dependencies:
     - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/layers/numpy
-    - ../../infrastructure/layers/pandas
-    - ../../infrastructure/layers/fastparquet
     - ../../infrastructure/datalake
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
@@ -39,13 +36,6 @@ custom:
     noDeploy:
       - boto3
       - botocore
-      - pandas
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
 provider:
   name: aws
@@ -87,9 +77,6 @@ package:
 functions:
   pollerIngest:
     handler: ${self:custom.editable.pollerIngestHandlerFile}.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-poller-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt PollerIngestLambdaRole.Arn
@@ -114,9 +101,6 @@ functions:
 
   webhookIngest:
     handler: ${self:custom.editable.webhookIngestHandlerFile}.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-webhook-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt WebhookIngestLambdaRole.Arn
@@ -145,10 +129,6 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-    layers:
-      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
@@ -215,9 +195,8 @@ resources:
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: |-
-                    !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:
-                    parameter/${self:custom.stage}/${self:service}/*'
+                  Resource:
+                    !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
     WebhookIngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -257,9 +236,8 @@ resources:
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: |-
-                    !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:
-                    parameter/${self:custom.stage}/${self:service}/*'
+                  Resource:
+                    !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
           - PolicyName: ${self:custom.stage}-${self:service}-webhook-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
