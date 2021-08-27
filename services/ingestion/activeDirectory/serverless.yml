@@ -84,7 +84,7 @@ functions:
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
-          
+
   mock:
     enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
     handler: ${self:custom.editable.mockIngestHandlerFile}.mock
@@ -127,7 +127,7 @@ resources:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
           - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
-          
+
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -154,7 +154,6 @@ resources:
                   Action:
                     - "ssm:GetParameter*"
                   Resource: !Sub "arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*"
-    
 
 plugins:
   - serverless-python-requirements

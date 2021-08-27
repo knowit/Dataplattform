@@ -36,7 +36,7 @@ resources:
           ReadCapacityUnits: 10
           WriteCapacityUnits: 10
         SSESpecification:
-          SSEEnabled: True
+          SSEEnabled: true
           SSEType: KMS
 
     PersonalMetadataTableAccess:
@@ -74,4 +74,3 @@ resources:
 
 plugins:
   - serverless-pseudo-parameters
-  
