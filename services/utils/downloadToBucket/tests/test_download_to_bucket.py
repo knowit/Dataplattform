@@ -1,4 +1,4 @@
-from dataplattform.testing.utilities import FakeResponse
+from dataplattform.testing.utilities import FakeResponse, FakePngResponse
 from download_to_bucket import handler
 from pytest import fixture
 from os import path
@@ -47,3 +47,17 @@ def test_download_from_http_not_readable(test_data):
     with patch('urllib.request.urlopen', return_value=FakeResponse(data=None, readable=False)):
         r = handler(test_data, None)
         assert r == 400
+
+@fixture
+def png_test():
+    with open(path.join(path.dirname(__file__), 'test_png.json'), 'r') as json_file:
+        yield load(json_file)
+
+def test_handler_for_png(png_test, s3_public_bucket):
+    with patch('urllib.request.urlopen', return_value=FakePngResponse(data=b'{}')):
+        png_test['private'] = False
+        event = png_test
+        handler(event, None)
+        response = s3_public_bucket.Object(next(iter(s3_public_bucket.objects.all())).key).get()
+        data = response['Body']
+        assert data is not None
