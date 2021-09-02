@@ -9,55 +9,18 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
   project: dataplattform
-  editable:
-    mockDescription: Mock data for the DynamoDB table named personal_metadata_table
-    mockRate: rate(30 days)
-  mockEnabled:
-    prod: false
-    dev: true
-  pythonRequirements:
-    dockerizePip: non-linux
-    faker: true
+
 
 provider:
+  stage: dev
   name: aws
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
-  runtime: python3.7
 
-functions:
-  mock:
-    enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
-    handler: handler.mock
-    environment:
-      STAGE: ${self:custom.stage}
-    name: ${self:custom.stage}-${self:service}-mock
-    description: ${self:custom.editable.mockDescription}
-    role: !GetAtt MockMetadataLambdaRole.Arn
-    vpc:
-      securityGroupIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
-      subnetIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-1
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
-    package:
-      include:
-        - "*.py"
-    events:
-      - schedule:
-          name: ${self:custom.stage}-${self:service}-timer
-          description: ${self:custom.editable.mockDescription}
-          rate: ${self:custom.editable.mockRate}
-          enabled: true
 
 resources:
-  Conditions:
-    CreateMetadataMockLambdaRole:
-      Fn::Equals:
-        - ${self:custom.mockEnabled.${self:custom.stage}}
-        - true
   Resources:
     PersonalMetadataTable:
       Type: AWS::DynamoDB::Table
@@ -73,7 +36,7 @@ resources:
           ReadCapacityUnits: 10
           WriteCapacityUnits: 10
         SSESpecification:
-          SSEEnabled: True
+          SSEEnabled: true
           SSEType: KMS
 
     PersonalMetadataTableAccess:
@@ -94,25 +57,6 @@ resources:
                 - dynamodb:Batch*
                 - dynamodb:DescribeTable
               Resource: !GetAtt PersonalMetadataTable.Arn
-
-    MockMetadataLambdaRole:
-      Type: AWS::IAM::Role
-      # Condition: CreateMetadataMockLambdaRole #TODO fix move mock to active directory
-      Properties:
-        RoleName: ${self:custom.stage}-${self:service}-role
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - lambda.amazonaws.com
-              Action: sts:AssumeRole
-        ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-          - !Ref PersonalMetadataTableAccess
-
   Outputs:
     PersonalMetadataTableAccessOutput:
       Value:
@@ -130,5 +74,3 @@ resources:
 
 plugins:
   - serverless-pseudo-parameters
-  - serverless-python-requirements
-  - serverless-plugin-conditional-functions
