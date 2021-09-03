@@ -1,8 +1,0 @@
-{
-    "body": {
-        "requestUrl": "https://test_url.com"
-    },
-    "filename": "filename.png",
-    "filetype": "png",
-    "private": false
-}

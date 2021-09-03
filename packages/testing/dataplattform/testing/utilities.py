@@ -53,3 +53,4 @@ class FakePngResponse:
         if (name == 'Content-Type'):
             return self.content_type
         return None
+        
