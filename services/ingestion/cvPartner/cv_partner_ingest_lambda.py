@@ -24,7 +24,9 @@ def ingest(event) -> Data:
     data_json = res.json()
     empty_content_in_path(bucket=environ.get('PUBLIC_BUCKET'), prefix=environ.get('PUBLIC_PREFIX'))
 
-    def write_cv_image_to_public_bucket(person, ext: str = 'jpg'):
+    def write_cv_image_to_public_bucket(person):
+        image_url = person['cv']['image']['thumb']['url']
+        ext = 'jpg' if ".jpeg" in image_url or '.jpg' in image_url else 'png'
         new_key = 'image_key'
         filename = f'{environ.get("PUBLIC_PREFIX")}/{uuid4()}.{ext}'
         http_request = {'requestUrl': person['cv']['image']['thumb']['url']}
@@ -43,7 +45,7 @@ def ingest(event) -> Data:
                                    language='{LANG}',
                                    ext='{FORMAT}')
         }
-
+        
         d.update(write_cv_image_to_public_bucket(person))
         return d
 
