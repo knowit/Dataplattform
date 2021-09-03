@@ -1,4 +1,4 @@
-from dataplattform.testing.utilities import FakeResponse, FakePngResponse, FakeJpgResponse
+from dataplattform.testing.utilities import FakeResponse, FakePngResponse
 from download_to_bucket import handler
 from pytest import fixture
 from os import path
