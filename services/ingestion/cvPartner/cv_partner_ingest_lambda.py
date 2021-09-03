@@ -10,7 +10,6 @@ from os import environ
 offset_size = 1000
 handler = IngestHandler()
 
-
 @handler.ingest(overwrite=True)
 def ingest(event) -> Data:
     url = SSM(with_decryption=False).get('cv_partner_url')
