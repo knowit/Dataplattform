@@ -23,7 +23,7 @@ def add_dummy_data(bucket, prefix):
         bucket.put_object(Body='some data', Key=item)
 
 
-def make_test_json(user_id, cv_id):
+def make_test_json(user_id, cv_id, ext):
     return {
         'cvs': [
             {
@@ -32,7 +32,7 @@ def make_test_json(user_id, cv_id):
                     'id': cv_id,
                     'image': {
                         'thumb': {
-                            'url': 'https://cvpartner.com/test.jpg'
+                            'url': f'https://cvpartner.com/test.{ext}'
                         }
                     }
                 }
@@ -40,22 +40,6 @@ def make_test_json(user_id, cv_id):
         ]
     }
 
-def make_test_json_png(user_id, cv_id):
-    return {
-        'cvs': [
-            {
-                'cv': {
-                    'user_id': user_id,
-                    'id': cv_id,
-                    'image': {
-                        'thumb': {
-                            'url': 'https://cvpartner.com/test.png'
-                        }
-                    }
-                }
-            }
-        ]
-    }
 
 def cv_test_json(cv_id):
     return [
@@ -85,7 +69,7 @@ def test_initial_ingest(s3_bucket, s3_public_bucket):
     cv_id = '2'
     responses.add(responses.GET,
                   f'{base_url}/v3/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
-                  json=make_test_json(user_id, cv_id), status=200)
+                  json=make_test_json(user_id, cv_id, 'jpg'), status=200)
     responses.add(responses.GET, f'{base_url}/v3/cvs/{user_id}/{cv_id}',
                   json=cv_test_json(cv_id), status=200)
     handler(None, None)
@@ -108,7 +92,7 @@ def test_png(s3_bucket):
     cv_id = '2'
     responses.add(responses.GET,
                   f'{base_url}/v3/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
-                  json=make_test_json_png(user_id, cv_id), status=200)
+                  json=make_test_json(user_id, cv_id, 'png'), status=200)
     responses.add(responses.GET, f'{base_url}/v3/cvs/{user_id}/{cv_id}',
                   json=cv_test_json(cv_id), status=200)
     handler(None, None)
