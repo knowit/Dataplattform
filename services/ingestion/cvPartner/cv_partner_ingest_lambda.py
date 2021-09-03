@@ -26,7 +26,6 @@ def ingest(event) -> Data:
 
     def write_cv_image_to_public_bucket(person):
         image_url = person['cv']['image']['thumb']['url']
-        print(image_url)
         ext = 'jpg' if ".jpeg" in image_url or '.jpg' in image_url else 'png'
         new_key = 'image_key'
         filename = f'{environ.get("PUBLIC_PREFIX")}/{uuid4()}.{ext}'
