@@ -22,18 +22,10 @@ def ingest(event) -> Data:
     def data_point():
         return {
             'id': repo['id'],
-            'name': repo['name'],
-            'description': repo['description'],
-            'url': repo['url'],
-            'html_url': repo['html_url'],
-            'owner': repo['owner']['login'],
-            'created_at': to_timestamp(repo['created_at']),
-            'updated_at': to_timestamp(repo['updated_at']),
-            'pushed_at': to_timestamp(repo['pushed_at']),
-            'language': repo['language'],
-            'forks_count': repo['forks_count'],
-            'stargazers_count': repo['stargazers_count'],
-            'default_branch': repo['default_branch']
+            'type': repo['type'],
+            'merged_at': to_timestamp(repo['payload']['pull_request']['merged_at']),
+            'created_at': to_timestamp(repo['payload']['pull_request']['created_at']),
+            'base-ref': repo['base']['ref']
         }
 
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(repo)])
