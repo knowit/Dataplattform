@@ -17,10 +17,16 @@ def ingest(event) -> Data:
     res = requests.get(url, headers={'Authorization': f'Bearer {api_token}'})
     events = res.json()
 
+    while 'next' in res.links.keys():
+        res = requests.get(res.links['next']['url'])
+        events.extend(res.json())
+
     def to_timestamp(date):
         return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
 
     def data_point(event):
+        if(event['type'] != "PullRequestEvent" or event['payload']['pull_request']['merged_at'] == None):
+            return None
         return {
             'id': event['id'],
             'type': event['type'],
