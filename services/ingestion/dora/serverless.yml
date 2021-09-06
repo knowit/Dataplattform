@@ -10,7 +10,7 @@ dataplattform:
     - ../../infrastructure/glue
   glue:
     tableName: dora
-    accessLevel: 3
+    accessLevel: 2
 
 custom:
   editable:
