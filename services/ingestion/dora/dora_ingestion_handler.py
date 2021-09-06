@@ -1,13 +1,11 @@
-from dataplattform.common.handler import Handler
+from dataplattform.common.handlers.ingest import IngestHandler
 from dataplattform.common.schema import Data, Metadata
 from dataplattform.common.aws import SSM
 from datetime import datetime
-import pandas as pd
 import requests
-from typing import Dict
 from dateutil.parser import isoparse
 
-handler = Handler()
+handler = IngestHandler()
 url = 'https://api.github.com/repos/knowit/Dataplattform/events'
 
 
@@ -25,19 +23,14 @@ def ingest(event) -> Data:
         return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
 
     def data_point(event):
-        if(event['type'] != "PullRequestEvent" or event['payload']['pull_request']['merged_at'] == None):
+        if event['type'] != "PullRequestEvent" or event['payload']['pull_request']['merged_at'] is None:
             return None
         return {
             'id': event['id'],
             'type': event['type'],
             'merged_at': to_timestamp(event['payload']['pull_request']['merged_at']),
             'created_at': to_timestamp(event['payload']['pull_request']['created_at']),
-            'base-ref': event['base']['ref']
+            'base-ref': event['payload']['pull_request']['base']['ref']
         }
 
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(event) for event in events])
-
-
-@handler.process(partitions={})
-def process(data) -> Dict[str, pd.DataFrame]:
-    return {}
