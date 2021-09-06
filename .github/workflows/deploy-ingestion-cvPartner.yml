@@ -66,6 +66,8 @@ jobs:
         run: |
           if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
             sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --region "eu-central-1" --profile deployment --overwrite
+          fi
+        run: |
           dataplattform register-table cv_partner
           dataplattform database -a 3 update-tables
       
@@ -73,5 +75,7 @@ jobs:
         run: |
           if [[ "${{github.base_ref}}" == "develop" || "${{github.ref}}" == "refs/heads/develop" ]]; then
             sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --region "eu-central-1" --profile deployment --overwrite
+          fi
+        run: |
           dataplattform register-table cv_partner
           dataplattform database -a 3 update-tables
