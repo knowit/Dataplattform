@@ -33,4 +33,4 @@ def ingest(event) -> Data:
             'base-ref': event['payload']['pull_request']['base']['ref']
         }
 
-    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(event) for event in events])
+    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(event) for event in events if data_point(event) != None])
