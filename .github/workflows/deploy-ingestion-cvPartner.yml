@@ -1,6 +1,7 @@
 name: Deploy ingestion - cvPartner
 
 on:
+  workflow_dipsatch
   push:
     branches:
       - develop
