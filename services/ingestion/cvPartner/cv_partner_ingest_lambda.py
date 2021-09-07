@@ -44,7 +44,6 @@ def ingest(event) -> Data:
                                    language='{LANG}',
                                    ext='{FORMAT}')
         }
-        
         d.update(write_cv_image_to_public_bucket(person))
         return d
 
