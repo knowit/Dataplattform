@@ -1,6 +1,7 @@
 name: Deploy ingestion - gitHub
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

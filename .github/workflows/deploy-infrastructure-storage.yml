@@ -1,6 +1,7 @@
 name: Deploy infrastructure - storage
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

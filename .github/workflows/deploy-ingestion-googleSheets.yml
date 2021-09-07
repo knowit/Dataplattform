@@ -1,6 +1,7 @@
 name: Deploy ingestion - googleSheets
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

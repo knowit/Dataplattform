@@ -2,6 +2,7 @@
 name: Dataplattform - package - cli
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

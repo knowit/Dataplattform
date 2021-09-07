@@ -2,6 +2,7 @@
 name: Dataplattform - ingestion - jiraSales
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

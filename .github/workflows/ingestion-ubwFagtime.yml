@@ -2,6 +2,7 @@
 name: Dataplattform - ingestion - ubwFagtime
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

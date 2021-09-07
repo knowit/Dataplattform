@@ -1,6 +1,7 @@
 name: Dataplattform - infrastructure - glue
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

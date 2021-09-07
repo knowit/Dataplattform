@@ -1,6 +1,7 @@
 name: Deploy utils - downloadToBucket
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

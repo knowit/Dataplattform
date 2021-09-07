@@ -2,6 +2,7 @@
 name: Dataplattform - ingestion - googleEvent
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

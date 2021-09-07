@@ -1,6 +1,7 @@
 name: Deploy infrastructure - metadata
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
