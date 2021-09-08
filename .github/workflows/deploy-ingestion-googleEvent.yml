@@ -1,6 +1,7 @@
 name: Deploy ingestion - googleEvent
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

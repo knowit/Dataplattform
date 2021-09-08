@@ -1,6 +1,7 @@
 name: Deploy api - dataApi
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

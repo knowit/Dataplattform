@@ -2,6 +2,7 @@
 name: Dataplattform - package - common
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

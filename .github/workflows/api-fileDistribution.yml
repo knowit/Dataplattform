@@ -2,6 +2,7 @@
 name: Dataplattform - api - fileDistribution
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

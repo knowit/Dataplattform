@@ -1,6 +1,7 @@
 name: Deploy infrastructure - vpc
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

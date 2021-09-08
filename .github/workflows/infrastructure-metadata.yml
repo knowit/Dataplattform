@@ -1,6 +1,7 @@
 name: Dataplattform - infrastructure - metadata
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

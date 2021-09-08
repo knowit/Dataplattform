@@ -1,6 +1,7 @@
 name: Deploy infrastructure - glue
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

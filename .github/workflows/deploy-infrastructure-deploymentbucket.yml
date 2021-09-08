@@ -1,6 +1,7 @@
 name: Deploy infrastructure - deploymentBucket
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
