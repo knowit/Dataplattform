@@ -36,10 +36,12 @@ def ingest(event) -> Data:
             return None
         return {
             'id': event['id'],
+            'name': event['repo']['name'],
             'type': event['type'],
             'merged_at': to_timestamp(event['payload']['pull_request']['merged_at']),
             'created_at': to_timestamp(event['payload']['pull_request']['created_at']),
-            'base-ref': event['payload']['pull_request']['base']['ref']
+            'base-ref': event['payload']['pull_request']['base']['ref'],
+            'default_branch': default_branch
         }
 
     return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(event) for event in events if data_point(event) != None])
