@@ -7,6 +7,7 @@ from dateutil.parser import isoparse
 
 handler = IngestHandler()
 url = 'https://api.github.com/repos/knowit/Dataplattform/events'
+branch_url = 'https://api.github.com/repos/knowit/dataplattform'
 
 
 @handler.ingest()
@@ -19,11 +20,19 @@ def ingest(event) -> Data:
         res = requests.get(res.links['next']['url'])
         events.extend(res.json())
 
+    def retrieve_default_branch():
+        api_token_default_branch = SSM(with_decryption=True).get('github_api_token')
+        res_default_branch = requests.get(branch_url, headers={'Authorization': f'Bearer {api_token_default_branch}'})
+        event_default_branch = res_default_branch.json()
+        return event_default_branch['default_branch']
+
+    default_branch = retrieve_default_branch()
+
     def to_timestamp(date):
         return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
 
     def data_point(event):
-        if event['type'] != "PullRequestEvent" or event['payload']['pull_request']['merged_at'] is None:
+        if event['type'] != "PullRequestEvent" or event['payload']['pull_request']['merged_at'] is None or event['payload']['pull_request']['base']['ref'] != default_branch:
             return None
         return {
             'id': event['id'],
