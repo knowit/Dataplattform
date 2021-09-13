@@ -33,7 +33,7 @@ jobs:
         run: npm install
 
       - name: Install requirements
-        run: pip3 install -r requirements-post
+        run: pip3 install -r requirements-post.txt
 
       - name: Run serverless deploy prod
         if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
