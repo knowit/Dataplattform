@@ -16,13 +16,6 @@ custom:
     noDeploy:
       - boto3
       - botocore
-      - pandas
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
 provider:
   name: aws
