@@ -24,7 +24,7 @@ jobs:
       - name: Install Serverless Framework
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
-       - name: Run serverless deploy prod
+      - name: Run serverless deploy prod
         if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
@@ -33,6 +33,7 @@ jobs:
         run: |
           echo "Deploying to production" && sls deploy --stage prod 
           
+
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
         env:
