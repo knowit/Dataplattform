@@ -13,7 +13,7 @@ dataplattform:
 
 custom:
   editable:
-    timeout: 28
+    timeout: 200
     handlerFile: dora_ingestion_handler
     processHandlerFile: dora_process_handler
     databaseName: level_2
@@ -102,6 +102,7 @@ functions:
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
+    tags:
 
 resources:
   Resources:
