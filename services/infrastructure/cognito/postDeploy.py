@@ -40,7 +40,9 @@ if __name__ == '__main__':
     ap.add_argument("--param-name",
                     required=True,
                     dest="param_name")
-
+    ap.add_argument("--region",
+                    required=True,
+                    dest="region")
     kwargs = vars(ap.parse_args())
     region = kwargs['region']
     outputs = get_cf_outputs(kwargs['stack_name'], region)
