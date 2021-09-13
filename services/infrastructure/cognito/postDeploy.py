@@ -3,8 +3,8 @@ import argparse
 import traceback
 
 
-def get_cf_outputs(stack_name: str) -> dict:
-    client = boto3.client('cloudformation')
+def get_cf_outputs(stack_name: str, region: str) -> dict:
+    client = boto3.client('cloudformation', region_name=region)
     response = client.describe_stacks(StackName=stack_name)
     result = dict()
     for output in response["Stacks"][0]["Outputs"]:
@@ -13,8 +13,8 @@ def get_cf_outputs(stack_name: str) -> dict:
         result[key] = value
     return result
 
-def set_ssm_parameter(name: str, value: str, param_type: str = "String"):
-    client = boto3.client('ssm')
+def set_ssm_parameter(name: str, value: str, region: str, param_type: str = "String"):
+    client = boto3.client('ssm', region_name=region)
     try:
         client.put_parameter(
             Name=name,
@@ -42,12 +42,12 @@ if __name__ == '__main__':
                     dest="param_name")
 
     kwargs = vars(ap.parse_args())
-
-    outputs = get_cf_outputs(kwargs['stack_name'])
+    region = kwargs['region']
+    outputs = get_cf_outputs(kwargs['stack_name'], region)
 
     client_id = outputs["CognitoUserPoolClientId"]
     param_name = kwargs["param_name"]
 
     print("\nConfiguring SSM...")
-    set_ssm_parameter(param_name, client_id)
+    set_ssm_parameter(param_name, client_id, region)
     print("Configuration complete!\n")
