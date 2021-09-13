@@ -44,7 +44,7 @@ jobs:
       - name: Run serverless deploy
         run: |
           if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment
+            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment --region "eu-central-1"
           else
-            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment
+            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment --region "eu-central-1"
           fi
