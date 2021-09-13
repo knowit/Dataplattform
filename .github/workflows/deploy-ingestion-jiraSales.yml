@@ -57,7 +57,7 @@ jobs:
           echo "Invoking ingestion" && sls invoke -f pollerIngest --stage prod --aws-profile deployment
           
       - name: Invoke ingestion dev
-         if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
+        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
