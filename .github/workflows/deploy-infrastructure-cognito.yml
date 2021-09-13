@@ -9,6 +9,7 @@ on:
     paths:
       - 'services/infrastructure/cognito/**'
       - ".config/.serverless"
+      - "packages/common/**"
 
 jobs:
   deploy:
