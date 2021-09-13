@@ -32,8 +32,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      -name: Install requirements
-        run: pip3 install -r requirements-postDeploy.txt
+      - name: Install requirements
+        run: pip3 install -r requirements-post
 
       - name: Run serverless deploy prod
         if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
