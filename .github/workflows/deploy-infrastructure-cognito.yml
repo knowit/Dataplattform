@@ -35,6 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+        run: pip3 install boto3
 
       - name: Serverless AWS authentication
         run: |
