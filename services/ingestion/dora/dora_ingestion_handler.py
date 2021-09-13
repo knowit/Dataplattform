@@ -44,4 +44,5 @@ def ingest(event) -> Data:
             'default_branch': default_branch
         }
 
-    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(event) for event in events if data_point(event) != None])
+    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(event) for event in events if
+                                                                               data_point(event) is not None])

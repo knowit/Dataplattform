@@ -4,6 +4,7 @@ from typing import Dict
 
 handler = ProcessHandler()
 
+
 @handler.process(partitions={'github_dora_repos': ['name']})
 def process(data, events) -> Dict[str, pd.DataFrame]:
     def make_dataframe(d):
@@ -14,6 +15,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         return repos_dataframe
 
     dora_data = [
+        'name',
         'id',
         'type',
         'merged_at',
@@ -23,4 +25,4 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     github_dataframe = pd.concat([make_dataframe(d) for d in data])
     dora_datas = github_dataframe.loc[:, dora_data]
 
-    return {'github_dora_repos':dora_datas}
+    return {'github_dora_repos': dora_datas}
