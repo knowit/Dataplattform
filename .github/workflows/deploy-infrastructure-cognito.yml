@@ -22,7 +22,9 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12.24.0'
-          cache: 'npm'
+      - run: npm install
+      - run: npm test
+
       - uses: actions/setup-python@v2
         with:
           python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
