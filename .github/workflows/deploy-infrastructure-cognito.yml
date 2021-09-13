@@ -22,8 +22,6 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: '12'
-      - run: npm install
-      - run: npm test
 
       - uses: actions/setup-python@v2
         with:
@@ -34,8 +32,7 @@ jobs:
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
       - name: Install dependencies
-        run: npm install
-        run: pip3 install boto3
+        run: npm install && pip3 install boto3
 
       - name: Serverless AWS authentication
         run: |
