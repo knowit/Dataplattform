@@ -143,7 +143,7 @@ resources:
           - Sid: Allow use of the key
             Effect: Allow
             Principal:
-              AWS: #Sett inn bruker
+              AWS:  #Sett inn bruker
             Action:
             - kms:DescribeKey
             - kms:Encrypt
@@ -152,6 +152,11 @@ resources:
             - kms:GenerateDataKey
             - kms:GenerateDataKeyWithoutPlaintext
             Resource: '*'
+    KeyAlias:
+      Type: 'AWS::KMS::Alias'
+      Properties:
+        AliasName: alias/KMSTestName
+        TargetKeyId: !Ref KMSTestKey
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
