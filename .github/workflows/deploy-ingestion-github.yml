@@ -39,13 +39,6 @@ jobs:
           pip install -e ../../../packages/query
           pip install -e ../../../packages/testing
 
-      - name: Serverless AWS authentication
-        run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          else
-            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          fi
 
       - name: Run serverless deploy
         run: |
@@ -64,7 +57,7 @@ jobs:
           fi
 
       - name: Registrer and update glue tables prod
-        if: github.base_ref == "master" || github.base_ref == "refs/heads/master"
+        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
@@ -74,7 +67,7 @@ jobs:
           dataplattform database -a 2 update-tables
 
       - name: Registrer and update glue tables dev
-        if: github.base_ref != "master" && github.base_ref != "refs/heads/master"
+        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
