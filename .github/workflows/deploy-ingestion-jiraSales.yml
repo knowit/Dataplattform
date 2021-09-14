@@ -58,24 +58,13 @@ jobs:
         run: |
           echo "Deploying to development" && sls deploy --stage dev 
 
-      - name: Invoke ingestion prod
-        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
+      - name: Invoke ingestion
         run: |
-          echo "Invoking ingestion" && sls invoke -f pollerIngest --stage prod --aws-profile deployment
-          
-      - name: Invoke ingestion dev
-        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          echo "Invoking ingestion" && sls invoke -f pollerIngest --stage dev --aws-profile deployment
-          
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+           echo "Invoking ingestion" && sls invoke -f pollerIngest --stage prod --aws-profile deployment
+          else
+           echo "Invoking ingestion" && sls invoke -f pollerIngest --stage dev --aws-profile deployment
+          fi
 
       - name: Registrer and update glue tables prod
         if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
