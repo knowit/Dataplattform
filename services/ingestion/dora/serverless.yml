@@ -106,6 +106,52 @@ functions:
 
 resources:
   Resources:
+    KMSTestKey:
+      Type: AWS::KMS::Key
+      Properties:
+        Description: An example symmetric KMS key
+        EnableKeyRotation: true
+        PendingWindowInDays: 20
+        KeyPolicy:
+          Version: '2012-10-17'
+          Id: key-default-1
+          Statement:
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+            Action: kms:*
+            Resource: '*'
+          - Sid: Allow administration of the key
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::${AWS::AccountId}:user/ #Hovebruker for tilgang. Må se på gruppe i stedet.
+            Action:
+            - kms:Create*
+            - kms:Describe*
+            - kms:Enable*
+            - kms:List*
+            - kms:Put*
+            - kms:Update*
+            - kms:Revoke*
+            - kms:Disable*
+            - kms:Get*
+            - kms:Delete*
+            - kms:ScheduleKeyDeletion
+            - kms:CancelKeyDeletion
+            Resource: '*'
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::${AWS::AccountId}:user/KMSTestUser #La til en ekstra bruker for å teste nøkkeltilgang her. Lot bruker stå for eksempel. 
+            Action:
+            - kms:DescribeKey
+            - kms:Encrypt
+            - kms:Decrypt
+            - kms:ReEncrypt*
+            - kms:GenerateDataKey
+            - kms:GenerateDataKeyWithoutPlaintext
+            Resource: '*'
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
