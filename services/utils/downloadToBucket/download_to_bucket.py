@@ -13,7 +13,8 @@ def handler(event, context):
 
     valid_content_types = {'pdf':  'application/pdf',
                            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                           'jpg':  'image/jpeg'}
+                           'jpg':  'image/jpeg',
+                           'png':  'image/png'}
 
     if filetype not in list(valid_content_types.keys()):
         return 400

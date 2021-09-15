@@ -23,7 +23,7 @@ def add_dummy_data(bucket, prefix):
         bucket.put_object(Body='some data', Key=item)
 
 
-def make_test_json(user_id, cv_id):
+def make_test_json(user_id, cv_id, ext):
     return {
         'cvs': [
             {
@@ -32,7 +32,7 @@ def make_test_json(user_id, cv_id):
                     'id': cv_id,
                     'image': {
                         'thumb': {
-                            'url': 'https://cvpartner.com'
+                            'url': f'https://cvpartner.com/test.{ext}'
                         }
                     }
                 }
@@ -69,7 +69,7 @@ def test_initial_ingest(s3_bucket, s3_public_bucket):
     cv_id = '2'
     responses.add(responses.GET,
                   f'{base_url}/v3/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
-                  json=make_test_json(user_id, cv_id), status=200)
+                  json=make_test_json(user_id, cv_id, 'jpg'), status=200)
     responses.add(responses.GET, f'{base_url}/v3/cvs/{user_id}/{cv_id}',
                   json=cv_test_json(cv_id), status=200)
     handler(None, None)
@@ -83,3 +83,19 @@ def test_initial_ingest(s3_bucket, s3_public_bucket):
 
     assert len(list(s3_public_bucket.objects.filter(Prefix=public_prefix))) == 0
     assert len(list(s3_bucket.objects.filter(Prefix=datalake_prefix))) == 1
+    assert 'jpg' in data['data'][0]['image_key']
+
+    
+def test_png(s3_bucket):
+    base_url = 'https://knowittest2.cvpartner.com/api'
+    user_id = '1'
+    cv_id = '2'
+    responses.add(responses.GET,
+                  f'{base_url}/v3/search?office_ids[]=objectnet_id&office_ids[]=sor_id&offset=0&size={offset_size}',
+                  json=make_test_json(user_id, cv_id, 'png'), status=200)
+    responses.add(responses.GET, f'{base_url}/v3/cvs/{user_id}/{cv_id}',
+                  json=cv_test_json(cv_id), status=200)
+    handler(None, None)
+    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
+    data = loads(response['Body'].read())
+    assert 'png' in data['data'][0]['image_key']

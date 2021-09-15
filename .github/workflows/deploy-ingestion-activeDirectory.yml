@@ -1,6 +1,7 @@
 name: Deploy ingestion - activeDirectory
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

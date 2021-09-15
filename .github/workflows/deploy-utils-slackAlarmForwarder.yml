@@ -1,6 +1,7 @@
 name: Deploy utils - slackAlarmForwarder
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

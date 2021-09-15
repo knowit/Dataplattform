@@ -2,6 +2,7 @@
 name: Dataplattform - ingestion - yrWeather
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

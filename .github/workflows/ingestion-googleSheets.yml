@@ -2,6 +2,7 @@
 name: Dataplattform - ingestion - googleSheets
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

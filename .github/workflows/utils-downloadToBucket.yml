@@ -2,6 +2,7 @@
 name: Dataplattform - utils - downloadToBucket
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

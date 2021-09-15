@@ -1,6 +1,7 @@
 name: Deploy ingestion - cvPartner
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
@@ -60,10 +61,10 @@ jobs:
            echo "Invoking ingestion" && sls invoke -f ingest --stage prod --aws-profile deployment
           else
            echo "Invoking ingestion" && sls invoke -f ingest --stage dev --aws-profile deployment
-          fi
+          fi          
 
       - name: Registrer and update glue tables prod
-        if: github.base_ref == "master" || github.base_ref == "refs/heads/master"
+        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
@@ -71,9 +72,9 @@ jobs:
         run: |
           dataplattform register-table cv_partner
           dataplattform database -a 3 update-tables
-
+          
       - name: Registrer and update glue tables dev
-        if: github.base_ref != "master" && github.base_ref != "refs/heads/master"
+        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
@@ -81,3 +82,4 @@ jobs:
         run: |
           dataplattform register-table cv_partner
           dataplattform database -a 3 update-tables
+             

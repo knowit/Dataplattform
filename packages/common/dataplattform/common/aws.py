@@ -114,9 +114,18 @@ class S3:
             objects_to_be_deleted = bucket.objects.filter(Prefix=prefix)
 
         if filter_val is not None:
+            delete_spec_list = []
             for obj in objects_to_be_deleted:
                 if filter_val in obj.key:
-                    self.fs.rm(obj.key)
+                    delete_spec_list.append({'Key': obj.key})
+                    try:
+                        delete_spec_list[-1].update({'VersionId': obj.id})
+                    except AttributeError:
+                        pass
+            if delete_spec_list:
+                bucket.delete_objects(Delete={
+                    'Objects': delete_spec_list
+                })
         else:
             objects_to_be_deleted.delete()
 

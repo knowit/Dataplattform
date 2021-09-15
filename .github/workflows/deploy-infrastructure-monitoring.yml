@@ -1,6 +1,7 @@
 name: Deploy infrastructure - monitoring
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop

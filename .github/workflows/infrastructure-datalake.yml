@@ -1,6 +1,7 @@
 name: Dataplattform - infrastructure - datalake
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

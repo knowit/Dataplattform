@@ -1,6 +1,7 @@
 name: Dataplattform - infrastructure - ingestApiGateway
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

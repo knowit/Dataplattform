@@ -1,6 +1,7 @@
 name: Deploy infrastructure - distribution
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
