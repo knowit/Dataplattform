@@ -9,7 +9,7 @@ dataplattform:
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
   glue:
-    tableName: ubw_fagtime
+    tableName: ubw_fagtimer
     accessLevel: 2
 
 custom:
