@@ -3,9 +3,6 @@ service: DataAPI
 dataplattform:
   dependencies:
     - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/layers/numpy
-    - ../../infrastructure/layers/pandas
-    - ../../infrastructure/layers/fastparquet
     - ../../infrastructure/cognito
     - ../../infrastructure/datalake
     - ../../infrastructure/events
@@ -30,11 +27,6 @@ custom:
     noDeploy:
       - boto3 # Default in lambda rt
       - botocore
-      - numpy
-      - numpy.libs
-      - pytz
-      - numba
-      - llvmlite
   authorizer:
     type: COGNITO_USER_POOLS
     name: authorizer
@@ -73,9 +65,6 @@ package:
 functions:
   DataAPI:
     handler: wsgi_handler.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.service}
     description: Dataplattform Data API
     role: !ImportValue ${self:custom.stage}-assumeRole
@@ -115,10 +104,6 @@ functions:
   CacheUpdater:
     handler: cache_updater.handler
     module: functions
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
     name: ${self:custom.service}-CacheUpdater
     description: Dataplattform API Cache updater
     role: !GetAtt ReportCacheRole.Arn
