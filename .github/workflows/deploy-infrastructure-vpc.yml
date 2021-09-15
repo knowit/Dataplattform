@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v1
 
       - name: Install Serverless Framework
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION_VPC/ {print $2}' ../../../.config/.serverless_vpc)
 
       - name: Install dependencies
         run: npm install
