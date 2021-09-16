@@ -1,0 +1,56 @@
+/* Table to create a list of deployments per merged date. */
+CREATE TABLE dev_level_2_database.github_deployments
+WITH (
+  format='PARQUET'
+) AS
+SELECT
+COUNT(distinct id) AS deployments,
+Date(from_unixtime(merged_at)) as Date
+FROM
+github_dora_repos
+group by Date(from_unixtime(merged_at));
+
+
+/* Table to create a list of all deployments per merged date, with null values on all empty dates */
+CREATE TABLE dev_level_2_database.github_deployments_null_values
+WITH (
+  format='PARQUET'
+) AS
+with all_dates as (
+SELECT
+     CAST(date_column AS DATE) date_column
+ FROM
+     (VALUES
+         (SEQUENCE(date('2021-07-13'),
+                   date('2021-10-30'),
+                   INTERVAL '1' DAY)
+         )
+     ) AS t1(date_array)
+ CROSS JOIN
+     UNNEST(date_array) AS t2(date_column)
+)
+
+select
+   date_column,
+   sum(val) as deployments
+from
+   (
+      select
+         date_list as date_column,
+         deployments as val
+      from
+         github_deployments
+   union
+      select
+         date_column,
+         0
+      from
+         all_dates
+      where
+         date_column >= date '2021-07-13' and
+         date_column <= current_date
+   )
+group by
+   date_column
+order by
+   date_column
