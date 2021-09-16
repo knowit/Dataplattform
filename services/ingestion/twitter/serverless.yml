@@ -13,7 +13,7 @@ dataplattform:
 
 custom:
   editable:
-    timeout: 128
+    timeout: 200
     ingestHandlerFile: twitter_ingest_lambda
     processHandlerFile: twitter_process_lambda
     databaseName: level_1
