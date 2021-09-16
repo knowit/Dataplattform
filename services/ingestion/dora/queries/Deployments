@@ -54,3 +54,25 @@ group by
    date_column
 order by
    date_column
+
+
+/* Query to check for monthly or yearly deployment frequency, needs to be expanded to inclue daily and weekly */
+with monthly_values as(
+select 
+   MONTH(date_column) AS MONTH,
+   COUNT(CASE WHEN deployments >0 then 1 end) as deployments
+from github_deployments_null_values 
+GROUP by MONTH(date_column)
+),
+monthly_distinct_values as(
+SELECT 
+   MONTH,
+   COUNT(CASE WHEN deployments >0 then 1 end) as deployments
+from monthly_values
+group by MONTH
+)
+Select CASE
+   when approx_percentile(deployments,0.5) >= 1 then 'monthly'
+   else 'yearly'
+   end as DeploymentFrequency
+from monthly_distinct_values
