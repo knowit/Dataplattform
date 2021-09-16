@@ -56,8 +56,22 @@ order by
    date_column
 
 
-/* Query to check for monthly or yearly deployment frequency, needs to be expanded to inclue daily and weekly */
-with monthly_values as(
+/* Query to check for daily, weekly, monthly or yearly deployment frequency, needs to be expanded to inclue daily and weekly */
+with daily_values as(
+SELECT
+   date_column,
+   COUNT(CASE WHEN deployments >0 then 1 end) as deployments
+from github_deployments_null_values 
+group by date_column
+),
+daily_aggregate_values as(
+SELECT 
+  WEEK(date_column) as week,
+  COUNT(CASE WHEN deployments >0 then 1 end) as daily_deployments
+  from daily_values
+  group by WEEK(date_column)
+),
+monthly_values as(
 select 
    MONTH(date_column) AS MONTH,
    COUNT(CASE WHEN deployments >0 then 1 end) as deployments
@@ -67,12 +81,46 @@ GROUP by MONTH(date_column)
 monthly_distinct_values as(
 SELECT 
    MONTH,
-   COUNT(CASE WHEN deployments >0 then 1 end) as deployments
+   COUNT(CASE WHEN deployments >0 then 1 end) as monthly_deployments
 from monthly_values
 group by MONTH
-)
+),
+weekly_table as(
 Select CASE
-   when approx_percentile(deployments,0.5) >= 1 then 'monthly'
-   else 'yearly'
+   when approx_percentile(daily_deployments,0.5) >= 3 then 'daily'
+   when approx_percentile(daily_deployments,0.5) >= 1 then 'weekly'
    end as DeploymentFrequency
+from daily_aggregate_values
+),
+monthly_table as(
+Select CASE
+  when approx_percentile(monthly_deployments,0.5) >= 1 then 'monthly'
+  else 'yearly'
+  end as DeploymentFrequency
 from monthly_distinct_values
+),
+aggregate_table as(
+  SELECT * from monthly_table union select * from weekly_table
+)
+SELECT CASE
+   when exists(
+     SELECT * FROM aggregate_table
+     WHERE DeploymentFrequency = 'daily'
+     )
+     then 'daily'
+   when exists(
+     SELECT * FROM aggregate_table
+     WHERE DeploymentFrequency = 'weekly'
+     )
+     then 'weekly'
+   when exists(
+     SELECT * FROM aggregate_table
+     WHERE DeploymentFrequency = 'monthly'
+     )
+     then 'monthly'
+   when exists(
+     SELECT * FROM aggregate_table
+     WHERE DeploymentFrequency = 'yearly'
+     )
+     then 'yearly'
+   end as DeploymentFrequency
