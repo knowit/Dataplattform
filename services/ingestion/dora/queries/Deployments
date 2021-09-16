@@ -21,8 +21,8 @@ SELECT
      CAST(date_column AS DATE) date_column
  FROM
      (VALUES
-         (SEQUENCE(date('2021-07-13'),
-                   date('2021-10-30'),
+         (SEQUENCE(date(date_add('month',-3,current_date)),
+                   date(current_date),
                    INTERVAL '1' DAY)
          )
      ) AS t1(date_array)
@@ -47,7 +47,7 @@ from
       from
          all_dates
       where
-         date_column >= date '2021-07-13' and
+         date_column >= date_add('month',-3,current_date) and
          date_column <= current_date
    )
 group by
