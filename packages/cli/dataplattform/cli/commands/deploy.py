@@ -3,11 +3,9 @@ import os
 import subprocess
 import traceback
 from argparse import ArgumentParser, Namespace
-from ..helper import safe_parse_yaml
+import yaml
 
-dependencies = dict()
-config_files = dict()
-access_levels = []
+targets = dict()
 
 # Do not search these directories for serverless.yml files
 ignore = [
@@ -26,23 +24,26 @@ install_commands = dict({
 })
 
 
-def get_dataplattform_config(path: str) -> dict:
-    filename = config_files[path]
+# Yaml-parser that will ignore Serverless tags
+class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+    def ignore_unknown(self, node):
+        return None
+
+
+SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+
+
+def parse_yaml(path: str) -> dict:
     try:
-        config = safe_parse_yaml(filename)
-        if 'dataplattform' in config.keys():
-            return config['dataplattform']
-        else:
-            return dict()
+        return yaml.load(open(path), Loader=SafeLoaderIgnoreUnknown)
     except Exception as e:
-        print("\nException occurred when parsing dataplattform config for " + filename)
-        traceback.print_stack()
+        print("Failed to parse yaml file: " + path + "\n" + str(e))
         raise e
 
 
 # Search a Dataplattform service for dependencies on other Dataplattform services
 def resolve_dependencies(path: str, filename: str) -> list:
-    config = safe_parse_yaml(filename)
+    config = parse_yaml(filename)
     if 'dataplattform' in config.keys() and 'dependencies' in config['dataplattform'].keys():
         result = []
         abspath = os.path.abspath(path)
@@ -86,13 +87,12 @@ def remove_path(path_list: list, path: str) -> None:
 
 
 # Find all service directories
-def search(path: str) -> None:
-    for entry in os.scandir(path):
+def search(target: str) -> None:
+    for entry in os.scandir(target):
         if entry.is_file():
             if entry.name == 'serverless.yml' or entry.name == 'serverless.yaml':
-                if not contains_path(list(dependencies), path):
-                    dependencies[path] = resolve_dependencies(path, entry.path)
-                    config_files[path] = entry.path
+                if not contains_path(list(targets), target):
+                    targets[target] = resolve_dependencies(target, entry.path)
         elif entry.name not in ignore:
             search(entry.path)
 
@@ -141,72 +141,25 @@ def print_status(status: str = None) -> None:
         print("\n" + line + message + line)
 
 
-def get_install_commands(path: str) -> list:
-    message = "Installing dependencies for: " + path
-    commands = ['echo ' + message]
-    for file in os.listdir(path):
-        if file in install_commands.keys():
-            commands.append(install_commands[file])
-
-    return commands
-
-
-def get_deployment_commands(path: str, stage: str = None) -> list:
+def get_deployment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
     message = "Deploying service: " + path
-    commands = ['echo ' + message]
+    commands = ['echo ' + message,  'cd ' + path]
     for file in os.listdir(path):
         if file in install_commands.keys():
             commands.append(install_commands[file])
-    commands.append('sls deploy' + ((" --stage " + stage) if stage is not None else ""))
+    commands.append('sls deploy'
+                    + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
+                    + ((" --stage " + stage) if stage is not None else ""))
     return commands
 
 
-def get_glue_commands(path: str) -> list:
-    dp_config = get_dataplattform_config(path)
-
-    if 'glue' in dp_config.keys() and 'tableName' in dp_config['glue'].keys():
-
-        if 'accessLevel' in dp_config['glue'].keys():
-            access_level = dp_config['glue']['accessLevel']
-            if access_level not in access_levels:
-                access_levels.append(access_level)
-
-        table_name = dp_config['glue']['tableName']
-        message = 'Registering glue table: ' + table_name
-        return ['echo ' + message, 'dataplattform register-table ' + table_name]
-    else:
-        return []
-
-
-def get_remove_commands(path: str, stage: str = None) -> list:
+def get_remove_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
     message = "Removing service: " + path
     return ['echo ' + message,
-            'sls remove' + ((" --stage " + stage) if stage is not None else "")]
-
-
-def run_process(command: str) -> None:
-    try:
-        if subprocess.call(command, shell=True) != 0:
-            raise Exception("An error occurred while running a subprocess")
-    except Exception as e:
-        print(e)
-        traceback.print_stack()
-        raise e
-
-
-def update_database() -> None:
-    print_status("Starting database update")
-    success = True
-    for access_level in access_levels:
-        message = "Updating database level " + str(access_level)
-        try:
-            run_process("echo " + message + " && dataplattform database -a " + str(access_level) + " update-tables")
-        except Exception as e:
-            print("\nException occurred when updating database with access-level " + str(access_level) + "\n" + str(e))
-            traceback.print_stack()
-            success = False
-            break
-    print_status("Database update complete" if success else "Database update stopped")
+            'cd ' + path,
+            'sls remove'
+            + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
+            + ((" --stage " + stage) if stage is not None else "")]
 
 
 def run_process_per_path(
@@ -215,13 +168,15 @@ def run_process_per_path(
         start_message: str = None,
         failed_message: str = None,
         complete_message: str = None) -> None:
+
     print_status(start_message)
     success = True
 
     for path in paths:
         commands = get_cmd_func(path)
         try:
-            if subprocess.call(' && '.join(commands), shell=True) != 0:
+            retcode = subprocess.call(' && '.join(commands), shell=True)
+            if retcode != 0:
                 raise Exception(str("\nAn error occurred while running a subprocess at " + path) if len(path) > 0
                                 else "\nAn error occurred while running a subprocess")
 
@@ -239,21 +194,22 @@ def init(parser: ArgumentParser):
     parser.add_argument('-e', '--stage', default='dev', choices=['dev', 'test', 'prod'])
     parser.add_argument('-c', '--config-file', default=None, dest='config_file')
     parser.add_argument('-r', '--remove', default=False, action='store_true')
+    parser.add_argument('-p', '--aws-profile', default=None, type=str, dest='aws_profile')
 
 
 def run(args: Namespace, _):
     print("")
-    for path in args.services:
-        search(path)
+    for target in args.services:
+        search(target)
 
-    paths = topological_sort(dependencies)
+    paths = topological_sort(targets)
 
     if args.remove:
         paths.reverse()
         # Remove all specified services
         run_process_per_path(
             paths=paths,
-            get_cmd_func=lambda p: ['cd ' + p] + get_install_commands(p) + get_remove_commands(p, args.stage),
+            get_cmd_func=lambda path: get_remove_commands(path, args.aws_profile, args.stage),
             start_message="Starting service removal",
             failed_message="Service removal stopped",
             complete_message="Service removal complete"
@@ -264,7 +220,7 @@ def run(args: Namespace, _):
             # Configure specified SSM-parameters
             run_process_per_path(
                 paths=[''],
-                get_cmd_func=lambda _: ["dataplattform configure --config-file " + args.config_file],
+                get_cmd_func=lambda path: ["dataplattform configure --config-file " + args.config_file],
                 start_message="Configuring parameters",
                 failed_message="Parameter configuraiton stopped",
                 complete_message="Parameter configuration complete"
@@ -273,14 +229,8 @@ def run(args: Namespace, _):
         # Deploy all specified services
         run_process_per_path(
             paths=paths,
-            get_cmd_func=lambda p: (['cd ' + p] +
-                                    get_install_commands(p) +
-                                    get_deployment_commands(p, args.stage) +
-                                    get_glue_commands(p)),
+            get_cmd_func=lambda path: get_deployment_commands(path, args.aws_profile, args.stage),
             start_message="Starting service deployment",
             failed_message="Service deployment stopped",
             complete_message="Service deployment complete"
         )
-
-        if len(access_levels) > 0:
-            update_database()
