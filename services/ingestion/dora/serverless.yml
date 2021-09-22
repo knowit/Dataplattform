@@ -16,10 +16,10 @@ custom:
     timeout: 200
     handlerFile: dora_ingestion_handler
     processHandlerFile: dora_process_handler
-    databaseName: level_2
+    databaseName: level_4
     description: Fetch key metrics from github API
     scheduleRate: rate(1 day)
-    accessLevel: level-2
+    accessLevel: level-4
     dataFolder: dora
 
   stage: ${opt:stage, self:provider.stage}
@@ -66,7 +66,7 @@ functions:
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      DATALAKE: !Sub '${self:custom.stage}-encryptedbucket-${AWS::AccountId}'
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
@@ -96,7 +96,7 @@ functions:
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      DATALAKE: !Sub '${self:custom.stage}-encryptedbucket-${AWS::AccountId}'
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
@@ -125,7 +125,7 @@ resources:
           - Sid: Allow administration of the key
             Effect: Allow
             Principal:
-              AWS: #Sett inn bruker
+              AWS: #arn:aws:iam::876363704293:user/even.johansen@knowit.no #Sett inn bruker
             Action:
             - kms:Create*
             - kms:Describe*
@@ -143,7 +143,7 @@ resources:
           - Sid: Allow use of the key
             Effect: Allow
             Principal:
-              AWS:  #Sett inn bruker
+              AWS: #arn:aws:iam::876363704293:user/KMSTestUser #Sett inn bruker
             Action:
             - kms:DescribeKey
             - kms:Encrypt
@@ -157,6 +157,19 @@ resources:
       Properties:
         AliasName: alias/KMSTestName
         TargetKeyId: !Ref KMSTestKey
+    EncryptedS3Bucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: !Sub '${self:custom.stage}-encryptedbucket-${AWS::AccountId}'
+        VersioningConfiguration:
+          Status: Enabled
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: 'aws:kms'
+                KMSMasterKeyID: !Ref KMSTestKey
+              BucketKeyEnabled: true
+      DeletionPolicy: Delete
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -172,7 +185,7 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+          - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -184,12 +197,22 @@ resources:
                     - s3:CopyObject
                     - s3:DeleteObjects
                     - s3:DeleteObjectVersion
-                  Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}-List
+                  Resource: 
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}/*
+          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - kms:Encrypt
+                    - kms:Decrypt
+                    - kms:DescribeKey
+                    - kms:ListKeys
+                    - kms:GenerateDataKey 
+                  Resource:  !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/b458b436-f666-43f5-a746-39152d820137' #Må fikses slik at vi får automatisk hentet id etter key/
+          - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -198,11 +221,9 @@ resources:
                     - s3:ListBucket
                     - s3:ListBucketVersions
                     - s3:GetBucketLocation
-                  Resource:
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - '*'
+                  Resource: 
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}/*
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
@@ -275,10 +296,8 @@ resources:
                     - s3:DeleteObjectVersion
                     - s3:DeleteObject
                   Resource:
-                    Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}/${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -289,10 +308,20 @@ resources:
                     - s3:ListBucketVersions
                     - s3:GetBucketLocation
                   Resource:
-                    Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - '*'
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}/*
+          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - kms:Encrypt
+                    - kms:Decrypt
+                    - kms:DescribeKey
+                    - kms:ListKeys
+                    - kms:GenerateDataKey 
+                  Resource:  !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/b458b436-f666-43f5-a746-39152d820137' #Må fikses slik at vi får automatisk hentet id etter key/
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
