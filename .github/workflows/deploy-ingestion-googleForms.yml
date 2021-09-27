@@ -62,7 +62,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table google_forms
+          dataplattform register-table google_forms_data
           dataplattform database -a 3 update-tables
 
       - name: Registrer and update glue tables dev
@@ -72,5 +72,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table google_forms
+          dataplattform register-table google_forms_data
           dataplattform database -a 3 update-tables
