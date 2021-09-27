@@ -9,7 +9,7 @@ dataplattform:
     - ../../infrastructure/glue
   glue:
     tableName: dora
-    accessLevel: 2
+    accessLevel: 4
 
 custom:
   editable:
@@ -173,7 +173,11 @@ resources:
                     - kms:DescribeKey
                     - kms:ListKeys
                     - kms:GenerateDataKey 
-                  Resource:  !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/b458b436-f666-43f5-a746-39152d820137' #Må fikses slik at vi får automatisk hentet id etter key/
+                  Resource:
+                    Fn::Join:
+                      - ""
+                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                        - !Ref KMSTestKey
     GlueCrawler:
       Type: AWS::Glue::Crawler
       Properties:
@@ -209,7 +213,7 @@ resources:
           - Sid: Allow administration of the key
             Effect: Allow
             Principal:
-              AWS: arn:aws:iam::876363704293:user/ #Sett inn bruker
+              AWS: arn:aws:iam::826278518019:user/frikk.fjuk@knowit.no #Sett inn bruker
             Action:
             - kms:Create*
             - kms:Describe*
@@ -227,7 +231,7 @@ resources:
           - Sid: Allow use of the key
             Effect: Allow
             Principal:
-              AWS: arn:aws:iam::876363704293:user/ #Sett inn bruker
+              AWS: arn:aws:iam::826278518019:user/frikk.fjuk@knowit.no #Sett inn bruker
             Action:
             - kms:DescribeKey
             - kms:Encrypt
@@ -295,7 +299,11 @@ resources:
                     - kms:DescribeKey
                     - kms:ListKeys
                     - kms:GenerateDataKey 
-                  Resource:  !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/b458b436-f666-43f5-a746-39152d820137' #Må fikses slik at vi får automatisk hentet id etter key/
+                  Resource:
+                    Fn::Join:
+                      - ""
+                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                        - !Ref KMSTestKey
           - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
             PolicyDocument:
               Version: "2012-10-17"
@@ -405,7 +413,11 @@ resources:
                     - kms:DescribeKey
                     - kms:ListKeys
                     - kms:GenerateDataKey 
-                  Resource:  !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/b458b436-f666-43f5-a746-39152d820137' #Må fikses slik at vi får automatisk hentet id etter key/
+                  Resource:
+                    Fn::Join:
+                      - ""
+                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                        - !Ref KMSTestKey
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
