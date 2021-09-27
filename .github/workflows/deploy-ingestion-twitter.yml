@@ -71,7 +71,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table twitter
+          dataplattform register-table twitter_tweets twitter_timeline twitter_account_status_update
           dataplattform database -a 1 update-tables
 
       - name: Registrer and update glue tables dev
@@ -81,5 +81,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table twitter
+          dataplattform register-table twitter_tweets twitter_timeline twitter_account_status_update
           dataplattform database -a 1 update-tables
