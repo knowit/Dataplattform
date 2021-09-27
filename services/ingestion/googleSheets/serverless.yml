@@ -1,7 +1,18 @@
 service: googleSheetsWebhook
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+    - ../../infrastructure/ingestApiGateway
+  glue:
+    tableName: google_sheets
+    accessLevel: 3
+
 custom:
-  #Edit these variables###########################
   editable:
     timeout: 12
     ingestHandlerFile: google_sheets_webhook_ingest_lambda
@@ -11,28 +22,20 @@ custom:
     description: Endpoint for Google Sheet webhooks
     accessLevel: level-3
     dataFolder: googleSheets/sheets
-  ################################################
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service} #this service definition includes stage
+  service: ${self:custom.stage}-${self:service}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3 # Default in lambda rt
+      - boto3
       - botocore
-      - pandas # Layer
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
   apiKeys:
-    - name: ${self:custom.stage}-main-ingest-api-key #when value is not set, AWS automatically generates API key
+    - name: ${self:custom.stage}-main-ingest-api-key
 
 
 provider:
@@ -41,13 +44,13 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
+    name: |-
+      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
+      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
-  
-  
-  #imports api gateway resources exported by ingestApiGateway service
+
   apiGateway:
     restApiId:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
@@ -74,18 +77,15 @@ package:
     - "./**"
 
 functions:
-  ingest: # A Function
+  ingest:
     handler: ${self:custom.editable.ingestHandlerFile}.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - '*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -93,17 +93,15 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-    tags: # Tag for this function. Every function are tagged with stage by default
 
     events:
       - http:
           path: sheets-data-callback
           method: post
-          private: true #if true API key is needed
-    
-  process: # A Function
+          private: true
+  process:
     handler: ${self:custom.editable.processHandlerFile}.handler
-    events: # The Events that trigger this Function
+    events:
       - sqs:
           arn:
             Fn::GetAtt:
@@ -111,17 +109,13 @@ functions:
               - Arn
           batchSize: 1
 
-    layers:
-      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - '*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -129,10 +123,9 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
-    tags: # Tag for this function. Every function are tagged with stage by default
-    
 
-resources: # The resources your functions use
+
+resources:
   Resources:
     IngestLambdaRole:
       Type: AWS::IAM::Role
@@ -163,18 +156,18 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-test-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                   - sqs:GetQueueUrl
-                   - sqs:SendMessageBatch
-                   - sqs:SendMessage
+                    - sqs:GetQueueUrl
+                    - sqs:SendMessageBatch
+                    - sqs:SendMessage
                   Resource: !GetAtt EventQueue.Arn
     ProcessLambdaRole:
       Type: AWS::IAM::Role
@@ -206,9 +199,9 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -219,9 +212,9 @@ resources: # The resources your functions use
                     - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - '*'
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - '*'
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
@@ -235,26 +228,24 @@ resources: # The resources your functions use
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
-    
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueName}
-        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
+        ContentBasedDeduplication: true
         VisibilityTimeout: ${self:custom.editable.timeout}
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
-          maxReceiveCount: 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
+          maxReceiveCount: 1
 
-    EventQueueDL: #Messages that fail are put here
+    EventQueueDL:
       Type: AWS::SQS::Queue
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
-        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
+        ContentBasedDeduplication: true
 
-  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
   - serverless-python-requirements

@@ -1,0 +1,2870 @@
+[
+    {
+        "username": "059ef00d-d6af-4517-ad1c-a05c63769c9b",
+        "email": "fredrik.arnesen@knowit.no",
+        "formDefinitionID": "fb9e8f06-4cfa-463e-9e8f-cc0853464070",
+        "updatedAt": "2021-06-18T12:05:42.341Z",
+        "answers": [
+            {
+                "knowledge": 2.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "230473f7-37e1-4f69-a106-2bbc01afe5cb",
+                    "topic": "Swift",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 3,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "148179dc-fb1e-49f2-8a6c-4248391e43ea",
+                    "topic": "Loddebolt",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "8f3141c6-97d5-43af-b1a7-7789e551e6d4",
+                    "topic": "Jupyter Notebook",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.1,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "5c6e6741-df3c-48f2-ac9d-0c07b111a108",
+                    "topic": "Markedsforståelse",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "71c90584-ed6c-4439-952f-ce4534d419de",
+                    "topic": "Porteføljestyring",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 3.3,
+                "motivation": 3.4,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "5e2aa1be-881a-45f1-a67a-1e1f2ecbbf1c",
+                    "topic": "iOS",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "bafeb23f-dd11-4bdd-9fa8-aeb420637e86",
+                    "topic": "Universell utforming, generelt",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "33e43b6a-92cb-477b-a62f-55f1ac1769da",
+                    "topic": "pytorch",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "ecb14523-4ed9-4b8c-9ccd-972c3152d0af",
+                    "topic": "Produktledelse",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.9,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "fb491ef6-e53d-41dc-887a-5999093989c4",
+                    "topic": "MongooseOS",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "d841ef8d-af7e-4f00-ba1b-c3ca272e2028",
+                    "topic": "Dokumentdatabaser",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "10af9bf6-e03d-4298-bc6b-3c4fc885c1c8",
+                    "topic": "SQL",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 3,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "9c9080dc-7c0f-497e-a89f-b33d2166d974",
+                    "topic": "Design Thinking metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "13fff96a-b616-4f0f-881d-6bfe4094adc0",
+                    "topic": "xgboost",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "c53ba4a5-58b5-4488-bf68-c21201b13d9b",
+                    "topic": "Feature Engineering",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "4b1d63ab-04ff-4572-93ce-347bd4cfb5aa",
+                    "topic": "NoSQL - databaser",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "b0a4e40c-f3cc-4d50-8161-50ad53c381b2",
+                    "topic": "Produktutvikling",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "f6086e2d-147f-449a-9656-ffa243cf05e5",
+                    "topic": "Angular",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "9f40d807-3fa6-4446-bdc2-7681ca136b3b",
+                    "topic": "Azure",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "2399172c-6528-4610-8ce8-34ec8002aa69",
+                    "topic": "Verktøy",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "e382da8c-0f26-4d24-ad4d-b056467448fd",
+                    "topic": "Strategisk ledelse",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "168dff90-46cf-4d2a-9e9b-76eb7f560089",
+                    "topic": "Node backend",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "d18a87b8-6749-4c5a-a293-a40b99e65e8f",
+                    "topic": "Skynettverk",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "9fb0e35e-3e68-48e7-a4b2-1a613d0f8189",
+                    "topic": "Datainnlasting / ETL",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 1.5,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "66e4485e-1795-413f-82b2-5ab5e79192f3",
+                    "topic": "Testing",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "d1862cf3-7123-4d35-9cfd-6587e97dc0c8",
+                    "topic": "ESP32",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "e60ffba8-41fd-4a14-a396-a99bce138d43",
+                    "topic": "Applikasjonsarkitektur",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 1.3,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "f8b678a1-5226-4eb1-a36c-ea0ddf98bdc3",
+                    "topic": "Nettverk",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 3.2,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "160669c5-9da3-4f5b-b514-5a9e6e6bb3f9",
+                    "topic": "Python",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "d96691ba-51d4-4af7-8b9e-ad583e64cb1c",
+                    "topic": "Produktutvikling",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "db0b7375-9d64-43fc-bc65-05fb4c3f7ae0",
+                    "topic": "Konfliktløsning",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "f56c7ec3-2c60-4a11-ba1a-afbf9b5ae359",
+                    "topic": "Rådgivning og pre-salg",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "b7b9d6d0-5979-433f-ad26-f03f3c55bd34",
+                    "topic": "Arkitektur",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "e517ba9a-8a29-4256-82f8-60450cabb606",
+                    "topic": "JVM-baserte språk og biblioteker generelt",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "cc2673d0-912e-4a1b-8604-5c1cf3af12c8",
+                    "topic": "Datavisualisering",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "b23792b0-cda3-42cb-860d-86ec67cb423c",
+                    "topic": "MQTT",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.5,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "b5191235-8cae-4961-8f0b-36ca2de58f85",
+                    "topic": "Kubernetes",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "08dd52d3-0946-4009-a634-5f7e898c5e19",
+                    "topic": "3D-printing, prototyping og annen produksjon",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "b449178c-ba98-4af8-9a41-fab5097128b2",
+                    "topic": "IBM Cloud",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "e14100b9-83f0-4ef2-905f-11bcfb72cdef",
+                    "topic": "Universell utforming, WCAG 2.x",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "a6e34dd1-6a22-4da0-9e5a-ccc6e53f8453",
+                    "topic": "Prosjektstyring med kontraktsoppfølging",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "fd126fc5-e15c-4ebe-9647-b7ee4e97ea58",
+                    "topic": "Designledelse og metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "7fdeb239-e65b-4990-bc5d-00a703c8f487",
+                    "topic": "Java",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "9e5d805a-fd65-4b93-8dd5-d636e38e7b36",
+                    "topic": "Elektronikk svakstrøm",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "3e7e29ac-1e38-4397-ba24-2fd8db247420",
+                    "topic": "KTor",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "1cb91984-3917-48f8-bf4a-5c762435ab56",
+                    "topic": "Mikro-frontend",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "40ec580b-352b-4da3-bbba-e5e26a65dd50",
+                    "topic": "Java",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 3,
+                "motivation": 3,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "a1f36482-c67f-47d4-a77b-538dcefe2ed5",
+                    "topic": "FPGA",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "7cf4f9ef-ee16-4bea-b796-6d4d538457af",
+                    "topic": "Nevrale nettverk",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "customScaleValue": 5,
+                "question": {
+                    "id": "8b36bcaa-3c0c-4741-b1e1-06e42af62e8e",
+                    "topic": "Nye muligheter for KION",
+                    "category": "Jobbrotasjon"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "60afa23c-4d1f-4b1f-9b0e-135984948b9c",
+                    "topic": "Svelte",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "ccb62d3e-7a56-4ee9-9347-1d04aa4c6a61",
+                    "topic": "Systemmonitorering",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "692ca9c3-4481-40e9-af75-2bd3deaf4da6",
+                    "topic": "CAD",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "e08dcf03-9aa0-4b3e-8105-abc8cae9391d",
+                    "topic": "Keras",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "7af67534-43a4-4f6c-99ac-7691da8d64e9",
+                    "topic": "Design Sprint metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.5,
+                "motivation": 3.2,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "8116c01f-b2e5-4b8c-9220-69f2b0c6c466",
+                    "topic": "Android",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "be02bf31-e082-41c9-a9eb-eb4c60c77f8c",
+                    "topic": "Maskinlæringsrammeverk",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 1.5,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "d01c9720-1db5-4d0f-b5a2-ac783619d90c",
+                    "topic": "Tjenestedesign",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.9,
+                "motivation": 1.2,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "9e949455-3ae3-4913-a2c6-b2ae921b6ea1",
+                    "topic": "Bundlere",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "7568ab5d-2153-485c-92ad-5be01b858c07",
+                    "topic": "Scala",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "f308eec8-412b-406f-9aef-47ca298ca116",
+                    "topic": "Fasilitering",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "3f42da99-4874-47b9-8c19-e9c9858d716e",
+                    "topic": "Vue",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "f1c97b3b-f9d7-4712-ad7f-c83c74768d38",
+                    "topic": "Tilbudsarbeid",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "a4078ae1-0e7d-4767-b025-35a7de801b14",
+                    "topic": "Maskinlæringsalgoritmer",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "b22413ec-7c39-4dd8-b3e5-dc74e8e10a75",
+                    "topic": "Enhets-/integrasjonstester",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 1.2,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "1c16719c-10cf-4976-bfe6-59a3657ffecc",
+                    "topic": "Objektorientert programmering",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.9,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "90c516d8-ee7e-433d-9a8b-b916e2eecea3",
+                    "topic": "Spring Boot",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.1,
+                "motivation": 3.3,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "bed1736f-3eec-451b-931a-4904477e71b2",
+                    "topic": "Databasedrift",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "9d494587-42ec-4ae6-8db4-95db86aa6259",
+                    "topic": "Teambuilding",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 1.3,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "515afa78-a873-4ac3-81c8-7fcc58db1427",
+                    "topic": "Interaksjonsdesign",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.9,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "9602309b-1447-4aec-86dc-1afc967756d6",
+                    "topic": "REST-API-integrasjon",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "e00baca6-9d27-4937-9210-7dd387a22f35",
+                    "topic": "Automatiserte verktøy for kodekvalitet",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "8636319c-d56b-45d7-838b-19cafb839760",
+                    "topic": "C++",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "4d48bb83-77bc-4fd7-84f0-36cd5ec550d8",
+                    "topic": "Micropython",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.1,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "ac95f077-faa9-406c-9c50-5c65d99c4210",
+                    "topic": "Smidig metodikk",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.1,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "69c7a510-9302-4bc8-9885-b838f97e9d58",
+                    "topic": "Opplæring i smidig",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 3,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "0e4bb43e-a444-43e9-82fb-c083ee45eb09",
+                    "topic": "Scrum master",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.5,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "844416ca-9c86-4b1f-9d8d-b78e5178cb42",
+                    "topic": "Terraform",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "5d875bd4-8dc4-4dea-8a11-ad334ceb6535",
+                    "topic": "Serverless",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "customScaleValue": 3.7,
+                "question": {
+                    "id": "e176f891-9e96-42d9-92c8-4b5f726c94f8",
+                    "topic": "Bytte prosjekt",
+                    "category": "Jobbrotasjon"
+                }
+            },
+            {
+                "knowledge": 5,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "c6cb13a4-c034-4849-935b-c49f713d75f3",
+                    "topic": "Typescript",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "3708d4b2-eb03-45c2-a060-1f2567934eef",
+                    "topic": "Personalledelse",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "21224733-64c4-41c8-b5e5-2b701d3da57f",
+                    "topic": "Hybridsky",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "18817a22-0a14-4d12-b310-a50f3ca8460d",
+                    "topic": "GCP",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "4a7e2aac-a71a-49d5-97b1-624addbaf218",
+                    "topic": "CI/CD",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "de961a27-8d56-4bf6-9505-05d6ebed0dba",
+                    "topic": "MLOps",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 1.5,
+                "motivation": 3.2,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "72300750-2547-45c2-88c6-4ffa316fc089",
+                    "topic": "Microsoft tech stack (C# og .NET)",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "77ffd25d-bce9-424e-b33a-b8b2a989d017",
+                    "topic": "API-design",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "166a1414-4139-4c36-a2a5-e14bb28873f3",
+                    "topic": "Kretskort",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "9d4c031f-4939-4c08-a0ae-089c6f5b0f66",
+                    "topic": "Anskaffelser og sourcing",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "1a81dbb1-3a46-48cf-8805-0af969c03832",
+                    "topic": "TensorFlow",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "71c489d0-1b96-4eb4-9914-b452c026a060",
+                    "topic": "Clojure",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "7ca4b0d7-1a28-4894-8dda-ea07bef99492",
+                    "topic": "Arkitektur",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "5fe736af-c786-4ebf-9987-e9273c0d71b2",
+                    "topic": "ML Edge Computing",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.1,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "aa086dae-e7ca-4e14-b17a-707f9f17cb60",
+                    "topic": "Skybasert maskinlæring",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 3.4,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "e61073ef-f0bc-4f8d-b1fd-b0dffaa78bf4",
+                    "topic": "Driftskostnader",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 3,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "3a27bde2-a0ae-40f5-ad4e-c324ad3f6e49",
+                    "topic": "Kanban fasilitator",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 3.2,
+                "motivation": 1.5,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "1cb70f51-0d35-4fc5-b02b-bb7e0932dc48",
+                    "topic": "Sikkerhet",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "853fdc65-0cff-4f03-92b7-d02cf8026de5",
+                    "topic": "Xamarin",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "94690eb5-998e-4e26-95eb-1df691996344",
+                    "topic": "Produkteier",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "67788459-ff90-4c20-adec-1d0727fccbf2",
+                    "topic": "React Native",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "1748b177-8caa-4b7d-95b2-bb5201d0835a",
+                    "topic": "Arduino",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "3067a2a8-a905-4dbf-9e1d-f932096ebb54",
+                    "topic": "Statistikk og matematikk",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 3,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "18cb5190-ebdb-47db-a097-170fcae0a968",
+                    "topic": "HTML",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "5c6a9427-c796-4d2b-a711-66b5b494fd75",
+                    "topic": "PWA",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 3.2,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "0f5d8bc4-78b3-431b-ae38-ba8de23837ad",
+                    "topic": "GDPR og Personvern",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "48b6f2a0-7428-464c-b9fd-dd24f96f4bbb",
+                    "topic": "JS uten dilldall",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "ebdc0177-61bb-4706-a327-9ab1f2869cdf",
+                    "topic": "Asynkron og eventbasert prosessering",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "ebbf36cb-f7c4-4fd7-abbd-d6698a3a11df",
+                    "topic": "Mikrotjenestearkitektur",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "7c773ab3-99cb-4c92-bb35-9547ca00cb0f",
+                    "topic": "Generering av treningsdata",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "489adad0-b537-46de-803c-fc4097b256a2",
+                    "topic": "Teamledelse",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "4a551d33-434b-4520-b717-2113734ef128",
+                    "topic": "Designprinsipper og patterns",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "1fd4af21-51ad-4875-9640-bbb727a0623e",
+                    "topic": "Universell utforming",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "3a3e1914-f174-474b-aea7-6890c787b50a",
+                    "topic": "Sketch",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "60f30652-bf6d-482f-b26e-ee79e00438a3",
+                    "topic": "Python eller R for ML",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "b165bff4-edef-49a9-a861-71c7bf2acce1",
+                    "topic": "Domeneforståelse",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "34ea1cb9-300a-4f9b-9f52-50d377396108",
+                    "topic": "Wireframes og mockups",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "1128d383-97d2-44fc-9bd7-a71290d858a5",
+                    "topic": "React",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 1.5,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "7eb02605-fcbe-4a86-8f24-062078e48220",
+                    "topic": "Kotlin",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "bd14f0ca-a50b-4b42-915b-b8aae30e8d36",
+                    "topic": "Grafisk design",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "46757916-5762-4b29-901c-736f9dca33af",
+                    "topic": "Adobe Photoshop",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "bf5aaf80-b8c6-48b2-8b0a-2107b9bc6262",
+                    "topic": "Web Assembly",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "37559e8b-61c6-4f83-b058-72914f555f93",
+                    "topic": "Smidige organisasjoner",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "e794a78e-1b8e-42b6-b331-a718351f2eab",
+                    "topic": "Data flow",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "6a2568aa-0f77-4121-84de-beac2471da1f",
+                    "topic": "IoT-infrastruktur i skyen",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "ea4697e9-e2e1-4e69-879d-55c0cda7c110",
+                    "topic": "Relasjonsdatabaser",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "70aebf78-6918-4050-a2ef-6ce1b38289f0",
+                    "topic": "Funksjonell programmering",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "5d7d65e9-045e-44be-889a-02b324e8bc92",
+                    "topic": "Datamodellering og typeteori",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 4.4,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "b29f2f24-bdd6-4ad3-9a15-2deb276a4221",
+                    "topic": "Validering av modeller",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "345eca5b-a2a6-4e97-ac8e-f6849e96adf2",
+                    "topic": "SBC (f.eks Raspberry Pi)",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "64520ca0-acc9-41e0-b7e2-2a251f54bdc8",
+                    "topic": "Adobe illustrator",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "81844517-98b2-4aff-98ec-19a6d51e7648",
+                    "topic": "Tegneferdigheter",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.4,
+                "motivation": 2.9,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "12050ca4-9111-459c-9888-2824d36c2d77",
+                    "topic": "Køtjenester",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "05067178-58bb-4882-98e8-00f0459ff014",
+                    "topic": "Kotlin",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.3,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "52454bc4-4d1d-42a2-91a6-a6965c1cc1ee",
+                    "topic": "Figma",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 3.7,
+                "motivation": 3.7,
+                "updatedAt": "2021-06-18T12:01:39.649Z",
+                "question": {
+                    "id": "48fbcd8e-f5cc-4f75-bb63-f4240d384b3b",
+                    "topic": "Systemspråk",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 3,
+                "motivation": 1.9,
+                "updatedAt": "2021-06-18T12:04:27.223Z",
+                "question": {
+                    "id": "baf26776-aa03-4a65-82e9-69baee5e88ae",
+                    "topic": "Teknologiledelse og organisering",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "1101ec5a-bee6-4935-bf73-a1a633c82a2e",
+                    "topic": "Sensorer og eksterne enheter",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "e060b778-dbd1-40ff-867a-1bd96499a1b8",
+                    "topic": "Double Diamond metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "a8235195-66a4-487c-a5c7-f646fa4339fe",
+                    "topic": "Flutter",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "b3d6245a-2903-4b2c-b6d9-193cb8d61aff",
+                    "topic": "Jenkins eller andre CI-verktøy",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:04:54.143Z",
+                "question": {
+                    "id": "0f672a91-11b4-4ba2-a69f-764a955f08bd",
+                    "topic": "AWS",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "0783074c-0941-4104-b441-5cf3a61f0120",
+                    "topic": "Ende-til-ende-tester",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:00:25.553Z",
+                "question": {
+                    "id": "0f4ed49e-cba9-42fe-9f3b-f3b4fbd8c45f",
+                    "topic": "ObjectiveC",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:02:16.582Z",
+                "question": {
+                    "id": "e1712100-a628-4d18-994a-1a529ca1c579",
+                    "topic": "Julia",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 3.9,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "aed2b4ec-dc31-4236-a97d-2b840536373d",
+                    "topic": "Kjøreomgivelser",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 4.3,
+                "motivation": 4.8,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "cefb3143-61d4-4977-9458-7e78e6428be3",
+                    "topic": "Brukertesting generelt",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:05:23.438Z",
+                "question": {
+                    "id": "32e99d2e-44ab-4808-a4d1-a738727dde54",
+                    "topic": "Andre tilsvarende verktøy",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "eebfae6a-0ccc-45eb-867b-8a11525b5d3d",
+                    "topic": "NB-IoT",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.9,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:03:35.734Z",
+                "question": {
+                    "id": "4b5c9034-c79d-46b7-b837-b2891b5f8c06",
+                    "topic": "platform.io",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "30bd188f-8818-4372-80df-6074a072da01",
+                    "topic": "Smidig coaching",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 3.5,
+                "updatedAt": "2021-06-18T12:01:03.533Z",
+                "question": {
+                    "id": "00734822-c920-444a-b893-4ddc97abc8e4",
+                    "topic": "CSS",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:05:04.859Z",
+                "question": {
+                    "id": "726fab4f-24ea-4dea-ace7-aff0359e05b9",
+                    "topic": "OKR",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            }
+        ]
+    },
+    {
+        "username": "2f119dc3-02fe-4159-adec-0238d77b18ce",
+        "email": "einar.halvorsen@knowit.no",
+        "formDefinitionID": "fb9e8f06-4cfa-463e-9e8f-cc0853464070",
+        "updatedAt": "2021-06-18T12:12:45.727Z",
+        "answers": [
+            {
+                "knowledge": 2.4,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "be02bf31-e082-41c9-a9eb-eb4c60c77f8c",
+                    "topic": "Maskinlæringsrammeverk",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "eebfae6a-0ccc-45eb-867b-8a11525b5d3d",
+                    "topic": "NB-IoT",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "12050ca4-9111-459c-9888-2824d36c2d77",
+                    "topic": "Køtjenester",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 3.8,
+                "motivation": 3.7,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "d841ef8d-af7e-4f00-ba1b-c3ca272e2028",
+                    "topic": "Dokumentdatabaser",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "853fdc65-0cff-4f03-92b7-d02cf8026de5",
+                    "topic": "Xamarin",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "e1712100-a628-4d18-994a-1a529ca1c579",
+                    "topic": "Julia",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.1,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "71c90584-ed6c-4439-952f-ce4534d419de",
+                    "topic": "Porteføljestyring",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "customScaleValue": 3.5,
+                "question": {
+                    "id": "8b36bcaa-3c0c-4741-b1e1-06e42af62e8e",
+                    "topic": "Nye muligheter for KION",
+                    "category": "Jobbrotasjon"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "1a81dbb1-3a46-48cf-8805-0af969c03832",
+                    "topic": "TensorFlow",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.9,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "e61073ef-f0bc-4f8d-b1fd-b0dffaa78bf4",
+                    "topic": "Driftskostnader",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.8,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "0f5d8bc4-78b3-431b-ae38-ba8de23837ad",
+                    "topic": "GDPR og Personvern",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "72300750-2547-45c2-88c6-4ffa316fc089",
+                    "topic": "Microsoft tech stack (C# og .NET)",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "de961a27-8d56-4bf6-9505-05d6ebed0dba",
+                    "topic": "MLOps",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "692ca9c3-4481-40e9-af75-2bd3deaf4da6",
+                    "topic": "CAD",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "90c516d8-ee7e-433d-9a8b-b916e2eecea3",
+                    "topic": "Spring Boot",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "aed2b4ec-dc31-4236-a97d-2b840536373d",
+                    "topic": "Kjøreomgivelser",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "e060b778-dbd1-40ff-867a-1bd96499a1b8",
+                    "topic": "Double Diamond metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 3.5,
+                "motivation": 3.5,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "34ea1cb9-300a-4f9b-9f52-50d377396108",
+                    "topic": "Wireframes og mockups",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "a8235195-66a4-487c-a5c7-f646fa4339fe",
+                    "topic": "Flutter",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "4b1d63ab-04ff-4572-93ce-347bd4cfb5aa",
+                    "topic": "NoSQL - databaser",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "1c16719c-10cf-4976-bfe6-59a3657ffecc",
+                    "topic": "Objektorientert programmering",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "fb491ef6-e53d-41dc-887a-5999093989c4",
+                    "topic": "MongooseOS",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.5,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "0f4ed49e-cba9-42fe-9f3b-f3b4fbd8c45f",
+                    "topic": "ObjectiveC",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "ebbf36cb-f7c4-4fd7-abbd-d6698a3a11df",
+                    "topic": "Mikrotjenestearkitektur",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 3.5,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "bd14f0ca-a50b-4b42-915b-b8aae30e8d36",
+                    "topic": "Grafisk design",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.9,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "64520ca0-acc9-41e0-b7e2-2a251f54bdc8",
+                    "topic": "Adobe illustrator",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "18817a22-0a14-4d12-b310-a50f3ca8460d",
+                    "topic": "GCP",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "7c773ab3-99cb-4c92-bb35-9547ca00cb0f",
+                    "topic": "Generering av treningsdata",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 3.8,
+                "motivation": 3.8,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "d18a87b8-6749-4c5a-a293-a40b99e65e8f",
+                    "topic": "Skynettverk",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "b23792b0-cda3-42cb-860d-86ec67cb423c",
+                    "topic": "MQTT",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "bed1736f-3eec-451b-931a-4904477e71b2",
+                    "topic": "Databasedrift",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "3a3e1914-f174-474b-aea7-6890c787b50a",
+                    "topic": "Sketch",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "e60ffba8-41fd-4a14-a396-a99bce138d43",
+                    "topic": "Applikasjonsarkitektur",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "ebdc0177-61bb-4706-a327-9ab1f2869cdf",
+                    "topic": "Asynkron og eventbasert prosessering",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "30bd188f-8818-4372-80df-6074a072da01",
+                    "topic": "Smidig coaching",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "77ffd25d-bce9-424e-b33a-b8b2a989d017",
+                    "topic": "API-design",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "b7b9d6d0-5979-433f-ad26-f03f3c55bd34",
+                    "topic": "Arkitektur",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "3a27bde2-a0ae-40f5-ad4e-c324ad3f6e49",
+                    "topic": "Kanban fasilitator",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "9d4c031f-4939-4c08-a0ae-089c6f5b0f66",
+                    "topic": "Anskaffelser og sourcing",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "46757916-5762-4b29-901c-736f9dca33af",
+                    "topic": "Adobe Photoshop",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "b29f2f24-bdd6-4ad3-9a15-2deb276a4221",
+                    "topic": "Validering av modeller",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "7fdeb239-e65b-4990-bc5d-00a703c8f487",
+                    "topic": "Java",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "f308eec8-412b-406f-9aef-47ca298ca116",
+                    "topic": "Fasilitering",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "8f3141c6-97d5-43af-b1a7-7789e551e6d4",
+                    "topic": "Jupyter Notebook",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 3.7,
+                "motivation": 3.6,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "d01c9720-1db5-4d0f-b5a2-ac783619d90c",
+                    "topic": "Tjenestedesign",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.9,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "7af67534-43a4-4f6c-99ac-7691da8d64e9",
+                    "topic": "Design Sprint metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "168dff90-46cf-4d2a-9e9b-76eb7f560089",
+                    "topic": "Node backend",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "66e4485e-1795-413f-82b2-5ab5e79192f3",
+                    "topic": "Testing",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "70aebf78-6918-4050-a2ef-6ce1b38289f0",
+                    "topic": "Funksjonell programmering",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "4d48bb83-77bc-4fd7-84f0-36cd5ec550d8",
+                    "topic": "Micropython",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "40ec580b-352b-4da3-bbba-e5e26a65dd50",
+                    "topic": "Java",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "db0b7375-9d64-43fc-bc65-05fb4c3f7ae0",
+                    "topic": "Konfliktløsning",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 1.9,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "7568ab5d-2153-485c-92ad-5be01b858c07",
+                    "topic": "Scala",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "33e43b6a-92cb-477b-a62f-55f1ac1769da",
+                    "topic": "pytorch",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "5c6e6741-df3c-48f2-ac9d-0c07b111a108",
+                    "topic": "Markedsforståelse",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "05067178-58bb-4882-98e8-00f0459ff014",
+                    "topic": "Kotlin",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 3,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "e14100b9-83f0-4ef2-905f-11bcfb72cdef",
+                    "topic": "Universell utforming, WCAG 2.x",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "f56c7ec3-2c60-4a11-ba1a-afbf9b5ae359",
+                    "topic": "Rådgivning og pre-salg",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "ccb62d3e-7a56-4ee9-9347-1d04aa4c6a61",
+                    "topic": "Systemmonitorering",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "baf26776-aa03-4a65-82e9-69baee5e88ae",
+                    "topic": "Teknologiledelse og organisering",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 3.6,
+                "motivation": 3.6,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "fd126fc5-e15c-4ebe-9647-b7ee4e97ea58",
+                    "topic": "Designledelse og metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "08dd52d3-0946-4009-a634-5f7e898c5e19",
+                    "topic": "3D-printing, prototyping og annen produksjon",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "c53ba4a5-58b5-4488-bf68-c21201b13d9b",
+                    "topic": "Feature Engineering",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "a6e34dd1-6a22-4da0-9e5a-ccc6e53f8453",
+                    "topic": "Prosjektstyring med kontraktsoppfølging",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "1fd4af21-51ad-4875-9640-bbb727a0623e",
+                    "topic": "Universell utforming",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "81844517-98b2-4aff-98ec-19a6d51e7648",
+                    "topic": "Tegneferdigheter",
+                    "category": "Design"
+                }
+            },
+            {
+                "customScaleValue": 3.8,
+                "question": {
+                    "id": "e176f891-9e96-42d9-92c8-4b5f726c94f8",
+                    "topic": "Bytte prosjekt",
+                    "category": "Jobbrotasjon"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "ac95f077-faa9-406c-9c50-5c65d99c4210",
+                    "topic": "Smidig metodikk",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 3.4,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "b449178c-ba98-4af8-9a41-fab5097128b2",
+                    "topic": "IBM Cloud",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "f8b678a1-5226-4eb1-a36c-ea0ddf98bdc3",
+                    "topic": "Nettverk",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "7cf4f9ef-ee16-4bea-b796-6d4d538457af",
+                    "topic": "Nevrale nettverk",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 1.9,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "5d875bd4-8dc4-4dea-8a11-ad334ceb6535",
+                    "topic": "Serverless",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "f1c97b3b-f9d7-4712-ad7f-c83c74768d38",
+                    "topic": "Tilbudsarbeid",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "230473f7-37e1-4f69-a106-2bbc01afe5cb",
+                    "topic": "Swift",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 3.1,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "bafeb23f-dd11-4bdd-9fa8-aeb420637e86",
+                    "topic": "Universell utforming, generelt",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "5c6a9427-c796-4d2b-a711-66b5b494fd75",
+                    "topic": "PWA",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "4b5c9034-c79d-46b7-b837-b2891b5f8c06",
+                    "topic": "platform.io",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "2399172c-6528-4610-8ce8-34ec8002aa69",
+                    "topic": "Verktøy",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "b3d6245a-2903-4b2c-b6d9-193cb8d61aff",
+                    "topic": "Jenkins eller andre CI-verktøy",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "f6086e2d-147f-449a-9656-ffa243cf05e5",
+                    "topic": "Angular",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "cc2673d0-912e-4a1b-8604-5c1cf3af12c8",
+                    "topic": "Datavisualisering",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "aa086dae-e7ca-4e14-b17a-707f9f17cb60",
+                    "topic": "Skybasert maskinlæring",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "148179dc-fb1e-49f2-8a6c-4248391e43ea",
+                    "topic": "Loddebolt",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "a4078ae1-0e7d-4767-b025-35a7de801b14",
+                    "topic": "Maskinlæringsalgoritmer",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.9,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "e00baca6-9d27-4937-9210-7dd387a22f35",
+                    "topic": "Automatiserte verktøy for kodekvalitet",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "e517ba9a-8a29-4256-82f8-60450cabb606",
+                    "topic": "JVM-baserte språk og biblioteker generelt",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "9e949455-3ae3-4913-a2c6-b2ae921b6ea1",
+                    "topic": "Bundlere",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 3.1,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "844416ca-9c86-4b1f-9d8d-b78e5178cb42",
+                    "topic": "Terraform",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "e382da8c-0f26-4d24-ad4d-b056467448fd",
+                    "topic": "Strategisk ledelse",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "1cb70f51-0d35-4fc5-b02b-bb7e0932dc48",
+                    "topic": "Sikkerhet",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "a1f36482-c67f-47d4-a77b-538dcefe2ed5",
+                    "topic": "FPGA",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "9fb0e35e-3e68-48e7-a4b2-1a613d0f8189",
+                    "topic": "Datainnlasting / ETL",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "9d494587-42ec-4ae6-8db4-95db86aa6259",
+                    "topic": "Teambuilding",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "345eca5b-a2a6-4e97-ac8e-f6849e96adf2",
+                    "topic": "SBC (f.eks Raspberry Pi)",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "67788459-ff90-4c20-adec-1d0727fccbf2",
+                    "topic": "React Native",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.4,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "8116c01f-b2e5-4b8c-9220-69f2b0c6c466",
+                    "topic": "Android",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "cefb3143-61d4-4977-9458-7e78e6428be3",
+                    "topic": "Brukertesting generelt",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.2,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "5e2aa1be-881a-45f1-a67a-1e1f2ecbbf1c",
+                    "topic": "iOS",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "6a2568aa-0f77-4121-84de-beac2471da1f",
+                    "topic": "IoT-infrastruktur i skyen",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.9,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "4a551d33-434b-4520-b717-2113734ef128",
+                    "topic": "Designprinsipper og patterns",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 3.6,
+                "motivation": 3.5,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "515afa78-a873-4ac3-81c8-7fcc58db1427",
+                    "topic": "Interaksjonsdesign",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "9e5d805a-fd65-4b93-8dd5-d636e38e7b36",
+                    "topic": "Elektronikk svakstrøm",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "13fff96a-b616-4f0f-881d-6bfe4094adc0",
+                    "topic": "xgboost",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:09:16.121Z",
+                "question": {
+                    "id": "9602309b-1447-4aec-86dc-1afc967756d6",
+                    "topic": "REST-API-integrasjon",
+                    "category": "Mobil"
+                }
+            },
+            {
+                "knowledge": 1.5,
+                "motivation": 1.4,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "8636319c-d56b-45d7-838b-19cafb839760",
+                    "topic": "C++",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.5,
+                "motivation": 4.7,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "1748b177-8caa-4b7d-95b2-bb5201d0835a",
+                    "topic": "Arduino",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "b0a4e40c-f3cc-4d50-8161-50ad53c381b2",
+                    "topic": "Produktutvikling",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "b165bff4-edef-49a9-a861-71c7bf2acce1",
+                    "topic": "Domeneforståelse",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "9f40d807-3fa6-4446-bdc2-7681ca136b3b",
+                    "topic": "Azure",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.9,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "3067a2a8-a905-4dbf-9e1d-f932096ebb54",
+                    "topic": "Statistikk og matematikk",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "69c7a510-9302-4bc8-9885-b838f97e9d58",
+                    "topic": "Opplæring i smidig",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "ecb14523-4ed9-4b8c-9ccd-972c3152d0af",
+                    "topic": "Produktledelse",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:12:20.706Z",
+                "question": {
+                    "id": "0e4bb43e-a444-43e9-82fb-c083ee45eb09",
+                    "topic": "Scrum master",
+                    "category": "Smidig metodikk og produktledelse"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "b22413ec-7c39-4dd8-b3e5-dc74e8e10a75",
+                    "topic": "Enhets-/integrasjonstester",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.6,
+                "motivation": 2.6,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "0f672a91-11b4-4ba2-a69f-764a955f08bd",
+                    "topic": "AWS",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2.1,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "21224733-64c4-41c8-b5e5-2b701d3da57f",
+                    "topic": "Hybridsky",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.3,
+                "updatedAt": "2021-06-18T12:11:29.412Z",
+                "question": {
+                    "id": "b5191235-8cae-4961-8f0b-36ca2de58f85",
+                    "topic": "Kubernetes",
+                    "category": "Cloud og DevOps"
+                }
+            },
+            {
+                "knowledge": 1.5,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "d1862cf3-7123-4d35-9cfd-6587e97dc0c8",
+                    "topic": "ESP32",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 1.7,
+                "motivation": 1.8,
+                "updatedAt": "2021-06-18T12:10:53.401Z",
+                "question": {
+                    "id": "10af9bf6-e03d-4298-bc6b-3c4fc885c1c8",
+                    "topic": "SQL",
+                    "category": "AI og Data Engineering"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 1.6,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "9c9080dc-7c0f-497e-a89f-b33d2166d974",
+                    "topic": "Design Thinking metodikk",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 3.3,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "52454bc4-4d1d-42a2-91a6-a6965c1cc1ee",
+                    "topic": "Figma",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "48fbcd8e-f5cc-4f75-bb63-f4240d384b3b",
+                    "topic": "Systemspråk",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 1.8,
+                "motivation": 3,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "00734822-c920-444a-b893-4ddc97abc8e4",
+                    "topic": "CSS",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2.3,
+                "motivation": 3.5,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "32e99d2e-44ab-4808-a4d1-a738727dde54",
+                    "topic": "Andre tilsvarende verktøy",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 1.7,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "60afa23c-4d1f-4b1f-9b0e-135984948b9c",
+                    "topic": "Svelte",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:12:41.673Z",
+                "question": {
+                    "id": "7ca4b0d7-1a28-4894-8dda-ea07bef99492",
+                    "topic": "Arkitektur",
+                    "category": "Salg og forretningsutvikling"
+                }
+            },
+            {
+                "knowledge": 2.4,
+                "motivation": 2.4,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "71c489d0-1b96-4eb4-9914-b452c026a060",
+                    "topic": "Clojure",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.7,
+                "motivation": 2.8,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "3f42da99-4874-47b9-8c19-e9c9858d716e",
+                    "topic": "Vue",
+                    "category": "Frontend"
+                }
+            },
+            {
+                "knowledge": 3.7,
+                "motivation": 3.6,
+                "updatedAt": "2021-06-18T12:08:49.631Z",
+                "question": {
+                    "id": "d96691ba-51d4-4af7-8b9e-ad583e64cb1c",
+                    "topic": "Produktutvikling",
+                    "category": "Design"
+                }
+            },
+            {
+                "knowledge": 1.6,
+                "motivation": 2.7,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "ea4697e9-e2e1-4e69-879d-55c0cda7c110",
+                    "topic": "Relasjonsdatabaser",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 2.5,
+                "updatedAt": "2021-06-18T12:11:59.581Z",
+                "question": {
+                    "id": "166a1414-4139-4c36-a2a5-e14bb28873f3",
+                    "topic": "Kretskort",
+                    "category": "IoT og Hardware"
+                }
+            },
+            {
+                "knowledge": 2,
+                "motivation": 2.2,
+                "updatedAt": "2021-06-18T12:10:16.979Z",
+                "question": {
+                    "id": "160669c5-9da3-4f5b-b514-5a9e6e6bb3f9",
+                    "topic": "Python",
+                    "category": "Backend"
+                }
+            },
+            {
+                "knowledge": 2.5,
+                "motivation": 1.3,
+                "updatedAt": "2021-06-18T12:09:40.513Z",
+                "question": {
+                    "id": "1128d383-97d2-44fc-9bd7-a71290d858a5",
+                    "topic": "React",
+                    "category": "Frontend"
+                }
+            }
+        ]
+    }
+]

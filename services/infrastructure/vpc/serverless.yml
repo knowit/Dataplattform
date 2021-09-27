@@ -1,6 +1,10 @@
 service: vpc
 frameworkVersion: "2"
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+
 plugins:
   - serverless-pseudo-parameters
 
@@ -36,7 +40,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:
-    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:

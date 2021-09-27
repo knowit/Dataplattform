@@ -1,12 +1,14 @@
 name: Deploy infrastructure - vpc
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
       # - master
     paths:
       - "services/infrastructure/vpc/**"
+      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -20,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v1
 
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION_VPC/ {print $2}' ../../../.config/.serverless_vpc)
 
       - name: Install dependencies
         run: npm install

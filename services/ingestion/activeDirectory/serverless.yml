@@ -1,29 +1,35 @@
-# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: activeDirectory
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/vpc
+    - ../../infrastructure/metadata
+    - ../../infrastructure/monitoring
+
 custom:
-  #Edit these variables###########################
   editable:
     timeout: 60
     ingestHandlerFile: active_directory_ingest_lambda
     databaseName: level_3
     description: Active directory output is saved to encrypted dynamoDB table
     scheduleRate: rate(7 days)
+    mockIngestHandlerFile: active_directory_ingest_mock_lambda
+    mockDescription: Mock data for the DynamoDB table named personal_metadata_table
+    mockRate: rate(30 days)
+  mockEnabled:
+    prod: false
+    dev: true
+  ingestEnabled:
+    prod: true
+    dev: false
 
-  ################################################
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3 # Default in lambda rt
+      - boto3
       - botocore
-      - pandas # Layer
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
 provider:
   name: aws
@@ -31,17 +37,17 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
+    name: |-
+      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
+      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
-  memorySize: 1024 # MB
-  timeout: ${self:custom.editable.timeout} # seconds
-  tags: # Tags that will be added to each of the deployment resources.
-    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    Layer: Ingestion # ingestion, processing, restApi, infrastructure
-    Ingestion: Pollers #webHooks, Pollers, iot
-  stackTags: # Tags for cloud formation
-    # key: value
-  environment: # Environment variables, ofthen stored in SSM
+  memorySize: 1024
+  timeout: ${self:custom.editable.timeout}
+  tags:
+    Project: Dataplattform
+    Layer: Ingestion
+    Ingestion: Pollers
+  environment:
   tracing:
     apiGateway: true
     lambda: true
@@ -49,15 +55,13 @@ provider:
 package:
   individually: true
   exclude:
-    - "./**" # Exclude everything and include what you need in the functions below
+    - "./**"
 
 functions:
-  ingest: # A Function
+  ingest:
+    enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
     handler: ${self:custom.editable.ingestHandlerFile}.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
-    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     vpc:
@@ -68,23 +72,62 @@ functions:
         - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
     package:
       include:
-        - "*.py" # Files to include in deployment
+        - "*.py"
         - "*.json"
-    environment: # Environment variables, often stored in SSM
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
-    tags: # Tag for this function. Every function are tagged with stage by default
-
-    events: # The Events that trigger this Function
+    events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
 
-resources: # The resources your functions use
+  mock:
+    enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
+    handler: ${self:custom.editable.mockIngestHandlerFile}.mock
+    environment:
+      STAGE: ${self:custom.stage}
+    name: ${self:custom.stage}-${self:service}-mock
+    description: ${self:custom.editable.mockDescription}
+    role: !GetAtt MockLambdaRole.Arn
+    vpc:
+      securityGroupIds:
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
+      subnetIds:
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-1
+        - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
+    package:
+      include:
+        - "*.py"
+    events:
+      - schedule:
+          name: ${self:custom.stage}-${self:service}-mock-timer
+          description: ${self:custom.editable.mockDescription}
+          rate: ${self:custom.editable.mockRate}
+          enabled: true
+
+resources:
   Resources:
+    MockLambdaRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-mock-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+          - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
+
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -115,3 +158,4 @@ resources: # The resources your functions use
 plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
+  - serverless-plugin-conditional-functions

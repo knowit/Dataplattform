@@ -2,10 +2,16 @@
 name: Dataplattform - ingestion - jiraSales
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master
       - develop
+    paths:
+      - 'services/ingestion/jiraSales/**'
+      - 'packages/common/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
   pull_request:
     branches:
       - master
@@ -13,7 +19,8 @@ on:
     paths:
       - 'services/ingestion/jiraSales/**'
       - 'packages/common/**'
-
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:
@@ -30,10 +37,12 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 ./services/ingestion/jiraSales --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 ./services/ingestion/jiraSales --count --max-line-length=120 --statistics
-  
+        flake8 --config=./.config/.flake8 ./services/ingestion/jiraSales
+    - name: Lint with yamllint
+      run: |
+        pip install yamllint
+        yamllint -c ./.config/.yamllint ./services/ingestion/jiraSales
+
   test:
     runs-on: ubuntu-latest
     container:
