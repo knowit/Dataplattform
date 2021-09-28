@@ -24,6 +24,13 @@ custom:
     noDeploy:
       - boto3 # Default in lambda rt
       - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
 
 provider:
   name: aws
@@ -31,7 +38,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${file(../../services/infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
@@ -59,6 +66,9 @@ package:
 functions:
   ingest: # A Function
     handler: ${self:custom.editable.ingestHandlerFile}.handler
+    layers:
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
@@ -70,6 +80,7 @@ functions:
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
+      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
@@ -91,7 +102,11 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-
+  
+    layers:
+      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn

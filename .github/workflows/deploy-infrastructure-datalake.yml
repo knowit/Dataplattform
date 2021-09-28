@@ -1,14 +1,12 @@
 name: Deploy infrastructure - datalake
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - develop
       - master
     paths:
       - "services/infrastructure/datalake/**"
-      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -22,10 +20,7 @@ jobs:
       - uses: actions/setup-node@v1
 
       - name: Install Serverless Framework
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
-
-      - name: Install dependencies
-        run: npm install
+        run: npm install -g serverless
 
       - name: Serverless AWS authentication
         run: |

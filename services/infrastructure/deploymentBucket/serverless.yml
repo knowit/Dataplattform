@@ -3,8 +3,7 @@ service: deploymentBucket
 plugins:
   - serverless-deployment-bucket
 
-
-defaultBucketName: dataplattform-deploymentbucket
+deploymentBucketName: ${self:custom.stage}-dataplattform-deploymentbucket
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -17,10 +16,8 @@ provider:
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}
-
-  # Lag en fil config.yml med feltet "bucketName" hvor du skriver inn et globalt unikt navn for deploymentbucket
   deploymentBucket:
-    name: ${self:custom.stage}-${file(./config.yml):bucketName, self:defaultBucketName}
+    name: ${self:deploymentBucketName}
     serverSideEncryption: AES256
 
 # Stack will not deploy unless at least one CF resource is defined.

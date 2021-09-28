@@ -1,32 +1,32 @@
 service: cloudfront-raw-storage
 
-dataplattform:
-  dependencies:
-    - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/storage
-    - ../../infrastructure/cognito
-    - ../../infrastructure/routes
-
 custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
   userPoolRegion: eu-central-1
   publicBucketName: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
+  privateBucketName: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.PrivateRawStorageBucketName}
+  S3PrivateOriginAccessIdentity: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.S3PrivateOriginAccessIdentity}
   S3PublicOriginAccessIdentity: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.S3PublicOriginAccessIdentity}
   publicDomainName: ${self:custom.publicBucketName}.s3.amazonaws.com
+  privateDomainName: ${self:custom.privateBucketName}.s3.amazonaws.com
   publicDomainId: custom/${self:custom.publicDomainName}
+  privateDomainId: custom/${self:custom.privateDomainName}
   publicFrontOrigin:
     DomainName: ${self:custom.publicDomainName}
     Id: ${self:custom.publicDomainId}
     S3OriginConfig:
       OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PublicOriginAccessIdentity}
+  privateFrontOrigin:
+    DomainName: ${self:custom.privateDomainName}
+    Id: ${self:custom.privateDomainId}
+    S3OriginConfig:
+      OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PrivateOriginAccessIdentity}
 
   userPoolId: ${cf.${self:custom.userPoolRegion}:cognito-${self:custom.stage}.CognitoUserPoolId}
   scripts:
     hooks:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
-  distributionAlias: storage.${ssm:/${self:custom.stage}/routes/domain_name}
-  certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
 
 package:
   individually: true
@@ -38,35 +38,73 @@ pythonRequirements:
   noDeploy:
     - boto3 # Default in lambda rt
     - botocore
+    - pandas # Layer
+    - pytz
+    - numpy
+    - numpy.libs
+    - fastparquet
+    - numba
+    - llvmlite
 
 provider:
   name: aws
-  region: eu-central-1
+  region: us-east-1
   stackName: ${self:custom.service}
   runtime: python3.7
 
+functions:
+  edgeLambdaJwtAuthenticator:
+    handler: jwtAuthenticator.handler
+    name: ${self:custom.stage}-${self:service}-jwt-authenticator
+    events:
+      - cloudFront:
+          eventType: viewer-request
+          isDefaultOrigin: false
+          pathPattern: "/private/*"
+          origin: ${self:custom.privateFrontOrigin}
+    role: !GetAtt EdgeLambdaRole.Arn
+    package:
+      include:
+        - "*.py" # Files to include in deployment
 resources:
   Resources:
-    storageDNSRecord:
-      Type: AWS::Route53::RecordSetGroup
+    EdgeLambdaRole:
+      Type: AWS::IAM::Role
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
-        RecordSets:
-          - Name: storage.${ssm:/${self:custom.stage}/routes/domain_name}
-            Type: A
-            AliasTarget:
-              DNSName:
-                "Fn::GetAtt": [CloudFrontDistribution, DomainName]
-              HostedZoneId: Z2FDTNDATAQYW2
+        RoleName: ${self:custom.stage}-${self:service}-edgelambda-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - edgelambda.amazonaws.com
+                  - lambda.amazonaws.com
+              Action:
+                - sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 
     CloudFrontDistribution:
       Type: AWS::CloudFront::Distribution
       Properties:
         DistributionConfig:
           Aliases:
-            - ${self:custom.stage}-${self:custom.distributionAlias}
+            - ${self:custom.stage}-storage.dataplattform.knowit.no
           Origins:
             - ${self:custom.publicFrontOrigin}
+            - ${self:custom.privateFrontOrigin}
+          CacheBehaviors:
+            - TargetOriginId: ${self:custom.privateDomainId}
+              AllowedMethods:
+                - HEAD
+                - GET
+              ForwardedValues:
+                QueryString: false
+                Headers:
+                  - Authorization
+              PathPattern: "/private/*"
+              ViewerProtocolPolicy: redirect-to-https
           DefaultCacheBehavior:
             AllowedMethods:
               - HEAD
@@ -83,7 +121,7 @@ resources:
                 - ":"
                 - - "arn:aws:acm:us-east-1"
                   - !Ref "AWS::AccountId"
-                  - ${self:custom.certificate}
+                  - certificate/fa79680b-dab9-4245-aaf0-a5ffeb15b5e9
             MinimumProtocolVersion: TLSv1.2_2019
             SslSupportMethod: sni-only
 

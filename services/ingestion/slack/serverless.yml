@@ -1,19 +1,7 @@
 service: slackWebhook
 
-dataplattform:
-  dependencies:
-    - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/datalake
-    - ../../infrastructure/events
-    - ../../infrastructure/monitoring
-    - ../../infrastructure/glue
-    - ../../infrastructure/ingestApiGateway
-  glue:
-    tableName: slack
-    accessLevel: 2
-
-
 custom:
+  #Edit these variables###########################
   editable:
     timeout: 60
     ingestHandlerFile: slack_webhook_ingest_lambda
@@ -22,17 +10,25 @@ custom:
     description: Endpoint for slack webhooks
     accessLevel: level-2
     dataFolder: slack
+  ################################################
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${self:custom.stage}-${self:service} #this service definition includes stage
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3
+      - boto3 # Default in lambda rt
       - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
 
 provider:
   name: aws
@@ -40,16 +36,14 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: |-
-      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
-      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
   memorySize: 1024
 
 #  apiKeys:
 #    - name: ${self:custom.stage}-mainIngestKey #when value is not set, AWS automatically generates API key
 
-  # imports api gateway resources exported by ingestApiGateway service
+  #imports api gateway resources exported by ingestApiGateway service
   apiGateway:
     restApiId:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
@@ -74,15 +68,18 @@ package:
     - "./**"
 
 functions:
-  ingest:
+  ingest: # A Function
     handler: ${self:custom.editable.ingestHandlerFile}.handler
-    name: ${self:custom.stage}-${self:service}-ingest
+    layers:
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
-    environment:
+        - '*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -90,16 +87,16 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-    tags:
+    tags: # Tag for this function. Every function are tagged with stage by default
     events:
       - http:
           path: slack-webhook/
           method: post
-          private: false
+          private: false #if true API key is needed
 
-  process:
+  process: # A Function
     handler: ${self:custom.editable.processHandlerFile}.handler
-    events:
+    events: # The Events that trigger this Function
       - sqs:
           arn:
             Fn::GetAtt:
@@ -107,14 +104,18 @@ functions:
               - Arn
           batchSize: 1
 
-    name: ${self:custom.stage}-${self:service}-process
+    layers:
+      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
     timeout: ${self:custom.editable.timeout}
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py'
-    environment:
+        - '*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -122,8 +123,9 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
+    tags: # Tag for this function. Every function are tagged with stage by default
 
-resources:
+resources: # The resources your functions use
   Resources:
     IngestLambdaRole:
       Type: AWS::IAM::Role
@@ -154,18 +156,18 @@ resources:
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /${self:custom.accessPath}*
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - sqs:GetQueueUrl
-                    - sqs:SendMessageBatch
-                    - sqs:SendMessage
+                   - sqs:GetQueueUrl
+                   - sqs:SendMessageBatch
+                   - sqs:SendMessage
                   Resource: !GetAtt EventQueue.Arn
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
@@ -205,9 +207,9 @@ resources:
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /${self:custom.accessPath}*
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -218,9 +220,9 @@ resources:
                     - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - '*'
+                      - "" 
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - '*'
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
@@ -240,20 +242,21 @@ resources:
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueName}
-        ContentBasedDeduplication: true
+        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
         VisibilityTimeout: ${self:custom.editable.timeout}
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
-          # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
-          maxReceiveCount: 1
+          maxReceiveCount: 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
 
-    EventQueueDL: # Messages that fail are put here
+    EventQueueDL: #Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
-        ContentBasedDeduplication: true # Assume all message bodies are unique, by design given as an uuid1
+        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
 
+
+  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
   - serverless-python-requirements

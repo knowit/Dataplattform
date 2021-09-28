@@ -1,6 +1,0 @@
-[flake8]
-count = True
-select = E9, F63, F7, F82
-show-source = True
-max-line-length = 120
-statistics = True

@@ -1,14 +1,12 @@
 name: Deploy infrastructure - monitoring
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - develop
       - master
     paths:
       - "services/infrastructure/monitoring/**"
-      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -22,27 +20,20 @@ jobs:
       - uses: actions/setup-node@v1
 
       - name: Install Serverless Framework
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+        run: npm install -g serverless
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run serverless deploy prod
-        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
+      - name: Serverless AWS authentication
         run: |
-          echo "Deploying to production" && sls deploy --stage prod 
-          
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
+          else
+            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
+          fi
 
-      - name: Run serverless deploy dev
-        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
+      - name: Run serverless deploy
         run: |
-          echo "Deploying to development" && sls deploy --stage dev 
-
+          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
+            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment
+          else
+            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment
+          fi

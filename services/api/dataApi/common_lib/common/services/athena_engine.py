@@ -41,8 +41,9 @@ def table_map():
 def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
     used_tables = []
     protection_level = 1
+    tmp_sql = sql.split(' ')
     for (_, database, table) in table_map():
-        if table in sql:
+        if table in tmp_sql:
             tmp_database = database
             tmp_str = tmp_database.replace(f'{environ.get("STAGE", "dev")}_level_', '').split('_database')
             protection_level_tmp = int(tmp_str[0])
@@ -73,7 +74,7 @@ def query_complete(athena, query_id: str):
 
 
 def get_staging_dir(protection_level):
-    rootdir = f's3://{environ.get("DATALAKE", "dev-datalake-bucket")}'
+    rootdir = f's3://{environ.get("DATALAKE", "dev-datalake-datalake")}'
     if protection_level == 3:
         return rootdir + "/" + str(environ.get('LEVEL_3_STAGING_DIR'))
     elif protection_level == 2:

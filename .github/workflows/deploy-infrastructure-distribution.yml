@@ -1,14 +1,12 @@
 name: Deploy infrastructure - distribution
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - develop
       - master
     paths:
       - "services/infrastructure/distribution/**"
-      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -22,7 +20,7 @@ jobs:
       - uses: actions/setup-node@v1
 
       - name: Install Serverless Framework
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+        run: npm install -g serverless
 
       - name: Serverless AWS authentication
         run: |

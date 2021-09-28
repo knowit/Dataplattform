@@ -2,16 +2,10 @@
 name: Dataplattform - ingestion - cvPartner
 
 on: 
-  workflow_dispatch:
   push:
     branches:
       - master
       - develop
-    paths:
-      - 'services/ingestion/cvPartner/**'
-      - 'packages/common/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master
@@ -19,8 +13,6 @@ on:
     paths:
       - 'services/ingestion/cvPartner/**'
       - 'packages/common/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
 
 jobs:
   lint:
@@ -37,11 +29,9 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 --config=./.config/.flake8 ./services/ingestion/cvPartner
-    - name: Lint with yamllint
-      run: |
-        pip install yamllint
-        yamllint -c ./.config/.yamllint ./services/ingestion/cvPartner
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 ./services/ingestion/cvPartner --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 ./services/ingestion/cvPartner --count --max-line-length=120 --statistics
   
   test:
     runs-on: ubuntu-latest

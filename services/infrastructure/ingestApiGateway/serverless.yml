@@ -1,10 +1,5 @@
 service: ingestApiGateway
 
-dataplattform:
-  dependencies:
-    - ../deploymentBucket
-    - ../routes
-
 custom:
   stage: ${opt:stage, self:provider.stage}
   project: dataplattform-${self:custom.stage}
@@ -15,7 +10,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
 
   tags:
@@ -34,20 +29,6 @@ resources:
       Properties:
         Name: ${self:custom.stage}-ingestApiGateway
         Description: main input api gateway
-    ingestDNSRecord:
-      Type: AWS::Route53::RecordSetGroup
-      Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
-        RecordSets:
-          - Name: ingest.${ssm:/${self:custom.stage}/routes/domain_name}
-            Type: A
-            AliasTarget:
-              DNSName:
-                Fn::Join:
-                  - "."
-                  - - Ref: ingestApiGateway
-                    - "execute-api.eu-central-1.amazonaws.com."
-              HostedZoneId: Z1U9ULNL0V5AJ3
 
   Outputs:
     apiGatewayRestApiId:

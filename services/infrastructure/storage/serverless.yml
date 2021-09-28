@@ -1,16 +1,11 @@
 service: raw-storage-for-dataplattform
 
-dataplattform:
-  dependencies:
-    - ../deploymentBucket
-
-plugins:
-  - serverless-pseudo-parameters
-
 custom:
   stage: ${opt:stage, self:provider.stage}
-  publicBucketName: public-raw-storagebucket-#{AWS::AccountId}
-  stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName}
+  publicBucketName: public-raw-storagebucket
+  privateBucketName: private-raw-storagebucket
+  stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName} 
+  stagePrivateBucketName: ${self:custom.stage}-${self:custom.privateBucketName} 
   service: ${self:custom.stage}-${self:service}
 
 provider:
@@ -19,22 +14,67 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
 resources:
   Resources:
-    PublicRawStorageBucket:
+    PrivateRawStorageBucket:
       Type: AWS::S3::Bucket
       Properties:
+        BucketName: ${self:custom.stagePrivateBucketName}
+        AccessControl: Private
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: true
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+              - ServerSideEncryptionByDefault:
+                  SSEAlgorithm: AES256
+
+    
+  
+    PublicRawStorageBucket:
+     Type: AWS::S3::Bucket
+     Properties:
         BucketName: ${self:custom.stagePublicBucketName}
         AccessControl: PublicRead
+      
 
+    PrivateCloudFrontOriginAccessIdentity:
+      Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+      Properties:
+        CloudFrontOriginAccessIdentityConfig:
+          Comment: "CloudFront OAI"
+    
     PublicCloudFrontOriginAccessIdentity:
       Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
       Properties:
         CloudFrontOriginAccessIdentityConfig:
           Comment: "CloudFront OAI"
-
+  
+    PrivateRawStorageBucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: 
+          Ref: PrivateRawStorageBucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Action:
+                - "s3:GetObject"
+              Effect: "Allow"
+              Resource: arn:aws:s3:::${self:custom.stagePrivateBucketName}/*
+              Principal:
+                CanonicalUser: !GetAtt PrivateCloudFrontOriginAccessIdentity.S3CanonicalUserId
+            - Action:
+                - "s3:ListBucket"
+              Effect: "Allow"
+              Resource: !GetAtt PrivateRawStorageBucket.Arn
+              Principal:
+                CanonicalUser: !GetAtt PrivateCloudFrontOriginAccessIdentity.S3CanonicalUserId
+    
     PublicRawStorageBucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:
@@ -55,10 +95,14 @@ resources:
               Resource: !GetAtt PublicRawStorageBucket.Arn
               Principal:
                 CanonicalUser: !GetAtt PublicCloudFrontOriginAccessIdentity.S3CanonicalUserId
-
+  
   Outputs:
     PublicRawStorageBucketName:
       Value: !Ref PublicRawStorageBucket
+    PrivateRawStorageBucketName:
+      Value: !Ref PrivateRawStorageBucket
+    S3PrivateOriginAccessIdentity:
+      Value: !Ref PrivateCloudFrontOriginAccessIdentity
     S3PublicOriginAccessIdentity:
       Value: !Ref PublicCloudFrontOriginAccessIdentity
     PublicBucketName:
@@ -69,3 +113,12 @@ resources:
       Value: !GetAtt PublicRawStorageBucket.Arn
       Export:
         Name: ${self:custom.stage}-publicBucketArn
+    PrivateBucketName:
+      Value: ${self:resources.Resources.PrivateRawStorageBucket.Properties.BucketName}
+      Export:
+        Name: ${self:custom.stage}-privateBucketName
+    PrivateBucketArn:
+      Value: !GetAtt PrivateRawStorageBucket.Arn
+      Export:
+        Name: ${self:custom.stage}-privateBucketArn
+    

@@ -1,18 +1,8 @@
 {
-    "pdf":{
-       "body":{
-          "requestUrl":"https://test_url.com"
-       },
-       "filename":"filename.pdf",
-       "filetype":"pdf",
-       "private":false
+    "body": {
+        "requestUrl": "https://test_url.com"
     },
-    "png":{
-       "body":{
-          "requestUrl":"https://test_url.com"
-       },
-       "filename":"filename.png",
-       "filetype":"png",
-       "private":false
-    }
- }
+    "filename": "filename.pdf",
+    "filetype": "pdf",
+    "private": false
+}
