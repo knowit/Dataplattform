@@ -25,7 +25,7 @@ jobs:
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
       - name: Run serverless deploy prod
-        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
@@ -35,7 +35,7 @@ jobs:
           
 
       - name: Run serverless deploy dev
-        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
