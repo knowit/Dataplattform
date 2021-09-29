@@ -2,7 +2,5 @@ flask
 flask_restx
 werkzeug==1.0.1
 flask-cors
-fastparquet
-pandas
 file:./common_lib
 file:../../../packages/api

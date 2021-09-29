@@ -1,41 +1,37 @@
+# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: cvPartnerPoller
 
-dataplattform:
-  dependencies:
-    - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/datalake
-    - ../../utils/downloadToBucket
-    - ../../infrastructure/storage
-    - ../../infrastructure/events
-    - ../../infrastructure/metadata
-    - ../../infrastructure/monitoring
-    - ../../infrastructure/glue
-  glue:
-    tableName: cv_partner
-    accessLevel: 3
-
 custom:
+  #Edit these variables###########################
   editable:
     timeout: 900
     ingestHandlerFile: cv_partner_ingest_lambda
     processHandlerFile: cv_partner_process_lambda
-    mockHandlerFile: cv_partner_mock_lambda
     databaseName: level_3
     description: cvPartner saved to s3, post on sqs, poll on sqs and post on s3
     scheduleRate: rate(7 days)
     accessLevel: level-3
     dataFolder: cvpartner
     publicS3Prefix: public/images
+    privateS3Prefix: private/cvs
 
-  stage: ${opt:stage, self:provider.stage}
+  ################################################
+  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3
+      - boto3 # Default in lambda rt
       - botocore
+      - pandas # Layer
+      - pytz
+      - numpy
+      - numpy.libs
+      - fastparquet
+      - numba
+      - llvmlite
 
 provider:
   name: aws
@@ -43,16 +39,21 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${file(../../infrastructure/deploymentBucket/serverless.yml):deploymentBucketName}
   runtime: python3.7
-  memorySize: 1024
-  timeout: ${self:custom.editable.timeout}
-  tags:
-    Project: Dataplattform
-    Layer: Ingestion
-    Ingestion: Pollers
-  stackTags:
-  environment:
+  memorySize: 1024 # MB
+  timeout: ${self:custom.editable.timeout} # seconds
+  tags: # Tags that will be added to each of the deployment resources.
+    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
+    Layer: Ingestion # ingestion, processing, restApi, infrastructure
+    Ingestion: Pollers #webHooks, Pollers, iot
+    #processing: linkedIn
+    #restApi: linkedIn
+    #infrastructure: s3
+    # key: value
+  stackTags: # Tags for cloud formation
+    # key: value
+  environment: # Environment variables, often stored in SSM
   tracing:
     apiGateway: true
     lambda: true
@@ -61,18 +62,21 @@ provider:
 package:
   individually: true
   exclude:
-    - "./**"
+    - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  ingest:
+  ingest: # A Function
     handler: ${self:custom.editable.ingestHandlerFile}.handler
-    name: ${self:custom.stage}-${self:service}-ingest
+    layers:
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
-    environment:
+        - '*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -82,18 +86,20 @@ functions:
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
       DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
+      PRIVATE_BUCKET: !ImportValue ${self:custom.stage}-privateBucketName
       PUBLIC_PREFIX: ${self:custom.editable.publicS3Prefix}
-    tags:
+      PRIVATE_PREFIX: ${self:custom.editable.privateS3Prefix}
+    tags: # Tag for this function. Every function are tagged with stage by default
 
-    events:
+    events: # The Events that trigger this Function
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
-  process:
+  process: # A Function
     handler: ${self:custom.editable.processHandlerFile}.handler
-    events:
+    events: # The Events that trigger this Function
       - sqs:
           arn:
             Fn::GetAtt:
@@ -101,13 +107,17 @@ functions:
               - Arn
           batchSize: 1
 
-    name: ${self:custom.stage}-${self:service}-process
+    layers:
+      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
+      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
+      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py'
-    environment:
+        - '*.py' # Files to include in deployment
+    environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -116,9 +126,9 @@ functions:
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
-    tags:
+    tags: # Tag for this function. Every function are tagged with stage by default
 
-resources:
+resources: # The resources your functions use
   Resources:
     IngestLambdaRole:
       Type: AWS::IAM::Role
@@ -158,31 +168,51 @@ resources:
                     - s3:DeleteObject
                     - s3:DeleteObjectVersion
                   Resource:
-                    Fn::Join:
+                    - Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-
-          - PolicyName: ${self:custom.stage}-Bucket-${self:service}-List
+          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}-List
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - s3:PutObject
                     - s3:ListBucket
                     - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-privateBucketArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}-List
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
+                    - s3:GetBucketLocation
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - '*'
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}-List
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:ListBucket
                     - s3:ListBucketVersions
+                    - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:
                         - ""
                         - - !ImportValue ${self:custom.stage}-datalakeArn
                           - '*'
-                    - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-publicBucketArn
-                          - '*'
-          - PolicyName: ${self:custom.stage}-storage-${self:service}
+          - PolicyName: ${self:custom.stage}-PrivateBucketIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -190,19 +220,31 @@ resources:
                   Action:
                     - s3:DeleteObject
                   Resource:
-                    Fn::Join:
-                      - ""
-                      - - !ImportValue ${self:custom.stage}-publicBucketArn
-                        - /${self:custom.editable.publicS3Prefix}*
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-privateBucketArn
+                          - /${self:custom.editable.privateS3Prefix}*
+          - PolicyName: ${self:custom.stage}-PublicBucketIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:DeleteObject
+                  Resource:
+                    - Fn::Join:
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-publicBucketArn
+                          - /${self:custom.editable.publicS3Prefix}*
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
-                    - sqs:GetQueueUrl
-                    - sqs:SendMessageBatch
-                    - sqs:SendMessage
+                   - sqs:GetQueueUrl
+                   - sqs:SendMessageBatch
+                   - sqs:SendMessage
                   Resource: !GetAtt EventQueue.Arn
           - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
             PolicyDocument:
@@ -212,7 +254,6 @@ resources:
                   Action:
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
-
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -245,7 +286,7 @@ resources:
                     - s3:DeleteObject
                     - s3:DeleteObjectVersion
                   Resource:
-                    Fn::Join:
+                    - Fn::Join:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
@@ -259,8 +300,8 @@ resources:
                     - s3:ListBucketVersions
                     - s3:GetBucketLocation
                   Resource:
-                    Fn::Join:
-                      - ""
+                    - Fn::Join:
+                      - "" 
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - '*'
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
@@ -282,23 +323,22 @@ resources:
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueName}
-        ContentBasedDeduplication: true
+        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
         VisibilityTimeout: ${self:custom.editable.timeout}
         RedrivePolicy:
-          deadLetterTargetArn: !GetAtt EventQueueDL.Arn
-          maxReceiveCount: 1
+          deadLetterTargetArn : !GetAtt EventQueueDL.Arn
+          maxReceiveCount : 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
 
-    EventQueueDL:
+    EventQueueDL: #Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
-        ContentBasedDeduplication: true
+        ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
 
 
-  Outputs:
+  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
   - serverless-python-requirements
   - serverless-pseudo-parameters
-  - serverless-plugin-conditional-functions

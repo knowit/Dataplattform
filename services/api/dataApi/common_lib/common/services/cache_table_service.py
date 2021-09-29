@@ -2,12 +2,11 @@ import boto3
 from os import environ, remove
 from tempfile import mkstemp
 from typing import Tuple, List
-import fastparquet
 
 
 def cached_key(protection: int, name: str) -> Tuple[str, str]:
     return (
-        environ.get("DATALAKE", "dev-datalake-bucket"),
+        environ.get("DATALAKE", "dev-datalake-datalake"),
         f'reports/level-{protection}/{name}.gzip'
     )
 

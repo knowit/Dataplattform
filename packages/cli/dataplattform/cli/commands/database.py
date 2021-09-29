@@ -93,10 +93,8 @@ def run(args: Namespace, parser: ArgumentParser):
         print('\n'.join(['Columns:'] + columns + ['Partitions:'] + partition))
 
     def query():
-        account_id = boto3.client('sts').get_caller_identity().get('Account')
-
         ath = Athena(
-            staging_dir=f's3://{args.stage}-datalake-bucket-{account_id}/data/level-{args.access_level}/athena-stage',
+            staging_dir=f's3://{args.stage}-datalake-datalake/data/level-{args.access_level}/athena-stage',
             stage=args.stage,
             schema_name=f'{args.stage}_level_{args.access_level}_database')
 

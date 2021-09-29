@@ -1,0 +1,4 @@
+fastparquet
+numba
+llvmlite
+thrift

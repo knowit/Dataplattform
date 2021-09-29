@@ -1,10 +1,5 @@
 service: glue
 
-dataplattform:
-  dependencies:
-    - ../deploymentBucket
-    - ../datalake
-
 custom:
   stage: ${opt:stage, self:provider.stage}
 
@@ -13,17 +8,17 @@ provider:
   stage: dev
   region: eu-central-1
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${file(../deploymentBucket/serverless.yml):deploymentBucketName}
 
 resources:
   Resources:
-    # Level 1
+    # Level 1 
     Level1GlueDatabase:
       Type: AWS::Glue::Database
-      Properties:
+      Properties: 
         CatalogId: !Ref AWS::AccountId
-        DatabaseInput:
-          Name: ${self:custom.stage}_level_1_database
+        DatabaseInput: 
+          Name:  ${self:custom.stage}_level_1_database
     Level1GlueAccess:
       Type: AWS::IAM::Role
       Properties:
@@ -49,17 +44,17 @@ resources:
                     - s3:GetObject
                   Resource:
                     - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /data/level-1*
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /data/level-1*
 
     # Level 2
     Leve2GlueDatabase:
       Type: AWS::Glue::Database
-      Properties:
+      Properties: 
         CatalogId: !Ref AWS::AccountId
-        DatabaseInput:
-          Name: ${self:custom.stage}_level_2_database
+        DatabaseInput: 
+          Name:  ${self:custom.stage}_level_2_database 
     Level2GlueAccess:
       Type: AWS::IAM::Role
       Properties:
@@ -85,17 +80,17 @@ resources:
                     - s3:GetObject
                   Resource:
                     - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /data/level-2*
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /data/level-2*
 
     # Level 3
     Leve3GlueDatabase:
       Type: AWS::Glue::Database
-      Properties:
+      Properties: 
         CatalogId: !Ref AWS::AccountId
-        DatabaseInput:
-          Name: ${self:custom.stage}_level_3_database
+        DatabaseInput: 
+          Name:  ${self:custom.stage}_level_3_database 
     Level3GlueAccess:
       Type: AWS::IAM::Role
       Properties:
@@ -121,9 +116,9 @@ resources:
                     - s3:GetObject
                   Resource:
                     - Fn::Join:
-                        - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
-                          - /data/level-3*
+                      - ""
+                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - /data/level-3*
 
   Outputs:
     Level1GlueAccessOutput:

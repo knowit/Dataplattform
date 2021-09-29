@@ -2,9 +2,7 @@
   "name": "DataAPI",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {
-    "serverless-plugin-scripts": "^1.0.2"
-  },
+  "dependencies": {},
   "devDependencies": {
     "serverless-pseudo-parameters": "^2.5.0",
     "serverless-python-requirements": "knowit/serverless-python-requirements",

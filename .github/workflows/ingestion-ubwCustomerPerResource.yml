@@ -1,16 +1,10 @@
 name: Dataplattform - ingestion - ubwCustomerPerResource
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - master
       - develop
-    paths:
-      - "services/ingestion/ubwCustomerPerResource/**"
-      - "packages/common/**"
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master
@@ -18,8 +12,7 @@ on:
     paths:
       - "services/ingestion/ubwCustomerPerResource/**"
       - "packages/common/**"
-      - '.config/.flake8'
-      - '.config/.yamllint'
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -35,11 +28,9 @@ jobs:
       - name: Lint with flake8
         run: |
           pip install flake8
-          flake8 --config=./.config/.flake8 ./services/ingestion/ubwCustomerPerResource
-      - name: Lint with yamllint
-        run: |
-          pip install yamllint
-          yamllint -c ./.config/.yamllint ./services/ingestion/ubwCustomerPerResource
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 ./services/ingestion/ubwCustomerPerResource --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 ./services/ingestion/ubwCustomerPerResource --count --max-line-length=120 --statistics
 
   test:
     runs-on: ubuntu-latest
