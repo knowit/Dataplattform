@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-node@v1
 
       - name: Install Serverless Framework
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION_VPC/ {print $2}' ../../../.config/.serverless_vpc)
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless_vpc)
 
       - name: Install dependencies
         run: npm install
@@ -38,7 +38,7 @@ jobs:
           
 
       - name: Run serverless deploy dev
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
