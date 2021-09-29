@@ -1,0 +1,62 @@
+[
+    {
+        "index": 5,
+        "text": "AI og Data Engineering",
+        "description": "Maskinlæring og datadrevne IT- løsninger.",
+        "id": "84baa82a-bbad-4fed-9bd1-85c9f50fdcfc"
+    },
+    {
+        "index": 4,
+        "text": "Backend",
+        "description": "Fagområdet for backend er et kjerneområde i vår virksomhet. Funksjonaliteten i neste generasjons tjenestetilbud samt viktige fagsystemer lener seg på et solid grep om utvikling av funksjonalitet innenfor dette området.",
+        "id": "5faf0519-809d-4d02-a8a0-9862024170bc"
+    },
+    {
+        "index": 8,
+        "text": "Smidig metodikk og produktledelse",
+        "description": "Smidig metodikk og produktledelse",
+        "id": "e99c1908-3da3-4e29-95e9-cfd5bfc41a57"
+    },
+    {
+        "index": 7,
+        "text": "IoT og Hardware",
+        "description": "Bruk og design av fysiske, digitale enheter. Fysisk produksjon og digitalt håndverk.",
+        "id": "a79de551-d88e-40c6-808f-ce0d2d07a242"
+    },
+    {
+        "index": 2,
+        "text": "Mobil",
+        "description": "Utvikling av moderne native og kryssplattform apper til Android- og iOS-enheter.",
+        "id": "6c9760ca-b5d4-4c0b-8ed4-0661689cc3ca"
+    },
+    {
+        "index": 1,
+        "text": "Design",
+        "description": "Design i Objectnet dekker et stort område som spenner fra produkt- og tjenestedesign gjennom interaksjonsdesign (IxD), brukeropplevelse (UX), grafisk design, designledelse og kunnskap om praktisk bruk av designmetodikk.",
+        "id": "287a6f25-f056-4299-ad6a-4dabd831fcc2"
+    },
+    {
+        "index": 10,
+        "text": "Jobbrotasjon",
+        "description": "",
+        "id": "841f669e-18d2-4ec9-a543-ed941e6dcf5f"
+    },
+    {
+        "index": 6,
+        "text": "Cloud og DevOps",
+        "description": "Cloud, DevOps og Docker/Kubernetes. Erfaring med de mest utbredte skytilbyderne og deres produkter. Kunnskap om produkter, teknologier og arkitektur i vanlig bruk. Erfaring med utvikling og drifting av applikasjoner på en skytjeneste.",
+        "id": "3efffcf3-b458-467d-bdac-e4ae08b3f040"
+    },
+    {
+        "index": 9,
+        "text": "Salg og forretningsutvikling",
+        "description": "Rådgivning, analyse og salgsarbeid, kontraktshåndtering, tekniske tekster etc.",
+        "id": "522b563b-5275-465e-bb1d-cb6a5131059a"
+    },
+    {
+        "index": 3,
+        "text": "Frontend",
+        "description": "Det som trengs for å få et HTML-basert brukergrensesnitt til å fungere – og å briljere.",
+        "id": "b76e0d72-aeab-4cd2-9278-c64ec3314b4c"
+    }
+]

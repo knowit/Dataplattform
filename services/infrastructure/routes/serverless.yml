@@ -1,0 +1,23 @@
+service: routes
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+
+resources:
+  Resources:
+    BasicZone:
+      Type: AWS::Route53::HostedZone
+      Properties:
+        Name: ${ssm:/${self:custom.stage}/routes/domain_name}
+
+  Outputs:
+    routesZoneId:
+      Value:
+        "Ref": BasicZone
+      Export:
+        Name: ${self:custom.stage}-routes-zoneid #TODO: Make available in filestoragedistribution

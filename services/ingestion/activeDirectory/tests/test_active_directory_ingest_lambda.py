@@ -34,7 +34,7 @@ def test_initial_ingest(s3_bucket, test_data, dynamodb_resource):
     table = resource.Table(environ.get('PERSON_DATA_TABLE'))
 
     add_ddb_dummy_data(table)
-    assert table.item_count == 8
+    assert table.item_count == 18
 
     handler(None, None)
 

@@ -1,6 +1,7 @@
 name: Deploy ingestion - jiraSales
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
@@ -8,6 +9,7 @@ on:
     paths:
       - "services/ingestion/jiraSales/**"
       - "packages/common/**"
+      - ".config/.serverless"
 
 jobs:
   deploy:
@@ -25,23 +27,70 @@ jobs:
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
       - name: Install dependencies
         run: npm install
 
-      - name: Serverless AWS authentication
+      - name: Install packages/*
         run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          else
-            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          fi
+          pip install -e ../../../packages/cli
+          pip install -e ../../../packages/common
+          pip install -e ../../../packages/query
+          pip install -e ../../../packages/testing
 
-      - name: Run serverless deploy
+      - name: Run serverless deploy prod
+        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
         run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment
-          else
-            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment
-          fi
+          echo "Deploying to production" && sls deploy --stage prodsls invoke -f ingest --stage prod
+          
+      - name: Run serverless deploy dev
+        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Deploying to development" && sls deploy --stage dev
+        
+      - name: Invoke ingestion prod
+        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Invoking ingestion in prod" && sls invoke -f ingest --stage prod
+          
+      - name: Invoke ingestion dev
+        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev
+
+      - name: Registrer and update glue tables prod
+        if: ${{ github.base_ref == 'master' || github.base_ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          dataplattform register-table jira_issue_created jira_issue_updated
+          dataplattform database -a 2 update-tables
+
+      - name: Registrer and update glue tables dev
+        if: ${{ github.base_ref != 'master' && github.base_ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          dataplattform register-table jira_issue_created jira_issue_updated
+          dataplattform database -a 2 update-tables
