@@ -56,6 +56,24 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to development" && sls deploy --stage dev
+        
+      - name: Invoke ingestion prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Invoking ingestion in prod" && sls invoke -f ingest --stage prod
+          
+      - name: Invoke ingestion dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev
 
       - name: Registrer and update glue tables prod
         if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
