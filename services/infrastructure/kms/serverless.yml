@@ -51,7 +51,7 @@ resources:
             Resource: "*"
             Condition:
               ArnLike:
-                kms:EncryptionContext: arn:aws:logs:eu-central-1:876363704293:log-group:/aws-glue/crawlers-role/dev-dora-DoraCrawlerRole-ZB0338V5YQCF-KMSGlueEncryptionConfigurations
+                kms:EncryptionContext:aws:logs:arn: arn:aws:logs:eu-central-1:876363704293:log-group:/aws-glue/crawlers-role/DoraCrawlerRole-KMSGlueEncryptionConfigurations
     KeyAlias:
       Type: 'AWS::KMS::Alias'
       Properties:

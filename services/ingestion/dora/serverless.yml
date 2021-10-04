@@ -109,6 +109,7 @@ resources:
     DoraCrawlerRole:
       Type: AWS::IAM::Role
       Properties:
+        RoleName: DoraCrawlerRole
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -195,9 +196,9 @@ resources:
     CrawlerLogGroup:
       Type: AWS::Logs::LogGroup
       Properties: 
-        KmsKeyId: arn:aws:kms:eu-central-1:876363704293:key/db670100-7eb7-4af9-a9cd-88d97044c4fd
-        LogGroupName: /aws-glue/crawlers-role/dev-dora-DoraCrawlerRole-ZB0338V5YQCF-KMSGlueEncryptionConfigurations
-    GlueEncryptionConfiguration:
+        KmsKeyId: !Sub arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/db670100-7eb7-4af9-a9cd-88d97044c4fd
+        LogGroupName: /aws-glue/crawlers-role/DoraCrawlerRole-KMSGlueEncryptionConfigurations
+    GlueEncryptionConfigurations:
       Type: AWS::Glue::SecurityConfiguration
       Properties:
         Name: KMSGlueEncryptionConfigurations
@@ -226,8 +227,8 @@ resources:
     GlueCrawler:
       Type: AWS::Glue::Crawler
       Properties:
-        Name: "DoraCrawler"
-        CrawlerSecurityConfiguration: !Ref GlueEncryptionConfiguration
+        Name: DoraCrawlers
+        CrawlerSecurityConfiguration: !Ref GlueEncryptionConfigurations
         Role: !GetAtt DoraCrawlerRole.Arn
         DatabaseName: dev_level_4_database
         Targets:
