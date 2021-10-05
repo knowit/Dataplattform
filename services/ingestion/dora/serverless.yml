@@ -106,93 +106,6 @@ functions:
 
 resources:
   Resources:
-    DoraCrawlerRole:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: DoraCrawlerRole
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: "Allow"
-              Principal:
-                Service:
-                  - "glue.amazonaws.com"
-              Action:
-                - "sts:AssumeRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-Glue-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'glue:GetTable'
-                    - 'glue:GetDatabase'
-                    - 'glue:CreateDatabase'
-                    - 'glue:CreateTable'
-                    - 'glue:UpdateTable'
-                    - 'glue:UpdatePartition'
-                    - 'glue:BatchGetPartition'
-                    - 'glue:BatchCreatePartition'
-                  Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
-          - PolicyName: ${self:custom.stage}-GlueSecurity-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'glue:GetDataCatalogEncryptionSettings'
-                    - 'glue:PutDataCatalogEncryptionSettings'
-                    - 'glue:CreateSecurityConfiguration'
-                    - 'glue:GetSecurityConfiguration'
-                    - 'glue:GetSecurityConfigurations'
-                    - 'glue:DeleteSecurityConfiguration'
-                  Resource: '*'
-          - PolicyName: ${self:custom.stage}-Logs-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'logs:CreateLogGroup'
-                    - 'logs:CreateLogStream'
-                    - 'logs:PutLogEvents'
-                    - 'logs:AssociateKmsKey'
-                  Resource:
-                    - !Sub 'arn:aws:logs:*:*:/aws-glue/*'
-          - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:ListObjects*
-                    - s3:ListBucket
-                    - s3:GetObject
-                    - s3:CopyObject
-                    - s3:PutObject
-                  Resource: 
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - kms:Encrypt
-                    - kms:Decrypt
-                    - kms:DescribeKey
-                    - kms:ListKeys
-                    - kms:GenerateDataKey 
-                  Resource:
-                    - Fn::Join:
-                      - ""
-                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                        - !ImportValue ${self:custom.stage}-KMS-KeyID
     CrawlerLogGroup:
       Type: AWS::Logs::LogGroup
       Properties: 
@@ -201,7 +114,7 @@ resources:
             - ""
             - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
               - !ImportValue ${self:custom.stage}-KMS-KeyID 
-        LogGroupName: /aws-glue/crawlers-role/DoraCrawlerRole-KMSGlueEncryptionConfigurations
+        LogGroupName: /aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations
     GlueEncryptionConfigurations:
       Type: AWS::Glue::SecurityConfiguration
       Properties:
@@ -233,7 +146,7 @@ resources:
       Properties:
         Name: DoraCrawlers
         CrawlerSecurityConfiguration: !Ref GlueEncryptionConfigurations
-        Role: !GetAtt DoraCrawlerRole.Arn
+        Role: !ImportValue dev-level-4-glue-access
         DatabaseName: dev_level_4_database
         Targets:
           S3Targets:
