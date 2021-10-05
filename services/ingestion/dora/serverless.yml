@@ -196,7 +196,11 @@ resources:
     CrawlerLogGroup:
       Type: AWS::Logs::LogGroup
       Properties: 
-        KmsKeyId: !Sub arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/db670100-7eb7-4af9-a9cd-88d97044c4fd
+        KmsKeyId: 
+          Fn::Join:
+            - ""
+            - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+              - !ImportValue ${self:custom.stage}-KMS-KeyID 
         LogGroupName: /aws-glue/crawlers-role/DoraCrawlerRole-KMSGlueEncryptionConfigurations
     GlueEncryptionConfigurations:
       Type: AWS::Glue::SecurityConfiguration
