@@ -2,11 +2,11 @@ service: kms
 
 dataplattform:
   dependencies:
-    - ../infrastructure/deploymentBucket
-    - ../infrastructure/datalake
-    - ../infrastructure/events
-    - ../infrastructure/monitoring
-    - ../infrastructure/glue
+    - ../deploymentBucket
+    - ../datalake
+    - ../events
+    - ../monitoring
+    - ../glue
 
 custom:
   stage: ${opt:stage, self:provider.stage}
