@@ -24,11 +24,13 @@ def ingest(event) -> Data:
     empty_content_in_path(bucket=environ.get('PUBLIC_BUCKET'), prefix=environ.get('PUBLIC_PREFIX'))
 
     def write_cv_image_to_public_bucket(person):
-        image_url = person['cv']['image']['thumb']['url']
-        ext = 'jpg' if ".jpeg" in image_url or '.jpg' in image_url else 'png'
         new_key = 'image_key'
+        image_url = person['cv']['image']['thumb']['url']
+        if image_url is None:
+            return {new_key: None}
+        ext = 'jpg' if ".jpeg" in image_url.lower() or '.jpg' in image_url.lower() else 'png'
         filename = f'{environ.get("PUBLIC_PREFIX")}/{uuid4()}.{ext}'
-        http_request = {'requestUrl': person['cv']['image']['thumb']['url']}
+        http_request = {'requestUrl': image_url}
         save_document(http_request, filename=filename, filetype=ext, private=False)
         return {new_key: filename}
 
@@ -44,7 +46,6 @@ def ingest(event) -> Data:
                                    language='{LANG}',
                                    ext='{FORMAT}')
         }
-        
         d.update(write_cv_image_to_public_bucket(person))
         return d
 

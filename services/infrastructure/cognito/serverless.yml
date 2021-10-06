@@ -17,7 +17,7 @@ custom:
     configureDescription: "Perform necessary post-deployment configurations for cognito to function properly."
   scripts:
     hooks:
-      after:deploy:finalize: python postDeploy.py --stack-name ${self:provider.stackName} --param-name ${self:custom.ssmParamName}
+      after:deploy:finalize: python postDeploy.py --stack-name ${self:provider.stackName} --param-name ${self:custom.ssmParamName} --region ${self:provider.region}
 
 provider:
   name: aws

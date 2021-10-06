@@ -23,7 +23,7 @@ def ingest(event) -> Data:
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_secret)
 
-    api = API(auth)
+    api = API(auth, wait_on_rate_limit=True)
 
     search_args = ['knowit', '"knowit objectnet"', '"knowit amende"',
                    '"knowit solutions"', '"knowit experience"', '"knowit insight"',

@@ -1,6 +1,7 @@
 name: Dataplattform - infrastructure - vpc
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master

@@ -1,6 +1,7 @@
 name: Deploy ingestion - knowitLabs
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
@@ -39,46 +40,58 @@ jobs:
           pip install -e ../../../packages/query
           pip install -e ../../../packages/testing
 
-      - name: Serverless AWS authentication
-        run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          else
-            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          fi
-
-      - name: Run serverless deploy
-        run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment
-          else
-            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment
-          fi
-
-      - name: Invoke ingestion
-        run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-           echo "Invoking ingestion" && sls invoke -f ingest --stage prod --aws-profile deployment
-          else
-           echo "Invoking ingestion" && sls invoke -f ingest --stage dev --aws-profile deployment
-          fi
-
-      - name: Registrer and update glue tables prod
-        if: github.base_ref == "master" || github.base_ref == "refs/heads/master"
+      - name: Run serverless deploy prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table knowit_labs
-          dataplattform database -a 1 update-tables
-
-      - name: Registrer and update glue tables dev
-        if: github.base_ref != "master" && github.base_ref != "refs/heads/master"
+          echo "Deploying to production" && sls deploy --stage prod
+          
+      - name: Run serverless deploy dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table knowit_labs
+          echo "Deploying to development" && sls deploy --stage dev
+        
+      - name: Invoke ingestion prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Invoking ingestion in prod" && sls invoke -f ingest --stage prod
+          
+      - name: Invoke ingestion dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev
+
+      - name: Registrer and update glue tables prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          dataplattform register-table knowit_labs_blog_posts knowit_labs_blog_updates
+          dataplattform database -a 1 update-tables
+
+      - name: Registrer and update glue tables dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          dataplattform register-table knowit_labs_blog_posts knowit_labs_blog_updates
           dataplattform database -a 1 update-tables

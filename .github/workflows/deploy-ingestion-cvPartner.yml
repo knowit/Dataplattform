@@ -1,6 +1,7 @@
 name: Deploy ingestion - cvPartner
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
@@ -38,40 +39,65 @@ jobs:
           pip install -e ../../../packages/query
           pip install -e ../../../packages/testing
 
-      - name: Serverless AWS authentication
+      - name: Run serverless deploy prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
         run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          else
-            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --profile deployment --overwrite
-          fi
+          echo "Deploying to production" && sls deploy --stage prod
+          
 
-      - name: Run serverless deploy
+      - name: Run serverless deploy dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
         run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            echo "Deploying to production" && sls deploy --stage prod --aws-profile deployment
-          else
-            echo "Deploying to development" && sls deploy --stage dev --aws-profile deployment
-          fi
+          echo "Deploying to development" && sls deploy --stage dev
+        
+      - name: Invoke ingestion prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Invoking ingestion in prod" && sls invoke -f ingest --stage prod
+          
 
-      - name: Invoke ingestion
+      - name: Invoke ingestion dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
         run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-           echo "Invoking ingestion" && sls invoke -f ingest --stage prod --aws-profile deployment
-          else
-           echo "Invoking ingestion" && sls invoke -f ingest --stage dev --aws-profile deployment
-          fi
+          echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev     
 
       - name: Registrer and update glue tables prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
         run: |
-          if [[ "${{github.base_ref}}" == "master" || "${{github.ref}}" == "refs/heads/master" ]]; then
-            sls config credentials --provider aws --key ${{ secrets.PROD_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }} --region "eu-central-1" --profile deployment --overwrite
-          dataplattform register-table cv_partner
+          dataplattform register-table cv_partner_employees cv_partner_education cv_partner_blogs cv_partner_courses \
+          cv_partner_key_qualification cv_partner_languages cv_partner_project_experience cv_partner_technology_skills \
+          cv_partner_work_experience
           dataplattform database -a 3 update-tables
-      
+          
       - name: Registrer and update glue tables dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
         run: |
-          if [[ "${{github.base_ref}}" == "develop" || "${{github.ref}}" == "refs/heads/develop" ]]; then
-            sls config credentials --provider aws --key ${{ secrets.DEV_AWS_ACCESS_KEY_ID }} --secret ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }} --region "eu-central-1" --profile deployment --overwrite
-          dataplattform register-table cv_partner
+          dataplattform register-table cv_partner_employees cv_partner_education cv_partner_blogs cv_partner_courses \
+          cv_partner_key_qualification cv_partner_languages cv_partner_project_experience cv_partner_technology_skills \
+          cv_partner_work_experience
           dataplattform database -a 3 update-tables
+             

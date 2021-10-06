@@ -67,7 +67,7 @@ functions:
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
-      DATALAKE: !Sub '${self:custom.stage}-encryptedbucket-${AWS::AccountId}'
+      DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
@@ -97,7 +97,7 @@ functions:
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
-      DATALAKE: !Sub '${self:custom.stage}-encryptedbucket-${AWS::AccountId}'
+      DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
@@ -131,87 +131,51 @@ functions:
 
 resources:
   Resources:
-    DoraCrawlerRole:
-      Type: AWS::IAM::Role
+    CrawlerLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties: 
+        KmsKeyId: 
+          Fn::Join:
+            - ""
+            - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+              - !ImportValue ${self:custom.stage}-KMS-KeyID 
+        LogGroupName: /aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations
+    GlueEncryptionConfigurations:
+      Type: AWS::Glue::SecurityConfiguration
       Properties:
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: "Allow"
-              Principal:
-                Service:
-                  - "glue.amazonaws.com"
-              Action:
-                - "sts:AssumeRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-Glue-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'glue:GetTable'
-                    - 'glue:GetDatabase'
-                    - 'glue:CreateDatabase'
-                    - 'glue:CreateTable'
-                    - 'glue:UpdateTable'
-                    - 'glue:UpdatePartition'
-                    - 'glue:BatchGetPartition'
-                    - 'glue:BatchCreatePartition'
-                  Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
-          - PolicyName: ${self:custom.stage}-Logs-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'logs:CreateLogGroup'
-                    - 'logs:CreateLogStream'
-                    - 'logs:PutLogEvents'
-                  Resource:
-                    - !Sub 'arn:aws:logs:*:*:/aws-glue/*'
-          - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:ListObjects*
-                    - s3:ListBucket
-                    - s3:GetObject
-                    - s3:CopyObject
-                    - s3:PutObject
-                  Resource: 
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}/*
-          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - kms:Encrypt
-                    - kms:Decrypt
-                    - kms:DescribeKey
-                    - kms:ListKeys
-                    - kms:GenerateDataKey 
-                  Resource:
-                    Fn::Join:
-                      - ""
-                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                        - !Ref KMSTestKey
+        Name: KMSGlueEncryptionConfigurations
+        EncryptionConfiguration:
+          CloudWatchEncryption:
+            CloudWatchEncryptionMode: SSE-KMS
+            KmsKeyArn: 
+              Fn::Join:
+                - ""
+                - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                  - !ImportValue ${self:custom.stage}-KMS-KeyID
+          JobBookmarksEncryption:
+            JobBookmarksEncryptionMode: CSE-KMS
+            KmsKeyArn: 
+              Fn::Join:
+                - ""
+                - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                  - !ImportValue ${self:custom.stage}-KMS-KeyID
+          S3Encryptions:
+            - KmsKeyArn: 
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                    - !ImportValue ${self:custom.stage}-KMS-KeyID
+              S3EncryptionMode: SSE-KMS
     GlueCrawler:
       Type: AWS::Glue::Crawler
       Properties:
-        Name: "DoraCrawler"
-        Role: !GetAtt DoraCrawlerRole.Arn
+        Name: DoraCrawlers
+        CrawlerSecurityConfiguration: !Ref GlueEncryptionConfigurations
+        Role: !ImportValue dev-level-4-glue-access
         DatabaseName: dev_level_4_database
         Targets:
           S3Targets:
-            - Path: !Sub '${self:custom.stage}-encryptedbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos'
+            - Path: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos'
               Exclusions:
               - "*_metadata**"
         SchemaChangePolicy:
@@ -219,70 +183,6 @@ resources:
           DeleteBehavior: "DEPRECATE_IN_DATABASE"
         Schedule:
           ScheduleExpression: "cron(45 16 ? * MON-FRI *)"
-    KMSTestKey:
-      Type: AWS::KMS::Key
-      Properties:
-        Description: An example symmetric KMS key
-        EnableKeyRotation: true
-        PendingWindowInDays: 20
-        KeyPolicy:
-          Version: '2012-10-17'
-          Id: key-default-1
-          Statement:
-          - Sid: Enable IAM User Permissions
-            Effect: Allow
-            Principal:
-              AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
-            Action: kms:*
-            Resource: '*'
-          - Sid: Allow administration of the key
-            Effect: Allow
-            Principal:
-              AWS: arn:aws:iam::826278518019:user/frikk.fjuk@knowit.no #Sett inn bruker
-            Action:
-            - kms:Create*
-            - kms:Describe*
-            - kms:Enable*
-            - kms:List*
-            - kms:Put*
-            - kms:Update*
-            - kms:Revoke*
-            - kms:Disable*
-            - kms:Get*
-            - kms:Delete*
-            - kms:ScheduleKeyDeletion
-            - kms:CancelKeyDeletion
-            Resource: '*'
-          - Sid: Allow use of the key
-            Effect: Allow
-            Principal:
-              AWS: arn:aws:iam::826278518019:user/frikk.fjuk@knowit.no #Sett inn bruker
-            Action:
-            - kms:DescribeKey
-            - kms:Encrypt
-            - kms:Decrypt
-            - kms:ReEncrypt*
-            - kms:GenerateDataKey
-            - kms:GenerateDataKeyWithoutPlaintext
-            Resource: '*'
-    KeyAlias:
-      Type: 'AWS::KMS::Alias'
-      Properties:
-        AliasName: alias/KMSTestName
-        TargetKeyId: !Ref KMSTestKey
-    EncryptedS3Bucket:
-      Type: 'AWS::S3::Bucket'
-      Properties:
-        BucketName: !Sub '${self:custom.stage}-encryptedbucket-${AWS::AccountId}'
-        VersioningConfiguration:
-          Status: Enabled
-        BucketEncryption:
-          ServerSideEncryptionConfiguration:
-            - ServerSideEncryptionByDefault:
-                SSEAlgorithm: 'aws:kms'
-                KMSMasterKeyID: !Ref KMSTestKey
-              BucketKeyEnabled: true
-      DeletionPolicy: Delete
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -311,8 +211,8 @@ resources:
                     - s3:DeleteObjects
                     - s3:DeleteObjectVersion
                   Resource: 
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}/*
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
           - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -328,7 +228,7 @@ resources:
                     Fn::Join:
                       - ""
                       - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                        - !Ref KMSTestKey
+                        - !ImportValue ${self:custom.stage}-KMS-KeyID
           - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
             PolicyDocument:
               Version: "2012-10-17"
@@ -339,8 +239,8 @@ resources:
                     - s3:ListBucketVersions
                     - s3:GetBucketLocation
                   Resource: 
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}/*
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
           - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
@@ -442,8 +342,8 @@ resources:
                     - s3:DeleteObjectVersion
                     - s3:DeleteObject
                   Resource:
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}*
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -454,8 +354,8 @@ resources:
                     - s3:ListBucketVersions
                     - s3:GetBucketLocation
                   Resource:
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-encryptedbucket-${AWS::AccountId}*
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
           - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -471,7 +371,7 @@ resources:
                     Fn::Join:
                       - ""
                       - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                        - !Ref KMSTestKey
+                        - !ImportValue ${self:custom.stage}-KMS-KeyID 
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
