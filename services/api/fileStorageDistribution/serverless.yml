@@ -5,9 +5,6 @@ dataplattform:
     - ../../infrastructure/deploymentBucket
     - ../../infrastructure/storage
     - ../../infrastructure/cognito
-    - ../../infrastructure/layers/numpy
-    - ../../infrastructure/layers/pandas
-    - ../../infrastructure/layers/fastparquet
     - ../../infrastructure/routes
 
 custom:
@@ -41,13 +38,6 @@ pythonRequirements:
   noDeploy:
     - boto3 # Default in lambda rt
     - botocore
-    - pandas # Layer
-    - pytz
-    - numpy
-    - numpy.libs
-    - fastparquet
-    - numba
-    - llvmlite
 
 provider:
   name: aws

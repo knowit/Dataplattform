@@ -4,9 +4,6 @@ service: slackAlarmForwarder
 dataplattform:
   dependencies:
     - ../../infrastructure/deploymentBucket
-    - ../../infrastructure/layers/numpy
-    - ../../infrastructure/layers/pandas
-    - ../../infrastructure/layers/fastparquet
     - ../../infrastructure/events
 
 custom:
@@ -22,13 +19,6 @@ custom:
     noDeploy:
       - boto3 # Default in lambda rt
       - botocore
-      - pandas # Layer
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
 provider:
   name: aws

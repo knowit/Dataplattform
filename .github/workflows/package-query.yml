@@ -2,6 +2,7 @@
 name: Dataplattform - package - query
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

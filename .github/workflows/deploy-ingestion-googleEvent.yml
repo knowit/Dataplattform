@@ -1,6 +1,7 @@
 name: Deploy ingestion - googleEvent
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - develop
@@ -63,21 +64,21 @@ jobs:
           fi
 
       - name: Registrer and update glue tables prod
-        if: github.base_ref == "master" || github.base_ref == "refs/heads/master"
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table google_event
+          dataplattform register-table google_calendar_events
           dataplattform database -a 2 update-tables
 
       - name: Registrer and update glue tables dev
-        if: github.base_ref != "master" && github.base_ref != "refs/heads/master"
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table google_event
+          dataplattform register-table google_calendar_events
           dataplattform database -a 2 update-tables

@@ -2,6 +2,7 @@
 name: Dataplattform - api - dataApi
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master

@@ -2,6 +2,7 @@
 name: Dataplattform - ingestion - cvPartner
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master
