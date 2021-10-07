@@ -6,7 +6,7 @@ from typing import List
 
 CERTIFICATE_REGION = 'us-east-1'
 
-def create_parameter(name: str, value: str):
+def create_parameter(name: str, value: str) -> None:
     client = boto3.client('ssm')
     client.put_parameter(
         Name=name,
