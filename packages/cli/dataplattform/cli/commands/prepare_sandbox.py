@@ -1,7 +1,6 @@
 from argparse import ArgumentParser, Namespace
 import boto3
 import datetime
-import json
 from typing import List
 
 CERTIFICATE_REGION = 'us-east-1'
