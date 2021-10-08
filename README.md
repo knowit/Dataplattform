@@ -12,6 +12,9 @@ Currently the platform gathers data from several different datasources, both as 
 It is also highly recommended that you use a virtual environment or similar to manage pip packages and dependencies. 
 To configure `aws-cli`, please contact an existing member of the team for credentials.
 
+## Wiki
+Members of the Dataplattform team can find useful information pertaining to the project on the [wiki](https://github.com/knowit/Dataplattform-issues/wiki).
+
 ## Running the services
 The indvidual services are deployed to AWS using
 `sls deploy --stage {STAGE}` where `dev` is the only currently supported stage.  
