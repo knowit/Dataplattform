@@ -331,6 +331,25 @@ resources:
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
+    DoraWorkgroup:
+      Type: AWS::Athena::WorkGroup
+      Properties:
+        Name: DoraWorkgroups
+        Description: Workgroup for DORA views
+        State: ENABLED
+        WorkGroupConfiguration:
+          ResultConfiguration:
+            OutputLocation: s3://dev-kmsbucket-876363704293/Athena-logs/
+            EncryptionConfiguration: 
+              EncryptionOption: SSE_KMS
+              KmsKey: 
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                    - !ImportValue ${self:custom.stage}-KMS-KeyID
+
+
+
 
     EventQueue:
       Type: AWS::SQS::Queue
