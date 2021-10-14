@@ -1,6 +1,11 @@
+import os
+
+from dataplattform.common.aws import S3
 from dataplattform.common.handlers.process import PersonDataProcessHandler
 from dataplattform.common.repositories.person_repository import PersonIdentifierType
 from typing import Dict
+from datetime import datetime
+from os import environ
 import pandas as pd
 import numpy as np
 
@@ -75,6 +80,24 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     per_project_data = get_per_project_data(df)
     df.pop('used_hrs')
+
+    s3 = S3()
+    if s3.fs.exists('structured/ubw_customer_per_resource/part.0.parquet'):
+        s3_path = os.path.join('s3://',
+                               environ.get('DATALAKE'),
+                               environ.get('ACCESS_PATH'),
+                               'structured/ubw_customer_per_resource')
+        old_frame = pd.read_parquet(s3_path)
+
+        cur_year, cur_week = datetime.now().isocalendar()[0:2]
+        cur_weeks = cur_year * 52 + cur_week
+
+        def filter_by_week(row):
+            weeks = int(row['reg_period'][0:4]) * 52 + int(row['reg_period'][4:])
+            return weeks > cur_weeks - 4
+
+        old_frame = old_frame[old_frame.apply(filter_by_week, axis=1)]
+        df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(subset=df.columns.difference(['time']))
 
     return {
         'ubw_customer_per_resource': df,
