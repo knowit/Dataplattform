@@ -1,11 +1,9 @@
-import os
-
 from dataplattform.common.aws import S3
 from dataplattform.common.handlers.process import PersonDataProcessHandler
 from dataplattform.common.repositories.person_repository import PersonIdentifierType
 from typing import Dict
 from datetime import datetime
-from os import environ
+import os
 import pandas as pd
 import numpy as np
 
@@ -84,8 +82,8 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     s3 = S3()
     if s3.fs.exists('structured/ubw_customer_per_resource/part.0.parquet'):
         s3_path = os.path.join('s3://',
-                               environ.get('DATALAKE'),
-                               environ.get('ACCESS_PATH'),
+                               os.environ.get('DATALAKE'),
+                               os.environ.get('ACCESS_PATH'),
                                'structured/ubw_customer_per_resource')
         old_frame = pd.read_parquet(s3_path)
 
