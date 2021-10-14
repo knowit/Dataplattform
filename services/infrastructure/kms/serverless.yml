@@ -37,6 +37,24 @@ resources:
             Action: 
               - kms:*
             Resource: '*'
+          - Sid: "Enable usage for Quicksight"
+            Effect: Allow
+            Principal:
+              AWS: 'arn:aws:iam::876363704293:role/service-role/aws-quicksight-service-role-v0'
+            Action:
+              - kms:Encrypt*
+              - kms:Decrypt*
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:Describe*
+            Resource: "*"
+          - Sid: "Give me all the juice"
+            Effect: Allow
+            Principal:
+              AWS: arn:aws:iam::876363704293:user/even.johansen@knowit.no
+            Action:
+              - kms:*
+            Resource: '*'
           - Sid: "Enable encryption for loggroup"
             Effect: Allow
             Principal:
