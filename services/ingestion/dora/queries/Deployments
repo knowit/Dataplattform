@@ -61,67 +61,63 @@ order by
 with daily_values as(
 SELECT
    date_column,
-   COUNT(CASE WHEN deployments >0 then 1 end) as deployments
-from github_deployments_null_values 
-group by date_column
+   COUNT(CASE WHEN deployments >0 then 1 end) as deployments,
+   partition_1
+from github_deployments_with_null_values 
+group by date_column, partition_1
 ),
 daily_aggregate_values as(
 SELECT 
   WEEK(date_column) as week,
-  COUNT(CASE WHEN deployments >0 then 1 end) as daily_deployments
+  COUNT(CASE WHEN deployments >0 then 1 end) as daily_deployments,
+  partition_1
   from daily_values
-  group by WEEK(date_column)
+  group by WEEK(date_column), partition_1
 ),
 monthly_values as(
 select 
    MONTH(date_column) AS MONTH,
-   COUNT(CASE WHEN deployments >0 then 1 end) as deployments
-from github_deployments_null_values 
-GROUP by MONTH(date_column)
-),
-monthly_distinct_values as(
-SELECT 
-   MONTH,
-   COUNT(CASE WHEN deployments >0 then 1 end) as monthly_deployments
-from monthly_values
-group by MONTH
+   COUNT(CASE WHEN deployments >0 then 1 end) as monthly_deployments,
+   partition_1
+from github_deployments_with_null_values 
+GROUP by MONTH(date_column), partition_1
 ),
 weekly_table as(
-Select CASE
-   when approx_percentile(daily_deployments,0.5) >= 3 then 'daily'
-   when approx_percentile(daily_deployments,0.5) >= 1 then 'weekly'
+Select 
+partition_1,
+CASE
+   when approx_percentile(daily_deployments,0.5) >= 3 then 1
+   when approx_percentile(daily_deployments,0.5) >= 1 then 2
    end as DeploymentFrequency
 from daily_aggregate_values
+group by partition_1
 ),
 monthly_table as(
-Select CASE
-  when approx_percentile(monthly_deployments,0.5) >= 1 then 'monthly'
-  else 'yearly'
+Select 
+partition_1,
+CASE
+  when approx_percentile(monthly_deployments,0.5) >= 1 then 3
+  else 4
   end as DeploymentFrequency
-from monthly_distinct_values
+from monthly_values
+where partition_1 is not null
+Group by partition_1
 ),
 aggregate_table as(
   SELECT * from monthly_table union select * from weekly_table
+),
+fixed_table as (
+    Select 
+    partition_1, 
+    min(DeploymentFrequency) as DeploymentFrequency
+    from aggregate_table group by partition_1
 )
-SELECT CASE
-   when exists(
-     SELECT * FROM aggregate_table
-     WHERE DeploymentFrequency = 'daily'
-     )
-     then 'daily'
-   when exists(
-     SELECT * FROM aggregate_table
-     WHERE DeploymentFrequency = 'weekly'
-     )
-     then 'weekly'
-   when exists(
-     SELECT * FROM aggregate_table
-     WHERE DeploymentFrequency = 'monthly'
-     )
-     then 'monthly'
-   when exists(
-     SELECT * FROM aggregate_table
-     WHERE DeploymentFrequency = 'yearly'
-     )
-     then 'yearly'
-   end as DeploymentFrequency
+Select partition_1, frequency from fixed_table join frequency on fixed_table.DeploymentFrequency = frequency.id
+
+/*Support query to create table from s3 csv file */
+CREATE EXTERNAL TABLE IF NOT EXISTS frequency(
+  id int, frequency string)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION 's3://dev-datalake-bucket-*/tablefrequency/'
