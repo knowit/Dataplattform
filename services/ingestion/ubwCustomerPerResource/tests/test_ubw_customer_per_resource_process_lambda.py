@@ -44,7 +44,7 @@ def test_process_data(create_table_mock, setup_queue_event, test_data, dynamodb_
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'reg_period',
-        pd.Series(['202053', '202053', '202053']))
+        pd.Series(['202053','202141', '202053','202140', '202053']))
 
 
 def test_process_data_test_weigth(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
@@ -58,12 +58,12 @@ def test_process_data_test_weigth(create_table_mock, setup_queue_event, test_dat
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'weigth',
-        pd.Series([1, 2, 1]))
+        pd.Series([1, 2, 3, 1, 2]))
 
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'customer',
-        pd.Series(['customer 2', 'customer 1', 'customer 3']))
+        pd.Series(['customer 2', 'Entur AS', 'customer 1', 'Entur AS', 'customer 3']))
 
 
 def test_process_data_test_used_hrs_zero(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
@@ -79,12 +79,12 @@ def test_process_data_test_used_hrs_zero(create_table_mock, setup_queue_event, t
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'weigth',
-        pd.Series([1, 1]))
+        pd.Series([1, 2, 1, 2]))
 
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'customer',
-        pd.Series(['customer 2', 'customer 3']))
+        pd.Series(['customer 2','Entur AS', 'Entur AS', 'customer 3']))
 
 
 def test_process_data_test_dataframe_content(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
@@ -98,16 +98,18 @@ def test_process_data_test_dataframe_content(create_table_mock, setup_queue_even
     create_table_mock.assert_table_data(
         'ubw_customer_per_resource',
         pd.DataFrame({
-            'reg_period': ['202053', '202053', '202053'],
-            'alias': ['frearn', 'frearn', 'einhal'],
-            'project_type': ['External Projects', 'Local Projects', 'Local Projects'],
-            'work_order': ['work order no 2', 'work order no 1', 'work order no 3'],
-            'work_order_description': ['Some work order desc.', 'Some work order desc.', 'Some work order desc.'],
-            'customer': ['customer 2', 'customer 1', 'customer 3'],
-            'time': [0, 0, 0],
-            'weigth': [1, 2, 1],
+            'reg_period': ['202053', '202141', '202053', '202140', '202053'],
+            'alias': ['frearn', 'frearn', 'frearn', 'einhal', 'einhal'],
+            'project_type': ['External Projects', 'External Projects', 'Local Projects', 'External Projects', 'Local Projects'],
+            'work_order': ['work order no 2', 'work order no 5', 'work order no 1', 'work order no 4', 'work order no 3'],
+            'work_order_description': ['Some work order desc.', 'Drift, forvalting og support', 'Some work order desc.', 'Entur Test', 'Some work order desc.'],
+            'customer': ['customer 2', 'Entur AS', 'customer 1', 'Entur AS', 'customer 3'],
+            'time': [0, 0, 0, 0, 0],
+            'weigth': [1, 2, 3, 1 , 2],
             'guid': ['b051b402346144a6cdcceb0027f6e80d29019f50',
                      'b051b402346144a6cdcceb0027f6e80d29019f50',
+                     'b051b402346144a6cdcceb0027f6e80d29019f50',
+                     '5d79f8b771cd4921b667f9227aece292213806d6',
                      '5d79f8b771cd4921b667f9227aece292213806d6'],
         }))
 
@@ -122,11 +124,11 @@ def test_process_per_project_data_content(create_table_mock, setup_queue_event, 
     create_table_mock.assert_table_data(
         'ubw_per_project_data',
         pd.DataFrame({
-            'customer': ['customer 2', 'customer 1', 'customer 3'],
-            'employees': [1, 1, 1],
-            'hours': np.array([6, 4, 1], dtype=np.float32),
-            'reg_period': ["202053", "202053", "202053"],
-            'timestamp': [1601294392, 1601294392, 1601294392]
+            'customer': ['customer 2', 'Entur AS', 'customer 1', 'customer 3'],
+            'employees': [1, 2, 1, 1],
+            'hours': np.array([6, 16, 4, 1], dtype=np.float32),
+            'reg_period': ["202053", "202053", "202053", "202053"],
+            'timestamp': [1601294392, 1601294392, 1601294392, 1601294392]
         }))
 
 
