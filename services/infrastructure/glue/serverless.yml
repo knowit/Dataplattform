@@ -205,7 +205,7 @@ resources:
                   Resource: 
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+          - PolicyName: ${self:custom.stage}-KMSKeyAccess-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -219,7 +219,7 @@ resources:
                   Resource:
                     - Fn::Join:
                       - ""
-                      - - "arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/"
+                      - - "arn:aws:kms:eu-central-1:876363704293:key/"
                         - !ImportValue ${self:custom.stage}-KMS-KeyID
 
   Outputs:

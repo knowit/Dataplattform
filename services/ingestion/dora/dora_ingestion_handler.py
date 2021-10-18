@@ -4,34 +4,46 @@ from dataplattform.common.aws import SSM
 from datetime import datetime
 import requests
 from dateutil.parser import isoparse
+import boto3
 
 handler = IngestHandler()
-url = 'https://api.github.com/repos/knowit/Dataplattform/events'
-branch_url = 'https://api.github.com/repos/knowit/dataplattform'
-
 
 @handler.ingest()
 def ingest(event) -> Data:
-    api_token = SSM(with_decryption=True).get('github_api_token')
-    res = requests.get(url, headers={'Authorization': f'Bearer {api_token}'})
-    events = res.json()
 
-    while 'next' in res.links.keys():
-        res = requests.get(res.links['next']['url'])
-        events.extend(res.json())
+    client = boto3.client('ssm')
+    repos = client.get_parameters_by_path(
+        Path='/dev/dora/github/repos/',
+        Recursive = True
+    )
 
-    def retrieve_default_branch():
-        api_token_default_branch = SSM(with_decryption=True).get('github_api_token')
-        res_default_branch = requests.get(branch_url, headers={'Authorization': f'Bearer {api_token_default_branch}'})
+    def retrieve_events_from_repo(repo):
+        events = []
+        repo_name= repo['Name'].rsplit("/",1)[1]
+        api_token = SSM(with_decryption=True).get('github/apikey/'+repo_name)
+        res = requests.get(SSM(with_decryption=False).get('github/repos/'+repo_name), headers={'Authorization': f'Bearer {api_token}'})
+        if not events:
+            events = res.json()
+        else:
+            events.extend(res.json())
+
+        while 'next' in res.links.keys():
+            res = requests.get(res.links['next']['url'])
+            events.extend(res.json())
+            
+        return events
+
+    def retrieve_default_branch(repo):
+        print(repo)
+        api_token_default_branch = SSM(with_decryption=True).get('github/apikey/'+repo)
+        res_default_branch = requests.get(SSM(with_decryption=False).get('github/defaultBranch/'+repo), headers={'Authorization': f'Bearer {api_token_default_branch}'})
         event_default_branch = res_default_branch.json()
         return event_default_branch['default_branch']
-
-    default_branch = retrieve_default_branch()
 
     def to_timestamp(date):
         return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
 
-    def data_point(event):
+    def data_point(event, default_branch):
         if event['type'] != "PullRequestEvent" or event['payload']['pull_request']['merged_at'] is None or event['payload']['pull_request']['base']['ref'] != default_branch:
             return None
         return {
@@ -43,6 +55,13 @@ def ingest(event) -> Data:
             'base-ref': event['payload']['pull_request']['base']['ref'],
             'default_branch': default_branch
         }
+    
+    def add_data_points():
+        data = []
+        for repo in repos['Parameters']:
+            events = retrieve_events_from_repo(repo)
+            default_branch = retrieve_default_branch(repo['Name'].rsplit("/",1)[1])
+            data.extend(data_point(event, default_branch) for event in events if data_point(event, default_branch) is not None)
+        return data
 
-    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=[data_point(event) for event in events if
-                                                                               data_point(event) is not None])
+    return Data(metadata=Metadata(timestamp=datetime.now().timestamp()), data=add_data_points())

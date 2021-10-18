@@ -1,21 +1,18 @@
 /* Table to create a list of deployments per merged date. */
-CREATE TABLE dev_level_2_database.github_deployments
-WITH (
-  format='PARQUET'
-) AS
+CREATE OR REPLACE VIEW "github_deployments"
+AS 
 SELECT
 COUNT(distinct id) AS deployments,
-Date(from_unixtime(merged_at)) as Date
+Date(from_unixtime(merged_at)) as Date,
+partition_1
 FROM
 github_dora_repos
-group by Date(from_unixtime(merged_at));
+group by Date(from_unixtime(merged_at)), partition_1;
 
 
 /* Table to create a list of all deployments per merged date, with null values on all empty dates */
-CREATE TABLE dev_level_2_database.github_deployments_null_values
-WITH (
-  format='PARQUET'
-) AS
+CREATE OR REPLACE VIEW "github_deployments_with_null_values"
+AS 
 with all_dates as (
 SELECT
      CAST(date_column AS DATE) date_column
@@ -32,17 +29,20 @@ SELECT
 
 select
    date_column,
+   partition_1,
    sum(val) as deployments
 from
    (
       select
-         date_list as date_column,
+         date as date_column,
+         partition_1,
          deployments as val
       from
          github_deployments
    union
       select
          date_column,
+         null,
          0
       from
          all_dates
@@ -51,7 +51,8 @@ from
          date_column <= current_date
    )
 group by
-   date_column
+   date_column,
+   partition_1
 order by
    date_column
 
