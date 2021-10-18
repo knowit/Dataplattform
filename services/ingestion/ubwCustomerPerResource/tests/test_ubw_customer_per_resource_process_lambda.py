@@ -79,12 +79,12 @@ def test_process_data_test_used_hrs_zero(create_table_mock, setup_queue_event, t
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'weigth',
-        pd.Series([1, 1, 1, 1, 1]))
+        pd.Series([1, 2, 1, 2]))
 
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'customer',
-        pd.Series(['customer 2', 'customer 3']))
+        pd.Series(['customer 2','Entur AS', 'Entur AS', 'customer 3']))
 
 
 def test_process_data_test_dataframe_content(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
@@ -124,11 +124,11 @@ def test_process_per_project_data_content(create_table_mock, setup_queue_event, 
     create_table_mock.assert_table_data(
         'ubw_per_project_data',
         pd.DataFrame({
-            'customer': ['customer 2', 'Entur AS', 'customer 1', 'Entur AS', 'customer 3'],
-            'employees': [1, 1, 1, 1, 1],
-            'hours': np.array([6, 4, 1, 10, 6], dtype=np.float32),
-            'reg_period': ["202053", "202053", "202053", "202140", "202141"],
-            'timestamp': [1601294392, 1601294392, 1601294392, 1601294392, 1601294392]
+            'customer': ['customer 2', 'Entur AS', 'customer 1', 'customer 3'],
+            'employees': [1, 2, 1, 1],
+            'hours': np.array([6, 16, 4, 1], dtype=np.float32),
+            'reg_period': ["202053", "202053", "202053", "202053"],
+            'timestamp': [1601294392, 1601294392, 1601294392, 1601294392]
         }))
 
 
