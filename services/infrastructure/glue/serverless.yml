@@ -56,7 +56,7 @@ resources:
                           - /data/level-1*
 
     # Level 2
-    Leve2GlueDatabase:
+    Level2GlueDatabase:
       Type: AWS::Glue::Database
       Properties:
         CatalogId: !Ref AWS::AccountId
@@ -92,7 +92,7 @@ resources:
                           - /data/level-2*
 
     # Level 3
-    Leve3GlueDatabase:
+    Level3GlueDatabase:
       Type: AWS::Glue::Database
       Properties:
         CatalogId: !Ref AWS::AccountId
@@ -128,7 +128,7 @@ resources:
                           - /data/level-3*
 
     # Level 4
-    Leve4GlueDatabase:
+    Level4GlueDatabase:
       Type: AWS::Glue::Database
       Properties:
         CatalogId: !Ref AWS::AccountId
@@ -217,9 +217,9 @@ resources:
                     - kms:ListKeys
                     - kms:GenerateDataKey
                   Resource:
-                    - Fn::Join:
+                    Fn::Join:
                       - ""
-                      - - "arn:aws:kms:eu-central-1:876363704293:key/"
+                      - - !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/'
                         - !ImportValue ${self:custom.stage}-KMS-KeyID
 
   Outputs:
