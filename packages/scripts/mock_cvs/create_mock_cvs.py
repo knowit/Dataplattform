@@ -1,3 +1,7 @@
+"""
+This script generates fake CVs and POSTs them to CvPartner test-api.
+Only intended to run once.
+"""
 from faker import Faker
 import requests
 import boto3
