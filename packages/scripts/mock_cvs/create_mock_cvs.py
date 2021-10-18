@@ -126,7 +126,7 @@ def work_experience_payload(education_finished_year):
                 'month_from': '8',
                 'month_to': '8',
                 'year_from': str(current_year - years_of_work_experience),
-                'year_to': str(str(current_year - 2))
+                'year_to': str(current_year - 2)
             }
         })
 
