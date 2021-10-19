@@ -226,11 +226,33 @@ def test_process_per_project_data_content_reg_period_2(create_table_mock, setup_
         }))
 
 
-def test_process_only_appending_historical_data(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+def test_process_only_appending_historical_data_reg_period_1(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
             data=test_data['reg_period_1']))
+
+    handler(event, None)
+    handler(event, None)
+
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    expected_keys = [
+        'data/test/structured/ubw_customer_per_resource/_common_metadata',
+        'data/test/structured/ubw_customer_per_resource/_metadata',
+        'data/test/structured/ubw_customer_per_resource/part.0.parquet',
+        'data/test/structured/ubw_per_project_data/_common_metadata',
+        'data/test/structured/ubw_per_project_data/_metadata',
+        'data/test/structured/ubw_per_project_data/part.0.parquet',
+        'data/test/structured/ubw_per_project_data/part.1.parquet'
+    ]
+    assert len(expected_keys) == len(keys_in_s3)
+    assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+
+def test_process_only_appending_historical_data_reg_period_2(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=1601294392),
+            data=test_data['reg_period_2']))
 
     handler(event, None)
     handler(event, None)
