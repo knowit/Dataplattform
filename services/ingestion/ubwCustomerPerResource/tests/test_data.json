@@ -2,7 +2,7 @@
   "metadata": {
     "timestamp": 1601294392.604705
   },
-  "data": [
+  "reg_period_1": [
     {
       "_recno": "0",
       "_section": "D",
@@ -38,23 +38,6 @@
       "r0work_order": "12006"
     },
     {
-      "_recno": "0",
-      "_section": "D",
-      "tab": "B",
-      "reg_period": "202141",
-      "used_hrs": "6",
-      "f0_billable": "0",
-      "resource_id": "FREARN",
-      "xresource_id": "X1_name",
-      "r1project": "XX",
-      "xr1project":"External Projects",
-      "work_order": "work order no 5",
-      "xwork_order": "Drift, forvalting og support",
-      "xr0work_order": "Entur AS",
-      "unit": "H",
-      "r0work_order": "12009"
-    },
-    {
         "_recno": "0",
         "_section": "D",
         "tab": "B",
@@ -72,21 +55,43 @@
         "r0work_order": "12014"
     },
     {
-        "_recno": "0",
-        "_section": "D",
-        "tab": "B",
-        "reg_period": "202140",
-        "used_hrs": "10",
-        "f0_billable": "0",
-        "resource_id": "EINHAL",
-        "xresource_id": "X3_name",
-        "r1project": "XX",
-        "xr1project":"External Projects",
-        "work_order": "work order no 4",
-        "xwork_order": "Entur Test",
-        "xr0work_order": "Entur AS",
-        "unit": "H",
-        "r0work_order": "12016"
+
   }
+  ],
+  "reg_period_2": [
+    {
+      "_recno": "0",
+      "_section": "D",
+      "tab": "B",
+      "reg_period": "202140",
+      "used_hrs": "6",
+      "f0_billable": "0",
+      "resource_id": "FREARN",
+      "xresource_id": "X1_name",
+      "r1project": "XX",
+      "xr1project":"External Projects",
+      "work_order": "work order no 5",
+      "xwork_order": "Drift, forvalting og support",
+      "xr0work_order": "Entur AS",
+      "unit": "H",
+      "r0work_order": "12009"
+    },
+    {
+      "_recno": "0",
+      "_section": "D",
+      "tab": "B",
+      "reg_period": "202140",
+      "used_hrs": "10",
+      "f0_billable": "0",
+      "resource_id": "EINHAL",
+      "xresource_id": "X3_name",
+      "r1project": "XX",
+      "xr1project":"External Projects",
+      "work_order": "work order no 4",
+      "xwork_order": "Entur Test",
+      "xr0work_order": "Entur AS",
+      "unit": "H",
+      "r0work_order": "12016"
+    }
   ]
 }
