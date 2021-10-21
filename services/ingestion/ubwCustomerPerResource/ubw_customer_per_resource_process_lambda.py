@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import pandas as pd
 import numpy as np
+from pathlib import PurePosixPath
 
 handler = PersonDataProcessHandler(PersonIdentifierType.ALIAS)
 
@@ -81,21 +82,22 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     s3 = S3()
     if s3.fs.exists('structured/ubw_customer_per_resource/part.0.parquet'):
-        s3_path = os.path.join('s3://',
-                               os.environ.get('DATALAKE'),
-                               os.environ.get('ACCESS_PATH'),
-                               'structured/ubw_customer_per_resource')
-        old_frame = pd.read_parquet(s3_path)
+        s3_path = PurePosixPath(os.environ.get('DATALAKE'),
+                                os.environ.get('ACCESS_PATH'),
+                                'structured/ubw_customer_per_resource')
+        old_frame = pd.read_parquet(f's3://{s3_path}')
 
         cur_year, cur_week = datetime.now().isocalendar()[0:2]
         cur_weeks = cur_year * 52 + cur_week
+        num_weeks = int(os.environ.get('NUM_WEEKS'))
 
         def filter_by_week(row):
             weeks = int(row['reg_period'][0:4]) * 52 + int(row['reg_period'][4:])
-            return weeks > cur_weeks - 4
+            return weeks > cur_weeks - num_weeks
 
         old_frame = old_frame[old_frame.apply(filter_by_week, axis=1)]
         df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(subset=df.columns.difference(['time']))
+
 
     return {
         'ubw_customer_per_resource': df,
