@@ -6,13 +6,13 @@ sts_client = boto3.client('sts')
 
 def handler(event, context):
 
-    account_response = sts_client.get_caller_identity()['Account']
+    account_response = str(sts_client.get_caller_identity()['Account'])
 
     partitions_response = glue_client.get_partitions(DatabaseName='dev_level_4_database', TableName='github_dora_repos')
     partitions = sorted(partitions_response['Partitions'], key=lambda k: k['CreationTime'])
 
     response_groups = quicksight_client.list_groups(
-        AwsAccountId = str(account_response),
+        AwsAccountId = account_response,
         MaxResults = 100,
         Namespace = 'default'
     )
@@ -30,7 +30,7 @@ def handler(event, context):
                 quicksight_client.create_group(
                     GroupName = partition,
                     Description = 'Group for people working in the project', #fix
-                    AwsAccountId = str(account_response),
+                    AwsAccountId = account_response,
                     Namespace = 'default'
                 )
 
