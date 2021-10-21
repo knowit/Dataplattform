@@ -139,7 +139,18 @@ functions:
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
-
+    events:
+      - eventBridge:
+          pattern:
+            source:
+              - aws.glue
+            detail-type:
+              - Glue Crawler State Change
+            detail:
+              crawlerName:
+                - DoraCrawler
+              state:
+                - Succeeded
 
 resources:
   Resources:
