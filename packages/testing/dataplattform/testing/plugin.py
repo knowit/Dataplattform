@@ -34,7 +34,7 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('PUBLIC_PREFIX', 'public/images'),
         ('ACCESS_LEVEL', 'level-1'),
         ('PERSON_DATA_TABLE', 'my_test_person_data_table'),
-        ('AWS_XRAY_SDK_ENABLED', 'false')
+        ('NUM_WEEKS', '4')
     ]
     for key, value in default_env:
         if key not in environ:
@@ -300,5 +300,6 @@ def create_table_mock(mocker):
     on_to_parquet_stub.assert_table_data = assert_table_data
     on_to_parquet_stub.assert_table_data_column = assert_table_data_column
     on_to_parquet_stub.assert_table_data_contains_df = assert_table_data_contains_df
+    on_to_parquet_stub.df_from_calls = df_from_calls
 
     yield on_to_parquet_stub
