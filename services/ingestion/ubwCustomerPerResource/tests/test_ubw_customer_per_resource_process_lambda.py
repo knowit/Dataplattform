@@ -50,6 +50,8 @@ def setup_queue_event(s3_bucket):
 
 
 def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_data, test_data_old, dynamodb_resource, s3_bucket):
+    os.environ['NUM_WEEKS'] = '4'
+
     event_old_data = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
