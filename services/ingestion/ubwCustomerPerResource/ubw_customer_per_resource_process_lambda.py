@@ -89,7 +89,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
         cur_year, cur_week = datetime.now().isocalendar()[0:2]
         cur_weeks = cur_year * 52 + cur_week
-        num_weeks = int(os.environ.get('NUM_WEEKS'))
+        num_weeks = int(os.environ.get('NUM_WEEKS', '4'))
 
         def filter_by_week(row):
             weeks = int(row['reg_period'][0:4]) * 52 + int(row['reg_period'][4:])
