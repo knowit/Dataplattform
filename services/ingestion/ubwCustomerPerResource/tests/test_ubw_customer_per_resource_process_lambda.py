@@ -49,7 +49,7 @@ def setup_queue_event(s3_bucket):
     yield make_queue_event
 
 
-def test_process_data(create_table_mock, setup_queue_event, test_data, test_data_old, dynamodb_resource, s3_bucket):
+def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_data, test_data_old, dynamodb_resource, s3_bucket):
     event_old_data = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -66,7 +66,7 @@ def test_process_data(create_table_mock, setup_queue_event, test_data, test_data
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
-            data=test_data['data']))
+            data=test_data['reg_period_1']))
 
     handler(event, None)
 
@@ -88,11 +88,25 @@ def test_process_data(create_table_mock, setup_queue_event, test_data, test_data
         data[0])
 
 
-def test_process_data_test_weigth(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
-            data=test_data['data']))
+            data=test_data['reg_period_2']))
+
+    handler(event, None)
+
+    create_table_mock.assert_table_data_column(
+        'ubw_customer_per_resource',
+        'reg_period',
+        pd.Series(['202140', '202140']))
+
+
+def test_process_data_test_weigth_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=test_data['reg_period_1']))
 
     handler(event, None)
 
@@ -107,13 +121,32 @@ def test_process_data_test_weigth(create_table_mock, setup_queue_event, test_dat
         pd.Series(['customer 2', 'customer 1', 'customer 3']))
 
 
-def test_process_data_test_used_hrs_zero(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
-    test_data['data'][0]['used_hrs'] = 0
+def test_process_data_test_weigth_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=test_data['reg_period_2']))
+
+    handler(event, None)
+
+    create_table_mock.assert_table_data_column(
+        'ubw_customer_per_resource',
+        'weigth',
+        pd.Series([1, 1]))
+
+    create_table_mock.assert_table_data_column(
+        'ubw_customer_per_resource',
+        'customer',
+        pd.Series(['Entur AS', 'Entur AS']))
+
+
+def test_process_data_test_used_hrs_zero_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+    test_data['reg_period_1'][0]['used_hrs'] = 0
 
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
-            data=test_data['data']))
+            data=test_data['reg_period_1']))
 
     handler(event, None)
 
@@ -128,11 +161,32 @@ def test_process_data_test_used_hrs_zero(create_table_mock, setup_queue_event, t
         pd.Series(['customer 2', 'customer 3']))
 
 
-def test_process_data_test_dataframe_content(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_test_used_hrs_zero_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+    test_data['reg_period_1'][0]['used_hrs'] = 0
+
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
-            data=test_data['data']))
+            data=test_data['reg_period_2']))
+
+    handler(event, None)
+
+    create_table_mock.assert_table_data_column(
+        'ubw_customer_per_resource',
+        'weigth',
+        pd.Series([1, 1]))
+
+    create_table_mock.assert_table_data_column(
+        'ubw_customer_per_resource',
+        'customer',
+        pd.Series(['Entur AS', 'Entur AS']))
+
+
+def test_process_data_test_dataframe_content_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=test_data['reg_period_1']))
 
     handler(event, None)
 
@@ -149,15 +203,39 @@ def test_process_data_test_dataframe_content(create_table_mock, setup_queue_even
             'weigth': [1, 2, 1],
             'guid': ['b051b402346144a6cdcceb0027f6e80d29019f50',
                      'b051b402346144a6cdcceb0027f6e80d29019f50',
-                     '5d79f8b771cd4921b667f9227aece292213806d6'],
+                     '5d79f8b771cd4921b667f9227aece292213806d6', ],
         }))
 
 
-def test_process_per_project_data_content(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_test_dataframe_content_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=test_data['reg_period_2']))
+
+    handler(event, None)
+
+    create_table_mock.assert_table_data(
+        'ubw_customer_per_resource',
+        pd.DataFrame({
+            'reg_period': ['202140', '202140'],
+            'alias': ['frearn', 'einhal'],
+            'project_type': ['External Projects', 'External Projects'],
+            'work_order': ['work order no 5', 'work order no 4'],
+            'work_order_description': ['Drift, forvalting og support', 'Entur Test'],
+            'customer': ['Entur AS', 'Entur AS'],
+            'time': [0, 0],
+            'weigth': [1, 1],
+            'guid': ['b051b402346144a6cdcceb0027f6e80d29019f50',
+                     '5d79f8b771cd4921b667f9227aece292213806d6', ],
+        }))
+
+
+def test_process_per_project_data_content_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
-            data=test_data['data']))
+            data=test_data['reg_period_1']))
 
     handler(event, None)
     create_table_mock.assert_table_data(
@@ -167,15 +245,55 @@ def test_process_per_project_data_content(create_table_mock, setup_queue_event, 
             'employees': [1, 1, 1],
             'hours': np.array([6, 4, 1], dtype=np.float32),
             'reg_period': ["202053", "202053", "202053"],
-            'timestamp': [1601294392, 1601294392, 1601294392]
+            'timestamp': [1601294392, 1601294392, 1601294392, ]
         }))
 
 
-def test_process_only_appending_historical_data(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+def test_process_per_project_data_content_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
-            data=test_data['data']))
+            data=test_data['reg_period_2']))
+
+    handler(event, None)
+    create_table_mock.assert_table_data(
+        'ubw_per_project_data',
+        pd.DataFrame({
+            'customer': ['Entur AS'],
+            'employees': [2],
+            'hours': np.array([16], dtype=np.float32),
+            'reg_period': ["202140"],
+            'timestamp': [1601294392]
+        }))
+
+
+def test_process_only_appending_historical_data_reg_period_1(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=1601294392),
+            data=test_data['reg_period_1']))
+
+    handler(event, None)
+    handler(event, None)
+
+    keys_in_s3 = [x.key for x in s3_bucket.objects.all() if 'structured' in x.key]
+    expected_keys = [
+        'data/test/structured/ubw_customer_per_resource/_common_metadata',
+        'data/test/structured/ubw_customer_per_resource/_metadata',
+        'data/test/structured/ubw_customer_per_resource/part.0.parquet',
+        'data/test/structured/ubw_per_project_data/_common_metadata',
+        'data/test/structured/ubw_per_project_data/_metadata',
+        'data/test/structured/ubw_per_project_data/part.0.parquet',
+        'data/test/structured/ubw_per_project_data/part.1.parquet'
+    ]
+    assert len(expected_keys) == len(keys_in_s3)
+    assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+
+def test_process_only_appending_historical_data_reg_period_2(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=1601294392),
+            data=test_data['reg_period_2']))
 
     handler(event, None)
     handler(event, None)

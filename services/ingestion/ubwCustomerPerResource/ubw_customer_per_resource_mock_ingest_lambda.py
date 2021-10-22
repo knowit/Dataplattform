@@ -13,5 +13,5 @@ def mock(event) -> Data:
 
     return Data(
         metadata=Metadata(timestamp=datetime.now().timestamp()),
-        data=test_json['data']
+        data=test_json['reg_period_2']
     )
