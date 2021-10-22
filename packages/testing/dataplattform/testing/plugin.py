@@ -34,6 +34,7 @@ def pytest_load_initial_conftests(args, early_config, parser):
         ('PUBLIC_PREFIX', 'public/images'),
         ('ACCESS_LEVEL', 'level-1'),
         ('PERSON_DATA_TABLE', 'my_test_person_data_table'),
+        ('AWS_XRAY_SDK_ENABLED', 'false'),
         ('NUM_WEEKS', '4')
     ]
     for key, value in default_env:
