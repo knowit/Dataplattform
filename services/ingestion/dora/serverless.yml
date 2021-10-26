@@ -346,8 +346,43 @@ resources:
                   Action:
                     - 'quicksight:ListGroups'
                     - 'quicksight:CreateGroup'
+                    - 'quicksight:HeadObject'
                   Resource:
                     - "*"
+          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - kms:Encrypt
+                    - kms:Decrypt
+                    - kms:DescribeKey
+                    - kms:ListKeys
+                    - kms:GenerateDataKey 
+                  Resource:
+                    Fn::Join:
+                      - ""
+                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                        - !ImportValue ${self:custom.stage}-KMS-KeyID
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                    - s3:DeleteObjectVersion
+                    - s3:DeleteObject
+                  Resource:
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
+                    - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}*
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
