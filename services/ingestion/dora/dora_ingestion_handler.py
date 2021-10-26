@@ -56,7 +56,8 @@ def ingest(event) -> Data:
             'merged_at': to_timestamp(event['payload']['pull_request']['merged_at']),
             'created_at': to_timestamp(event['payload']['pull_request']['created_at']),
             'base-ref': event['payload']['pull_request']['base']['ref'],
-            'default_branch': default_branch
+            'default_branch': default_branch,
+            'source': 'github'
         }
 
     def add_data_points():
