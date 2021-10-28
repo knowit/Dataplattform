@@ -18,6 +18,7 @@ custom:
     processHandlerFile: dora_process_handler
     glueLambdaHandlerFile: dora_glue_lambda
     quicksightUsersHandlerFile: dora_quicksight_groups
+    addMemberHandlerFile: dora_add_member_lambda
     databaseName: level_4
     description: Fetch key metrics from github API
     scheduleRate: rate(1 day)
@@ -151,6 +152,17 @@ functions:
                 - DoraCrawler
               state:
                 - Succeeded
+  quicksight_add_member_lambda:
+    handler: ${self:custom.editable.addMemberHandlerFile}.handler
+    name: ${self:custom.stage}-${self:service}-quicksight-add_member-lambda
+    description: Adds new users in quicksight
+    role: !GetAtt QuicksightUserCreationRole.Arn
+    package:
+      include:
+        - '*.py'
+    environment:
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
 
 resources:
   Resources:
@@ -381,6 +393,51 @@ resources:
                   Resource:
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
+                    - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}*
+    QuicksightUserCreationRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-quicksight-usercreation-lambda-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'quicksight:ListGroups'
+                    - 'quicksight:CreateGroup'
+                    - 'quicksight:HeadObject'
+                    - 'quicksight:ListUsers'
+                    - 'quicksight:RegisterUser'
+                    - 'quicksight:CreateGroupMembership'
+                  Resource:
+                    - "*"
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                    - s3:DeleteObjectVersion
+                    - s3:DeleteObject
+                  Resource:
                     - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}*
     ProcessLambdaRole:
