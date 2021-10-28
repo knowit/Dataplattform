@@ -107,6 +107,13 @@ resources:
           Fn::GetAtt:
           - CloudTrailLogsRole
           - Arn
+        EventSelectors:
+          - DataResources:
+              - Type: "AWS::S3::Object"
+                Values:
+                  - !Sub 'arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/'
+            IncludeManagementEvents: True
+            ReadWriteType: All    
       DependsOn:
       - CloudTrailLogsPolicy
       - CloudTrailLogsRole
