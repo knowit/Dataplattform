@@ -97,7 +97,7 @@ def handler(event, context):
                 delete_membership(user, get_memberships(user))
                 delete_user(user)
 
-    create_quicksight_users()
+    #create_quicksight_users()
     return {
         'message': 'success!'
     }
