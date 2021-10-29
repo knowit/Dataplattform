@@ -19,6 +19,7 @@ custom:
     glueLambdaHandlerFile: dora_glue_lambda
     quicksightUsersHandlerFile: dora_quicksight_groups
     addMemberHandlerFile: dora_add_member_lambda
+    athenaStartupHandlerFile: dora_athena_setup
     databaseName: level_4
     description: Fetch key metrics from github API
     scheduleRate: rate(1 day)
@@ -157,6 +158,17 @@ functions:
     name: ${self:custom.stage}-${self:service}-quicksight-add_member-lambda
     description: Adds new users in quicksight
     role: !GetAtt QuicksightUserCreationRole.Arn
+    package:
+      include:
+        - '*.py'
+    environment:
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+  athena_setup_lambda:
+    handler: ${self:custom.editable.athenaStartupHandlerFile}.handler
+    name: ${self:custom.stage}-${self:service}-athena-setup-lambda
+    description: Initialized and runs queries in Athena
+    role: !GetAtt AthenaSetupRole.Arn
     package:
       include:
         - '*.py'
@@ -440,6 +452,79 @@ resources:
                   Resource:
                     - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}*
+    AthenaSetupRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self:custom.stage}-${self:service}-Athena-Setup-role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - lambda.amazonaws.com
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies:
+          - PolicyName: ${self:custom.stage}-Glue-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'glue:GetTable'
+                    - 'glue:GetDatabase'
+                  Resource:
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
+                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - kms:Encrypt
+                    - kms:Decrypt
+                    - kms:DescribeKey
+                    - kms:ListKeys
+                    - kms:GenerateDataKey 
+                  Resource:
+                    Fn::Join:
+                      - ""
+                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                        - !ImportValue ${self:custom.stage}-KMS-KeyID 
+          - PolicyName: ${self:custom.stage}-Athena-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - 'athena:StartQueryExecution'
+                    - 'athena:GetQueryExecution'
+                    - 'athena:GetQueryResults'
+                    - 'athena:ListNamedQueries'
+                    - 'athena:GetNamedQuery'
+                    - 'athena:CreateNamedQuery'
+                  Resource:
+                    !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/DoraWorkgroups'
+          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - s3:PutObject
+                    - s3:ListObjects*
+                    - s3:GetObject
+                    - s3:CopyObject
+                    - s3:DeleteObjects
+                    - s3:DeleteObjectVersion
+                    - s3:DeleteObject
+                  Resource:
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
