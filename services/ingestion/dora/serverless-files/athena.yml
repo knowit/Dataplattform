@@ -144,8 +144,6 @@ Resources:
                         from aggregate_table group by partition_1
                     )
                     Select partition_1, frequency from fixed_table join frequency on fixed_table.DeploymentFrequency = frequency.id
-
-
   AthenaFrequencyTable:
     Type: AWS::Athena::NamedQuery
     Properties:
