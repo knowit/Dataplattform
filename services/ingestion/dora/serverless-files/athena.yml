@@ -15,6 +15,151 @@ Resources:
                 - ""
                 - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
                   - !ImportValue ${self:custom.stage}-KMS-KeyID
+  AthenaGithubDeployments:
+    Type: AWS::Athena::NamedQuery
+    Properties:
+      Database: "dev_level_4_database"
+      Description: "A query that gets all distinct deployments and groups them by repo and date"
+      Name: "GithubDeployments"
+      WorkGroup: !Ref DoraWorkgroup
+      QueryString: >
+                    CREATE OR REPLACE VIEW "github_deployments"
+                    AS 
+                    SELECT
+                    COUNT(distinct id) AS deployments,
+                    Date(from_unixtime(merged_at)) as Date,
+                    partition_1
+                    FROM
+                    github_dora_repos
+                    group by Date(from_unixtime(merged_at)), partition_1;
+  AthenaGithubDeploymentsWithNullValues:
+    Type: AWS::Athena::NamedQuery
+    Properties:
+      Database: "dev_level_4_database"
+      Description: "A query that adds zero deployments to all dates within the last 3 months with missing values"
+      Name: "GithubDeploymentsWithNullValues"
+      WorkGroup: !Ref DoraWorkgroup
+      QueryString: >
+                    CREATE OR REPLACE VIEW "github_deployments_with_null_values"
+                    AS 
+                    WITH all_dates AS (
+                      SELECT CAST(date_column AS date) date_column
+                      FROM
+                        ((
+                    VALUES 
+                            "sequence"("date"("date_add"('month', -3, current_date)), "date"(current_date), INTERVAL  '1' DAY)
+                      )  t1 (date_array)
+                      CROSS JOIN UNNEST(date_array) t2 (date_column))
+                    ),
+                    all_partitions AS (
+                        SELECT distinct(partition_1) from github_deployments
+                    ),
+                    cross_product AS(
+                        SELECT * from all_partitions cross join all_dates
+                    )
+                    SELECT
+                      date_column, 
+                      partition_1, 
+                      "sum"(val) deployments
+                    FROM
+                      (
+                      SELECT
+                        date date_column
+                      , partition_1
+                      , deployments val
+                      FROM
+                        github_deployments
+                    UNION
+                    SELECT
+                        date_column
+                      , partition_1
+                      , 0
+                      FROM
+                        cross_product
+                      WHERE ((date_column >= "date_add"('month', -3, current_date)) AND (date_column <= current_date))
+                    ) 
+                    GROUP BY date_column, partition_1
+                    ORDER BY date_column ASC
+  AthenaDeploymentFrequency:
+    Type: AWS::Athena::NamedQuery
+    Properties:
+      Database: "dev_level_4_database"
+      Description: "A query that calculates the deployment frequence for each repo"
+      Name: "DeploymentFrequency"
+      WorkGroup: !Ref DoraWorkgroup
+      QueryString: >
+                    CREATE OR REPLACE VIEW "DeploymentFrequency"
+                    AS with daily_values as(
+                    SELECT
+                      date_column,
+                      COUNT(CASE WHEN deployments >0 then 1 end) as deployments,
+                      partition_1
+                    from github_deployments_with_null_values 
+                    group by date_column, partition_1
+                    ),
+                    daily_aggregate_values as(
+                    SELECT 
+                      WEEK(date_column) as week,
+                      COUNT(CASE WHEN deployments >0 then 1 end) as daily_deployments,
+                      partition_1
+                      from daily_values
+                      group by WEEK(date_column), partition_1
+                    ),
+                    monthly_values as(
+                    select 
+                      MONTH(date_column) AS MONTH,
+                      COUNT(CASE WHEN deployments >0 then 1 end) as monthly_deployments,
+                      partition_1
+                    from github_deployments_with_null_values 
+                    GROUP by MONTH(date_column), partition_1
+                    ),
+                    weekly_table as(
+                    Select 
+                    partition_1,
+                    CASE
+                      when approx_percentile(daily_deployments,0.5) >= 3 then 1
+                      when approx_percentile(daily_deployments,0.5) >= 1 then 2
+                      end as DeploymentFrequency
+                    from daily_aggregate_values
+                    group by partition_1
+                    ),
+                    monthly_table as(
+                    Select 
+                    partition_1,
+                    CASE
+                      when approx_percentile(monthly_deployments,0.5) >= 1 then 3
+                      else 4
+                      end as DeploymentFrequency
+                    from monthly_values
+                    where partition_1 is not null
+                    Group by partition_1
+                    ),
+                    aggregate_table as(
+                      SELECT * from monthly_table union select * from weekly_table
+                    ),
+                    fixed_table as (
+                        Select 
+                        partition_1, 
+                        min(DeploymentFrequency) as DeploymentFrequency
+                        from aggregate_table group by partition_1
+                    )
+                    Select partition_1, frequency from fixed_table join frequency on fixed_table.DeploymentFrequency = frequency.id
+
+
+  AthenaFrequencyTable:
+    Type: AWS::Athena::NamedQuery
+    Properties:
+      Database: "dev_level_4_database"
+      Description: "Creates a reference table used in DeploymentFrequency calculation "
+      Name: "Frequency"
+      WorkGroup: !Ref DoraWorkgroup
+      QueryString: >
+                    CREATE EXTERNAL TABLE IF NOT EXISTS frequency(
+                    id int, frequency string)
+                    ROW FORMAT DELIMITED
+                    FIELDS TERMINATED BY ','
+                    STORED AS TEXTFILE
+                    LOCATION 's3://dev-datalake-bucket-*/tablefrequency/
   AthenaSetupRole:
       Type: AWS::IAM::Role
       Properties:
