@@ -7,8 +7,8 @@ storage_bucket = "s3://dev-kmsbucket-876363704293/Athena-logs/"
 database = 'dev_level_4_database'
 workgroup = 'DoraWorkgroups'
 
-def handler(event, context):
 
+def handler(event, context):
     def create_query(name, query):
         response = athena_client.create_named_query(
             Name=name,
@@ -27,18 +27,18 @@ def handler(event, context):
 
     def run_query(query):
         athena_client.start_query_execution(
-            QueryString = query,
-            QueryExecutionContext = {
+            QueryString=query,
+            QueryExecutionContext={
                 'Database': database
             },
-            ResultConfiguration = {
-                'OutputLocation' : storage_bucket,
-                'EncryptionConfiguration' : {
-                    'EncryptionOption' : 'SSE_KMS',
-                    'KmsKey' : get_KMS_arn('alias/KMSBucketKey')
+            ResultConfiguration={
+                'OutputLocation': storage_bucket,
+                'EncryptionConfiguration': {
+                    'EncryptionOption': 'SSE_KMS',
+                    'KmsKey': get_KMS_arn('alias/KMSBucketKey')
                 }
             },
-            WorkGroup = workgroup
+            WorkGroup=workgroup
         )
 
     def list_all_queries():
@@ -54,18 +54,18 @@ def handler(event, context):
             list_of_named_queries.append(named_query['NamedQuery']['Name'])
         return list_of_named_queries
 
-
     def create_queries():
         saved_queries = list_all_queries()
         new_queries = queries
         for key, query in new_queries.items():
-            if(key not in saved_queries):
+            if (key not in saved_queries):
                 create_query(key, query)
                 run_query(query)
             else:
                 run_query(query)
 
     create_queries()
+
 
 query1 = '''CREATE OR REPLACE VIEW "github_deployments"
 AS 
@@ -183,8 +183,8 @@ STORED AS TEXTFILE
 LOCATION 's3://dev-datalake-bucket-*/tablefrequency/'"""
 
 queries = {
-    'github_deployments':query1, 
-    'github_deployments_with_null_values':query2, 
-    'DeploymentFrequency':query3, 
-    'frequency':query4
-    }
+    'github_deployments': query1,
+    'github_deployments_with_null_values': query2,
+    'DeploymentFrequency': query3,
+    'frequency': query4
+}

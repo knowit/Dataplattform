@@ -14,11 +14,10 @@ namespace = 'default'
 
 
 def handler(event, context):
-
     def list_users():
         users = quicksight_client.list_users(
-            AwsAccountId = account_response,
-            Namespace = 'default'
+            AwsAccountId=account_response,
+            Namespace='default'
         )
         list_of_users = []
         for user in users['UserList']:
@@ -27,20 +26,20 @@ def handler(event, context):
 
     def add_membership(name, group):
         quicksight_client.create_group_membership(
-            MemberName = name,
-            GroupName = group,
-            AwsAccountId = account_response,
-            Namespace = 'default'
+            MemberName=name,
+            GroupName=group,
+            AwsAccountId=account_response,
+            Namespace='default'
         )
 
     def add_user(name, email):
         quicksight_client.register_user(
-            IdentityType = 'QUICKSIGHT',
-            Email = email,
-            UserRole = 'READER',
-            AwsAccountId = account_response,
-            Namespace = namespace,
-            UserName = name,
+            IdentityType='QUICKSIGHT',
+            Email=email,
+            UserRole='READER',
+            AwsAccountId=account_response,
+            Namespace=namespace,
+            UserName=name,
         )
 
     def get_members(filename, bucketname):
@@ -59,24 +58,24 @@ def handler(event, context):
     def delete_membership(member, groups):
         for group in groups:
             quicksight_client.delete_group_membership(
-                MemberName = member,
-                GroupName = group,
-                AwsAccountId = account_response,
-                Namespace = namespace
+                MemberName=member,
+                GroupName=group,
+                AwsAccountId=account_response,
+                Namespace=namespace
             )
-    
+
     def delete_user(user):
         quicksight_client.delete_user(
-            UserName = user,
-            AwsAccountId = account_response,
-            Namespace = namespace
+            UserName=user,
+            AwsAccountId=account_response,
+            Namespace=namespace
         )
 
     def get_memberships(user):
         membership = quicksight_client.list_user_groups(
-            UserName = user,
-            AwsAccountId = account_response,
-            Namespace = namespace
+            UserName=user,
+            AwsAccountId=account_response,
+            Namespace=namespace
         )
         list_of_memberships = [item['GroupName'] for item in membership['GroupList']]
         return list_of_memberships
@@ -85,19 +84,19 @@ def handler(event, context):
         members = get_members(csv, bucket)
         users = list_users()
         for member in members:
-            if(member[0] not in users):
+            if (member[0] not in users):
                 try:
-                    add_user(member[0],member[1])
+                    add_user(member[0], member[1])
                 except:
                     continue
-                add_membership(member[1],member[2])
+                add_membership(member[1], member[2])
         member_names = [item[0] for item in members]
         for user in users:
             if user not in member_names:
                 delete_membership(user, get_memberships(user))
                 delete_user(user)
 
-    #create_quicksight_users()
+    # create_quicksight_users()
     return {
         'message': 'success!'
     }

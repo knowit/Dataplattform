@@ -12,17 +12,17 @@ bucket = s3.Bucket('dev-datalake-bucket-876363704293')
 
 key = 'quicksight-rolebindings.csv'
 
-def handler(event, context):
 
+def handler(event, context):
     account_response = str(sts_client.get_caller_identity()['Account'])
 
     partitions_response = glue_client.get_partitions(DatabaseName='dev_level_4_database', TableName='github_dora_repos')
     partitions = sorted(partitions_response['Partitions'], key=lambda k: k['CreationTime'])
 
     response_groups = quicksight_client.list_groups(
-        AwsAccountId = account_response,
-        MaxResults = 100,
-        Namespace = 'default'
+        AwsAccountId=account_response,
+        MaxResults=100,
+        Namespace='default'
     )
 
     def get_existing_groups(groups):
@@ -34,7 +34,7 @@ def handler(event, context):
     def get_group_names(response, existing_groups):
         list_of_groups = []
         for group in response:
-            if(group not in existing_groups):
+            if (group not in existing_groups):
                 list_of_groups.append(group)
         return list_of_groups
 
@@ -47,10 +47,10 @@ def handler(event, context):
     def create_groups(partitions):
         for partition in partitions:
             quicksight_client.create_group(
-                GroupName = partition,
-                Description = 'Group for people working in the project', #fix
-                AwsAccountId = account_response,
-                Namespace = 'default'
+                GroupName=partition,
+                Description='Group for people working in the project',  # fix
+                AwsAccountId=account_response,
+                Namespace='default'
             )
 
     def download_csv_to_temp(filename, bucketname):
@@ -68,7 +68,7 @@ def handler(event, context):
 
     def write_to_csv(dataframes, filename):
         df = pd.concat(dataframes)
-        df.to_csv('/tmp/' + filename + '.csv', mode = 'a', index = False, header = True)
+        df.to_csv('/tmp/' + filename + '.csv', mode='a', index=False, header=True)
 
     def add_to_dataframe(group):
         df = pd.DataFrame({
@@ -86,7 +86,7 @@ def handler(event, context):
         for group in existing_group:
             if group not in existing_rolebindings:
                 list_of_df.append(add_to_dataframe(group))
-        
+
         write_to_csv(list_of_df, filename)
 
         bucket.upload_file('/tmp/' + filename + '.csv', key)
