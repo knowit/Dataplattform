@@ -10,7 +10,28 @@ Resources:
       Type: ATHENA
       DataSourceId: DoraWorkGroupid5
       Permissions:
-        - Principal: '' #empty 
+        - Principal: $(ssm(/dev/dora/quicksight_principal))
+          Actions:
+            - quicksight:UpdateDataSourcePermissions
+            - quicksight:DescribeDataSource
+            - quicksight:DescribeDataSourcePermissions
+            - quicksight:PassDataSource
+            - quicksight:UpdateDataSource
+            - quicksight:DeleteDataSource
+  S3DataSource:
+    Type: AWS::QuickSight::DataSource
+    Properties:
+      DataSourceParameters: 
+        S3Parameters:
+          ManifestFileLocation:
+            Bucket: ${self:custom.stage}-datalake-bucket-${AWS::AccountId} #Update to accurate location
+            Key: /manifest.json #Update to accurate location
+      AwsAccountId: !Sub ${AWS::AccountId}
+      Name: DoraWorkGroup-s3Source
+      Type: S3
+      DataSourceId: S3Source
+      Permissions:
+        - Principal: $(ssm(/dev/dora/quicksight_principal))
           Actions:
             - quicksight:UpdateDataSourcePermissions
             - quicksight:DescribeDataSource
