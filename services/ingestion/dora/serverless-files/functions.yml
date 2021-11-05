@@ -1,0 +1,127 @@
+ingest:
+    handler: ${self:custom.editable.handlerFile}.handler
+    name: ${self:custom.stage}-${self:service}-ingest
+    description: ${self:custom.editable.description}
+    role: !GetAtt IngestLambdaRole.Arn
+    package:
+      include:
+        - '*.py'
+    environment:
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+      ACCESS_PATH: ${self:custom.accessPath}
+      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+      SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+    tags:
+    events:
+      - schedule:
+          name: ${self:custom.stage}-${self:service}-timer
+          description: ${self:custom.editable.description}
+          rate: ${self:custom.editable.scheduleRate}
+          enabled: true
+process:
+  handler: ${self:custom.editable.processHandlerFile}.handler
+  events:
+    - sqs:
+        arn:
+          Fn::GetAtt:
+            - EventQueue
+            - Arn
+        batchSize: 1
+  name: ${self:custom.stage}-${self:service}-process
+  description: ${self:custom.editable.description}
+  role: !GetAtt ProcessLambdaRole.Arn
+  package:
+    include:
+      - '*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+    DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+    ACCESS_PATH: ${self:custom.accessPath}
+    DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+    DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
+    ACCESS_LEVEL: ${self:custom.editable.accessLevel}
+    PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
+  tags:
+glue_lambda:
+  handler: ${self:custom.editable.glueLambdaHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-glue-lambda
+  description: Trigger on crawler job finish
+  role: !GetAtt GlueLambdaRole.Arn
+  package:
+    include:
+      - '*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+  events:
+    - eventBridge:
+        pattern:
+          source:
+            - aws.glue
+          detail-type:
+            - Glue Crawler State Change
+          detail:
+            crawlerName:
+              - DoraCrawler
+            state:
+              - Succeeded
+quicksight_usergroup_lambda:
+  handler: ${self:custom.editable.quicksightUsersHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-quicksight-usergroup-lambda
+  description: Adds new user groups in quicksight for new repos
+  role: !GetAtt QuicksightUserGroupRole.Arn
+  package:
+    include:
+      - '*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+  events:
+    - eventBridge:
+        pattern:
+          source:
+            - aws.glue
+          detail-type:
+            - Glue Crawler State Change
+          detail:
+            crawlerName:
+              - DoraCrawler
+            state:
+              - Succeeded
+quicksight_add_member_lambda:
+  handler: ${self:custom.editable.addMemberHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-quicksight-add_member-lambda
+  description: Adds new users in quicksight
+  role: !GetAtt QuicksightUserCreationRole.Arn
+  package:
+    include:
+      - '*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+athena_setup_lambda:
+  handler: ${self:custom.editable.athenaStartupHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-athena-setup-lambda
+  description: Initialized and runs queries in Athena
+  role: !GetAtt AthenaSetupRole.Arn
+  package:
+    include:
+      - '*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+quicksight_setup:
+  handler: ${self:custom.editable.quicksightStartupHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-quicksight-setup-lambda
+  description: Sets up quicksight resources
+  role: !GetAtt QuicksightSetupRole.Arn
+  package:
+    include:
+      - '*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
