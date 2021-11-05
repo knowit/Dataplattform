@@ -1,0 +1,20 @@
+Resources:
+  DataSources:
+    Type: AWS::QuickSight::DataSource
+    Properties:
+      DataSourceParameters: 
+        AthenaParameters:
+          WorkGroup: DoraWorkgroups
+      AwsAccountId: !Sub ${AWS::AccountId}
+      Name: DoraWorkGroup-sources7
+      Type: ATHENA
+      DataSourceId: DoraWorkGroupid5
+      Permissions:
+        - Principal: '' #empty 
+          Actions:
+            - quicksight:UpdateDataSourcePermissions
+            - quicksight:DescribeDataSource
+            - quicksight:DescribeDataSourcePermissions
+            - quicksight:PassDataSource
+            - quicksight:UpdateDataSource
+            - quicksight:DeleteDataSource

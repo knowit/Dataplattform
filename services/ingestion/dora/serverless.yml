@@ -69,6 +69,7 @@ resources:
   - ${file(serverless-files/sqs.yml)}
   - ${file(serverless-files/glue.yml)}
   - ${file(serverless-files/cloudwatch.yml)}
+  - ${file(serverless-files/quicksight.yml)}
 
 plugins:
   - serverless-python-requirements
