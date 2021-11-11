@@ -87,15 +87,12 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                                 'structured/ubw_customer_per_resource')
         old_frame = pd.read_parquet(f's3://{s3_path}')
 
-        cur_year, cur_week = datetime.now().isocalendar()[0:2]
-        cur_weeks = cur_year * 52 + cur_week
         num_weeks = int(os.environ.get('NUM_WEEKS', '4'))
 
-        def filter_by_week(row):
-            weeks = int(row['reg_period'][0:4]) * 52 + int(row['reg_period'][4:])
-            return weeks > cur_weeks - num_weeks
+        reg_periods = old_frame['reg_period'].drop_duplicates().sort_values(ascending=False)
+        reg_periods = reg_periods.head(num_weeks)
 
-        old_frame = old_frame[old_frame.apply(filter_by_week, axis=1)]
+        old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
         df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(subset=df.columns.difference(['time']))
 
 

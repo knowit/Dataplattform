@@ -26,7 +26,9 @@ def test_data_old():
         json = load(json_file)
         cur_year, cur_week = datetime.now().isocalendar()[0:2]
         for i in range(len(json['data'])):  # Update reg_period to simulate recent data
-            json['data'][i]['reg_period'] = str(cur_year) + str(cur_week - i)
+            year = cur_year - 1 if cur_week - i <= 0 else cur_year
+            week = 52 if cur_week - i <= 0 else cur_week
+            json['data'][i]['reg_period'] = str(year) + str(week - i)
         yield json
 
 
