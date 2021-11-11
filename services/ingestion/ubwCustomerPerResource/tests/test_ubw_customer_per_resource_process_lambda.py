@@ -1,17 +1,35 @@
+import os
+from pathlib import PurePosixPath
 from pytest import fixture
 from ubw_customer_per_resource_process_lambda import handler
 import pandas as pd
 import numpy as np
+import fastparquet as fp
+import s3fs
 from os import path
 import numpy as np
 from json import load
 from dataplattform.common import schema
+from datetime import datetime
+from dataplattform.common.aws import S3
 
 
 @fixture
 def test_data():
     with open(path.join(path.dirname(__file__), 'test_data.json'), 'r') as json_file:
         yield load(json_file)
+
+
+@fixture
+def test_data_old():
+    with open(path.join(path.dirname(__file__), 'test_old_data.json'), 'r') as json_file:
+        json = load(json_file)
+        cur_year, cur_week = datetime.now().isocalendar()[0:2]
+        for i in range(len(json['data'])):  # Update reg_period to simulate recent data
+            year = cur_year - 1 if cur_week - i <= 0 else cur_year
+            week = 52 if cur_week - i <= 0 else cur_week
+            json['data'][i]['reg_period'] = str(year) + str(week - i)
+        yield json
 
 
 @fixture
@@ -33,7 +51,22 @@ def setup_queue_event(s3_bucket):
     yield make_queue_event
 
 
-def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_data, test_data_old, dynamodb_resource, s3_bucket):
+    os.environ['NUM_WEEKS'] = '4'
+
+    event_old_data = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=test_data_old['data']))
+
+    handler(event_old_data, None)
+
+    df = create_table_mock.df_from_calls('structured/ubw_customer_per_resource')
+    s3_path = PurePosixPath(os.environ.get('DATALAKE'),
+                            os.environ.get('ACCESS_PATH'),
+                            'structured/ubw_customer_per_resource')
+    fp.write(str(s3_path), df, file_scheme='hive', open_with=s3fs.S3FileSystem().open)
+
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -41,10 +74,22 @@ def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_da
 
     handler(event, None)
 
+    cur_year, cur_week = datetime.now().isocalendar()[0:2]
+    new_data = pd.Series(['202053',
+                          '202053',
+                          '202053',
+                          str(cur_year) + str(cur_week - 1),
+                          str(cur_year) + str(cur_week),
+                          str(cur_year) + str(cur_week - 2),
+                          str(cur_year) + str(cur_week - 3)])
+
+    # Merge frames here since mocked data table does not overwrite old data
+    data = pd.concat([df['reg_period'], new_data]).reset_index()
+
     create_table_mock.assert_table_data_column(
         'ubw_customer_per_resource',
         'reg_period',
-        pd.Series(['202053', '202053', '202053']))
+        data[0])
 
 
 def test_process_data_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):

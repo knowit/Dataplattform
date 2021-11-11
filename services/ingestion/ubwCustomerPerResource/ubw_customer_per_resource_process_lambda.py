@@ -1,8 +1,12 @@
+from dataplattform.common.aws import S3
 from dataplattform.common.handlers.process import PersonDataProcessHandler
 from dataplattform.common.repositories.person_repository import PersonIdentifierType
 from typing import Dict
+from datetime import datetime
+import os
 import pandas as pd
 import numpy as np
+from pathlib import PurePosixPath
 
 handler = PersonDataProcessHandler(PersonIdentifierType.ALIAS)
 
@@ -75,6 +79,22 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     per_project_data = get_per_project_data(df)
     df.pop('used_hrs')
+
+    s3 = S3()
+    if s3.fs.exists('structured/ubw_customer_per_resource/part.0.parquet'):
+        s3_path = PurePosixPath(os.environ.get('DATALAKE'),
+                                os.environ.get('ACCESS_PATH'),
+                                'structured/ubw_customer_per_resource')
+        old_frame = pd.read_parquet(f's3://{s3_path}')
+
+        num_weeks = int(os.environ.get('NUM_WEEKS', '4'))
+
+        reg_periods = old_frame['reg_period'].drop_duplicates().sort_values(ascending=False)
+        reg_periods = reg_periods.head(num_weeks)
+
+        old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
+        df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(subset=df.columns.difference(['time']))
+
 
     return {
         'ubw_customer_per_resource': df,
