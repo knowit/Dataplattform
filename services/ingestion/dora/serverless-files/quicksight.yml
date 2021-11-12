@@ -6,11 +6,11 @@ Resources:
         AthenaParameters:
           WorkGroup: DoraWorkgroups
       AwsAccountId: !Sub ${AWS::AccountId}
-      Name: DoraWorkGroup-sources7
+      Name: DoraWorkGroup-sources
       Type: ATHENA
-      DataSourceId: DoraWorkGroupid5
+      DataSourceId: DoraWorkGroupid
       Permissions:
-        - Principal: $(ssm(/dev/dora/quicksight_principal))
+        - Principal: ${ssm:/dev/dora/quicksight_principal}
           Actions:
             - quicksight:UpdateDataSourcePermissions
             - quicksight:DescribeDataSource
@@ -21,17 +21,17 @@ Resources:
   S3DataSource:
     Type: AWS::QuickSight::DataSource
     Properties:
+      AwsAccountId: !Sub ${AWS::AccountId}
+      Name: DoraWorkGroup-S3DataSource
+      Type: S3
+      DataSourceId: S3Source
       DataSourceParameters: 
         S3Parameters:
           ManifestFileLocation:
-            Bucket: ${self:custom.stage}-datalake-bucket-${AWS::AccountId} #Update to accurate location
-            Key: /manifest.json #Update to accurate location
-      AwsAccountId: !Sub ${AWS::AccountId}
-      Name: DoraWorkGroup-s3Source
-      Type: S3
-      DataSourceId: S3Source
+            Bucket: dev-datalake-bucket-876363704293 #Update to accurate location
+            Key: data/Manifest-S3.json #Update to accurate location
       Permissions:
-        - Principal: $(ssm(/dev/dora/quicksight_principal))
+        - Principal: ${ssm:/dev/dora/quicksight_principal}
           Actions:
             - quicksight:UpdateDataSourcePermissions
             - quicksight:DescribeDataSource
@@ -39,3 +39,37 @@ Resources:
             - quicksight:PassDataSource
             - quicksight:UpdateDataSource
             - quicksight:DeleteDataSource
+  Rolebindings:
+    Type: AWS::QuickSight::DataSet
+    Properties:
+      AwsAccountId: !Sub ${AWS::AccountId}
+      DataSetId: Rolebinding-test
+      Name: Rolebinding-test
+      ImportMode: SPICE
+      PhysicalTableMap:
+        s3PhysicalTable:
+          S3Source:
+            DataSourceArn: !Sub arn:aws:quicksight:${AWS::Region}:${AWS::AccountId}:datasource/S3Source
+            InputColumns: 
+              - Name: partition_1
+                Type: STRING
+              - Name: UserName
+                Type: STRING
+            UploadSettings:
+              Format: CSV
+              StartFromRow: 1
+              ContainsHeader: True
+              Delimiter: ','
+      Permissions:
+        - Principal: ${ssm:/dev/dora/quicksight_principal}
+          Actions:
+            - quicksight:UpdateDataSetPermissions
+            - quicksight:DescribeDataSet
+            - quicksight:DescribeDataSetPermissions
+            - quicksight:PassDataSet
+            - quicksight:DescribeIngestion
+            - quicksight:ListIngestions
+            - quicksight:UpdateDataSet
+            - quicksight:DeleteDataSet
+            - quicksight:CreateIngestion
+            - quicksight:CancelIngestion
