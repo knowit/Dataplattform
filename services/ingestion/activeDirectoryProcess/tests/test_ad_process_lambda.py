@@ -1,5 +1,5 @@
 from pytest import fixture
-from ad_process_lambda import handler
+from activedirectoryprocess.ad_process_lambda import handler
 import pandas as pd
 from io import BytesIO
 from dataplattform.common import schema
