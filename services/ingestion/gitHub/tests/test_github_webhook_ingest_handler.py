@@ -1,4 +1,4 @@
-from github_webhook_ingest_handler import handler
+from github.github_webhook_ingest_handler import handler
 from dataplattform.testing.events import APIGateway
 from json import loads
 from hmac import new

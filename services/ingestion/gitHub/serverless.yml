@@ -16,6 +16,7 @@ custom:
   editable:
     scheduleRate: rate(7 days)
     timeout: 15
+    srcDir: lib/github
     webhookIngestHandlerFile: github_webhook_ingest_handler
     pollerIngestHandlerFile: github_poller_ingest_handler
     processHandlerFile: github_process_handler
@@ -76,13 +77,13 @@ package:
 
 functions:
   pollerIngest:
-    handler: ${self:custom.editable.pollerIngestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.pollerIngestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-poller-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt PollerIngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -100,13 +101,13 @@ functions:
           enabled: true
 
   webhookIngest:
-    handler: ${self:custom.editable.webhookIngestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.webhookIngestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-webhook-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt WebhookIngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -121,7 +122,7 @@ functions:
           method: post
           private: false # if true API key is needed
   process:
-    handler: ${self:custom.editable.processHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events:
       - sqs:
           arn:
@@ -134,7 +135,7 @@ functions:
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
