@@ -14,7 +14,8 @@ def main():
         'database',
         'deploy',
         'configure',
-        'prepare-sandbox'
+        'prepare-sandbox',
+        'test'
     ]
 
     parser = ArgumentParser('dataplattform')
