@@ -50,14 +50,9 @@ jobs:
       
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
+    - name: Test with pytest/tox
       working-directory: './services/utils/downloadToBucket'
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-test.txt
-    - name: Test with pytest
-      working-directory: './services/utils/downloadToBucket'
-      run: |
-        pip install pytest
-        pytest 
+        python -m pip install tox
+        tox
