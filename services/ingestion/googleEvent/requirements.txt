@@ -1,2 +1,2 @@
 file:../../../packages/common
-google-api-python-client
+google-api-python-client==2.30.0
