@@ -1,4 +1,4 @@
-from knowit_labs_process_lambda import handler
+from knowitlabs.knowit_labs_process_lambda import handler
 from dataplattform.common import schema
 from responses import RequestsMock
 from pytest import fixture
