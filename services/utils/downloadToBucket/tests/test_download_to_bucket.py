@@ -1,5 +1,5 @@
 from dataplattform.testing.utilities import FakeResponse, FakePngResponse
-from download_to_bucket import handler
+from downloadtobucket.download_to_bucket import handler
 from pytest import fixture
 from os import path
 from json import load
