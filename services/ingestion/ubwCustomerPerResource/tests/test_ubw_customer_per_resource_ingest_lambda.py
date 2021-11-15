@@ -1,4 +1,4 @@
-from ubw_customer_per_resource_ingest_lambda import handler
+from ubwcustomerperresource.ubw_customer_per_resource_ingest_lambda import handler
 from pytest import fixture
 from json import loads
 
