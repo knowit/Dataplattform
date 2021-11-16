@@ -7,7 +7,6 @@ import os
 import pandas as pd
 import numpy as np
 from pathlib import PurePosixPath
-import s3fs
 
 handler = PersonDataProcessHandler(PersonIdentifierType.ALIAS)
 
