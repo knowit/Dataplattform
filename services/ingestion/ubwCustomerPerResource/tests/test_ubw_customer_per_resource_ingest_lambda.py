@@ -59,7 +59,7 @@ def zeep_ubw_mock(mocker):
             </Agresso>
         """
     }
-    mocker.patch('ubw_customer_per_resource_ingest_lambda.Client', return_value=mock)
+    mocker.patch('ubwcustomerperresource.ubw_customer_per_resource_ingest_lambda.Client', return_value=mock)
 
     yield mock
 
