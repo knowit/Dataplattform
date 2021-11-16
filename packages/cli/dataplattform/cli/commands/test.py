@@ -7,7 +7,7 @@ def test_all():
     test_dirs = [p.resolve().parent for p in Path().glob("**/tox.ini")]
     for test_dir in test_dirs:
         os.chdir(test_dir)
-        subprocess.run(["tox"])
+        subprocess.run(["tox", "-r"])
 
 def init(parser: ArgumentParser):
     pass
