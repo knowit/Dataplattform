@@ -141,6 +141,7 @@ functions:
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
+      NUM_WEEKS: 4
 
 resources:
   Conditions:

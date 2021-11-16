@@ -128,3 +128,6 @@ services/infrastructure/deploymentBucket/config.yml
 
 # SSM-parameters config
 **/ssm-parameters.yml
+
+# Sandbox
+**/my_name_servers.*
