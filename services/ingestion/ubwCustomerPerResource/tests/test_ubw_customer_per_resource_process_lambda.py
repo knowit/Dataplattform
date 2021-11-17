@@ -1,7 +1,7 @@
 import os
 from pathlib import PurePosixPath
 from pytest import fixture
-from ubw_customer_per_resource_process_lambda import handler
+from ubwcustomerperresource.ubw_customer_per_resource_process_lambda import handler
 import pandas as pd
 import numpy as np
 import fastparquet as fp

@@ -16,6 +16,7 @@ dataplattform:
 custom:
   editable:
     timeout: 60
+    srcDir: lib/slack
     ingestHandlerFile: slack_webhook_ingest_lambda
     processHandlerFile: slack_webhook_process_lambda
     databaseName: level_2
@@ -75,13 +76,13 @@ package:
 
 functions:
   ingest:
-    handler: ${self:custom.editable.ingestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -98,7 +99,7 @@ functions:
           private: false
 
   process:
-    handler: ${self:custom.editable.processHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events:
       - sqs:
           arn:
@@ -113,7 +114,7 @@ functions:
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}

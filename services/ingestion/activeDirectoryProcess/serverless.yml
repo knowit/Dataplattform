@@ -18,6 +18,7 @@ custom:
   #Edit these variables###########################
   editable:
     timeout: 12
+    srcDir: lib/activeDirectoryProcess
     ingestHandlerFile: ad_ingest_lambda
     processHandlerFile: ad_process_lambda
     databaseName: level_3
@@ -69,13 +70,13 @@ package:
 
 functions:
   ingest: # A Function
-    handler: ${self:custom.editable.ingestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -94,7 +95,7 @@ functions:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
   process: # A Function
-    handler: ${self:custom.editable.processHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events: # The Events that trigger this Function
       - sqs:
           arn:
@@ -108,7 +109,7 @@ functions:
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}

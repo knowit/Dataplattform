@@ -1,4 +1,4 @@
-from google_forms_webhook_ingest_lambda import handler as ingestHandler
+from googleforms.google_forms_webhook_ingest_lambda import handler as ingestHandler
 from dataplattform.testing.events import APIGateway
 import os
 from json import loads

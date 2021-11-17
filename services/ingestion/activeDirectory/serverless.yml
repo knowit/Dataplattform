@@ -10,6 +10,7 @@ dataplattform:
 custom:
   editable:
     timeout: 60
+    srcDir: lib/activeDirectory
     ingestHandlerFile: active_directory_ingest_lambda
     databaseName: level_3
     description: Active directory output is saved to encrypted dynamoDB table
@@ -28,7 +29,7 @@ custom:
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3
+      - boto3 # Default in lambda rt
       - botocore
 
 provider:
@@ -60,7 +61,7 @@ package:
 functions:
   ingest:
     enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
-    handler: ${self:custom.editable.ingestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
@@ -72,7 +73,7 @@ functions:
         - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
     package:
       include:
-        - "*.py"
+        - "${self:custom.editable.srcDir}/*.py"
         - "*.json"
     environment:
       STAGE: ${self:custom.stage}
@@ -87,7 +88,7 @@ functions:
 
   mock:
     enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
-    handler: ${self:custom.editable.mockIngestHandlerFile}.mock
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.mockIngestHandlerFile}.mock
     environment:
       STAGE: ${self:custom.stage}
     name: ${self:custom.stage}-${self:service}-mock
@@ -101,7 +102,7 @@ functions:
         - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
     package:
       include:
-        - "*.py"
+        - "${self:custom.editable.srcDir}/*.py"
     events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-mock-timer

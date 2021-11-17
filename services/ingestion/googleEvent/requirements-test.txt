@@ -1,4 +1,4 @@
 file:../../../packages/testing
-freezegun
-pyrfc3339
-pytz
+freezegun==1.1.0
+pyrfc3339==1.1
+pytz==2021.3

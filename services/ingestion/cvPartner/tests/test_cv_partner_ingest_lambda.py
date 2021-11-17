@@ -1,4 +1,4 @@
-from cv_partner_ingest_lambda import handler, offset_size
+from cvpartner.cv_partner_ingest_lambda import handler, offset_size
 from json import loads
 import responses
 from pytest import fixture
@@ -7,7 +7,7 @@ from os import environ
 
 @fixture(autouse=True)
 def mock_save_document(mocker):
-    mocker.patch('cv_partner_ingest_lambda.save_document')
+    mocker.patch('cvpartner.cv_partner_ingest_lambda.save_document')
 
 
 def add_dummy_data(bucket, prefix):

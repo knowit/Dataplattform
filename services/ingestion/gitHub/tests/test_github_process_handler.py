@@ -1,4 +1,4 @@
-from github_process_handler import handler
+from github.github_process_handler import handler
 from dataplattform.common import schema
 from pytest import fixture
 from json import load

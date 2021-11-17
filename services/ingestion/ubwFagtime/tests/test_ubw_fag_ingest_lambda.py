@@ -1,4 +1,4 @@
-from ubw_fag_ingest_lambda import handler
+from ubwfagtime.ubw_fag_ingest_lambda import handler
 from pytest import fixture
 from json import loads
 
@@ -35,7 +35,7 @@ def zeep_ubw_mock(mocker):
             </Agresso>
         """
     }
-    mocker.patch('ubw_fag_ingest_lambda.Client', return_value=mock)
+    mocker.patch('ubwfagtime.ubw_fag_ingest_lambda.Client', return_value=mock)
 
     yield mock
 
