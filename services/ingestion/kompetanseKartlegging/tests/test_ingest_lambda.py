@@ -1,4 +1,4 @@
-from kompetansekartlegging_ingest_lambda import handler
+from kompetansekartlegging.kompetansekartlegging_ingest_lambda import handler
 from json import loads
 from pytest import fixture
 from responses import RequestsMock, GET

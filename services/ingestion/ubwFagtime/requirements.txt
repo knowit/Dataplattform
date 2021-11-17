@@ -1,4 +1,4 @@
 file:../../../packages/common
 file:../../../packages/query
-zeep
-xmltodict
+zeep==3.4
+xmltodict==0.12

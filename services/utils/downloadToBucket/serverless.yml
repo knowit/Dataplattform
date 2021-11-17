@@ -8,6 +8,7 @@ dataplattform:
 custom:
   editable:
     timeout: 900
+    srcDir: lib/downloadtobucket
     handlerFile: download_to_bucket
     description: Downloads documents to a public raw storage bucket
   stage: ${opt:stage, self:provider.stage}
@@ -36,13 +37,13 @@ package:
 
 functions:
   downloadToBucket:
-    handler: ${self:custom.editable.handlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler
     name: ${self:custom.stage}-${self:service}
     description: ${self:custom.editable.description}
     role: !GetAtt S3Access.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
 

@@ -1,2 +1,2 @@
 file:../../../packages/common
-requests
+requests==2.23

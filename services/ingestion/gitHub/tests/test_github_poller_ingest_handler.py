@@ -1,4 +1,4 @@
-from github_poller_ingest_handler import handler, url
+from github.github_poller_ingest_handler import handler, url
 from pytest import fixture
 from json import loads, load
 from responses import RequestsMock, GET

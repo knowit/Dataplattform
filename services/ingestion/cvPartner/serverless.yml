@@ -17,6 +17,7 @@ dataplattform:
 custom:
   editable:
     timeout: 900
+    srcDir: lib/cvpartner
     ingestHandlerFile: cv_partner_ingest_lambda
     processHandlerFile: cv_partner_process_lambda
     mockHandlerFile: cv_partner_mock_lambda
@@ -65,13 +66,13 @@ package:
 
 functions:
   ingest:
-    handler: ${self:custom.editable.ingestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -92,7 +93,7 @@ functions:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
   process:
-    handler: ${self:custom.editable.processHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events:
       - sqs:
           arn:
@@ -106,7 +107,7 @@ functions:
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}

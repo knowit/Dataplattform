@@ -1,4 +1,4 @@
-from twitter_ingest_lambda import handler
+from twitter.twitter_ingest_lambda import handler
 from pytest import fixture
 from json import loads
 from datetime import datetime, timezone
@@ -13,7 +13,7 @@ def mock_twitter_model(data):
 
 @fixture(autouse=True)
 def mock_twitter_api(mocker):
-    api = mocker.patch('twitter_ingest_lambda.API')
+    api = mocker.patch('twitter.twitter_ingest_lambda.API')
     yield api.return_value
 
 

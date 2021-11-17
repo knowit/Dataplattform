@@ -1,4 +1,4 @@
-from cv_partner_process_lambda import handler
+from cvpartner.cv_partner_process_lambda import handler
 from dataplattform.common import schema
 from pytest import fixture
 from os import path

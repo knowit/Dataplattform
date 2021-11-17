@@ -1,4 +1,4 @@
-from kompetansekartlegging_process_lambda import handler
+from kompetansekartlegging.kompetansekartlegging_process_lambda import handler
 from dataplattform.common import schema
 from pytest import fixture
 from os import path

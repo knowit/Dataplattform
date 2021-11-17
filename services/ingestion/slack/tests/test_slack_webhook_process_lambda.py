@@ -1,4 +1,4 @@
-from slack_webhook_process_lambda import handler
+from slack.slack_webhook_process_lambda import handler
 from dataplattform.common import schema
 from json import load
 from os import path
