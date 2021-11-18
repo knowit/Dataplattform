@@ -18,7 +18,7 @@ custom:
   #Edit these variables###########################
   editable:
     timeout: 12
-    srcDir: lib/activeDirectoryProcess
+    srcDir: lib/activedirectoryprocess
     ingestHandlerFile: ad_ingest_lambda
     processHandlerFile: ad_process_lambda
     databaseName: level_3
