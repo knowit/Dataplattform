@@ -103,6 +103,7 @@ quicksight_add_member_lambda:
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
+    DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
 athena_setup_lambda:
   handler: ${self:custom.editable.athenaStartupHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-athena-setup-lambda
