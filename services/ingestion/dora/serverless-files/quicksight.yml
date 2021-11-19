@@ -1,14 +1,14 @@
 Resources:
-  DataSources:
+  AthenaDataSource:
     Type: AWS::QuickSight::DataSource
     Properties:
       DataSourceParameters: 
         AthenaParameters:
           WorkGroup: DoraWorkgroups
       AwsAccountId: !Sub ${AWS::AccountId}
-      Name: DoraWorkGroup-sources
+      Name: DoraWorkGroup-AthenaSources
       Type: ATHENA
-      DataSourceId: DoraWorkGroupid
+      DataSourceId: DoraWorkGroup-AthenaID
       Permissions:
         - Principal: ${ssm:/dev/dora/quicksight_principal}
           Actions:
@@ -43,13 +43,13 @@ Resources:
     Type: AWS::QuickSight::DataSet
     Properties:
       AwsAccountId: !Sub ${AWS::AccountId}
-      DataSetId: Rolebinding-test
-      Name: Rolebinding-test
+      DataSetId: Rolebinding
+      Name: Rolebinding
       ImportMode: SPICE
       PhysicalTableMap:
         s3PhysicalTable:
           S3Source:
-            DataSourceArn: !Sub arn:aws:quicksight:${AWS::Region}:${AWS::AccountId}:datasource/S3Source
+            DataSourceArn: !GetAtt S3DataSource.Arn
             InputColumns: 
               - Name: partition_1
                 Type: STRING
@@ -60,6 +60,78 @@ Resources:
               StartFromRow: 1
               ContainsHeader: True
               Delimiter: ','
+      Permissions:
+        - Principal: ${ssm:/dev/dora/quicksight_principal}
+          Actions:
+            - quicksight:UpdateDataSetPermissions
+            - quicksight:DescribeDataSet
+            - quicksight:DescribeDataSetPermissions
+            - quicksight:PassDataSet
+            - quicksight:DescribeIngestion
+            - quicksight:ListIngestions
+            - quicksight:UpdateDataSet
+            - quicksight:DeleteDataSet
+            - quicksight:CreateIngestion
+            - quicksight:CancelIngestion
+  DeploymentFrequency:
+    Type: AWS::QuickSight::DataSet
+    Properties:
+      AwsAccountId: !Sub ${AWS::AccountId}
+      DataSetId: DeploymentFrequency-id
+      Name: DeploymentFrequency-id
+      ImportMode: SPICE
+      PhysicalTableMap:
+        deploymentfreq:
+          CustomSql:
+            DataSourceArn: !GetAtt AthenaDataSource.Arn
+            Name: deploymentFrequency
+            SqlQuery: 'SELECT * FROM AwsDataCatalog.dev_level_4_database.deploymentfrequency'
+            Columns:
+              - Name: partition_1
+                Type: STRING
+              - Name: frequency
+                Type: STRING
+      RowLevelPermissionDataSet:
+        Arn: !GetAtt Rolebindings.Arn
+        FormatVersion: VERSION_1
+        PermissionPolicy: GRANT_ACCESS
+      Permissions:
+        - Principal: ${ssm:/dev/dora/quicksight_principal}
+          Actions:
+            - quicksight:UpdateDataSetPermissions
+            - quicksight:DescribeDataSet
+            - quicksight:DescribeDataSetPermissions
+            - quicksight:PassDataSet
+            - quicksight:DescribeIngestion
+            - quicksight:ListIngestions
+            - quicksight:UpdateDataSet
+            - quicksight:DeleteDataSet
+            - quicksight:CreateIngestion
+            - quicksight:CancelIngestion
+  DeploymentsNullValues:
+    Type: AWS::QuickSight::DataSet
+    Properties:
+      AwsAccountId: !Sub ${AWS::AccountId}
+      DataSetId: DeploymentsNullValues-id
+      Name: DeploymentsNullValues-id
+      ImportMode: SPICE
+      PhysicalTableMap:
+        deploymentfreq:
+          CustomSql:
+            DataSourceArn: !GetAtt AthenaDataSource.Arn
+            Name: DeploymentsNullValues
+            SqlQuery: 'SELECT * FROM AwsDataCatalog.dev_level_4_database.github_deployments_with_null_values'
+            Columns:
+              - Name: date_column
+                Type: DATETIME 
+              - Name: partition_1
+                Type: STRING
+              - Name: deployments
+                Type: INTEGER 
+      RowLevelPermissionDataSet:
+        Arn: !GetAtt Rolebindings.Arn
+        FormatVersion: VERSION_1
+        PermissionPolicy: GRANT_ACCESS
       Permissions:
         - Principal: ${ssm:/dev/dora/quicksight_principal}
           Actions:
