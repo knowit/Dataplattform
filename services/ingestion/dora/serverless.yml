@@ -15,6 +15,7 @@ dataplattform:
 custom:
   editable:
     timeout: 200
+    srcDir: lib/dora
     handlerFile: dora_ingestion_handler
     processHandlerFile: dora_process_handler
     glueLambdaHandlerFile: dora_glue_lambda

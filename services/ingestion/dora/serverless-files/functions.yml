@@ -1,11 +1,11 @@
 ingest:
-    handler: ${self:custom.editable.handlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler
     name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -22,7 +22,7 @@ ingest:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
 process:
-  handler: ${self:custom.editable.processHandlerFile}.handler
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
   events:
     - sqs:
         arn:
@@ -35,7 +35,7 @@ process:
   role: !GetAtt ProcessLambdaRole.Arn
   package:
     include:
-      - '*.py'
+      - '${self:custom.editable.srcDir}/*.py'
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
@@ -47,13 +47,13 @@ process:
     PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
   tags:
 glue_lambda:
-  handler: ${self:custom.editable.glueLambdaHandlerFile}.handler
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.glueLambdaHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-glue-lambda
   description: Trigger on crawler job finish
   role: !GetAtt GlueLambdaRole.Arn
   package:
     include:
-      - '*.py'
+      - '${self:custom.editable.srcDir}/*.py'
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
@@ -70,13 +70,13 @@ glue_lambda:
             state:
               - Succeeded
 quicksight_usergroup_lambda:
-  handler: ${self:custom.editable.quicksightUsersHandlerFile}.handler
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightUsersHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-quicksight-usergroup-lambda
   description: Adds new user groups in quicksight for new repos
   role: !GetAtt QuicksightUserGroupRole.Arn
   package:
     include:
-      - '*.py'
+      - '${self:custom.editable.srcDir}/*.py'
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
@@ -93,36 +93,36 @@ quicksight_usergroup_lambda:
             state:
               - Succeeded
 quicksight_add_member_lambda:
-  handler: ${self:custom.editable.addMemberHandlerFile}.handler
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.addMemberHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-quicksight-add_member-lambda
   description: Adds new users in quicksight
   role: !GetAtt QuicksightUserCreationRole.Arn
   package:
     include:
-      - '*.py'
+      - '${self:custom.editable.srcDir}/*.py'
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
     DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
 athena_setup_lambda:
-  handler: ${self:custom.editable.athenaStartupHandlerFile}.handler
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.athenaStartupHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-athena-setup-lambda
   description: Initialized and runs queries in Athena
   role: !GetAtt AthenaSetupRole.Arn
   package:
     include:
-      - '*.py'
+      - '${self:custom.editable.srcDir}/*.py'
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
 quicksight_setup:
-  handler: ${self:custom.editable.quicksightStartupHandlerFile}.handler
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightStartupHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-quicksight-setup-lambda
   description: Sets up quicksight resources
   role: !GetAtt QuicksightSetupRole.Arn
   package:
     include:
-      - '*.py'
+      - '${self:custom.editable.srcDir}/*.py'
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
