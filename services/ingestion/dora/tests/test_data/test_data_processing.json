@@ -1,0 +1,16 @@
+{
+    "metadata": {
+      "timestamp": 1632910947
+    },
+    "data": [
+      {
+        "id": "18143216775",
+        "name": "knowit/Dataplattform",
+        "type": "PullRequestEvent",
+        "merged_at": 1632823448,
+        "created_at": 163543478,
+        "base-ref": "develop",
+        "default_branch": "develop"
+      }
+    ]
+  }
