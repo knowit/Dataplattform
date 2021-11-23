@@ -35,7 +35,6 @@ def ingest(event) -> Data:
         return events
 
     def retrieve_default_branch(repo):
-        print(repo)
         api_token_default_branch = SSM(with_decryption=True).get('github/apikey/' + repo)
         res_default_branch = requests.get(SSM(with_decryption=False).get('github/defaultBranch/' + repo),
                                           headers={'Authorization': f'Bearer {api_token_default_branch}'})
