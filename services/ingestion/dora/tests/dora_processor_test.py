@@ -11,7 +11,7 @@ def mocked_responses():
         yield reqs
 
 @fixture
-def test_data():
+def test_data_poller():
     with open(path.join(path.dirname(__file__), 'test_data/test_data_processing.json'), 'r') as json_file:
         yield load(json_file)
 
@@ -41,23 +41,6 @@ def test_process_data_poller(setup_queue_event, test_data_poller, create_table_m
     handler(event, None)
 
     create_table_mock.assert_table_data_column(
-        'github_knowit_repos',
+        'github_dora_repos',
         'id',
-        pd.Series([4672898, 4730463]))
-
-def test_process_data_skip_existing(setup_queue_event, athena, test_data_poller, create_table_mock):
-    event = setup_queue_event(
-        schema.Data(
-            metadata=schema.Metadata(timestamp=0),
-            data=test_data_poller['data']))
-
-    athena.on_query(
-        'SELECT "id" FROM "github_knowit_repos"',
-        pd.DataFrame({'id': [4672898]}))
-
-    handler(event, None)
-
-    create_table_mock.assert_table_data_column(
-        'github_knowit_repos',
-        'id',
-        pd.Series([4730463]))
+        pd.Series(["18154316775", "181631654288"]))
