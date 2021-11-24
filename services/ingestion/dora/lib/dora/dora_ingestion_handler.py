@@ -35,11 +35,14 @@ def ingest(event) -> Data:
         return events
 
     def retrieve_default_branch(repo):
-        api_token_default_branch = SSM(with_decryption=True).get('github/apikey/' + repo)
-        res_default_branch = requests.get(SSM(with_decryption=False).get('github/defaultBranch/' + repo),
-                                          headers={'Authorization': f'Bearer {api_token_default_branch}'})
-        event_default_branch = res_default_branch.json()
-        return event_default_branch['default_branch']
+        try:
+            return SSM(with_decryption=False).get('github/prod/' + repo)
+        except:
+            api_token_default_branch = SSM(with_decryption=True).get('github/apikey/' + repo)
+            res_default_branch = requests.get(SSM(with_decryption=False).get('github/defaultBranch/' + repo),
+                                            headers={'Authorization': f'Bearer {api_token_default_branch}'})
+            event_default_branch = res_default_branch.json()
+            return event_default_branch['default_branch']
 
     def to_timestamp(date):
         return int(isoparse(date).timestamp()) if isinstance(date, str) else int(date)
