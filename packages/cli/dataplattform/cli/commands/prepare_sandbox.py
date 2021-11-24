@@ -3,6 +3,9 @@ import boto3
 import datetime
 from typing import List
 
+class IllegalAWSAccountException(Exception):
+    pass
+
 CERTIFICATE_REGION = 'us-east-1'
 
 def create_parameter(name: str, value: str) -> None:
@@ -72,6 +75,9 @@ def init(parser: ArgumentParser):
     parser.add_argument("--stage", default='dev', choices=['dev', 'prod'])
 
 def run(args: Namespace, _):
+    bucket_names = [b["Name"] for b in boto3.client("s3").list_buckets()["Buckets"]]
+    if "dev-dataplattform-deploymentbucket" in bucket_names or "prod-dataplattform-deploymentbucket" in bucket_names:
+        raise IllegalAWSAccountException("You are trying to use the sandbox script outside of your sandbox, i.e. in either the dev or prod environment.")
     cert_response = create_certificate(args.domain_name)
     hosted_zone_response = create_hosted_zone(args.domain_name)
     create_record_for_validation(hosted_zone_response['HostedZone']['Id'], cert_response['CertificateArn'])
