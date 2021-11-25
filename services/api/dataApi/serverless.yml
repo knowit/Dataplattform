@@ -169,7 +169,7 @@ resources:
           - AttributeName: name
             KeyType: HASH
         ProvisionedThroughput:
-          ReadCapacityUnits: 1
+          ReadCapacityUnits: 6
           WriteCapacityUnits: 1
 
     ReportCacheRole:
