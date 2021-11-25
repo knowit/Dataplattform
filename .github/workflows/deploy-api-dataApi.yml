@@ -31,9 +31,6 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-        
-      - name: Remove cached requirements
-        run: sls requirements clean && sls requirements cleanCache
 
       - name: Run serverless deploy prod
         if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
@@ -42,9 +39,9 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
+          echo "Removing cached Python requirements" && sls requirements clean && sls requirements cleanCache
           echo "Deploying to production" && sls deploy --stage prod
           
-
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
@@ -52,4 +49,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
+          echo "Removing cached Python requirements" && sls requirements clean && sls requirements cleanCache
           echo "Deploying to development" && sls deploy --stage dev
