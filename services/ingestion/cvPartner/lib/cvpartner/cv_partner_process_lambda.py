@@ -105,7 +105,13 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         def create_df_for_each_elem(elem_tag, list1_elem, topic):
             if not isinstance(topic, list):
                 return None
+            if not topic:
+                return None
             return pd.DataFrame.from_records(np.array([{elem_tag: list1_elem, **x} for x in topic]))
+
+        tmp_df_list = [create_df_for_each_elem(elem_tag, l, t) for l, t in zip(list1, topic_list)]
+        if np.sum(x is not None for x in tmp_df_list) == 0:
+            return None
         return pd.concat([create_df_for_each_elem(elem_tag,
                          list1[indx], topic_list[indx]) for indx in range(topic_list.size)],
                          ignore_index=True)
@@ -135,16 +141,23 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         return col1_series
 
     def create_df(df, sub_cat, cols, normalizable_cols):
+
         if f'cv.{sub_cat}' not in df.columns:
             return pd.DataFrame(columns=cols)
 
         cat_dict = df['cv.' + sub_cat].copy()
+
         user_ids = df['user_id'].copy()
-        tmp_df = create_from_topic('user_id', user_ids, cat_dict)[cols].copy()
+        tmp_df = create_from_topic('user_id', user_ids, cat_dict)
+        if tmp_df is not None:
+            tmp_df = tmp_df[cols].copy()
+        else:
+            return pd.DataFrame()
 
         for col in normalizable_cols:
             tmp_df[col] = normalize_coloums(tmp_df, col, 'no')
             tmp_df[col].replace(np.nan, '', regex=True, inplace=True)
+
 
         return tmp_df
 
