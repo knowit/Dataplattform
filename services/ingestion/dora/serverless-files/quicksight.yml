@@ -28,8 +28,8 @@ Resources:
       DataSourceParameters: 
         S3Parameters:
           ManifestFileLocation:
-            Bucket: dev-datalake-bucket-876363704293 #Update to accurate location
-            Key: data/Manifest-S3.json #Update to accurate location
+            Bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+            Key: data/level-3/dora/manifest.json
       Permissions:
         - Principal: ${ssm:/dev/dora/quicksight_principal}
           Actions:
