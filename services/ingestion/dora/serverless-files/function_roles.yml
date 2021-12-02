@@ -347,3 +347,51 @@ Resources:
                   - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
                   - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
                   - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
+  RolebindingIngestionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:custom.stage}-${self:service}-quicksight-ingestion-lambda-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'quicksight:CreateIngestion'
+                Resource:
+                  - "*"
+  QuicksightIngestionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:custom.stage}-${self:service}-rolebindings-ingestion-lambda-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'quicksight:CreateIngestion'
+                Resource:
+                  - "*"

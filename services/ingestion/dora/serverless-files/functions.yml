@@ -92,9 +92,9 @@ quicksight_usergroup_lambda:
               - DoraCrawler
             state:
               - Succeeded
-quicksight_add_member_lambda:
-  handler: ${self:custom.editable.srcDir}/${self:custom.editable.addMemberHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-quicksight-add_member-lambda
+quicksight_register_users_lambda:
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.registerUsersHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-quicksight-register-users-lambda
   description: Adds new users in quicksight
   role: !GetAtt QuicksightUserCreationRole.Arn
   package:
@@ -106,7 +106,7 @@ quicksight_add_member_lambda:
     DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
   events:
       - s3:
-          bucket: '${self:custom.stage}-datalake-${AWS::AccountId}'
+          bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
           event: s3:ObjectCreated:*
           rules:
             - prefix: data/level-3/dora/
@@ -134,3 +134,45 @@ quicksight_setup:
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
+dataset_ingestion:
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightIngestionHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-quicksight-ingestion-lambda
+  description: Performes ingestion to quicksight based on new updates to glue
+  role: !GetAtt QuicksightIngestionRole.Arn
+  package:
+    include:
+      - '${self:custom.editable.srcDir}/*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+  events:
+    - eventBridge:
+        pattern:
+          source:
+            - aws.glue
+          detail-type:
+            - Glue Crawler State Change
+          detail:
+            crawlerName:
+              - DoraCrawler
+            state:
+              - Succeeded
+rolebindings_ingestion:
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.rolebindingsIngestionHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-rolebinding-ingestion-lambda
+  description: Performes ingestion to quicksight rolebindings based on new updates to csv
+  role: !GetAtt RolebindingIngestionRole.Arn
+  package:
+    include:
+      - '${self:custom.editable.srcDir}/*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+  events:
+      - s3:
+          bucket: !Sub ${self:custom.stage}-kmsbucket-${AWS::AccountId}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: data/level-4/dora/
+            - suffix: .csv
+          existing: true

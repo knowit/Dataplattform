@@ -20,9 +20,11 @@ custom:
     processHandlerFile: dora_process_handler
     glueLambdaHandlerFile: dora_glue_lambda
     quicksightUsersHandlerFile: dora_quicksight_groups
-    addMemberHandlerFile: dora_add_member_lambda
+    registerUsersHandlerFile: dora_register_users_lambda
     athenaStartupHandlerFile: dora_athena_setup
     quicksightStartupHandlerFile: dora_quicksight_setup_lambda
+    quicksightIngestionHandlerFile: dora_quicksight_ingestion
+    rolebindingsIngestionHandlerFile: dora_rolebindings_ingestion
     databaseName: level_4
     description: Fetch key metrics from github API
     scheduleRate: rate(1 day)

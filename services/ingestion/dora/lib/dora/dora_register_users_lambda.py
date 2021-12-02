@@ -10,7 +10,7 @@ account_id = sts_client.get_caller_identity().get('Account')
 s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 
-csv = "quicksight-users.csv"
+csv = "data/level-3/dora/dora_users.csv"
 s3_bucket = environ.get('DATALAKE')
 namespace = 'default'
 
@@ -23,7 +23,7 @@ def handler(context):
         ).get('UserList')
 
     def get_all_users():
-        csv_file = s3_client.get_object(Bucket=s3_bucket, Key="quicksight-users.csv")
+        csv_file = s3_client.get_object(Bucket=s3_bucket, Key=csv)
         csv_string = csv_file['Body'].read().decode('utf-8')
         return pd.read_csv(io.StringIO(csv_string)).to_dict('records')
 
