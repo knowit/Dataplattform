@@ -10,7 +10,6 @@ account_id = sts_client.get_caller_identity().get('Account')
 data_sets = ["DeploymentFrequency-id", "DeploymentsNullValues-id"]
 
 def handler(event, context):
-
     def create_ingestion(account_id, data_set_ids):
         
         for data_set_id in data_set_ids:

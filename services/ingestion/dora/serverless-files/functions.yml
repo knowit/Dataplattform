@@ -46,29 +46,6 @@ process:
     ACCESS_LEVEL: ${self:custom.editable.accessLevel}
     PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
   tags:
-glue_lambda:
-  handler: ${self:custom.editable.srcDir}/${self:custom.editable.glueLambdaHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-glue-lambda
-  description: Trigger on crawler job finish
-  role: !GetAtt GlueLambdaRole.Arn
-  package:
-    include:
-      - '${self:custom.editable.srcDir}/*.py'
-  environment:
-    STAGE: ${self:custom.stage}
-    SERVICE: ${self:service}
-  events:
-    - eventBridge:
-        pattern:
-          source:
-            - aws.glue
-          detail-type:
-            - Glue Crawler State Change
-          detail:
-            crawlerName:
-              - DoraCrawler
-            state:
-              - Succeeded
 quicksight_usergroup_lambda:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightUsersHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-quicksight-usergroup-lambda
@@ -112,28 +89,6 @@ quicksight_register_users_lambda:
             - prefix: data/level-3/dora/
             - suffix: .csv
           existing: true
-athena_setup_lambda:
-  handler: ${self:custom.editable.srcDir}/${self:custom.editable.athenaStartupHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-athena-setup-lambda
-  description: Initialized and runs queries in Athena
-  role: !GetAtt AthenaSetupRole.Arn
-  package:
-    include:
-      - '${self:custom.editable.srcDir}/*.py'
-  environment:
-    STAGE: ${self:custom.stage}
-    SERVICE: ${self:service}
-quicksight_setup:
-  handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightStartupHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-quicksight-setup-lambda
-  description: Sets up quicksight resources
-  role: !GetAtt QuicksightSetupRole.Arn
-  package:
-    include:
-      - '${self:custom.editable.srcDir}/*.py'
-  environment:
-    STAGE: ${self:custom.stage}
-    SERVICE: ${self:service}
 dataset_ingestion:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightIngestionHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-quicksight-ingestion-lambda

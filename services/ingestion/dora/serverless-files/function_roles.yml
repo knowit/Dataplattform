@@ -75,34 +75,6 @@ Resources:
                   Action:
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
-  GlueLambdaRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ${self:custom.stage}-${self:service}-glue-lambda-role
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-      Policies:
-        - PolicyName: ${self:custom.stage}-Glue-${self:service}
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'glue:GetPartitions'
-                  - 'glue:GetTable'
-                  - 'glue:GetDatabase'
-                Resource:
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
   QuicksightUserGroupRole:
     Type: AWS::IAM::Role
     Properties:
@@ -221,35 +193,6 @@ Resources:
                 Resource:
                   - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}
                   - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}*
-  QuicksightSetupRole:
-    Type: AWS::IAM::Role
-    Properties:
-      RoleName: ${self:custom.stage}-${self:service}-quicksight-setup-lambda-role
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service:
-                - lambda.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-      Policies:
-        - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - 'quicksight:ListGroups'
-                  - 'quicksight:CreateGroup'
-                  - 'quicksight:HeadObject'
-                  - 'quicksight:ListUsers'
-                  - 'quicksight:RegisterUser'
-                  - 'quicksight:CreateGroupMembership'
-                Resource:
-                  - "*"
   ProcessLambdaRole:
     Type: AWS::IAM::Role
     Properties:

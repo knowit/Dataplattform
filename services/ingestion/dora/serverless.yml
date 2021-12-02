@@ -12,7 +12,7 @@ dataplattform:
     tableName: dora
     accessLevel: 4
 
-custom:
+custom: 
   editable:
     timeout: 200
     srcDir: lib/dora
