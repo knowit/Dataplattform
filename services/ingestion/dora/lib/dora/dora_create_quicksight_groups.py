@@ -28,8 +28,8 @@ def handler(event, context):
             'partition_1': groups
         })
 
-        data_frame.to_csv(f'/tmp/{role_bindings_filename}', mode='w+', index=False, header=True)
-        s3_bucket.upload_file(f'/tmp/{role_bindings_filename}', role_bindings_filename)
+        data_frame.to_csv('/tmp/quicksight_role_bindings.csv', mode='w+', index=False, header=True)
+        s3_bucket.upload_file('/tmp/quicksight_role_bindings.csv', role_bindings_filename)
 
     groups = quicksight_client.list_groups(
         AwsAccountId=account_id,
