@@ -15,7 +15,7 @@ s3_bucket = environ.get('DATALAKE')
 namespace = 'default'
 
 
-def handler(context):
+def handler(event, context):
     def get_existing_users():
         return quicksight_client.list_users(
             AwsAccountId=account_id,
@@ -42,7 +42,7 @@ def handler(context):
             UserName=user_name,
             AwsAccountId=account_id,
             Namespace=namespace
-        ).get('GroupList')
+        )
         return [group['GroupName'] for group in user_groups['GroupList']]
 
     def create_group_membership(user_name, group_name):
@@ -60,12 +60,20 @@ def handler(context):
             Namespace=namespace
         )
 
+    def describe_user(user_name):
+        response = quicksight_client.describe_user(
+            UserName=user_name,
+            AwsAccountId=account_id,
+            Namespace=namespace
+        )
+        return response
+
     def register_new_users():
         existing_usernames = [user['UserName'] for user in get_existing_users()]
         all_users = get_all_users()
 
         for user in all_users:
-            user_name = user['User']
+            user_name = user['UserName']
             try:
                 if user_name not in existing_usernames:
                     register_user(user_name, user['Email'])
@@ -78,10 +86,12 @@ def handler(context):
             except ClientError as error:
                 raise error
 
-        users_to_delete = set(existing_usernames) - set([user['User'] for user in all_users])
+        users_to_delete = set(existing_usernames) - set([user['UserName'] for user in all_users])
 
         for user_name in users_to_delete:
-            delete_user(user_name)
+            user = describe_user(user_name)
+            if user['User']['Role'] != 'ADMIN':
+                delete_user(user_name)
 
     register_new_users()
 

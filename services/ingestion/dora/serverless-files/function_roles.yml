@@ -173,6 +173,8 @@ Resources:
                   - 'quicksight:CreateGroup'
                   - 'quicksight:HeadObject'
                   - 'quicksight:ListUsers'
+                  - 'quicksight:ListUserGroups'
+                  - 'quicksight:DescribeUser'
                   - 'quicksight:RegisterUser'
                   - 'quicksight:CreateGroupMembership'
                 Resource:
