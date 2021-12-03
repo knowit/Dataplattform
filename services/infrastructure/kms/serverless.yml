@@ -40,7 +40,7 @@ resources:
           - Sid: "Enable usage for Quicksight"
             Effect: Allow
             Principal:
-              AWS: 'arn:aws:iam::876363704293:role/service-role/aws-quicksight-service-role-v0'
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/aws-quicksight-service-role-v0'
             Action:
               - kms:Encrypt*
               - kms:Decrypt*
