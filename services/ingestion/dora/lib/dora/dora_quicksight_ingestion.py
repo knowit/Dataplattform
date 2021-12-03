@@ -25,5 +25,5 @@ def handler(event, context):
     response = create_ingestion(account_id, data_sets)
 
     return {
-        'message': response
+        'message': 'success!'
     }
