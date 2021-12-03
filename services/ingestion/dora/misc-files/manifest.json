@@ -2,7 +2,7 @@
     "fileLocations": [
         {
             "URIs": [
-                "s3://dev-datalake-bucket-876363704293/accessFile.csv"
+                "s3://dev-datalake-bucket-876363704293/data/level-3/dora/quicksight_role_bindings.csv"
             ]
         }
     ],
