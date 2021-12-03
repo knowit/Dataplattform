@@ -19,7 +19,7 @@ custom:
     handlerFile: dora_ingestion_handler
     processHandlerFile: dora_process_handler
     glueLambdaHandlerFile: dora_glue_lambda
-    quicksightUsersHandlerFile: dora_quicksight_groups
+    quicksightUsersHandlerFile: dora_create_quicksight_groups
     registerUsersHandlerFile: dora_register_users_lambda
     athenaStartupHandlerFile: dora_athena_setup
     quicksightStartupHandlerFile: dora_quicksight_setup_lambda

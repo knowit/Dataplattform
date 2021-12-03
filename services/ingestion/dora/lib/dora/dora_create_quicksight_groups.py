@@ -7,10 +7,10 @@ sts_client = boto3.client('sts')
 s3_client = boto3.client('s3')
 s3 = boto3.resource('s3')
 
-role_bindings_filename = 'quicksight_role_bindings.csv'
+role_bindings_filename = 'data/level-3/dora/quicksight_role_bindings.csv'
 
 
-def handler():
+def handler(event, context):
     account_id = sts_client.get_caller_identity().get('Account')
     s3_bucket = s3.Bucket(f'dev-datalake-bucket-{account_id}')
 
