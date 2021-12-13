@@ -44,7 +44,6 @@ process:
     DEFAULT_DATABASE: ${self:custom.editable.databaseName}
     DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
     ACCESS_LEVEL: ${self:custom.editable.accessLevel}
-    PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
   tags:
 quicksight_usergroup_lambda:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightUsersHandlerFile}.handler
