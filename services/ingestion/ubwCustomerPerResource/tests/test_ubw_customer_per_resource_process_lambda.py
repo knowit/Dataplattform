@@ -10,7 +10,7 @@ from os import path
 import numpy as np
 from json import load
 from dataplattform.common import schema
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from dataplattform.common.aws import S3
 
 
