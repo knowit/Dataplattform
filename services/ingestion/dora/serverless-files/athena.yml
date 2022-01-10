@@ -157,7 +157,7 @@ Resources:
                     ROW FORMAT DELIMITED
                     FIELDS TERMINATED BY ','
                     STORED AS TEXTFILE
-                    LOCATION 's3://dev-datalake-bucket-*/tablefrequency/
+                    LOCATION 's3://dev-datalake-bucket-*/data/level-3/dora
   AthenaSetupRole:
       Type: AWS::IAM::Role
       Properties:

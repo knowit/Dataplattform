@@ -32,6 +32,7 @@ def upload_file(file_name, bucket):
 def main():
     upload_file("manifest.json",bucket)
     upload_file("dora_users.csv",bucket)
+    upload_file("frequency.csv", bucket)
 
 if __name__ == "__main__":
     main()
