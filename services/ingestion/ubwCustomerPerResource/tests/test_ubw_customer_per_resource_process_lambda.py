@@ -10,13 +10,13 @@ from os import path
 import numpy as np
 from json import load
 from dataplattform.common import schema
-from datetime import datetime
+from datetime import datetime, timedelta
 from dataplattform.common.aws import S3
 
 
 @fixture
 def test_data():
-    with open(path.join(path.dirname(__file__), 'test_data.json'), 'r') as json_file:
+    with open(path.join(path.dirname(__file__), 'unit_test_data.json'), 'r') as json_file:
         yield load(json_file)
 
 
@@ -24,12 +24,15 @@ def test_data():
 def test_data_old():
     with open(path.join(path.dirname(__file__), 'test_old_data.json'), 'r') as json_file:
         json = load(json_file)
-        cur_year, cur_week = datetime.now().isocalendar()[0:2]
         for i in range(len(json['data'])):  # Update reg_period to simulate recent data
-            year = cur_year - 1 if cur_week - i <= 0 else cur_year
-            week = 52 if cur_week - i <= 0 else cur_week
-            json['data'][i]['reg_period'] = str(year) + str(week - i)
+            json['data'][i]['reg_period'] = create_date_string(i)
         yield json
+
+def create_date_string(num_weeks_back):
+    date = datetime.now()
+    delta = timedelta(weeks=num_weeks_back)
+    tmp_year, tmp_week = (date - delta).isocalendar()[0:2]
+    return str(tmp_year) + str(tmp_week)
 
 
 @fixture
@@ -74,14 +77,14 @@ def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_da
 
     handler(event, None)
 
-    cur_year, cur_week = datetime.now().isocalendar()[0:2]
+    #cur_year, cur_week = datetime.now().isocalendar()[0:2]
     new_data = pd.Series(['202053',
                           '202053',
                           '202053',
-                          str(cur_year) + str(cur_week - 1),
-                          str(cur_year) + str(cur_week),
-                          str(cur_year) + str(cur_week - 2),
-                          str(cur_year) + str(cur_week - 3)])
+                          create_date_string(1),
+                          create_date_string(0),
+                          create_date_string(2),
+                          create_date_string(3)])
 
     # Merge frames here since mocked data table does not overwrite old data
     data = pd.concat([df['reg_period'], new_data]).reset_index()
