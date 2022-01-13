@@ -53,7 +53,7 @@ Resources:
             InputColumns: 
               - Name: partition_1
                 Type: STRING
-              - Name: UserName
+              - Name: GroupName
                 Type: STRING
             UploadSettings:
               Format: CSV
