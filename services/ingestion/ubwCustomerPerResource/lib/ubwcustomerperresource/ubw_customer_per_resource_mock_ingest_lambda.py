@@ -19,7 +19,7 @@ def mock(event) -> Data:
     # Dette er ikke riktig forhold til virkelig, da man egentlig får inn kun en reg_period om gangen.
     # For testdata som inneholder flere reg_perioder så fungerer dette da den tar inn alle.
 
-    data = flatten(list(test_json.values())[1:-1])
+    data = flatten(list(test_json.values())[1:])
 
     return Data(
         metadata=Metadata(timestamp=datetime.now().timestamp()),
