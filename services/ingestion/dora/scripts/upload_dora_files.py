@@ -22,9 +22,16 @@ def get_stage(bucket):
 
 def upload_file(file_name, bucket):
     stage = get_stage(bucket)
-    print(stage)
     try:
         response = s3_client.upload_file(path + file_name, f"{stage}{bucket}", location + file_name)
+    except ClientError as e:
+        logging.error(e)
+    return response
+
+def upload_frequency(file_name, bucket):
+    stage = get_stage(bucket)
+    try:
+        response = s3_client.upload_file(path + file_name, f"{stage}{bucket}", location+'frequency/' + file_name)
     except ClientError as e:
         logging.error(e)
     return response
@@ -32,6 +39,7 @@ def upload_file(file_name, bucket):
 def main():
     upload_file("manifest.json",bucket)
     upload_file("dora_users.csv",bucket)
+    upload_frequency('frequency.csv',bucket)
 
 if __name__ == "__main__":
     main()

@@ -153,12 +153,16 @@ Resources:
       WorkGroup: !Ref DoraWorkgroup
       QueryString: !Sub
                    >
-                    CREATE EXTERNAL TABLE IF NOT EXISTS frequency(
-                    id int, frequency string)
-                    ROW FORMAT DELIMITED
-                    FIELDS TERMINATED BY ','
-                    STORED AS TEXTFILE
-                    LOCATION 's3://dev-datalake-bucket-#{AWS::AccountId}/data/level-3/dora'
+                    CREATE EXTERNAL TABLE IF NOT EXISTS `dev_level_4_database`.`frequency` (
+                    `id` int,
+                    `frequency` string
+                  )
+                  ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+                  WITH SERDEPROPERTIES (
+                    'serialization.format' = ',',
+                    'field.delim' = ','
+                  ) LOCATION 's3://dev-datalake-bucket-#{AWS::AccountId}/data/level-3/dora/frequency/'
+                  TBLPROPERTIES ('has_encrypted_data'='false');
   AthenaSetupRole:
       Type: AWS::IAM::Role
       Properties:
