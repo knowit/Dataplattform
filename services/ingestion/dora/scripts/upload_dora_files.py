@@ -56,7 +56,6 @@ def create_manifest():
     }
 
     json_string = json.dumps(manifest_data, indent=2)
-    print(json_string)
     jsonFile = open("../misc-files/manifest.json", "w")
     jsonFile.write(json_string)
     jsonFile.close()
