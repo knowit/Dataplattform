@@ -151,13 +151,14 @@ Resources:
       Description: "Creates a reference table used in DeploymentFrequency calculation "
       Name: "Frequency"
       WorkGroup: !Ref DoraWorkgroup
-      QueryString: >
+      QueryString: !Sub
+                   >
                     CREATE EXTERNAL TABLE IF NOT EXISTS frequency(
                     id int, frequency string)
                     ROW FORMAT DELIMITED
                     FIELDS TERMINATED BY ','
                     STORED AS TEXTFILE
-                    LOCATION 's3://dev-datalake-bucket-*/data/level-3/dora'
+                    LOCATION 's3://dev-datalake-bucket-#{AWS::AccountId}/data/level-3/dora'
   AthenaSetupRole:
       Type: AWS::IAM::Role
       Properties:
