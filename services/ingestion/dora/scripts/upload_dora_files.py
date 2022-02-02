@@ -2,6 +2,7 @@ import boto3
 import os
 from botocore.exceptions import ClientError
 import logging
+import json
 
 s3_client = boto3.client('s3')
 sts_client = boto3.client('sts')
@@ -36,7 +37,32 @@ def upload_frequency(file_name, bucket):
         logging.error(e)
     return response
 
+def create_manifest():
+
+    manifest_data = {
+        "fileLocations": [
+            {
+                "URIs": [
+                    "s3://dev-datalake-bucket-"+account_response+"/data/level-3/dora/quicksight_role_bindings.csv"
+                ]
+            }
+        ],
+        "globalUploadSettings": {
+            "format": "CSV",
+            "delimiter": ",",
+            "textqualifier": "'",
+            "containsHeader": "true"
+        }
+    }
+
+    json_string = json.dumps(manifest_data, indent=2)
+    print(json_string)
+    jsonFile = open("../misc-files/manifest.json", "w")
+    jsonFile.write(json_string)
+    jsonFile.close()
+
 def main():
+    create_manifest()
     upload_file("manifest.json",bucket)
     upload_file("dora_users.csv",bucket)
     upload_frequency('frequency.csv',bucket)
