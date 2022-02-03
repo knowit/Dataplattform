@@ -124,9 +124,9 @@ rolebindings_ingestion:
     SERVICE: ${self:service}
   events:
       - s3:
-          bucket: !Sub ${self:custom.stage}-kmsbucket-${AWS::AccountId}
+          bucket: !Sub ${self:custom.stage}-datalake-${AWS::AccountId}
           event: s3:ObjectCreated:*
           rules:
-            - prefix: data/level-4/dora/
+            - prefix: data/level-3/dora/
             - suffix: .csv
           existing: true
