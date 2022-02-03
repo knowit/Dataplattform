@@ -156,13 +156,13 @@ Resources:
                     CREATE EXTERNAL TABLE IF NOT EXISTS `dev_level_4_database`.`frequency` (
                     `id` int,
                     `frequency` string
-                  )
-                  ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
-                  WITH SERDEPROPERTIES (
+                    )
+                    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe' 
+                    WITH SERDEPROPERTIES (
                     'serialization.format' = ',',
                     'field.delim' = ','
-                  ) LOCATION 's3://dev-datalake-bucket-#{AWS::AccountId}/data/level-3/dora/frequency/'
-                  TBLPROPERTIES ('has_encrypted_data'='false');
+                    ) LOCATION 's3://dev-datalake-bucket-#{AWS::AccountId}/data/level-3/dora/frequency/'
+                    TBLPROPERTIES ('has_encrypted_data'='false');
   AthenaSetupRole:
       Type: AWS::IAM::Role
       Properties:
