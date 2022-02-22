@@ -252,7 +252,8 @@ def test_process_per_project_data_content_reg_period_1(create_table_mock, setup_
             'employees': [1, 1, 1],
             'hours': np.array([6, 4, 1], dtype=np.float32),
             'reg_period': ["202053", "202053", "202053"],
-            'timestamp': [1601294392, 1601294392, 1601294392, ]
+            'timestamp': [1601294392, 1601294392, 1601294392, ],
+            'work_order': ["Some work order desc.", "Some work order desc.", "Some work order desc."]
         }))
 
 
@@ -266,11 +267,31 @@ def test_process_per_project_data_content_reg_period_2(create_table_mock, setup_
     create_table_mock.assert_table_data(
         'ubw_per_project_data',
         pd.DataFrame({
-            'customer': ['Entur AS'],
-            'employees': [2],
-            'hours': np.array([16], dtype=np.float32),
-            'reg_period': ["202140"],
-            'timestamp': [1601294392]
+            'customer': ['Entur AS', 'Entur AS'],
+            'employees': [1, 1],
+            'hours': np.array([6, 10], dtype=np.float32),
+            'reg_period': ["202140", "202140"],
+            'timestamp': [1601294392, 1601294392],
+            'work_order': ["Drift, forvalting og support", "Entur Test"]
+        }))
+
+
+def test_process_per_project_data_content_reg_period_3(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=1601294392),
+            data=test_data['reg_period_3']))
+
+    handler(event, None)
+    create_table_mock.assert_table_data(
+        'ubw_per_project_data',
+        pd.DataFrame({
+            'customer': ['Entur AS', 'customer_1', 'Entur AS'],
+            'employees': [1, 1, 2],
+            'hours': np.array([6, 3, 20], dtype=np.float32),
+            'reg_period': ["202140", "202140", "202140"],
+            'timestamp': [1601294392, 1601294392, 1601294392],
+            'work_order': ["Drift, forvalting og support", "Konsulentbistand", "Entur Test"]
         }))
 
 

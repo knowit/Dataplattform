@@ -67,13 +67,18 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         project_customers = []
         reg_period = dataframe.iloc[0]['reg_period']
         timestamp = dataframe.iloc[0]['time']
-        for customer in dataframe['customer'].unique():
+        new_dataframe = dataframe.drop_duplicates(
+            subset=["customer", "work_order_description"], keep="last")
+        df_with_employees = dataframe.drop_duplicates(subset=["customer", "work_order_description", "alias"], keep="last").groupby(
+            ['customer', 'work_order_description']).size().reset_index(name="employees")
+        for (index, row) in new_dataframe.iterrows():
             project_customers.append({
-                'customer': customer,
-                'employees': dataframe[dataframe['customer'] == customer]['alias'].unique().shape[0],
-                'hours': dataframe[dataframe['customer'] == customer]['used_hrs'].sum(),
+                'customer': row["customer"],
+                'employees': df_with_employees[(df_with_employees["customer"] == row["customer"]) & (df_with_employees["work_order_description"] == row["work_order_description"])]["employees"].sum(),
+                'hours': dataframe[(dataframe['customer'] == row["customer"]) & (dataframe['work_order_description'] == row["work_order_description"])]['used_hrs'].sum(),
                 'reg_period': reg_period,
-                'timestamp': timestamp
+                'timestamp': timestamp,
+                'work_order': row["work_order_description"]
             })
         return pd.DataFrame(project_customers)
 
@@ -94,7 +99,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
         old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
         df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(subset=df.columns.difference(['time']))
-
 
     return {
         'ubw_customer_per_resource': df,
