@@ -339,3 +339,55 @@ Resources:
                   - 'quicksight:CreateIngestion'
                 Resource:
                   - "*"
+  ConfigurationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:custom.stage}-${self:service}-configuration-lambda-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: ${self:custom.stage}-start-ingestion-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'lambda:InvokeFunction'
+                Resource:
+                  - !Sub arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:custom.stage}-${self:service}-ingest
+        - PolicyName: ${self:custom.stage}-start-crawler-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'glue:StartCrawler'
+                  - 'glue:GetCrawler'
+                Resource:
+                  Fn::Join:
+                      - ""
+                      - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/
+                        - !Ref GlueCrawler
+        - PolicyName: ${self:custom.stage}-athena-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'athena:ListNamedQueries'
+                  - 'athena:GetNamedQuery'
+                  - 'athena:BatchGetNamedQuery'
+                  - 'athena:StartQueryExecution'
+                Resource:
+                  Fn::Join:
+                      - ""
+                      - - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/
+                        - !Ref DoraWorkgroup
