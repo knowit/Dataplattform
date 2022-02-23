@@ -65,18 +65,17 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     def get_per_project_data(dataframe):
         project_customers = []
-        reg_period = dataframe.iloc[0]['reg_period']
         timestamp = dataframe.iloc[0]['time']
         new_dataframe = dataframe.drop_duplicates(
-            subset=["customer", "work_order_description"], keep="last")
+            subset=["customer", "work_order_description", "reg_period"], keep="last")
         df_with_employees = dataframe.drop_duplicates(subset=["customer", "work_order_description", "alias"], keep="last").groupby(
             ['customer', 'work_order_description']).size().reset_index(name="employees")
         for (index, row) in new_dataframe.iterrows():
             project_customers.append({
                 'customer': row["customer"],
                 'employees': df_with_employees[(df_with_employees["customer"] == row["customer"]) & (df_with_employees["work_order_description"] == row["work_order_description"])]["employees"].sum(),
-                'hours': dataframe[(dataframe['customer'] == row["customer"]) & (dataframe['work_order_description'] == row["work_order_description"])]['used_hrs'].sum(),
-                'reg_period': reg_period,
+                'hours': dataframe[(dataframe['customer'] == row["customer"]) & (dataframe['work_order_description'] == row["work_order_description"]) & (dataframe['reg_period'] == row["reg_period"])]['used_hrs'].sum(),
+                'reg_period': row["reg_period"],
                 'timestamp': timestamp,
                 'work_order': row["work_order_description"]
             })
