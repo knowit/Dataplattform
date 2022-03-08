@@ -1,4 +1,3 @@
 pyarrow==6.0.0
-markupsafe==2.0.1
 file:../../../packages/testing
 file:../../../packages/common
