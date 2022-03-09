@@ -4,6 +4,7 @@ from botocore.exceptions import ClientError
 import logging
 import json
 
+s3 = boto3.resource('s3')
 s3_client = boto3.client('s3')
 sts_client = boto3.client('sts')
 account_response = str(sts_client.get_caller_identity()['Account'])
@@ -37,6 +38,15 @@ def upload_frequency(file_name, bucket):
         logging.error(e)
     return response
 
+def get_bucket(bucket):
+    return s3.Bucket(bucket)
+
+def isfile_s3(bucket, key: str) -> bool:
+    """Returns T/F whether the file exists."""
+    bucky = get_bucket(bucket)
+    objs = list(bucky.objects.filter(Prefix=location + key))
+    return len(objs) == 1 and objs[0].key == location + key
+
 def create_manifest():
 
     manifest_data = {
@@ -60,11 +70,12 @@ def create_manifest():
     jsonFile.write(json_string)
     jsonFile.close()
 
-def main():
-    create_manifest()
-    upload_file("manifest.json",bucket)
-    upload_file("dora_users.csv",bucket)
-    upload_frequency('frequency.csv',bucket)
-
 if __name__ == "__main__":
-    main()
+    stage = get_stage(bucket)
+    create_manifest()
+    print(isfile_s3(f"{stage}{bucket}", "dora_users.csv"))
+    if not isfile_s3(f"{stage}{bucket}", "dora_usersa.csv"):
+        print("heyho")
+        #upload_file("dora_users.csv",f"{stage}{bucket})
+    upload_file("manifest.json",f"{stage}{bucket}")
+    upload_frequency('frequency.csv',f"{stage}{bucket}")
