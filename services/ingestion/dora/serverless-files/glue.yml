@@ -1,30 +1,30 @@
 Resources:
   GlueEncryptionConfigurations:
-      Type: AWS::Glue::SecurityConfiguration
-      Properties:
-        Name: KMSGlueEncryptionConfigurations
-        EncryptionConfiguration:
-          CloudWatchEncryption:
-            CloudWatchEncryptionMode: SSE-KMS
-            KmsKeyArn: 
+    Type: AWS::Glue::SecurityConfiguration
+    Properties:
+      Name: KMSGlueEncryptionConfigurations
+      EncryptionConfiguration:
+        CloudWatchEncryption:
+          CloudWatchEncryptionMode: SSE-KMS
+          KmsKeyArn:
+            Fn::Join:
+              - ""
+              - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                - !ImportValue ${self:custom.stage}-KMS-KeyID
+        JobBookmarksEncryption:
+          JobBookmarksEncryptionMode: CSE-KMS
+          KmsKeyArn:
+            Fn::Join:
+              - ""
+              - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                - !ImportValue ${self:custom.stage}-KMS-KeyID
+        S3Encryptions:
+          - KmsKeyArn:
               Fn::Join:
                 - ""
                 - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
                   - !ImportValue ${self:custom.stage}-KMS-KeyID
-          JobBookmarksEncryption:
-            JobBookmarksEncryptionMode: CSE-KMS
-            KmsKeyArn: 
-              Fn::Join:
-                - ""
-                - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                  - !ImportValue ${self:custom.stage}-KMS-KeyID
-          S3Encryptions:
-            - KmsKeyArn: 
-                Fn::Join:
-                  - ""
-                  - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                    - !ImportValue ${self:custom.stage}-KMS-KeyID
-              S3EncryptionMode: SSE-KMS
+            S3EncryptionMode: SSE-KMS
   GlueCrawler:
     Type: AWS::Glue::Crawler
     Properties:
@@ -36,7 +36,7 @@ Resources:
         S3Targets:
           - Path: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos'
             Exclusions:
-            - "*_metadata**"
+          - "*_metadata**"
       SchemaChangePolicy:
         UpdateBehavior: "UPDATE_IN_DATABASE"
         DeleteBehavior: "DEPRECATE_IN_DATABASE"
