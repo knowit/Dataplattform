@@ -65,7 +65,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           dataplattform register-table slack_emoji -s prod
-          dataplattform database -a 2 update-tables -s prod
+          dataplattform database -a 2 update-tables
 
       - name: Registrer and update glue tables dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
@@ -75,4 +75,4 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           dataplattform register-table slack_emoji -s dev
-          dataplattform database -a 2 update-tables -s dev
+          dataplattform database -a 2 update-tables
