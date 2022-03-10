@@ -48,7 +48,6 @@ jobs:
         run: |
           echo "Deploying to production" && sls deploy --stage prod
           
-
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
@@ -58,6 +57,7 @@ jobs:
         run: |
           echo "Deploying to development" && sls deploy --stage dev
         
+
       - name: Configure dora prod
         if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
         env:
@@ -67,7 +67,6 @@ jobs:
         run: |
           echo "Invoking configuration in prod" && sls invoke -f configuration --stage prod
           
-
       - name: Configure dora dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
@@ -77,3 +76,22 @@ jobs:
         run: |
           echo "Invoking configuration in dev" && sls invoke -f configuration --stage dev
 
+        #- name: Run serverless deploy dev
+        #working-directoy: quicksight
+        #if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        #env:
+        #  AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+        #  AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+        #  AWS_DEFAULT_REGION: eu-central-1
+        #run: |
+        #  echo "Deploying to development" && sls deploy --stage dev
+
+        #- name: Run serverless deploy prod
+        #working-directoy: quicksight
+        #if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        #env:
+        #  AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+        #  AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+        #  AWS_DEFAULT_REGION: eu-central-1
+        #run: |
+        #  echo "Deploying to development" && sls deploy --stage prod
