@@ -5,8 +5,6 @@ dataplattform:
     - ../deploymentBucket
     - ../events
 
-plugins:
-  - serverless-pseudo-parameters
 
 custom:
   stage: ${opt:stage, self:provider.stage}
