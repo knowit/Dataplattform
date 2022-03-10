@@ -1,80 +1,80 @@
-Resources:  
+Resources:
   IngestLambdaRole:
-      Type: AWS::IAM::Role
-      Properties:
-        RoleName: ${self:custom.stage}-${self:service}-ingest-role
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - lambda.amazonaws.com
-              Action: sts:AssumeRole
-        ManagedPolicyArns:
-          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-        Policies:
-          - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:PutObject
-                    - s3:ListObjects*
-                    - s3:GetObject
-                    - s3:CopyObject
-                    - s3:DeleteObjects
-                    - s3:DeleteObjectVersion
-                  Resource: 
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-          - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - kms:Encrypt
-                    - kms:Decrypt
-                    - kms:DescribeKey
-                    - kms:ListKeys
-                    - kms:GenerateDataKey 
-                  Resource:
-                    Fn::Join:
-                      - ""
-                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                        - !ImportValue ${self:custom.stage}-KMS-KeyID
-          - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - s3:ListBucket
-                    - s3:ListBucketVersions
-                    - s3:GetBucketLocation
-                  Resource: 
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-          - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - sqs:GetQueueUrl
-                    - sqs:SendMessageBatch
-                    - sqs:SendMessage
-                  Resource: !GetAtt EventQueue.Arn
-          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: ${self:custom.stage}-${self:service}-ingest-role
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+      Policies:
+        - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:ListObjects*
+                  - s3:GetObject
+                  - s3:CopyObject
+                  - s3:DeleteObjects
+                  - s3:DeleteObjectVersion
+                Resource:
+                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
+        - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Encrypt
+                  - kms:Decrypt
+                  - kms:DescribeKey
+                  - kms:ListKeys
+                  - kms:GenerateDataKey
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                      - !ImportValue ${self:custom.stage}-KMS-KeyID
+        - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                  - s3:ListBucketVersions
+                  - s3:GetBucketLocation
+                Resource:
+                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
+        - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - sqs:GetQueueUrl
+                  - sqs:SendMessageBatch
+                  - sqs:SendMessage
+                Resource: !GetAtt EventQueue.Arn
+        - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 'ssm:GetParameter*'
+                Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
   QuicksightUserGroupRole:
     Type: AWS::IAM::Role
     Properties:
@@ -124,7 +124,7 @@ Resources:
                   - kms:Decrypt
                   - kms:DescribeKey
                   - kms:ListKeys
-                  - kms:GenerateDataKey 
+                  - kms:GenerateDataKey
                 Resource:
                   Fn::Join:
                     - ""
@@ -272,12 +272,12 @@ Resources:
                   - kms:Decrypt
                   - kms:DescribeKey
                   - kms:ListKeys
-                  - kms:GenerateDataKey 
+                  - kms:GenerateDataKey
                 Resource:
                   Fn::Join:
                     - ""
                     - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
-                      - !ImportValue ${self:custom.stage}-KMS-KeyID 
+                      - !ImportValue ${self:custom.stage}-KMS-KeyID
         - PolicyName: ${self:custom.stage}-glue-${self:service}-role
           PolicyDocument:
             Version: "2012-10-17"
@@ -373,9 +373,9 @@ Resources:
                   - 'glue:GetCrawler'
                 Resource:
                   Fn::Join:
-                      - ""
-                      - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/
-                        - !Ref GlueCrawler
+                    - ""
+                    - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/
+                      - !Ref GlueCrawler
         - PolicyName: ${self:custom.stage}-athena-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -388,6 +388,6 @@ Resources:
                   - 'athena:StartQueryExecution'
                 Resource:
                   Fn::Join:
-                      - ""
-                      - - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/
-                        - !Ref DoraWorkgroup
+                    - ""
+                    - - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/
+                      - !Ref DoraWorkgroup
