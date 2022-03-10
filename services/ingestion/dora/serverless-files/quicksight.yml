@@ -2,7 +2,7 @@ Resources:
   AthenaDataSource:
     Type: AWS::QuickSight::DataSource
     Properties:
-      DataSourceParameters: 
+      DataSourceParameters:
         AthenaParameters:
           WorkGroup: DoraWorkgroups
       AwsAccountId: !Sub ${AWS::AccountId}
@@ -25,7 +25,7 @@ Resources:
       Name: DoraWorkGroup-S3DataSource
       Type: S3
       DataSourceId: S3Source
-      DataSourceParameters: 
+      DataSourceParameters:
         S3Parameters:
           ManifestFileLocation:
             Bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
@@ -50,7 +50,7 @@ Resources:
         s3PhysicalTable:
           S3Source:
             DataSourceArn: !GetAtt S3DataSource.Arn
-            InputColumns: 
+            InputColumns:
               - Name: partition_1
                 Type: STRING
               - Name: GroupName
@@ -58,7 +58,7 @@ Resources:
             UploadSettings:
               Format: CSV
               StartFromRow: 1
-              ContainsHeader: True
+              ContainsHeader: true
               Delimiter: ','
       Permissions:
         - Principal: ${ssm:/dev/dora/quicksight_principal}
@@ -123,11 +123,11 @@ Resources:
             SqlQuery: 'SELECT * FROM AwsDataCatalog.dev_level_4_database.github_deployments_with_null_values'
             Columns:
               - Name: date_column
-                Type: DATETIME 
+                Type: DATETIME
               - Name: partition_1
                 Type: STRING
               - Name: deployments
-                Type: INTEGER 
+                Type: INTEGER
       RowLevelPermissionDataSet:
         Arn: !GetAtt Rolebindings.Arn
         FormatVersion: VERSION_1
