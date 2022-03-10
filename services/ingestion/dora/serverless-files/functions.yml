@@ -1,26 +1,26 @@
 ingest:
-    handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler
-    name: ${self:custom.stage}-${self:service}-ingest
-    description: ${self:custom.editable.description}
-    role: !GetAtt IngestLambdaRole.Arn
-    package:
-      include:
-        - '${self:custom.editable.srcDir}/*.py'
-    environment:
-      STAGE: ${self:custom.stage}
-      SERVICE: ${self:service}
-      DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
-      ACCESS_PATH: ${self:custom.accessPath}
-      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
-      SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
-      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-    tags:
-    events:
-      - schedule:
-          name: ${self:custom.stage}-${self:service}-timer
-          description: ${self:custom.editable.description}
-          rate: ${self:custom.editable.scheduleRate}
-          enabled: true
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-ingest
+  description: ${self:custom.editable.description}
+  role: !GetAtt IngestLambdaRole.Arn
+  package:
+    include:
+      - '${self:custom.editable.srcDir}/*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+    DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+    ACCESS_PATH: ${self:custom.accessPath}
+    DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+    SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+    SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+  tags:
+  events:
+    - schedule:
+      name: ${self:custom.stage}-${self:service}-timer
+      description: ${self:custom.editable.description}
+      rate: ${self:custom.editable.scheduleRate}
+      enabled: true
 process:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
   events:
@@ -81,13 +81,13 @@ quicksight_register_users_lambda:
     SERVICE: ${self:service}
     DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
   events:
-      - s3:
-          bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: data/level-3/dora/
-            - suffix: dora_users.csv
-          existing: true
+    - s3:
+        bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+        event: s3:ObjectCreated:*
+        rules:
+          - prefix: data/level-3/dora/
+          - suffix: dora_users.csv
+        existing: true
 dataset_ingestion:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightIngestionHandlerFile}.handler
   name: ${self:custom.stage}-${self:service}-quicksight-ingestion-lambda
@@ -123,10 +123,10 @@ rolebindings_ingestion:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
   events:
-      - s3:
-          bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
-          event: s3:ObjectCreated:*
-          rules:
-            - prefix: data/level-3/dora/
-            - suffix: quicksight_role_bindings.csv
-          existing: true
+    - s3:
+        bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+        event: s3:ObjectCreated:*
+        rules:
+          - prefix: data/level-3/dora/
+          - suffix: quicksight_role_bindings.csv
+        existing: true
