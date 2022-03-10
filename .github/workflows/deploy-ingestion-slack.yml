@@ -64,8 +64,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table slack_emoji
-          dataplattform database -a 2 update-tables
+          dataplattform register-table slack_emoji -s prod
+          dataplattform database -a 2 update-tables -s prod
 
       - name: Registrer and update glue tables dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
@@ -74,5 +74,5 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          dataplattform register-table slack_emoji
-          dataplattform database -a 2 update-tables
+          dataplattform register-table slack_emoji -s dev
+          dataplattform database -a 2 update-tables -s dev
