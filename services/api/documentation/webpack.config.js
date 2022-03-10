@@ -1,6 +1,6 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { DefinePlugin } = require('webpack')
 const fs = require("fs")
@@ -16,6 +16,14 @@ module.exports = {
   mode: 'development',
   entry: {
     app: './src/index.js',
+  },
+  resolve : {
+    fallback:{
+      buffer: require.resolve("buffer/"),
+      url: require.resolve("url/"),
+      stream: require.resolve("stream-browserify/"),
+      events: require.resolve("events/")
+    }
   },
   module: {
     rules: [
@@ -36,17 +44,19 @@ module.exports = {
     ]
   },
   plugins: [
-    new CleanWebpackPlugin([
-      outputPath
-    ]),
-    new CopyWebpackPlugin([
+    new CleanWebpackPlugin(),
+    new CopyWebpackPlugin(
+      {
+        patterns:[
       {
         // Copy the Swagger OAuth2 redirect file to the project root;
         // that file handles the OAuth2 redirect after authenticating the end-user.
         from: 'node_modules/swagger-ui/dist/oauth2-redirect.html',
         to: './'
       }
-    ]),
+    ]
+    }
+    ),
     new HtmlWebpackPlugin({
       template: 'index.html'
     }),
