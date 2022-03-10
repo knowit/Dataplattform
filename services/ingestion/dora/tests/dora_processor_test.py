@@ -3,6 +3,7 @@ from dataplattform.common import schema
 from pytest import fixture
 from json import load
 import pandas as pd
+from responses import RequestsMock
 from os import path
 
 @fixture
