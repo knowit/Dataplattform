@@ -36,7 +36,7 @@ Resources:
         S3Targets:
           - Path: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos'
             Exclusions:
-          - "*_metadata**"
+              - "*_metadata**"
       SchemaChangePolicy:
         UpdateBehavior: "UPDATE_IN_DATABASE"
         DeleteBehavior: "DEPRECATE_IN_DATABASE"
