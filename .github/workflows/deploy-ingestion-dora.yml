@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install packages/*   #Usikker hva vi trenger her, review
+      - name: Install packages/* 
         run: |
           pip install -e ../../../packages/cli
           pip install -e ../../../packages/common
