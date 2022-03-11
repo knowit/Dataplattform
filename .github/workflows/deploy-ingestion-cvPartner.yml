@@ -77,27 +77,27 @@ jobs:
         run: |
           echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev     
 
-      - name: Registrer and update glue tables prod
-        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          dataplattform register-table cv_partner_employees cv_partner_education cv_partner_blogs cv_partner_courses \
-          cv_partner_key_qualification cv_partner_languages cv_partner_project_experience cv_partner_technology_skills \
-          cv_partner_work_experience
-          dataplattform database -a 3 update-tables
+      # - name: Registrer and update glue tables prod
+      #   if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: eu-central-1
+      #   run: |
+      #     dataplattform register-table cv_partner_employees cv_partner_education cv_partner_blogs cv_partner_courses \
+      #     cv_partner_key_qualification cv_partner_languages cv_partner_project_experience cv_partner_technology_skills \
+      #     cv_partner_work_experience
+      #     dataplattform database -a 3 update-tables
           
-      - name: Registrer and update glue tables dev
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          dataplattform register-table cv_partner_employees cv_partner_education cv_partner_blogs cv_partner_courses \
-          cv_partner_key_qualification cv_partner_languages cv_partner_project_experience cv_partner_technology_skills \
-          cv_partner_work_experience
-          dataplattform database -a 3 update-tables
+      # - name: Registrer and update glue tables dev
+      #   if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+      #   env:
+      #     AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+      #     AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+      #     AWS_DEFAULT_REGION: eu-central-1
+      #   run: |
+      #     dataplattform register-table cv_partner_employees cv_partner_education cv_partner_blogs cv_partner_courses \
+      #     cv_partner_key_qualification cv_partner_languages cv_partner_project_experience cv_partner_technology_skills \
+      #     cv_partner_work_experience
+      #     dataplattform database -a 3 update-tables
              
