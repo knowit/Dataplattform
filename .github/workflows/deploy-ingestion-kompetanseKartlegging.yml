@@ -74,25 +74,3 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev
-
-      - name: Registrer and update glue tables prod
-        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          dataplattform register-table kompetansekartlegging_users kompetansekartlegging_answers \
-          kompetansekartlegging_catalogs kompetansekartlegging_questions kompetansekartlegging_categories
-          dataplattform database -a 3 update-tables
-
-      - name: Registrer and update glue tables dev
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          dataplattform register-table kompetansekartlegging_users kompetansekartlegging_answers \
-          kompetansekartlegging_catalogs kompetansekartlegging_questions kompetansekartlegging_categories
-          dataplattform database -a 1 update-tables
