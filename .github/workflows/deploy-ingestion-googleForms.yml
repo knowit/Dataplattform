@@ -57,22 +57,3 @@ jobs:
         run: |
           echo "Deploying to development" && sls deploy --stage dev
 
-      - name: Registrer and update glue tables prod
-        if:  ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          dataplattform register-table google_forms_data
-          dataplattform database -a 3 update-tables
-
-      - name: Registrer and update glue tables dev
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: eu-central-1
-        run: |
-          dataplattform register-table google_forms_data
-          dataplattform database -a 3 update-tables
