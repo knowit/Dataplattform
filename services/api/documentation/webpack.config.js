@@ -63,7 +63,8 @@ module.exports = {
       DEMO_CLIENT_ID: JSON.stringify(cognitoClientId)
     }),
     new ProvidePlugin({
-      Buffer: ['buffer', 'Buffer']
+      Buffer: ['buffer', 'Buffer'],
+      process: 'process/browser'
     })
   ],
   output: {
