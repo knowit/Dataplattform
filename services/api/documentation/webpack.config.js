@@ -1,8 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { DefinePlugin } = require('webpack')
+const { DefinePlugin, ProvidePlugin } = require('webpack')
 const fs = require("fs")
 
 const outputPath = path.resolve(__dirname, 'dist');
@@ -17,10 +17,9 @@ module.exports = {
   entry: {
     app: './src/index.js',
   },
-  resolve : {
-    fallback:{
-      buffer: false,
-      stream: false
+  resolve: {
+    fallback: {
+      stream: require.resolve('stream-browserify/')
     }
   },
   module: {
@@ -61,6 +60,10 @@ module.exports = {
     new DefinePlugin({
       API_URL: JSON.stringify(apiUrl),
       DEMO_CLIENT_ID: JSON.stringify(cognitoClientId)
+    }),
+    new ProvidePlugin({
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer']
     })
   ],
   output: {
