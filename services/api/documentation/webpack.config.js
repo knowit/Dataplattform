@@ -18,6 +18,12 @@ module.exports = {
   entry: {
     app: './src/index.js',
   },
+  resolve : {
+    fallback:{
+      buffer: false,
+      stream: false
+    }
+  },
   module: {
     rules: [
       {
