@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const { DefinePlugin } = require('webpack')
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 const fs = require("fs")
 
 const outputPath = path.resolve(__dirname, 'dist');
@@ -61,7 +62,8 @@ module.exports = {
     new DefinePlugin({
       API_URL: JSON.stringify(apiUrl),
       DEMO_CLIENT_ID: JSON.stringify(cognitoClientId)
-    })
+    }),
+    new NodePolyfillPlugin()
   ],
   output: {
     filename: '[name].bundle.js',
