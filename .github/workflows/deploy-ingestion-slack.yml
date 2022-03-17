@@ -56,3 +56,4 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to development" && sls deploy --stage dev
+
