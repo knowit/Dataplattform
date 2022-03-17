@@ -2,7 +2,8 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { DefinePlugin, ProvidePlugin } = require('webpack')
+const { DefinePlugin } = require('webpack')
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin")
 const fs = require("fs")
 
 const outputPath = path.resolve(__dirname, 'dist');
@@ -17,12 +18,6 @@ module.exports = {
   entry: {
     app: './src/index.js',
   },
-  resolve: {
-    fallback: {
-        buffer: require.resolve('buffer'),
-        stream: require.resolve('stream-browserify')
-    },
-},
   module: {
     rules: [
       {
@@ -62,10 +57,7 @@ module.exports = {
       API_URL: JSON.stringify(apiUrl),
       DEMO_CLIENT_ID: JSON.stringify(cognitoClientId)
     }),
-    new ProvidePlugin({
-      Buffer: ['buffer', 'Buffer'],
-      process: 'process/browser'
-    })
+    new NodePolyfillPlugin()
   ],
   output: {
     filename: '[name].bundle.js',
