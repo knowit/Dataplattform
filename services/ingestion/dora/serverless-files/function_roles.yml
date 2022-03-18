@@ -43,7 +43,7 @@ Resources:
                 Resource:
                   Fn::Join:
                     - ""
-                    - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                    - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                       - !ImportValue ${self:custom.stage}-KMS-KeyID
         - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
           PolicyDocument:
@@ -74,7 +74,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - 'ssm:GetParameter*'
-                Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*
   QuicksightUserGroupRole:
     Type: AWS::IAM::Role
     Properties:
@@ -100,9 +100,9 @@ Resources:
                   - 'glue:GetTable'
                   - 'glue:GetDatabase'
                 Resource:
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*
         - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -128,7 +128,7 @@ Resources:
                 Resource:
                   Fn::Join:
                     - ""
-                    - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                    - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                       - !ImportValue ${self:custom.stage}-KMS-KeyID
         - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
           PolicyDocument:
@@ -220,9 +220,9 @@ Resources:
                   - 'glue:GetTable'
                   - 'glue:GetDatabase'
                 Resource:
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*
         - PolicyName: ${self:custom.stage}-Athena-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -233,7 +233,7 @@ Resources:
                   - 'athena:GetQueryExecution'
                   - 'athena:GetQueryResults'
                 Resource:
-                  !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary'
+                  !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary
         - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -276,7 +276,7 @@ Resources:
                 Resource:
                   Fn::Join:
                     - ""
-                    - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                    - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                       - !ImportValue ${self:custom.stage}-KMS-KeyID
         - PolicyName: ${self:custom.stage}-glue-${self:service}-role
           PolicyDocument:
@@ -287,10 +287,10 @@ Resources:
                   - glue:GetCrawler
                   - glue:UpdateCrawler
                 Resource:
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
-                  - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*
   RolebindingIngestionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -362,7 +362,7 @@ Resources:
                 Action:
                   - 'lambda:InvokeFunction'
                 Resource:
-                  - !Sub arn:aws:lambda:#{AWS::Region}:#{AWS::AccountId}:function:${self:custom.stage}-${self:service}-ingest
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${self:custom.stage}-${self:service}-ingest
         - PolicyName: ${self:custom.stage}-start-crawler-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -372,8 +372,7 @@ Resources:
                   - 'glue:StartCrawler'
                   - 'glue:GetCrawler'
                 Resource:
-                  - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/DoraCrawlers
-                    #  - !ImportValue ${self:custom.stage}-DoraCrawler
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/DoraCrawlers
         - PolicyName: ${self:custom.stage}-athena-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -385,5 +384,4 @@ Resources:
                   - 'athena:BatchGetNamedQuery'
                   - 'athena:StartQueryExecution'
                 Resource:
-                  - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/DoraWorkgroup
-                    # - !ImportValue ${self:custom.stage}-DoraWorkgroup
+                  - !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/DoraWorkgroup
