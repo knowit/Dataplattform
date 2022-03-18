@@ -372,9 +372,7 @@ Resources:
                   - 'glue:StartCrawler'
                   - 'glue:GetCrawler'
                 Resource:
-                  Fn::Join:
-                    - ""
-                    - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/DoraCrawler
+                  - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/DoraCrawlers
                     #  - !ImportValue ${self:custom.stage}-DoraCrawler
         - PolicyName: ${self:custom.stage}-athena-${self:service}
           PolicyDocument:
@@ -387,7 +385,5 @@ Resources:
                   - 'athena:BatchGetNamedQuery'
                   - 'athena:StartQueryExecution'
                 Resource:
-                  Fn::Join:
-                    - ""
-                    - - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/DoraWorkgroup
+                  - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/DoraWorkgroup
                     # - !ImportValue ${self:custom.stage}-DoraWorkgroup
