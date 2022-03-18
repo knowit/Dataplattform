@@ -62,7 +62,7 @@ provider:
 package:
   individually: true
   exclude:
-    - ./**
+    - "./**"
 
 functions:
   - ${file(serverless-files/functions.yml)}
@@ -72,9 +72,7 @@ resources:
   - ${file(serverless-files/athena.yml)}
   - ${file(serverless-files/function_roles.yml)}
   - ${file(serverless-files/sqs.yml)}
-  - ${file(serverless-files/glue.yml)}
   - ${file(serverless-files/cloudwatch.yml)}
-  - ${file(serverless-files/quicksight.yml)}
 
 plugins:
   - serverless-python-requirements
