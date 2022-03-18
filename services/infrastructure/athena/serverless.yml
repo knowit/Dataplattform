@@ -261,7 +261,7 @@ resources:
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
 
-Outputs:
+  Outputs:
     DoraWorkgroup:
       Description: WorkGroup used for dora
       Value: !Ref DoraWorkgroup
