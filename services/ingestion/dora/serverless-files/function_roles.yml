@@ -374,8 +374,8 @@ Resources:
                 Resource:
                   Fn::Join:
                     - ""
-                    - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/
-                      - !ImportValue ${self:custom.stage}-DoraCrawler
+                    - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/DoraCrawler
+                    #  - !ImportValue ${self:custom.stage}-DoraCrawler
         - PolicyName: ${self:custom.stage}-athena-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -389,5 +389,5 @@ Resources:
                 Resource:
                   Fn::Join:
                     - ""
-                    - - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/
-                      - !Ref DoraWorkgroup
+                    - - !Sub arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/DoraWorkgroup
+                    # - !ImportValue ${self:custom.stage}-DoraWorkgroup
