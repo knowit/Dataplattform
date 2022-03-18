@@ -65,7 +65,7 @@ quicksight_usergroup_lambda:
             - Glue Crawler State Change
           detail:
             crawlerName:
-              - !ImportValue ${self:custom.stage}-DoraCrawler
+              - DoraCrawler
             state:
               - Succeeded
 quicksight_register_users_lambda:
@@ -108,7 +108,7 @@ dataset_ingestion:
             - Glue Crawler State Change
           detail:
             crawlerName:
-              - !ImportValue ${self:custom.stage}-DoraCrawler
+              - DoraCrawler
             state:
               - Succeeded
 rolebindings_ingestion:
