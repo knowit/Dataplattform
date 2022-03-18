@@ -260,5 +260,12 @@ resources:
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
 
+Outputs:
+    DoraWorkgroup:
+      Description: WorkGroup used for dora
+      Value: !Ref DoraWorkgroup
+      Export:
+        Name: ${self:custom.stage}-DoraWorkgroup
+
 plugins:
   - serverless-pseudo-parameters
