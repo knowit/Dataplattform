@@ -75,7 +75,6 @@ if __name__ == "__main__":
     create_manifest()
     print(isfile_s3(f"{stage}{bucket}", "dora_users.csv"))
     if not isfile_s3(f"{stage}{bucket}", "dora_usersa.csv"):
-        print("heyho")
-        #upload_file("dora_users.csv",f"{stage}{bucket})
+        upload_file("dora_users.csv",f"{stage}{bucket}")
     upload_file("manifest.json",f"{stage}{bucket}")
     upload_frequency('frequency.csv',f"{stage}{bucket}")

@@ -21,6 +21,7 @@ resources:
   Resources:
     CrawlerLogGroup:
       Type: AWS::Logs::LogGroup
+      DeletionPolicy: Retain
       Properties:
         KmsKeyId:
           Fn::Join:

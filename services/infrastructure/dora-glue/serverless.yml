@@ -62,3 +62,10 @@ resources:
           DeleteBehavior: "DEPRECATE_IN_DATABASE"
         Schedule:
           ScheduleExpression: "cron(45 16 ? * MON-FRI *)"
+
+Outputs:
+    GlueCrawler:
+      Description: Glue crawler used for dora
+      Value: !Ref GlueCrawler
+      Export:
+        Name: ${self:custom.stage}-DoraCrawler
