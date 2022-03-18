@@ -18,11 +18,8 @@ custom:
     srcDir: lib/dora
     handlerFile: dora_ingestion_handler
     processHandlerFile: dora_process_handler
-    glueLambdaHandlerFile: dora_glue_lambda
     quicksightUsersHandlerFile: dora_create_quicksight_groups
     registerUsersHandlerFile: dora_register_users_lambda
-    athenaStartupHandlerFile: dora_athena_setup
-    quicksightStartupHandlerFile: dora_quicksight_setup_lambda
     quicksightIngestionHandlerFile: dora_quicksight_ingestion
     rolebindingsIngestionHandlerFile: dora_rolebindings_ingestion
     doraConfigurationHandlerFile: dora_configuration_lambda
@@ -69,10 +66,8 @@ functions:
   - ${file(serverless-files/configuration.yml)}
 
 resources:
-  - ${file(serverless-files/athena.yml)}
   - ${file(serverless-files/function_roles.yml)}
   - ${file(serverless-files/sqs.yml)}
-  - ${file(serverless-files/cloudwatch.yml)}
 
 plugins:
   - serverless-python-requirements
