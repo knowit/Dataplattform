@@ -48,9 +48,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: >
-      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName,
-      file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
@@ -64,7 +62,7 @@ provider:
 package:
   individually: true
   exclude:
-    - ./**
+    - "./**"
 
 functions:
   - ${file(serverless-files/functions.yml)}
@@ -74,9 +72,7 @@ resources:
   - ${file(serverless-files/athena.yml)}
   - ${file(serverless-files/function_roles.yml)}
   - ${file(serverless-files/sqs.yml)}
-  - ${file(serverless-files/glue.yml)}
   - ${file(serverless-files/cloudwatch.yml)}
-  - ${file(serverless-files/quicksight.yml)}
 
 plugins:
   - serverless-python-requirements

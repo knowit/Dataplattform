@@ -374,8 +374,7 @@ Resources:
                 Resource:
                   Fn::Join:
                     - ""
-                    - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/
-                      - !Ref GlueCrawler
+                    - - !Sub arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/DoraCrawlers
         - PolicyName: ${self:custom.stage}-athena-${self:service}
           PolicyDocument:
             Version: "2012-10-17"

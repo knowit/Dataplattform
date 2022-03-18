@@ -1,0 +1,64 @@
+service: dora-glue
+
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../kms
+    - ../glue
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.service}
+  deploymentBucket:
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+
+resources:
+  Resources:
+    GlueEncryptionConfigurations:
+      Type: AWS::Glue::SecurityConfiguration
+      Properties:
+        Name: KMSGlueEncryptionConfigurations
+        EncryptionConfiguration:
+          CloudWatchEncryption:
+            CloudWatchEncryptionMode: SSE-KMS
+            KmsKeyArn:
+              Fn::Join:
+                - ""
+                - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                  - !ImportValue ${self:custom.stage}-KMS-KeyID
+          JobBookmarksEncryption:
+            JobBookmarksEncryptionMode: CSE-KMS
+            KmsKeyArn:
+              Fn::Join:
+                - ""
+                - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                  - !ImportValue ${self:custom.stage}-KMS-KeyID
+          S3Encryptions:
+            - KmsKeyArn:
+                Fn::Join:
+                  - ""
+                  - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                    - !ImportValue ${self:custom.stage}-KMS-KeyID
+              S3EncryptionMode: SSE-KMS
+    GlueCrawler:
+      Type: AWS::Glue::Crawler
+      Properties:
+        Name: DoraCrawlers
+        CrawlerSecurityConfiguration: !Ref GlueEncryptionConfigurations
+        Role: !ImportValue dev-level-4-glue-access
+        DatabaseName: dev_level_4_database
+        Targets:
+          S3Targets:
+            - Path: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos'
+              Exclusions:
+                - "*_metadata**"
+        SchemaChangePolicy:
+          UpdateBehavior: "UPDATE_IN_DATABASE"
+          DeleteBehavior: "DEPRECATE_IN_DATABASE"
+        Schedule:
+          ScheduleExpression: "cron(45 16 ? * MON-FRI *)"
