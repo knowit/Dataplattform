@@ -24,6 +24,7 @@ resources:
   Resources:
     DoraWorkgroup:
       Type: AWS::Athena::WorkGroup
+      DeletionPolicy: Retain
       Properties:
         Name: DoraWorkgroups
         Description: Workgroup for DORA views
