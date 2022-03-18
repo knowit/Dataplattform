@@ -31,13 +31,13 @@ resources:
         State: ENABLED
         WorkGroupConfiguration:
           ResultConfiguration:
-            OutputLocation: s3://${self:custom.stage}-kmsbucket-#{AWS::AccountId}/Athena-logs/
+            OutputLocation: !Sub s3://${self:custom.stage}-kmsbucket-${AWS::AccountId}/Athena-logs/
             EncryptionConfiguration:
               EncryptionOption: SSE_KMS
               KmsKey:
                 Fn::Join:
                   - ""
-                  - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                  - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                     - !ImportValue ${self:custom.stage}-KMS-KeyID
     AthenaGithubDeployments:
       Type: AWS::Athena::NamedQuery
@@ -185,7 +185,7 @@ resources:
           WITH SERDEPROPERTIES (
           'serialization.format' = ',',
           'field.delim' = ','
-          ) LOCATION 's3://dev-datalake-bucket-#{AWS::AccountId}/data/level-3/dora/frequency/'
+          ) LOCATION 's3://dev-datalake-bucket-${AWS::AccountId}/data/level-3/dora/frequency/'
           TBLPROPERTIES ('has_encrypted_data'='false');
     AthenaSetupRole:
       Type: AWS::IAM::Role
@@ -211,9 +211,9 @@ resources:
                     - 'glue:GetTable'
                     - 'glue:GetDatabase'
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+                    - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
+                    - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database
+                    - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*
           - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -228,7 +228,7 @@ resources:
                   Resource:
                     Fn::Join:
                       - ""
-                      - - "arn:aws:kms:#{AWS::Region}:#{AWS::AccountId}:key/"
+                      - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                         - !ImportValue ${self:custom.stage}-KMS-KeyID
           - PolicyName: ${self:custom.stage}-Athena-${self:service}
             PolicyDocument:
@@ -243,7 +243,7 @@ resources:
                     - 'athena:GetNamedQuery'
                     - 'athena:CreateNamedQuery'
                   Resource:
-                    !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/DoraWorkgroups'
+                    !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/DoraWorkgroups
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -267,6 +267,3 @@ resources:
       Value: !Ref DoraWorkgroup
       Export:
         Name: ${self:custom.stage}-DoraWorkgroup
-
-plugins:
-  - serverless-pseudo-parameters

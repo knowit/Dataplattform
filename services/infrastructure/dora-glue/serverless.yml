@@ -29,20 +29,20 @@ resources:
             KmsKeyArn:
               Fn::Join:
                 - ""
-                - - !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/'
+                - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                   - !ImportValue ${self:custom.stage}-KMS-KeyID
           JobBookmarksEncryption:
             JobBookmarksEncryptionMode: CSE-KMS
             KmsKeyArn:
               Fn::Join:
                 - ""
-                - - !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/'
+                - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                   - !ImportValue ${self:custom.stage}-KMS-KeyID
           S3Encryptions:
             - KmsKeyArn:
                 Fn::Join:
                   - ""
-                  - - !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/'
+                  - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
                     - !ImportValue ${self:custom.stage}-KMS-KeyID
               S3EncryptionMode: SSE-KMS
     GlueCrawler:
@@ -54,7 +54,7 @@ resources:
         DatabaseName: dev_level_4_database
         Targets:
           S3Targets:
-            - Path: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos'
+            - Path: !Sub ${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos
               Exclusions:
                 - "*_metadata**"
         SchemaChangePolicy:
