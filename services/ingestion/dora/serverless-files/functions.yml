@@ -17,10 +17,10 @@ ingest:
   tags:
   events:
     - schedule:
-      name: ${self:custom.stage}-${self:service}-timer
-      description: ${self:custom.editable.description}
-      rate: ${self:custom.editable.scheduleRate}
-      enabled: true
+        name: ${self:custom.stage}-${self:service}-timer
+        description: ${self:custom.editable.description}
+        rate: ${self:custom.editable.scheduleRate}
+        enabled: true
 process:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
   events:
@@ -65,7 +65,7 @@ quicksight_usergroup_lambda:
             - Glue Crawler State Change
           detail:
             crawlerName:
-              - DoraCrawlers
+              - DoraCrawler
             state:
               - Succeeded
 quicksight_register_users_lambda:

@@ -9,7 +9,7 @@ configuration:
   environment:
     STAGE: ${self:custom.stage}
     SERVICE: ${self:service}
-    DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+    DATALAKE: !Sub ${self:custom.stage}-kmsbucket-${AWS::AccountId}
     ACCESS_PATH: ${self:custom.accessPath}
     DEFAULT_DATABASE: ${self:custom.editable.databaseName}
     SQS_QUEUE_NAME: ${self:custom.sqsQueueName}

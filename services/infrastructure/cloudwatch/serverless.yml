@@ -1,0 +1,31 @@
+service: cloudwatch
+
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../datalake
+    - ../kms
+    - ../glue
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  deploymentBucket:
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+
+resources:
+  Resources:
+    CrawlerLogGroup:
+      Type: AWS::Logs::LogGroup
+      DeletionPolicy: Retain
+      Properties:
+        KmsKeyId:
+          Fn::Join:
+            - ""
+            - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
+              - !ImportValue ${self:custom.stage}-KMS-KeyID
+        LogGroupName: /aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations

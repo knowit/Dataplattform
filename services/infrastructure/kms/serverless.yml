@@ -96,3 +96,4 @@ resources:
       Value: !Ref KMSBucketKey
       Export:
         Name: ${self:custom.stage}-KMS-KeyID
+        
