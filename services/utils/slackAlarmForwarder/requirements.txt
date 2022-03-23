@@ -1,2 +1,2 @@
-cachetools
-requests
+cachetools==4.2.4
+requests==2.23

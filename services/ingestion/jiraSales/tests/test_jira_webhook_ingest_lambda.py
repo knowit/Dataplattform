@@ -1,4 +1,4 @@
-from jira_webhook_ingest_lambda import handler
+from jirasales.jira_webhook_ingest_lambda import handler
 from dataplattform.testing.events import APIGateway
 from json import dumps, loads
 

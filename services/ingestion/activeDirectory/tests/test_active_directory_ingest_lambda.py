@@ -1,6 +1,6 @@
 import boto3
 from uuid import uuid4
-from active_directory_ingest_lambda import handler
+from activeDirectory.active_directory_ingest_lambda import handler
 from pytest import fixture
 from json import load
 from os import path, environ

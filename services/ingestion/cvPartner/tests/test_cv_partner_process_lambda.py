@@ -1,11 +1,10 @@
-from cv_partner_process_lambda import handler
+from cvpartner.cv_partner_process_lambda import handler
 from dataplattform.common import schema
 from pytest import fixture
 from os import path
 from json import load
 import pandas as pd
 from io import BytesIO
-
 
 @fixture
 def test_data():
@@ -157,6 +156,36 @@ def test_process_education_table_content_missing(setup_queue_event, test_data,
             'year_from': [2015, 2018],
             'year_to': [2018, 2020]
             }))
+
+
+"""
+Case: user1 has no courses, api reports cv.courses = [], while for user2 the cv.courses entry is not present,
+therefore the data frame should not be made
+"""
+
+
+def test_process_courses_table_content_empty(setup_queue_event, test_data,
+                                                 create_table_mock, dynamodb_resource):
+
+    tmp_data = test_data['data']
+    tmp_data[0]['cv']['courses'] = []
+
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=tmp_data))
+
+    handler(event, None)
+
+    create_table_mock.assert_table_created(
+        'cv_partner_employees',
+        'cv_partner_education',
+        'cv_partner_blogs',
+        'cv_partner_key_qualification',
+        'cv_partner_languages',
+        'cv_partner_project_experience',
+        'cv_partner_technology_skills',
+        'cv_partner_work_experience')
 
 
 def test_project_experiences_df(setup_queue_event, test_data, create_table_mock, dynamodb_resource):

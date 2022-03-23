@@ -15,6 +15,7 @@ dataplattform:
 custom:
   editable:
     timeout: 12
+    srcDir: lib/jirasales
     webhookIngestHandlerFile: jira_webhook_ingest_lambda
     pollerIngestHandlerFile: jira_poller_ingest_lambda
     processHandlerFile: jira_process_lambda
@@ -76,13 +77,13 @@ package:
 
 functions:
   pollerIngest:
-    handler: ${self:custom.editable.pollerIngestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.pollerIngestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-poller-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -98,13 +99,13 @@ functions:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
   webhookIngest:
-    handler: ${self:custom.editable.webhookIngestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.webhookIngestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-webhook-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -120,7 +121,7 @@ functions:
           private: false # if true API key is needed
 
   process:
-    handler: ${self:custom.editable.processHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events:
       - sqs:
           arn:
@@ -134,7 +135,7 @@ functions:
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}

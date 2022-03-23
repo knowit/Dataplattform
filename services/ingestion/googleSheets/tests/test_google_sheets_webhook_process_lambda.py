@@ -1,4 +1,4 @@
-from google_sheets_webhook_process_lambda import handler as process_handler
+from googlesheets.google_sheets_webhook_process_lambda import handler as process_handler
 from dataplattform.common import schema
 from json import load
 from os import path

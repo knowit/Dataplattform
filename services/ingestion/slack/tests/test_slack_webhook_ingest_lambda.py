@@ -1,4 +1,4 @@
-from slack_webhook_ingest_lambda import handler
+from slack.slack_webhook_ingest_lambda import handler
 
 from dataplattform.testing.events import APIGateway
 from json import loads, dumps

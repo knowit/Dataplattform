@@ -1,4 +1,4 @@
-from yr_ingest_lambda import handler
+from yrweather.yr_ingest_lambda import handler
 from pytest import fixture
 from responses import RequestsMock, GET
 from json import loads

@@ -1,4 +1,4 @@
-from knowit_labs_ingest_lambda import handler
+from knowitlabs.knowit_labs_ingest_lambda import handler
 from responses import RequestsMock, GET
 from pytest import fixture
 from json import loads, dumps

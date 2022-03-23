@@ -1,4 +1,4 @@
-from google_event_process_lambda import handler
+from googleevent.google_event_process_lambda import handler
 from dataplattform.common import schema
 from pytest import fixture
 import pandas as pd

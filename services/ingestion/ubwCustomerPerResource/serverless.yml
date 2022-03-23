@@ -14,6 +14,7 @@ dataplattform:
 custom:
   editable:
     timeout: 200
+    srcDir: lib/ubwcustomerperresource
     ingestHandlerFile: ubw_customer_per_resource_ingest_lambda
     processHandlerFile: ubw_customer_per_resource_process_lambda
     databaseName: level_3
@@ -69,13 +70,13 @@ package:
 functions:
   mock:
     enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
-    handler: ${self:custom.editable.mockIngestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.mockIngestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-mock-ingest
     description: ${self:custom.editable.mockDescription}
     role: !GetAtt MockLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
         - 'tests/test_data.json'
     environment:
       STAGE: ${self:custom.stage}
@@ -94,13 +95,13 @@ functions:
           enabled: true
   ingest: # A Function
     enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
-    handler: ${self:custom.editable.ingestHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -117,7 +118,7 @@ functions:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
   process:
-    handler: ${self:custom.editable.processHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events:
       - sqs:
           arn:
@@ -131,7 +132,7 @@ functions:
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py'
+        - '${self:custom.editable.srcDir}/*.py'
     environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -141,6 +142,7 @@ functions:
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
+      NUM_WEEKS: 4
 
 resources:
   Conditions:

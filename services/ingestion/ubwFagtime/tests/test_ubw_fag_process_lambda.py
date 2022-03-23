@@ -1,5 +1,5 @@
 from pytest import fixture
-from ubw_fag_process_lambda import handler
+from ubwfagtime.ubw_fag_process_lambda import handler
 import pandas as pd
 from os import path
 from json import load

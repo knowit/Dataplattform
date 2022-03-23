@@ -10,6 +10,7 @@ custom:
   #Edit these variables###########################
   editable:
     timeout: 900
+    srcDir: lib/slackalarmforwarder
     handlerFile: forwarder
     description: Forwards Alarms from the ${self:custom.stage}-CloudwatchAlarms SNS topic to slack 
   ################################################
@@ -38,13 +39,13 @@ package:
 
 functions:
   forwarder:
-    handler: ${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
     name: ${self:custom.stage}-${self:service} # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt ForwarderRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
