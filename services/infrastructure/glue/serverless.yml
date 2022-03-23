@@ -202,7 +202,7 @@ resources:
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:PutObject
-                  Resource: 
+                  Resource:
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
           - PolicyName: ${self:custom.stage}-KMSKeyAccess-${self:service}
