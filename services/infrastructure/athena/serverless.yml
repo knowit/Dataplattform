@@ -10,7 +10,7 @@ dataplattform:
 custom:
   editable:
     databaseName: level_4
-  
+
   stage: ${opt:stage, self:provider.stage}
 
 provider:
