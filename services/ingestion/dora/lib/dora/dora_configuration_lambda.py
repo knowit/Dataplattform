@@ -26,7 +26,6 @@ def handler(event, context):
     def run_crawler():
         response = ""
         try:
-            print("hey")
             response = glue_client.start_crawler(Name='DoraCrawlers')
         except:
             pass
@@ -37,7 +36,6 @@ def handler(event, context):
         # Checks if the crawler has finished running. 
         state_previous = None
         while True:
-            print("hey2")
             response_get = glue_client.get_crawler(Name='DoraCrawlers')
             state = response_get["Crawler"]["State"]
             if state != state_previous:
@@ -51,7 +49,6 @@ def handler(event, context):
         response = athena_client.batch_get_named_query(
             NamedQueryIds=query_ids
         )
-        print(response)
         return response['NamedQueries']
 
     def map_name_to_query(dictionary):
@@ -65,7 +62,6 @@ def handler(event, context):
             MaxResults=10,
             WorkGroup=workgroup
         )
-        print(response)
         return response['NamedQueryIds']
 
 
@@ -80,7 +76,6 @@ def handler(event, context):
         )
 
     def run_athena_query(queries):
-        print(queries)
         # To run them in the correct order
         query_execution(queries['Frequency'])
         query_execution(queries['GithubDeployments'])	
@@ -90,7 +85,6 @@ def handler(event, context):
     s3_ingestion()
     run_crawler()
     query_information = get_saved_queries(get_query_id())
-    print(query_information)
     queries = map_name_to_query(query_information)
     run_athena_query(queries)
 
