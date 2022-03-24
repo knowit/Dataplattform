@@ -193,7 +193,8 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 continue
             tmp_string = ""
             for elem in col_list:
-                tmp_string = tmp_string + ";" + none_to_empty_str(elem.get(tag, {}).get(sub_tag, ''))
+                if(elem != None):
+                    tmp_string = tmp_string + ";" + none_to_empty_str(elem.get(tag, {}).get(sub_tag, ''))
             new_col.append(tmp_string[1:])
         out_tmp[new_col_name] = new_col
         return out_tmp
