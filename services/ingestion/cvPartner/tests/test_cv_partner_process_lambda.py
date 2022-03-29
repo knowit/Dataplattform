@@ -320,6 +320,29 @@ def test_tag_value_none(setup_queue_event, test_data,
         }))
 
 
+def test_tag_value_none_2(setup_queue_event, test_data,
+                        create_table_mock, dynamodb_resource):
+
+    tmp_data = test_data['data']
+    tmp_data[1]['cv']['technologies'][0]['technology_skills'][0]['tags'] = None
+
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=tmp_data))
+
+    handler(event, None)
+
+    create_table_mock.assert_table_data(
+        'cv_partner_technology_skills',
+        pd.DataFrame({
+            'user_id': ['60cc81232e97ff100ca405c6', '60cc81232e97ff100ca405c6',
+                        '60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+            'category': ["", "Smidig utvikling", "Skytjenester", ""],
+            'technology_skills': ["", "Scrum", "AWS;Microsoft Azure", ";azure;svelte;Java"]
+        }))
+
+
 def test_set_guid_from_ad_data(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
     tmp_data = test_data['data']
     tmp_data[1]['cv']['email'] = "non.existing@mail.no"
