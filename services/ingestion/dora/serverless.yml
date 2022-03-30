@@ -1,0 +1,74 @@
+service: dora
+
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+    - ../../infrastructure/kms
+  glue:
+    tableName: dora
+    accessLevel: 4
+
+custom:
+  editable:
+    timeout: 200
+    srcDir: lib/dora
+    handlerFile: dora_ingestion_handler
+    processHandlerFile: dora_process_handler
+    quicksightUsersHandlerFile: dora_create_quicksight_groups
+    registerUsersHandlerFile: dora_register_users_lambda
+    quicksightIngestionHandlerFile: dora_quicksight_ingestion
+    rolebindingsIngestionHandlerFile: dora_rolebindings_ingestion
+    doraConfigurationHandlerFile: dora_configuration_lambda
+    databaseName: level_4
+    description: Fetch key metrics from github API
+    scheduleRate: rate(1 day)
+    accessLevel: level-4
+    dataFolder: dora
+
+  stage: ${opt:stage, self:provider.stage}
+  accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+  sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
+  sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
+  pythonRequirements:
+    dockerizePip: non-linux
+    noDeploy:
+      - boto3
+      - botocore
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
+  deploymentBucket:
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+  runtime: python3.7
+  memorySize: 1024
+  timeout: ${self:custom.editable.timeout}
+  tags:
+    Project: Dataplattform
+    Layer: Ingestion
+    Ingestion: Pollers
+  stackTags:
+  environment:
+
+package:
+  individually: true
+  exclude:
+    - "./**"
+
+functions:
+  - ${file(serverless-files/functions.yml)}
+  - ${file(serverless-files/configuration.yml)}
+
+resources:
+  - ${file(serverless-files/function_roles.yml)}
+  - ${file(serverless-files/sqs.yml)}
+
+plugins:
+  - serverless-python-requirements
+  - serverless-pseudo-parameters

@@ -1,0 +1,118 @@
+service: cloudtrail
+
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../datalake
+    - ../events
+    - ../monitoring
+    - ../glue
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  deploymentBucket:
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+
+resources:
+  Resources:
+
+    CloudTrailS3Bucket:
+      Type: AWS::S3::Bucket
+      DeletionPolicy: Retain
+      Properties:
+        BucketName: !Sub '${self:custom.stage}-cloudtrail-logging-${AWS::AccountId}'
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: false
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+
+    CloudTrailBucketPolicy:
+      DependsOn:
+        - CloudTrailS3Bucket
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref CloudTrailS3Bucket
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Sid: "AWSCloudTrailAclCheck"
+              Effect: Allow
+              Principal:
+                Service: 'cloudtrail.amazonaws.com'
+              Action: "s3:GetBucketAcl"
+              Resource: !Sub arn:aws:s3:::${CloudTrailS3Bucket}
+            - Sid: "AWSCloudTrailWrite"
+              Effect: Allow
+              Principal:
+                Service: 'cloudtrail.amazonaws.com'
+              Action: "s3:PutObject"
+              Resource: !Sub arn:aws:s3:::${CloudTrailS3Bucket}/AWSLogs/${AWS::AccountId}/*
+              Condition:
+                StringEquals:
+                  's3:x-amz-acl': 'bucket-owner-full-control'
+
+    LogGroup: # A new log group
+      Type: AWS::Logs::LogGroup
+      Properties:
+        RetentionInDays: 365 # optional
+        LogGroupName: /cloudtrail/Cloudtrail-LogGroup
+
+    CloudTrailLogsRole: # A role for your trail
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Statement:
+            - Action: sts:AssumeRole
+              Effect: Allow
+              Principal:
+                Service: cloudtrail.amazonaws.com
+          Version: '2012-10-17'
+
+    CloudTrailLogsPolicy: # The policy for your role
+      Type: AWS::IAM::Policy
+      Properties:
+        PolicyDocument:
+          Statement:
+            - Action:
+                - logs:PutLogEvents
+                - logs:CreateLogStream
+              Effect: Allow
+              Resource:
+                Fn::GetAtt:
+                  - LogGroup
+                  - Arn
+          Version: '2012-10-17'
+        PolicyName: DefaultPolicy
+        Roles:
+          - Ref: CloudTrailLogsRole
+
+    CloudTrail: # The trail
+      Type: AWS::CloudTrail::Trail
+      Properties:
+        IsLogging: true
+        S3BucketName: !Ref CloudTrailS3Bucket
+        CloudWatchLogsLogGroupArn:
+          Fn::GetAtt:
+            - LogGroup
+            - Arn
+        CloudWatchLogsRoleArn:
+          Fn::GetAtt:
+            - CloudTrailLogsRole
+            - Arn
+        EventSelectors:
+          - DataResources:
+              - Type: "AWS::S3::Object"
+                Values:
+                  - !Sub 'arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/'
+            IncludeManagementEvents: True
+            ReadWriteType: All
+      DependsOn:
+        - CloudTrailLogsPolicy
+        - CloudTrailLogsRole
+        - CloudTrailBucketPolicy
