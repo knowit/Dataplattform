@@ -51,7 +51,7 @@ jobs:
 
       - name: Run serverless deploy prod
         working-directory: services/infrastructure/cloudwatch
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        if: ${{ github.base_ref == 'master' && github.ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
@@ -71,7 +71,7 @@ jobs:
 
       - name: Run serverless deploy prod
         working-directory: services/infrastructure/dora-glue
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        if: ${{ github.base_ref == 'master' && github.ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
@@ -109,7 +109,7 @@ jobs:
 
       - name: Run serverless deploy prod
         working-directory: services/infrastructure/athena
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        if: ${{ github.base_ref == 'master' && github.ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
@@ -147,7 +147,7 @@ jobs:
 
       - name: Run serverless deploy prod
         working-directory: services/infrastructure/quicksight
-        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        if: ${{ github.base_ref == 'master' && github.ref == 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
