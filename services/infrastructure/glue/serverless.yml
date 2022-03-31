@@ -56,7 +56,7 @@ resources:
                           - /data/level-1*
 
     # Level 2
-    Level2GlueDatabase:
+    Leve2GlueDatabase:
       Type: AWS::Glue::Database
       Properties:
         CatalogId: !Ref AWS::AccountId
@@ -92,7 +92,7 @@ resources:
                           - /data/level-2*
 
     # Level 3
-    Level3GlueDatabase:
+    Leve3GlueDatabase:
       Type: AWS::Glue::Database
       Properties:
         CatalogId: !Ref AWS::AccountId
