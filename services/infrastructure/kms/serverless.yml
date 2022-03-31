@@ -1,0 +1,98 @@
+service: kms
+
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../datalake
+    - ../events
+    - ../monitoring
+    - ../glue
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+
+provider:
+  name: aws
+  stage: dev
+  region: eu-central-1
+  deploymentBucket:
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+
+resources:
+  Resources:
+    KMSBucketKey:
+      Type: AWS::KMS::Key
+      Properties:
+        Description: An example symmetric KMS key
+        EnableKeyRotation: true
+        PendingWindowInDays: 20
+        KeyPolicy:
+          Id: key-default-2
+          Version: '2012-10-17'
+          Statement:
+            - Sid: "Enable IAM User Permissions"
+              Effect: Allow
+              Principal:
+                AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
+              Action:
+                - kms:*
+              Resource: '*'
+            - Sid: "Enable usage for Quicksight"
+              Effect: Allow
+              Principal:
+                AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/aws-quicksight-service-role-v0'
+              Action:
+                - kms:Encrypt*
+                - kms:Decrypt*
+                - kms:ReEncrypt*
+                - kms:GenerateDataKey*
+                - kms:Describe*
+              Resource: "*"
+            - Sid: "Enable encryption for loggroup"
+              Effect: Allow
+              Principal:
+                Service:
+                  - logs.eu-central-1.amazonaws.com
+              Action:
+                - kms:Encrypt*
+                - kms:Decrypt*
+                - kms:ReEncrypt*
+                - kms:GenerateDataKey*
+                - kms:Describe*
+              Resource: "*"
+              Condition:
+                ArnLike:
+                  kms:EncryptionContext:aws:logs:arn:
+                    Fn::Join:
+                      - ""
+                      - - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/'
+                        - 'aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations'
+    KeyAlias:
+      Type: 'AWS::KMS::Alias'
+      Properties:
+        AliasName: alias/KMSBucketKey
+        TargetKeyId: !Ref KMSBucketKey
+    EncryptedS3Bucket:
+      Type: 'AWS::S3::Bucket'
+      Properties:
+        BucketName: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+        VersioningConfiguration:
+          Status: Enabled
+        BucketEncryption:
+          ServerSideEncryptionConfiguration:
+            - ServerSideEncryptionByDefault:
+                SSEAlgorithm: 'aws:kms'
+                KMSMasterKeyID: !Ref KMSBucketKey
+              BucketKeyEnabled: true
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: true
+          BlockPublicPolicy: false
+          IgnorePublicAcls: true
+          RestrictPublicBuckets: true
+      DeletionPolicy: Delete
+  Outputs:
+    KMSKey:
+      Description: KMS key ID used for encryptedbucket
+      Value: !Ref KMSBucketKey
+      Export:
+        Name: ${self:custom.stage}-KMS-KeyID

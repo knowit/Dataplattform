@@ -1,5 +1,12 @@
 service: datalake
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+
+plugins:
+  - serverless-pseudo-parameters
+
 custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
@@ -10,7 +17,7 @@ custom:
   level3ReportDir: reports/level-3/
   level2ReportDir: reports/level-2/
   level1ReportDir: reports/level-1/
-  
+
 
 provider:
   name: aws
@@ -18,7 +25,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
 
   tags:
     project: dataplattform
@@ -28,11 +35,11 @@ provider:
     layer: infrastructure
 
 resources:
-  Resources: 
+  Resources:
     LogBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.service}-log-bucket
+        BucketName: ${self:custom.service}-logbucket-#{AWS::AccountId}
         VersioningConfiguration:
           Status: Enabled #keeps different versions of object if overwrited/updated
         AccessControl:
@@ -41,7 +48,7 @@ resources:
     DataLake:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.service}-datalake
+        BucketName: ${self:custom.service}-bucket-#{AWS::AccountId}
         VersioningConfiguration:
           Status: Enabled #keeps different versions of object if overwrited/updated
         PublicAccessBlockConfiguration: #blocks any public access to s3 bucket
@@ -76,7 +83,7 @@ resources:
             - NoncurrentVersionExpirationInDays: 1
               Prefix: ${self:custom.level1ReportDir}
               Status: Enabled
-        
+
         LoggingConfiguration:
           DestinationBucketName: ${self:resources.Resources.LogBucket.Properties.BucketName}
           LogFilePrefix: ${self:resources.Resources.LogBucket.Properties.BucketName}

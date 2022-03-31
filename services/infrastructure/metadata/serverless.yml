@@ -1,16 +1,24 @@
 service: metadata
 
+dataplattform:
+  dependencies:
+    - ../deploymentBucket
+    - ../vpc
+
 custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
+  project: dataplattform
+
 
 provider:
-  name: aws
   stage: dev
+  name: aws
   region: eu-central-1
   stackName: ${self:custom.service}
-  deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
-    name: ${self:custom.stage}-dataplattform-v2-deploymentbucket
+  deploymentBucket:
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+
 
 resources:
   Resources:
@@ -28,10 +36,8 @@ resources:
           ReadCapacityUnits: 10
           WriteCapacityUnits: 10
         SSESpecification:
-          SSEEnabled: True
+          SSEEnabled: true
           SSEType: KMS
-          KMSMasterKeyId: de8ca893-e2fc-4f8c-83b1-bc41a9a3a79a
-
 
     PersonalMetadataTableAccess:
       Type: AWS::IAM::ManagedPolicy
@@ -45,12 +51,12 @@ resources:
               Action:
                 - dynamodb:Scan
                 - dynamodb:GetItem
+                - dynamodb:PutItem
                 - dynamodb:UpdateItem
                 - dynamodb:DeleteItem
                 - dynamodb:Batch*
                 - dynamodb:DescribeTable
               Resource: !GetAtt PersonalMetadataTable.Arn
-
   Outputs:
     PersonalMetadataTableAccessOutput:
       Value:
@@ -65,3 +71,6 @@ resources:
       Value: !GetAtt PersonalMetadataTable.Arn
       Export:
         Name: ${self:custom.stage}-personal-metadata-tableArn
+
+plugins:
+  - serverless-pseudo-parameters

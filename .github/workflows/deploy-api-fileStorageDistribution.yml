@@ -1,0 +1,51 @@
+name: Deploy api - fileStorageDistribution
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+      - master
+    paths:
+      - "services/api/fileStorageDistribution/**"
+      - ".config/.serverless"
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api/fileStorageDistribution
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
+
+      - name: Install Serverless Framework
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run serverless deploy prod
+        if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Deploying to production" && sls deploy --stage prod
+          
+
+      - name: Run serverless deploy dev
+        if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: eu-central-1
+        run: |
+          echo "Deploying to development" && sls deploy --stage dev

@@ -11,7 +11,11 @@ def main():
         'generate-encrypted-password',
         'setup-datasource',
         'register-table',
-        'database'
+        'database',
+        'deploy',
+        'configure',
+        'prepare-sandbox',
+        'test'
     ]
 
     parser = ArgumentParser('dataplattform')

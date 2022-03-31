@@ -1,4 +1,4 @@
-from google_sheets_webhook_ingest_lambda import handler as ingest_handler
+from googlesheets.google_sheets_webhook_ingest_lambda import handler as ingest_handler
 from dataplattform.testing.events import APIGateway
 from json import loads
 from os import path

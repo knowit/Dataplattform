@@ -1,0 +1,17 @@
+configuration:
+  handler: ${self:custom.editable.srcDir}/${self:custom.editable.doraConfigurationHandlerFile}.handler
+  name: ${self:custom.stage}-${self:service}-configuration
+  description: ${self:custom.editable.description}
+  role: !GetAtt ConfigurationRole.Arn
+  package:
+    include:
+      - '${self:custom.editable.srcDir}/*.py'
+  environment:
+    STAGE: ${self:custom.stage}
+    SERVICE: ${self:service}
+    DATALAKE: !Sub ${self:custom.stage}-kmsbucket-${AWS::AccountId}
+    ACCESS_PATH: ${self:custom.accessPath}
+    DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+    SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+    SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+  tags:

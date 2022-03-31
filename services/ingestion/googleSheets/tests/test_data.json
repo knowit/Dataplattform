@@ -1,0 +1,5 @@
+{
+    "tableName":"kundemapping",
+    "values":[["dagens ubw prosjekt","arbeids_ordre","kunde", "prosjekt"],["customer 1","Some work order desc.", "new customer 1", ""],["customer 2","Some work order desc.", "new customer 2", ""]],
+    "user":"test@test.no"
+}

@@ -1,0 +1,17 @@
+Resources:
+  EventQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      FifoQueue: true
+      QueueName: ${self:custom.sqsQueueName}
+      ContentBasedDeduplication: true
+      VisibilityTimeout: ${self:custom.editable.timeout}
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt EventQueueDL.Arn
+        maxReceiveCount: 1
+  EventQueueDL:
+    Type: AWS::SQS::Queue
+    Properties:
+      FifoQueue: true
+      QueueName: ${self:custom.sqsQueueDLName}
+      ContentBasedDeduplication: true

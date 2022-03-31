@@ -2,15 +2,27 @@
 name: Dataplattform - ingestion - ubwFagtime
 
 on: 
+  workflow_dispatch:
   push:
     branches:
       - master
-  pull_request:
+      - develop
     paths:
       - 'services/ingestion/ubwFagtime/**'
       - 'packages/common/**'
       - 'packages/query/**'
-
+      - '.config/.flake8'
+      - '.config/.yamllint'
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - 'services/ingestion/ubwFagtime/**'
+      - 'packages/common/**'
+      - 'packages/query/**'
+      - '.config/.flake8'
+      - '.config/.yamllint'
 
 jobs:
   lint:
@@ -27,9 +39,11 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 ./services/ingestion/ubwFagtime --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 ./services/ingestion/ubwFagtime --count --max-line-length=120 --statistics
+        flake8 --config=./.config/.flake8 ./services/ingestion/ubwFagtime
+    - name: Lint with yamllint
+      run: |
+        pip install yamllint
+        yamllint -c ./.config/.yamllint ./services/ingestion/ubwFagtime
   
   test:
     runs-on: ubuntu-latest
@@ -38,14 +52,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install dependencies
+    - name: Test with tox/pytest
       working-directory: './services/ingestion/ubwFagtime'
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-test.txt
-    - name: Test with pytest
-      working-directory: './services/ingestion/ubwFagtime'
-      run: |
-        pip install pytest
-        pytest 
+        python -m pip install tox
+        tox

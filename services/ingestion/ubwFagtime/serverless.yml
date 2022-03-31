@@ -1,10 +1,22 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: ubwFagtimePoller
 
+dataplattform:
+  dependencies:
+    - ../../infrastructure/deploymentBucket
+    - ../../infrastructure/datalake
+    - ../../infrastructure/events
+    - ../../infrastructure/monitoring
+    - ../../infrastructure/glue
+  glue:
+    tableName: ubw_fagtimer
+    accessLevel: 2
+
 custom:
   #Edit these variables###########################
   editable:
     timeout: 28
+    srcDir: lib/ubwfagtime
     ingestHandlerFile: ubw_fag_ingest_lambda
     processHandlerFile: ubw_fag_process_lambda
     databaseName: level_2
@@ -23,13 +35,6 @@ custom:
     noDeploy:
       - boto3 # Default in lambda rt
       - botocore
-      - pandas # Layer
-      - pytz
-      - numpy
-      - numpy.libs
-      - fastparquet
-      - numba
-      - llvmlite
 
 provider:
   name: aws
@@ -37,7 +42,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: dataplattform-v2-deploymentbucket # Name of s3 bucket
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024 # MB
   timeout: ${self:custom.editable.timeout} # seconds
@@ -52,6 +57,9 @@ provider:
   stackTags: # Tags for cloud formation
     # key: value
   environment: # Service wide environment variables
+  tracing:
+    apiGateway: true
+    lambda: true
 
 
 package:
@@ -61,16 +69,13 @@ package:
 
 functions:
   ingest: # A Function
-    handler: ${self:custom.editable.ingestHandlerFile}.handler
-    layers:
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -88,7 +93,7 @@ functions:
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
   process: # A Function
-    handler: ${self:custom.editable.processHandlerFile}.handler
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events: # The Events that trigger this Function
       - sqs:
           arn:
@@ -97,16 +102,12 @@ functions:
               - Arn
           batchSize: 1
 
-    layers:
-      - !ImportValue ${self:custom.stage}-fastparquetDepLayer-arn
-      - !ImportValue ${self:custom.stage}-numpyDepLayer-arn
-      - !ImportValue ${self:custom.stage}-pandasDepLayer-arn
     name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '*.py' # Files to include in deployment
+        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
     environment: # Environment variables, often stored in SSM
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
@@ -133,6 +134,7 @@ resources: # The resources your functions use
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
@@ -183,6 +185,7 @@ resources: # The resources your functions use
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
           - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
+          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.stage}-Glue-${self:service}
             PolicyDocument:
