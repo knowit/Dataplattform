@@ -42,8 +42,7 @@ resources:
               Principal:
                 AWS: !Sub arn:aws:iam::${AWS::AccountId}:user/dev-deploy-bot
               Action:
-                - kms:CreateKey
-                - kms:CreateAlias
+                - kms:*
               Resource: '*'
             - Sid: "Enable usage for Quicksight"
               Effect: Allow
