@@ -40,7 +40,7 @@ jobs:
           pip install -e ../../../packages/testing
 
       - name: Run serverless deploy dev
-        working-directoy: services/infrastructure/cloudwatch
+        working-directory: services/infrastructure/cloudwatch
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
@@ -50,7 +50,7 @@ jobs:
           echo "Deploying to development" && sls deploy --stage dev
 
       - name: Run serverless deploy prod
-        working-directoy: services/infrastructure/cloudwatch
+        working-directory: services/infrastructure/cloudwatch
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
@@ -60,7 +60,7 @@ jobs:
           echo "Deploying to development" && sls deploy --stage prod
 
       - name: Run serverless deploy dev
-        working-directoy: services/infrastructure/dora-glue
+        working-directory: services/infrastructure/dora-glue
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
@@ -70,7 +70,7 @@ jobs:
           echo "Deploying to development" && sls deploy --stage dev
 
       - name: Run serverless deploy prod
-        working-directoy: services/infrastructure/dora-glue
+        working-directory: services/infrastructure/dora-glue
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
@@ -98,7 +98,7 @@ jobs:
           echo "Deploying to development" && sls deploy --stage dev
         
       - name: Run serverless deploy dev
-        working-directoy: services/infrastructure/athena
+        working-directory: services/infrastructure/athena
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
@@ -108,7 +108,7 @@ jobs:
           echo "Deploying to development" && sls deploy --stage dev
 
       - name: Run serverless deploy prod
-        working-directoy: services/infrastructure/athena
+        working-directory: services/infrastructure/athena
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
@@ -136,7 +136,7 @@ jobs:
           echo "Invoking configuration in dev" && sls invoke -f configuration --stage dev
 
       - name: Run serverless deploy dev
-        working-directoy: services/infrastructure/quicksight
+        working-directory: services/infrastructure/quicksight
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
@@ -146,7 +146,7 @@ jobs:
           echo "Deploying to development" && sls deploy --stage dev
 
       - name: Run serverless deploy prod
-        working-directoy: services/infrastructure/quicksight
+        working-directory: services/infrastructure/quicksight
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
