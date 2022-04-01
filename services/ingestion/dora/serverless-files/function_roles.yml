@@ -384,4 +384,4 @@ Resources:
                   - 'athena:BatchGetNamedQuery'
                   - 'athena:StartQueryExecution'
                 Resource:
-                  - !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/DoraWorkgroup
+                  - !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/DoraWorkgroups
