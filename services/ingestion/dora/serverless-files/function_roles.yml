@@ -385,3 +385,21 @@ Resources:
                   - 'athena:StartQueryExecution'
                 Resource:
                   - !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/DoraWorkgroups
+        - PolicyName: ${self:custom.stage}-s3-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - 's3:GetBucketLocation',
+                  - 's3:GetObject',
+                  - 's3:ListBucket',
+                  - 's3:ListBucketMultipartUploads',
+                  - 's3:ListMultipartUploadParts',
+                  - 's3:AbortMultipartUpload',
+                  - 's3:PutObject' 
+                Resource:
+                  - !Sub arn:aws:s3:::dev-kmsbucket-${AWS::AccountId}/*
+                  - !Sub arn:aws:s3:::dev-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::dev-kmsbucket-${AWS::AccountId}/Athena-logs/
+                  - !Sub arn:aws:s3:::dev-kmsbucket-${AWS::AccountId}/Athena-logs/*
