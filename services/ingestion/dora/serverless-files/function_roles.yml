@@ -403,3 +403,19 @@ Resources:
                   - !Sub arn:aws:s3:::dev-kmsbucket-${AWS::AccountId}
                   - !Sub arn:aws:s3:::dev-kmsbucket-${AWS::AccountId}/Athena-logs/
                   - !Sub arn:aws:s3:::dev-kmsbucket-${AWS::AccountId}/Athena-logs/*
+        - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:Encrypt
+                  - kms:Decrypt
+                  - kms:DescribeKey
+                  - kms:ListKeys
+                  - kms:GenerateDataKey
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
+                      - !ImportValue ${self:custom.stage}-KMS-KeyID
