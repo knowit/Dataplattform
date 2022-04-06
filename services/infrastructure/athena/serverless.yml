@@ -175,8 +175,7 @@ resources:
         Description: "Creates a reference table used in DeploymentFrequency calculation "
         Name: "Frequency"
         WorkGroup: !Ref DoraWorkgroup
-        QueryString: !Sub
-          >
+        QueryString: !Sub >
           CREATE EXTERNAL TABLE IF NOT EXISTS `dev_level_4_database`.`frequency` (
           `id` int,
           `frequency` string
