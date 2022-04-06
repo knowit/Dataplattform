@@ -429,6 +429,7 @@ Resources:
                   - 'glue:GetTable'
                   - 'glue:GetDatabase'
                   - 'glue:GetDatabases'
+                  - 'glue:CreateTable'
                 Resource:
                   - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
                   - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database
