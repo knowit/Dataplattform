@@ -14,10 +14,6 @@ class EmptyGroupException(Exception):
     pass
 
 
-# todo region greier?
-# todo endre script/filnavn til move_user?
-
-
 def get_user_pool_id(user_pool_name: str) -> str:
     client = boto3.client('cognito-idp')
     response = client.list_user_pools(
