@@ -10,6 +10,7 @@ dataplattform:
   glue:
     tableName: kompetansekartlegging
     accessLevel: 3
+    accessLevelStrict: 4
 
 custom:
   editable:
@@ -21,10 +22,12 @@ custom:
     description: data from kompetansekartlegging-API
     scheduleRate: rate(7 days)
     accessLevel: level-3
+    accessLevelStrict: level-4
     dataFolder: kompetansekartlegging
 
   stage: ${opt:stage, self:provider.stage}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
+  accessPathStrict: data/${self:custom.editable.accessLevelStrict/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
@@ -70,6 +73,7 @@ functions:
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
+      ACCESS_PATH_STRICT: ${self:custom.accessPathStrict}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
