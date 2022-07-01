@@ -92,6 +92,13 @@ module.exports = serverless => {
             ...accessStatement('level-1', 'level_1_database'),
             ...accessStatement('level-2', 'level_2_database'),
             ...accessStatement('level-3', 'level_3_database')
+        ],
+        'level4': [
+            ...commonStatement,
+            ...accessStatement('level-1', 'level_1_database'),
+            ...accessStatement('level-2', 'level_2_database'),
+            ...accessStatement('level-3', 'level_3_database'),
+            ...accessStatement('level-4', 'level_4_database')
         ]
     }
 
@@ -107,6 +114,7 @@ module.exports = serverless => {
     return {
         level1: [access('level1')],
         level2: [access('level2')],
-        level3: [access('level3')]
+        level3: [access('level3')],
+        level4: [access('level4')]
     };
 };

@@ -140,6 +140,13 @@ resources:
         GroupName: level3
         RoleArn: !GetAtt Level3.Arn
         UserPoolId: !Ref CognitoUserPool
+    CognitoUserPoolGroupLevel4:
+      Type: AWS::Cognito::UserPoolGroup
+      Properties:
+        Description: level-4 access
+        GroupName: level4
+        RoleArn: !GetAtt Level4.Arn
+        UserPoolId: !Ref CognitoUserPool
 
     AssumeRole:
       Type: AWS::IAM::Role
@@ -219,6 +226,21 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies: ${self:custom.policies.level3}
+    Level4:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: ${self.custom.stage}-${self:service}-level4
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: lambda.amazonaws.com
+                AWS: !GetAtt AssumeRole.Arn
+              Action: sts:AssumeRole
+        ManagedPolicyArns:
+          - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        Policies: ${self:custom.policies.level4}
 
   Outputs:
     CognitoUserPoolOutput:
