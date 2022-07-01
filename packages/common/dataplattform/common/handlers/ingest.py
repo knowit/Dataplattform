@@ -5,8 +5,9 @@ from typing import Dict, Any, Callable
 
 
 class IngestHandler:
-    def __init__(self, access_path: str = None, bucket: str = None):
+    def __init__(self, access_path: str = None, access_path_strict: str = None, bucket: str = None):
         self.access_path = access_path
+        self.access_path_strict = access_path_strict
         self.bucket = bucket
         self.wrapped_func: Dict[str, Callable] = {}
         self.wrapped_func_args: Dict[str, Any] = {}
@@ -26,7 +27,12 @@ class IngestHandler:
         s3 = S3(
             access_path=self.access_path,
             bucket=self.bucket)
-
+        if self.access_path_strict: # todo double check med whitespaces n shit
+            s3 = S3(
+                access_path=self.access_path_strict,
+                bucket=self.bucket
+            )
+        print(f'S3 access_path be: {s3.access_path}') # todo slett print
         assert 'ingest' in self.wrapped_func, \
             'IngestHandler must wrap and ingest function'
 
