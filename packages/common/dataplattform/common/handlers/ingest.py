@@ -24,15 +24,10 @@ class IngestHandler:
             if result and isinstance(result, str):
                 return Response(status_code=403, body=result).to_dict()
 
+        access_path = self.access_path_strict if self.access_path_strict else self.access_path
         s3 = S3(
-            access_path=self.access_path,
+            access_path=access_path,
             bucket=self.bucket)
-        if self.access_path_strict: # todo double check med whitespaces n shit
-            s3 = S3(
-                access_path=self.access_path_strict,
-                bucket=self.bucket
-            )
-        print(f'S3 access_path be: {s3.access_path}') # todo slett print
         assert 'ingest' in self.wrapped_func, \
             'IngestHandler must wrap and ingest function'
 
