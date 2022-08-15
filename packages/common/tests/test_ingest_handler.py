@@ -93,3 +93,25 @@ def test_handler_sqs_event(sqs_queue):
     message = next(iter(sqs_queue.receive_messages()))
 
     assert re.fullmatch(r'data/test/raw/[\w]{8}-[\w]{4}-[\w]{4}-[\w]{4}-[\w]{12}.json', message.body)
+
+
+def test_ingest_access_path(s3_bucket):
+    ingest_handler = handler.IngestHandler(access_path_strict='level4', access_path='level3')
+
+    @ingest_handler.ingest()
+    def test(event):
+        return schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data='hello test'
+        )
+
+    ingest_handler(None)
+
+    response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()
+    data = schema.Data.from_json(response['Body'].read())
+    access_path = s3_bucket.Object(s3_bucket.Object(next((iter(s3_bucket.objects.all())))).key).key
+    level = access_path.key.split('/')[0]
+
+    assert data.data == 'hello test'
+    assert level == 'level4'
+

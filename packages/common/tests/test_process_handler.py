@@ -566,6 +566,7 @@ def test_process_handling_s3_use_highest_access_level():
     process_handler = handler.ProcessHandler(access_path_strict='test', access_path='enkel')
     assert process_handler.s3.access_path == 'test'
 
+
 def test_process_person_handling_s3_access_path():
     process_handler = person_data_handler(PersonIdentifierType.ALIAS, access_path='left', access_path_strict='right')
     assert process_handler.s3.access_path == 'right'
