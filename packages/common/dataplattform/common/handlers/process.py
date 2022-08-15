@@ -48,13 +48,14 @@ def delete_table(s3: S3, table_name: str):
 
 
 class ProcessHandler:
-    def __init__(self, access_path: str = None, bucket: str = None):
+    def __init__(self, access_path: str = None, access_path_strict: str = None, bucket: str = None):
         self.access_path = access_path
+        self.access_path_strict = access_path_strict
         self.bucket = bucket
         self.wrapped_func: Dict[str, Callable] = {}
         self.wrapped_func_args: Dict[str, Any] = {}
         self.s3 = S3(
-            access_path=access_path,
+            access_path=access_path_strict if access_path_strict else access_path,
             bucket=bucket)
 
     def __call__(self, event, context=None):
@@ -155,8 +156,8 @@ class ProcessHandler:
 
 
 class PersonDataProcessHandler(ProcessHandler):
-    def __init__(self, id_type: PersonIdentifierType, access_path=None, bucket=None) -> None:
-        super().__init__(access_path=access_path, bucket=bucket)
+    def __init__(self, id_type: PersonIdentifierType, access_path=None, access_path_strict=None, bucket=None) -> None:
+        super().__init__(access_path=access_path_strict if access_path_strict else access_path, bucket=bucket)
         self.id_type = id_type
 
     def call_wrapped(self, s3_data, event):
