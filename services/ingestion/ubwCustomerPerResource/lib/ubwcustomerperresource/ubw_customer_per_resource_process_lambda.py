@@ -96,7 +96,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     # Temporary dummy data
     dummy_mapping_data = {
         mapping_cols_dict['origi_cust']:
-            ['Knowit Dataess AS', 'Knowit Experience Oslo AS', 'customer 3'],
+            ['Knowit Dataess AS', 'Knowit Experience Oslo AS', 'customer 4'],
         mapping_cols_dict['origi_proj']:
             ['Javautviklere tverrfaglig utviklingsteam', 'Konsulentbistand', 'Some work order desc.'],
         mapping_cols_dict['new_cust']:
