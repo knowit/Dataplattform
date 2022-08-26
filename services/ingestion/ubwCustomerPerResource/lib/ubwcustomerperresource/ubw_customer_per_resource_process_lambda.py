@@ -81,60 +81,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             })
         return pd.DataFrame(project_customers)
 
-    # Project / customer mapping
-
-    # Maps original / new customer / project
-    # to the actual column names from the
-    # Google Sheet
-    mapping_cols_dict = {
-        'origi_cust': 'Dagens UBW prosjekt',
-        'origi_proj': 'arbeids_ordre',
-        'new_cust': 'Kunde',
-        'new_proj': 'Prosjekt'
-    }
-
-    # Temporary dummy data
-    dummy_mapping_data = {
-        mapping_cols_dict['origi_cust']:
-            ['Knowit Dataess AS', 'Knowit Experience Oslo AS', 'customer 3'],
-        mapping_cols_dict['origi_proj']:
-            ['Javautviklere tverrfaglig utviklingsteam', 'Konsulentbistand', 'Some work order desc.'],
-        mapping_cols_dict['new_cust']:
-            ['Skatteetaten', 'Kompetanse Norge', 'real customer'],
-        mapping_cols_dict['new_proj']:
-            ['Skatteprosessen', 'Finn lærebedrift', 'real project']
-    }
-
-    # Create DataFrame
-    df_dummy = pd.DataFrame(dummy_mapping_data)
-
-    # Create / Get mapping dataframe (should get from S3)
-    mapping_df = df_dummy
-
-    # Transform dataframe to dict of tuple -> tuple
-    def create_mapping_from_df(df):
-        zipped_columns = zip(
-            df[mapping_cols_dict['origi_cust']],
-            df[mapping_cols_dict['origi_proj']],
-            df[mapping_cols_dict['new_cust']],
-            df[mapping_cols_dict['new_proj']])
-        return dict(
-            [((o_cus, o_pro), (n_cus, n_pro)) for o_cus, o_pro, n_cus, n_pro in zipped_columns]
-        )
-
-    mapping = create_mapping_from_df(mapping_df)
-
-    # Mapping function for a row
-    # If the (customer, work order descr) is not
-    # in the mapping dict --> leave the row unchanged
-    def map_new_proj_cust(row):
-        key = (row['customer'], row['work_order_description'])
-        val = key if key not in mapping else mapping[key]
-        return pd.Series(val)
-
-    # Apply mapping
-    df[["customer", "work_order_description"]] = df.apply(map_new_proj_cust, axis=1)
-
     per_project_data = get_per_project_data(df)
     df.pop('used_hrs')
 
@@ -148,15 +94,14 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         num_weeks = int(os.environ.get('NUM_WEEKS', '4'))
 
         reg_periods_int = old_frame['reg_period'].astype('str').astype('int')
-        reg_periods = reg_periods_int.drop_duplicates().sort_values(ascending=False).astype('str')
+        reg_periods = reg_periods_int.drop_duplicates(
+        ).sort_values(ascending=False).astype('str')
         reg_periods = reg_periods.head(num_weeks)
 
         old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
 
-        # Apply mapping to old frame
-        old_frame[["customer", "work_order_description"]] = old_frame.apply(map_new_proj_cust, axis=1)
-
-        df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(subset=df.columns.difference(['time']))
+        df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(
+            subset=df.columns.difference(['time']))
 
     return {
         'ubw_customer_per_resource': df,
