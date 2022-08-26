@@ -99,7 +99,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         reg_periods = reg_periods.head(num_weeks)
 
         old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
-
         df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(
             subset=df.columns.difference(['time']))
 
