@@ -94,11 +94,13 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         num_weeks = int(os.environ.get('NUM_WEEKS', '4'))
 
         reg_periods_int = old_frame['reg_period'].astype('str').astype('int')
-        reg_periods = reg_periods_int.drop_duplicates().sort_values(ascending=False).astype('str')
+        reg_periods = reg_periods_int.drop_duplicates(
+        ).sort_values(ascending=False).astype('str')
         reg_periods = reg_periods.head(num_weeks)
-     
+
         old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
-        df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(subset=df.columns.difference(['time']))
+        df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(
+            subset=df.columns.difference(['time']))
 
     return {
         'ubw_customer_per_resource': df,
