@@ -7,7 +7,7 @@ import re
 handler = ProcessHandler()
 
 
-@handler.process(partitions={})
+@handler.process(partitions={}, overwrite=True)
 def process(data, events) -> Dict[str, pd.DataFrame]:
 
     def make_dataframes(d):
@@ -27,11 +27,14 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             mask = tmp_array == ''
             rows = np.flatnonzero((~mask).sum(axis=1))
             cols = np.flatnonzero((~mask).sum(axis=0))
-            cropped_table = tmp_array[rows.min():rows.max()+1, cols.min():cols.max()+1]
+            cropped_table = tmp_array[rows.min(
+            ):rows.max()+1, cols.min():cols.max()+1]
             content = cropped_table[1:, :]
             column_names = cropped_table[0, :]
-            data_df = pd.DataFrame(content.tolist(), columns=column_names.tolist(), dtype=None)
-            data_df = data_df.replace(r'^\s*$', pd.NA, regex=True)  # Replace " " with nullable
+            data_df = pd.DataFrame(
+                content.tolist(), columns=column_names.tolist(), dtype=None)
+            # Replace " " with nullable
+            data_df = data_df.replace(r'^\s*$', pd.NA, regex=True)
 
         metadata_df = pd.DataFrame({'uploaded_by_user': user,
                                     'time_added': [metadata['timestamp']],
@@ -46,6 +49,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     ]))
 
     return {
-            **dict(data_tables),
-            'google_sheets_metadata': pd.concat(metadata_tables)
+        **dict(data_tables),
+        'google_sheets_metadata': pd.concat(metadata_tables)
     }
