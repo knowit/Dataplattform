@@ -20,6 +20,32 @@ provider:
 
 resources:
   Resources:
+    KMSAccessRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                  - quicksight.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: ${self:service}-Quicksight-Access
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - kms:Encrypt*
+                    - kms:Decrypt*
+                    - kms:ReEncrypt*
+                    - kms:GenerateDataKey*
+                    - kms:Describe*
+                  Resource:
+                    - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}"
+                    - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*"
     KMSBucketKey:
       Type: AWS::KMS::Key
       Properties:
@@ -28,7 +54,7 @@ resources:
         PendingWindowInDays: 20
         KeyPolicy:
           Id: key-default-2
-          Version: '2012-10-17'
+          Version: "2012-10-17"
           Statement:
             - Sid: "Enable IAM User Permissions"
               Effect: Allow
@@ -36,25 +62,24 @@ resources:
                 AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
               Action:
                 - kms:*
-              Resource: '*'
-            - Sid: "Enable IAM User Permissions"
+              Resource: "*"
+            - Sid: "Enable quicksight access"
               Effect: Allow
               Principal:
-                AWS: !Sub arn:aws:iam::${AWS::AccountId}:user/dev-deploy-bot
-              Action:
-                - kms:*
-              Resource: '*'
-            - Sid: "Enable usage for Quicksight"
-              Effect: Allow
-              Principal:
-                AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/aws-quicksight-service-role-v0'
+                AWS:
+                  Fn::Join:
+                    - ""
+                    - - !Sub "arn:aws:iam::${AWS::AccountId}:role/"
+                      - !Ref KMSAccessRole
               Action:
                 - kms:Encrypt*
                 - kms:Decrypt*
                 - kms:ReEncrypt*
                 - kms:GenerateDataKey*
                 - kms:Describe*
-              Resource: "*"
+              Resource:
+                - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}"
+                - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*"
             - Sid: "Enable encryption for loggroup"
               Effect: Allow
               Principal:
@@ -72,23 +97,23 @@ resources:
                   kms:EncryptionContext:aws:logs:arn:
                     Fn::Join:
                       - ""
-                      - - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/'
-                        - 'aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations'
+                      - - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/"
+                        - "aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations"
     KeyAlias:
-      Type: 'AWS::KMS::Alias'
+      Type: "AWS::KMS::Alias"
       Properties:
         AliasName: alias/KMSBucketKey
         TargetKeyId: !Ref KMSBucketKey
     EncryptedS3Bucket:
-      Type: 'AWS::S3::Bucket'
+      Type: "AWS::S3::Bucket"
       Properties:
-        BucketName: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+        BucketName: !Sub "${self:custom.stage}-kmsbucket-${AWS::AccountId}"
         VersioningConfiguration:
           Status: Enabled
         BucketEncryption:
           ServerSideEncryptionConfiguration:
             - ServerSideEncryptionByDefault:
-                SSEAlgorithm: 'aws:kms'
+                SSEAlgorithm: "aws:kms"
                 KMSMasterKeyID: !Ref KMSBucketKey
               BucketKeyEnabled: true
         PublicAccessBlockConfiguration:
@@ -103,3 +128,8 @@ resources:
       Value: !Ref KMSBucketKey
       Export:
         Name: ${self:custom.stage}-KMS-KeyID
+    KMSQuicksightRole:
+      Description: A role that gives quicksight access to kms
+      Value: !Ref KMSAccessRole
+      Export:
+        Name: ${self:custom.stage}-KMS-QuicksightRole
