@@ -33,6 +33,26 @@ resources:
             - Sid: "Enable IAM User Permissions"
               Effect: Allow
               Principal:
+                AWS: !Sub arn:aws:iam::${AWS::AccountId}:user/${self:custom.stage}-deploy-bot
+              Action:
+                - kms:Describe*
+                - kms:Put*
+                - kms:Create*
+                - kms:Update*
+                - kms:Enable*
+                - kms:Revoke*
+                - kms:List*
+                - kms:Disable*
+                - kms:Get*
+                - kms:Delete*
+                - kms:ScheduleKeyDeletion
+                - kms:CancelKeyDeletion
+                - kms:TagResource
+                - kms:UntagResource
+              Resource: "*"
+            - Sid: "Enable IAM User Permissions"
+              Effect: Allow
+              Principal:
                 AWS: !Sub arn:aws:iam::${AWS::AccountId}:root
               Action:
                 - kms:*
