@@ -20,32 +20,6 @@ provider:
 
 resources:
   Resources:
-    KMSAccessRole:
-      Type: AWS::IAM::Role
-      Properties:
-        AssumeRolePolicyDocument:
-          Version: "2012-10-17"
-          Statement:
-            - Effect: Allow
-              Principal:
-                Service:
-                  - quicksight.amazonaws.com
-              Action: sts:AssumeRole
-        Policies:
-          - PolicyName: ${self:service}-Quicksight-Access
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - kms:Encrypt*
-                    - kms:Decrypt*
-                    - kms:ReEncrypt*
-                    - kms:GenerateDataKey*
-                    - kms:Describe*
-                  Resource:
-                    - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}"
-                    - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*"
     KMSBucketKey:
       Type: AWS::KMS::Key
       Properties:
@@ -63,23 +37,6 @@ resources:
               Action:
                 - kms:*
               Resource: "*"
-            - Sid: "Enable quicksight access"
-              Effect: Allow
-              Principal:
-                AWS:
-                  Fn::Join:
-                    - ""
-                    - - !Sub "arn:aws:iam::${AWS::AccountId}:role/"
-                      - !Ref KMSAccessRole
-              Action:
-                - kms:Encrypt*
-                - kms:Decrypt*
-                - kms:ReEncrypt*
-                - kms:GenerateDataKey*
-                - kms:Describe*
-              Resource:
-                - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}"
-                - !Sub "arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*"
             - Sid: "Enable encryption for loggroup"
               Effect: Allow
               Principal:
@@ -128,8 +85,3 @@ resources:
       Value: !Ref KMSBucketKey
       Export:
         Name: ${self:custom.stage}-KMS-KeyID
-    KMSQuicksightRole:
-      Description: A role that gives quicksight access to kms
-      Value: !Ref KMSAccessRole
-      Export:
-        Name: ${self:custom.stage}-KMS-QuicksightRole
