@@ -3,7 +3,7 @@ from os import environ
 from typing import List
 
 from boto3.dynamodb.conditions import Key
-from dynamo_db import DynamoDBRepository
+from common.repositories.dynamo_db import DynamoDBRepository
 
 
 class ReportsRepository(DynamoDBRepository):
