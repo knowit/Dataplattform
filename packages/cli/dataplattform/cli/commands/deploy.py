@@ -195,6 +195,7 @@ def init(parser: ArgumentParser):
     parser.add_argument('-c', '--config-file', default=None, dest='config_file')
     parser.add_argument('-r', '--remove', default=False, action='store_true')
     parser.add_argument('-p', '--aws-profile', default=None, type=str, dest='aws_profile')
+    parser.add_argument('-i', '--ignore', default='', type=str, nargs='*')
 
 
 def run(args: Namespace, _):
@@ -203,6 +204,12 @@ def run(args: Namespace, _):
         search(target)
 
     paths = topological_sort(targets)
+
+    # Ignore provided services (if any)
+    # Paths to ignore are assumed to be 
+    # provided without leading './' which
+    # is the reason for using path[2:]
+    paths = [path for path in paths if path[2:] not in args.ignore]
 
     if args.remove:
         paths.reverse()
