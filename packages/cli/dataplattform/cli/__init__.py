@@ -15,6 +15,7 @@ def main():
         'deploy',
         'configure',
         'prepare-sandbox',
+        'move-user-pool-group',
         'test'
     ]
 
