@@ -6,7 +6,6 @@ dataplattform:
     - ../datalake
     - ../events
     - ../monitoring
-    - ../glue
 
 custom:
   stage: ${opt:stage, self:provider.stage}
@@ -15,6 +14,7 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
 
