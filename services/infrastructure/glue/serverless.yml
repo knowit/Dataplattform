@@ -4,6 +4,7 @@ dataplattform:
   dependencies:
     - ../deploymentBucket
     - ../datalake
+    - ../kms
 
 custom:
   editable:
@@ -14,6 +15,7 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
+  stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
 
