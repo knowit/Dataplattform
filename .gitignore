@@ -130,3 +130,4 @@ services/infrastructure/deploymentBucket/config.yml
 
 # Sandbox
 **/my_name_servers.*
+**/my_key_policy.*
