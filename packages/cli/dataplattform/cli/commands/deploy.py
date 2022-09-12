@@ -143,7 +143,7 @@ def print_status(status: str = None) -> None:
 
 def get_deployment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
     message = "Deploying service: " + path
-    commands = ['echo ' + message,  'cd ' + path]
+    commands = ['echo ' + message, 'cd ' + path]
     for file in os.listdir(path):
         if file in install_commands.keys():
             commands.append(install_commands[file])
@@ -155,11 +155,14 @@ def get_deployment_commands(path: str, aws_profile: str = None, stage: str = Non
 
 def get_remove_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
     message = "Removing service: " + path
-    return ['echo ' + message,
-            'cd ' + path,
-            'sls remove'
-            + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
-            + ((" --stage " + stage) if stage is not None else "")]
+    commands = ['echo ' + message, 'cd ' + path]
+    for file in os.listdir(path):
+        if file in install_commands.keys():
+            commands.append(install_commands[file])
+    commands.append('sls remove'
+                    + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
+                    + ((" --stage " + stage) if stage is not None else ""))
+    return commands
 
 
 def run_process_per_path(
@@ -168,7 +171,6 @@ def run_process_per_path(
         start_message: str = None,
         failed_message: str = None,
         complete_message: str = None) -> None:
-
     print_status(start_message)
     success = True
 
@@ -207,9 +209,12 @@ def run(args: Namespace, _):
 
     # Ignore provided services (if any)
     # Paths to ignore are assumed to be 
-    # provided without leading './' which
-    # is the reason for using path[2:]
-    paths = [path for path in paths if path[2:] not in args.ignore]
+    # provided without leading './'
+    for item in args.ignore:
+        try:
+            remove_path(paths, item)
+        except IndexError:
+            print("Path list does not include element: " + item)
 
     if args.remove:
         paths.reverse()
