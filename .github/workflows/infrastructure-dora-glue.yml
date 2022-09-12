@@ -1,5 +1,5 @@
 
-name: Dataplattform - infrastructure - athena
+name: Dataplattform - infrastructure - dora-glue
 
 on:
   workflow_dispatch:
@@ -8,19 +8,19 @@ on:
       - master
       - develop
     paths:
-      - 'services/infrastructure/athena/**'
+      - 'services/infrastructure/dora-glue/**'
       - '.config/.flake8'
       - '.config/.yamllint'
-      - '.github/workflows/infrastructure-athena.yml'
+      - '.github/workflows/infrastructure-dora-glue.yml'
   pull_request:
     branches:
       - master
       - develop
     paths:
-      - 'services/infrastructure/athena/**'
+      - 'services/infrastructure/dora-glue/**'
       - '.config/.flake8'
       - '.config/.yamllint'
-      - '.github/workflows/infrastructure-athena.yml'
+      - '.github/workflows/infrastructure-dora-glue.yml'
 
 jobs:
   lint:
@@ -34,8 +34,8 @@ jobs:
     - name: Lint with flake8
       run: |
         pip install flake8
-        flake8 --config=./.config/.flake8 ./services/infrastructure/athena
+        flake8 --config=./.config/.flake8 ./services/infrastructure/dora-glue
     - name: Lint with yamllint
       run: |
         pip install yamllint
-        yamllint -c ./.config/.yamllint ./services/infrastructure/athena
+        yamllint -c ./.config/.yamllint ./services/infrastructure/dora-glue
