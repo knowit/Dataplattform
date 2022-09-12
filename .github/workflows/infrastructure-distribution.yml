@@ -2,13 +2,6 @@ name: Dataplattform - infrastructure - distribution
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/distribution/**'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

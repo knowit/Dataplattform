@@ -3,14 +3,6 @@ name: Dataplattform - infrastructure - cloudtrail
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/cloudtrail/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

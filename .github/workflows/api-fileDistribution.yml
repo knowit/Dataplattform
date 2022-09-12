@@ -3,14 +3,6 @@ name: Dataplattform - api - fileDistribution
 
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/api/fileStorageDistribution/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

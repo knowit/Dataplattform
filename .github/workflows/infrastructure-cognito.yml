@@ -3,14 +3,6 @@ name: Dataplattform - infrastructure - cognito
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/cognito/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

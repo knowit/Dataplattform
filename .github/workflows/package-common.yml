@@ -3,14 +3,6 @@ name: Dataplattform - package - common
 
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'packages/common/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

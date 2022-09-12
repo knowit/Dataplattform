@@ -3,15 +3,6 @@ name: Dataplattform - infrastructure - cloudwatch
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/cloudwatch/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
-      - '.github/workflows/infrastructure-cloudwatch.yml'
   pull_request:
     branches:
       - master

@@ -3,16 +3,6 @@ name: Dataplattform - ingestion - knowitLabs
 
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/ingestion/knowitLabs/**'
-      - 'packages/common/**'
-      - 'packages/query/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

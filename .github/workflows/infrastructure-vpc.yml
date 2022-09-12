@@ -2,13 +2,6 @@ name: Dataplattform - infrastructure - vpc
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/vpc/**'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

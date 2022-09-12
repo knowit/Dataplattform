@@ -2,13 +2,6 @@ name: Dataplattform - infrastructure - datalake
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/datalake/**'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

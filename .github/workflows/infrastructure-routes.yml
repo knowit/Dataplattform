@@ -2,13 +2,6 @@ name: Dataplattform - infrastructure - routes
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/routes/**'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

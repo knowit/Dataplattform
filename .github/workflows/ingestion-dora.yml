@@ -3,15 +3,6 @@ name: Dataplattform - ingestion - dora
 
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/ingestion/dora/**'
-      - 'packages/common/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

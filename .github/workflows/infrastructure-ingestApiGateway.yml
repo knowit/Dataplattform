@@ -2,13 +2,6 @@ name: Dataplattform - infrastructure - ingestApiGateway
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/ingestApiGateway/**'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master
