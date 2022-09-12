@@ -207,22 +207,6 @@ resources:
                   Resource:
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
                     - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-          - PolicyName: ${self:custom.stage}-KMSKeyAccess-${self:service}
-            PolicyDocument:
-              Version: "2012-10-17"
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - kms:Encrypt
-                    - kms:Decrypt
-                    - kms:DescribeKey
-                    - kms:ListKeys
-                    - kms:GenerateDataKey
-                  Resource:
-                    Fn::Join:
-                      - ""
-                      - - !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/'
-                        - !ImportValue ${self:custom.stage}-KMS-KeyID
 
   Outputs:
     Level1GlueAccessOutput:

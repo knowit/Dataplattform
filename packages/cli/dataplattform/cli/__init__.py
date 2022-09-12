@@ -15,7 +15,8 @@ def main():
         'deploy',
         'configure',
         'prepare-sandbox',
-        'test'
+        'test',
+        'generate-key-policy'
     ]
 
     parser = ArgumentParser('dataplattform')
