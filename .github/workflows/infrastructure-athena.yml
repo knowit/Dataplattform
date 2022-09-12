@@ -11,6 +11,7 @@ on:
       - 'services/infrastructure/athena/**'
       - '.config/.flake8'
       - '.config/.yamllint'
+      - '.github/workflows/infrastructure-athena.yml'
   pull_request:
     branches:
       - master
@@ -19,6 +20,7 @@ on:
       - 'services/infrastructure/athena/**'
       - '.config/.flake8'
       - '.config/.yamllint'
+      - '.github/workflows/infrastructure-athena.yml'
 
 jobs:
   lint:

@@ -8,7 +8,8 @@ on:
       - master
     paths:
       - 'services/infrastructure/athena/**'
-      - ".config/.serverless"
+      - '.config/.serverless'
+      - '.github/workflows/deploy-infrastructure-athena.yml'
 
 jobs:
   deploy:
