@@ -8,7 +8,8 @@ on:
       - master
     paths:
       - 'services/infrastructure/dora-glue/**'
-      - ".config/.serverless"
+      - '.config/.serverless'
+      - '.github/workflows/deploy-infrastructure-dora-glue.yml'
 
 jobs:
   deploy:

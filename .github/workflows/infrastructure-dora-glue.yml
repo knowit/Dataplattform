@@ -11,6 +11,7 @@ on:
       - 'services/infrastructure/dora-glue/**'
       - '.config/.flake8'
       - '.config/.yamllint'
+      - '.github/workflows/infrastructure-dora-glue.yml'
   pull_request:
     branches:
       - master
@@ -19,6 +20,7 @@ on:
       - 'services/infrastructure/dora-glue/**'
       - '.config/.flake8'
       - '.config/.yamllint'
+      - '.github/workflows/infrastructure-dora-glue.yml'
 
 jobs:
   lint:

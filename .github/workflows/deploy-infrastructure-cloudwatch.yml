@@ -9,6 +9,7 @@ on:
     paths:
       - 'services/infrastructure/cloudwatch/**'
       - ".config/.serverless"
+      - '.github/workflows/deploy-infrastructure/cloudwatch.yml'
 
 jobs:
   deploy:
