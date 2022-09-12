@@ -39,7 +39,7 @@ resources:
                 Fn::Join:
                   - ""
                   - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                    - !ImportValue ${self:custom.stage}-KMS-KeyID
+                    - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
     AthenaGithubDeployments:
       Type: AWS::Athena::NamedQuery
       Properties:

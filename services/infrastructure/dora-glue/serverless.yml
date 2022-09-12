@@ -30,20 +30,20 @@ resources:
               Fn::Join:
                 - ""
                 - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                  - !ImportValue ${self:custom.stage}-KMS-KeyID
+                  - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
           JobBookmarksEncryption:
             JobBookmarksEncryptionMode: CSE-KMS
             KmsKeyArn:
               Fn::Join:
                 - ""
                 - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                  - !ImportValue ${self:custom.stage}-KMS-KeyID
+                  - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
           S3Encryptions:
             - KmsKeyArn:
                 Fn::Join:
                   - ""
                   - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                    - !ImportValue ${self:custom.stage}-KMS-KeyID
+                    - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
               S3EncryptionMode: SSE-KMS
     GlueCrawler:
       Type: AWS::Glue::Crawler

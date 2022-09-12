@@ -44,7 +44,7 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !ImportValue ${self:custom.stage}-KMS-KeyID
+                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
         - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
           PolicyDocument:
             Version: "2012-10-17"
@@ -129,7 +129,7 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !ImportValue ${self:custom.stage}-KMS-KeyID
+                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
         - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
@@ -277,7 +277,7 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !ImportValue ${self:custom.stage}-KMS-KeyID
+                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
         - PolicyName: ${self:custom.stage}-glue-${self:service}-role
           PolicyDocument:
             Version: "2012-10-17"
@@ -418,7 +418,7 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !ImportValue ${self:custom.stage}-KMS-KeyID
+                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
         - PolicyName: ${self:custom.stage}-Glue-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
