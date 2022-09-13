@@ -7,9 +7,10 @@ on:
       - develop
       - master
     paths:
-      - "services/ingestion/googleEvent/**"
-      - "packages/common/**"
-      - ".config/.serverless"
+      - 'services/ingestion/googleEvent/**'
+      - 'packages/common/**'
+      - '.config/.serverless'
+      - '.github/workflows/deploy-ingestion-googleEvent.yml'
 
 jobs:
   deploy:
@@ -27,7 +28,7 @@ jobs:
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless_ingestors)
 
       - name: Install dependencies
         run: npm install
