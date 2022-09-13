@@ -23,6 +23,8 @@ jobs:
         working-directory: services/ingestion/twitter
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: fix/twitter-test
       - uses: actions/setup-node@v3
       - uses: actions/setup-python@v2
         with:
