@@ -7,7 +7,7 @@ on:
       - master
       - develop
     paths:
-      - "services/ingestion/ubwCustomerPerResource/**"
+      - 'services/ingestion/ubwCustomerPerResource/**'
       - "packages/common/**"
       - '.config/.flake8'
       - '.config/.yamllint'

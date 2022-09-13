@@ -7,9 +7,10 @@ on:
       - develop
       - master
     paths:
-      - "services/ingestion/dora/**"
-      - "packages/common/**"
-      - ".config/.serverless"
+      - 'services/ingestion/dora/**'
+      - 'packages/common/**'
+      - '.config/.serverless'
+      - '.github/workflows/deploy-ingestion-dora.yml'
 
 jobs:
   deploy:
@@ -20,11 +21,11 @@ jobs:
         working-directory: services/ingestion/dora
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
+          python-version: '3.7' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
         run: npm install -g serverless@2
@@ -32,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install packages/* 
+      - name: Install packages/*
         run: |
           pip install -e ../../../packages/cli
           pip install -e ../../../packages/common
@@ -87,7 +88,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to production" && sls deploy --stage prod
-          
+
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:
@@ -96,7 +97,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to development" && sls deploy --stage dev
-        
+
       - name: Run serverless deploy dev
         working-directory: services/infrastructure/athena
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
@@ -125,7 +126,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Invoking configuration in prod" && sls invoke -f configuration --stage prod
-          
+
       - name: Configure dora dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:

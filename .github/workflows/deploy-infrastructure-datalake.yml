@@ -7,8 +7,9 @@ on:
       - develop
       - master
     paths:
-      - "services/infrastructure/datalake/**"
-      - ".config/.serverless"
+      - 'services/infrastructure/datalake/**'
+      - '.config/.serverless'
+      - '.github/workflows/deploy-infrastructure-datalake.yml'
 
 jobs:
   deploy:
@@ -19,7 +20,7 @@ jobs:
         working-directory: services/infrastructure/datalake
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
 
       - name: Install Serverless Framework
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
@@ -35,7 +36,6 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to production" && sls deploy --stage prod
-          
 
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}

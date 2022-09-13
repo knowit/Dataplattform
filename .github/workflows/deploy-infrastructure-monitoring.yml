@@ -7,8 +7,8 @@ on:
       - develop
       - master
     paths:
-      - "services/infrastructure/monitoring/**"
-      - ".config/.serverless"
+      - 'services/infrastructure/monitoring/**'
+      - '.config/.serverless'
       - '.github/workflows/deploy-infrastructure-monitoring.yml'
 
 jobs:
@@ -37,8 +37,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          echo "Deploying to production" && sls deploy --stage prod 
-          
+          echo "Deploying to production" && sls deploy --stage prod
+
 
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
@@ -47,5 +47,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          echo "Deploying to development" && sls deploy --stage dev 
-
+          echo "Deploying to development" && sls deploy --stage dev
