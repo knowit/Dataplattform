@@ -10,7 +10,7 @@ on:
       - 'services/ingestion/knowitLabs/**'
       - 'packages/common/**'
       - 'packages/query/**'
-      - '.config/.serverless'
+      - '.config/.serverless_ingestors'
       - '.github/workflows/deploy-ingestion-knowitLabs.yml'
 
 jobs:

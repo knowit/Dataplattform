@@ -9,7 +9,7 @@ on:
     paths:
       - 'services/ingestion/jiraSales/**'
       - 'packages/common/**'
-      - '.config/.serverless'
+      - '.config/.serverless_ingestors'
       - '.github/workflows/deploy-ingestion-jiraSales.yml'
 
 jobs:
