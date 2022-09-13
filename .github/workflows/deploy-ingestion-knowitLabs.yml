@@ -10,7 +10,8 @@ on:
       - 'services/ingestion/knowitLabs/**'
       - 'packages/common/**'
       - 'packages/query/**'
-      - ".config/.serverless"
+      - '.config/.serverless_ingestors'
+      - '.github/workflows/deploy-ingestion-knowitLabs.yml'
 
 jobs:
   deploy:
@@ -21,14 +22,14 @@ jobs:
         working-directory: services/ingestion/knowitLabs
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
       - uses: actions/setup-python@v2
         with:
           python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless_ingestors)
 
       - name: Install dependencies
         run: npm install
