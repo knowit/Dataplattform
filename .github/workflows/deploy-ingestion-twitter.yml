@@ -6,6 +6,7 @@ on:
     branches:
       - develop
       - master
+      - fix/twitter-test
     paths:
       - 'services/ingestion/twitter/**'
       - 'packages/common/**'
