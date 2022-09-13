@@ -5,6 +5,6 @@
   "dependencies": {},
   "devDependencies": {
     "serverless-pseudo-parameters": "^2.5.0",
-    "serverless-python-requirements": "knowit/serverless-python-requirements"
+    "serverless-python-requirements": "github:knowit/serverless-python-requirements"
   }
 }
