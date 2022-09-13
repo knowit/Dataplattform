@@ -3,15 +3,6 @@ name: Dataplattform - ingestion - slack
 
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/ingestion/slack/**'
-      - 'packages/common/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

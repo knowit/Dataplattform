@@ -2,13 +2,6 @@ name: Dataplattform - infrastructure - glue
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/glue/**'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

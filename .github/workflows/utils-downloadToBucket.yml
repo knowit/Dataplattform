@@ -3,15 +3,6 @@ name: Dataplattform - utils - downloadToBucket
 
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/utils/downloadToBucket/**'
-      - 'packages/common/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

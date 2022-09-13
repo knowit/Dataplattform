@@ -3,15 +3,6 @@ name: Dataplattform - api - dataApi
 
 on: 
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/api/dataApi/**'
-      - 'packages/api/**'
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

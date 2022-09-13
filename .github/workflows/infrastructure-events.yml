@@ -2,13 +2,6 @@ name: Dataplattform - infrastructure - events
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/infrastructure/events/**'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master

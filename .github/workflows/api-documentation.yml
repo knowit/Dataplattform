@@ -2,14 +2,6 @@ name: Dataplattform - api - documentation
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - 'services/api/documentation/**'
-      - '.config/.yamllint'
-      - '.config/.flake8'
   pull_request:
     branches:
       - master

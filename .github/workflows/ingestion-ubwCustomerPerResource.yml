@@ -2,15 +2,6 @@ name: Dataplattform - ingestion - ubwCustomerPerResource
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - develop
-    paths:
-      - "services/ingestion/ubwCustomerPerResource/**"
-      - "packages/common/**"
-      - '.config/.flake8'
-      - '.config/.yamllint'
   pull_request:
     branches:
       - master
