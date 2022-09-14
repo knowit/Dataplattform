@@ -7,9 +7,10 @@ on:
       - develop
       - master
     paths:
-      - "services/ingestion/cvPartner/**"
-      - "packages/common/**"
-      - ".config/.serverless"
+      - 'services/ingestion/cvPartner/**'
+      - 'packages/common/**'
+      - '.config/.serverless'
+      - '.github/workflows/deploy-ingestion-cvPartner.yml'
 
 jobs:
   deploy:
@@ -20,7 +21,7 @@ jobs:
         working-directory: services/ingestion/cvPartner
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
       - uses: actions/setup-python@v2
         with:
           python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
@@ -47,7 +48,6 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to production" && sls deploy --stage prod
-          
 
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
@@ -57,7 +57,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to development" && sls deploy --stage dev
-        
+
       - name: Invoke ingestion prod
         if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
         env:
@@ -66,7 +66,6 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Invoking ingestion in prod" && sls invoke -f ingest --stage prod
-          
 
       - name: Invoke ingestion dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
@@ -75,5 +74,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev     
-
+          echo "Invoking ingestion in dev" && sls invoke -f ingest --stage dev

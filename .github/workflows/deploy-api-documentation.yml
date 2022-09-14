@@ -7,8 +7,9 @@ on:
       - develop
       - master
     paths:
-      - "services/api/documentation/**"
-      - ".config/.serverless"
+      - 'services/api/documentation/**'
+      - '.config/.serverless'
+      - '.github/workflows/deploy-api-documentation.yml'
 
 jobs:
   deploy:
@@ -19,13 +20,13 @@ jobs:
         working-directory: services/api/documentation
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with: 
+      - uses: actions/setup-node@v3
+        with:
           node-version: '12'
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
+          python-version: '3.7' # Version range or exact version of a Python version to use, using SemVer's version range syntax
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
@@ -38,10 +39,10 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-        
+
       - name: Install requirements
         run: pip3 install -r requirements-postDeploy.txt
-      
+
 
       - name: Run serverless deploy prod
         if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}
@@ -50,8 +51,8 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          echo "Deploying to production" && sls deploy --stage prod 
-          
+          echo "Deploying to production" && sls deploy --stage prod
+
 
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
@@ -60,5 +61,4 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: eu-central-1
         run: |
-          echo "Deploying to development" && sls deploy --stage dev 
-
+          echo "Deploying to development" && sls deploy --stage dev

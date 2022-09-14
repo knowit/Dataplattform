@@ -7,9 +7,10 @@ on:
       - develop
       - master
     paths:
-      - "services/ingestion/googleSheets/**"
-      - "packages/common/**"
-      - ".config/.serverless"
+      - 'services/ingestion/googleSheets/**'
+      - 'packages/common/**'
+      - '.config/.serverless'
+      - '.github/workflows/deploy-ingestion-googleSheets.yml'
 
 jobs:
   deploy:
@@ -20,11 +21,11 @@ jobs:
         working-directory: services/ingestion/googleSheets
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v3
       - uses: actions/setup-python@v2
         with:
-          python-version: "3.7" # Version range or exact version of a Python version to use, using SemVer's version range syntax
-          architecture: "x64" # optional x64 or x86. Defaults to x64 if not specified
+          python-version: '3.7' # Version range or exact version of a Python version to use, using SemVers version range syntax
+          architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Install Serverless Framework
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
@@ -47,7 +48,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-central-1
         run: |
           echo "Deploying to production" && sls deploy --stage prod
-          
+
       - name: Run serverless deploy dev
         if: ${{ github.base_ref != 'master' && github.ref != 'refs/heads/master' }}
         env:

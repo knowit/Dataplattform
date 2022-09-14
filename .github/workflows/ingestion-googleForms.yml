@@ -1,6 +1,6 @@
 name: Dataplattform - ingestion - googleForms
 
-on: 
+on:
   workflow_dispatch:
   pull_request:
     branches:
@@ -16,22 +16,22 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        flake8 --config=./.config/.flake8 ./services/ingestion/googleForms
-    - name: Lint with yamllint
-      run: |
-        pip install yamllint
-        yamllint -c ./.config/.yamllint ./services/ingestion/googleForms
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --config=./.config/.flake8 ./services/ingestion/googleForms
+      - name: Lint with yamllint
+        run: |
+          pip install yamllint
+          yamllint -c ./.config/.yamllint ./services/ingestion/googleForms
 
   test:
     runs-on: ubuntu-latest
@@ -39,10 +39,10 @@ jobs:
       image: lambci/lambda:build-python3.7
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Test with tox/pytest
-      working-directory: './services/ingestion/googleForms'
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox
-        tox
+      - uses: actions/checkout@v2
+      - name: Test with tox/pytest
+        working-directory: './services/ingestion/googleForms'
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+          tox

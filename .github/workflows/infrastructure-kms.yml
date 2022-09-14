@@ -1,4 +1,3 @@
-
 name: Dataplattform - infrastructure - kms
 
 on:
@@ -16,16 +15,16 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Lint with flake8
-      run: |
-        pip install flake8
-        flake8 --config=./.config/.flake8 ./services/infrastructure/kms
-    - name: Lint with yamllint
-      run: |
-        pip install yamllint
-        yamllint -c ./.config/.yamllint ./services/infrastructure/kms
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 --config=./.config/.flake8 ./services/infrastructure/kms
+      - name: Lint with yamllint
+        run: |
+          pip install yamllint
+          yamllint -c ./.config/.yamllint ./services/infrastructure/kms
