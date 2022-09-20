@@ -20,6 +20,7 @@ provider:
   stackName: ${self:custom.service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+  runtime: nodejs16.x
 
 resources:
   Resources:
