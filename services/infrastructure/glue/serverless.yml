@@ -1,4 +1,5 @@
 service: glue
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
