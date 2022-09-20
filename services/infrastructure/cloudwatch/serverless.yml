@@ -1,4 +1,5 @@
 service: cloudwatch
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
