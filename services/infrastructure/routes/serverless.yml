@@ -1,4 +1,5 @@
 service: routes
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -28,4 +29,4 @@ resources:
       Value:
         "Ref": BasicZone
       Export:
-        Name: ${self:custom.stage}-routes-zoneid #TODO: Make available in filestoragedistribution
+        Name: ${self:custom.stage}-routes-zoneid
