@@ -1,5 +1,6 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: slackAlarmForwarder
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -80,10 +81,9 @@ resources: # The resources your functions use
                   Action:
                     - 'ssm:GetParameter*'
                     - 'ssm:PutParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
       
   Outputs:
 
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters
