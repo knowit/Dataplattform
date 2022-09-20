@@ -26,6 +26,7 @@ provider:
   stackName: ${self:custom.service}
   deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+  runtime: nodejs16.x
 
   tags:
     project: dataplattform
