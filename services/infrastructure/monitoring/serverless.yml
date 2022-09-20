@@ -1,15 +1,15 @@
 service: monitoring
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
     - ../deploymentBucket
     - ../events
 
-
 custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
-  datalakeName: ${self:custom.stage}-datalake-bucket-#{AWS::AccountId}
+  datalakeName: !Sub '${self:custom.stage}-datalake-bucket-${AWS::AccountId}'
 
 provider:
   name: aws
@@ -26,8 +26,8 @@ resources:
       Type: AWS::CloudWatch::Dashboard
       Properties:
         DashboardName: ${self:custom.stage}-lambda-dashboard
-        DashboardBody: >-
-          {
+        DashboardBody:
+          '{
             "widgets": [
               {
                 "type": "metric",
@@ -39,25 +39,25 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND process ', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND process `, `Sum`, 300 )",
                         "label": "All ProcessInvocations",
                         "id": "p",
-                        "region": "${self:provider.region}",
+                        "region": "\${self:provider.region}",
                         "visible": false
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND process', 'Sum', 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND process`, `Sum`, 300)",
                         "label": "",
                         "id": "er",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -86,20 +86,20 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH('{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND ${self:custom.stage} AND NOT dl ', 'Sum',3600)",
+                        "expression": "SEARCH(`{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND \${self:custom.stage} AND NOT dl `, `Sum`,3600)",
                         "label": "AllQueues",
                         "id": "q",
                         "visible": false,
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH('{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND ${self:custom.stage} AND dl ', 'Sum',3600)",
+                        "expression": "SEARCH(`{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND \${self:custom.stage} AND dl `, `Sum`,3600)",
                         "label": "All DeadLetters",
                         "id": "dl",
                         "visible": false,
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
@@ -107,7 +107,7 @@ resources:
                         "expression": "SUM(q)",
                         "label": "MessagesReceived",
                         "id": "e1",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
@@ -115,12 +115,12 @@ resources:
                         "expression": "SUM(dl)",
                         "label": "MessagesReceived in DL",
                         "id": "e2",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "singleValue",
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 3600,
                   "title": "SQS",
@@ -137,27 +137,27 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND ingest ', 'Sum', 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND ingest `, `Sum`, 300)",
                         "label": "",
                         "id": "i",
-                        "region": "${self:provider.region}",
+                        "region": "\${self:provider.region}",
                         "yAxis": "left",
                         "visible": false
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND ingest', 'Sum', 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND ingest`, `Sum`, 300)",
                         "label": "",
                         "id": "er",
-                        "region": "${self:provider.region}",
+                        "region": "\${self:provider.region}",
                         "yAxis": "left"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -191,7 +191,7 @@ resources:
                       "StorageType",
                       "StandardStorage",
                       "BucketName",
-                      "${self:custom.datalakeName}",
+                      "\${self:custom.datalakeName}",
                       {
                         "label": "Average Size"
                       }
@@ -209,7 +209,7 @@ resources:
                     ]
                   ],
                   "view": "singleValue",
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Average",
                   "period": 604800,
                   "stacked": false,
@@ -230,7 +230,7 @@ resources:
                         "expression": "SUM(er)",
                         "label": "IngestErrors",
                         "id": "e1",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
@@ -238,31 +238,31 @@ resources:
                         "expression": "SUM(i) - SUM(er)",
                         "label": "IngestSuccesses",
                         "id": "e2",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND ingest ', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND ingest `, `Sum`, 300 )",
                         "label": "All IngestInvocations",
                         "id": "i",
                         "visible": false,
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND ingest', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND ingest`, `Sum`, 300 )",
                         "label": "All IngestErrors",
                         "id": "er",
                         "visible": false,
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": true,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -291,19 +291,19 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND ingest ', 'Sum', 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND ingest `, `Sum`, 300)",
                         "label": "",
                         "id": "i",
-                        "region": "${self:provider.region}",
+                        "region": "\${self:provider.region}",
                         "yAxis": "left"
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND ingest', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND ingest`, `Sum`, 300 )",
                         "label": "All IngestErrors",
                         "id": "er",
-                        "region": "${self:provider.region}",
+                        "region": "\${self:provider.region}",
                         "yAxis": "left",
                         "visible": false
                       }
@@ -311,7 +311,7 @@ resources:
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -344,7 +344,7 @@ resources:
                         "expression": "SUM(er)",
                         "label": "ProcessErrors",
                         "id": "e1",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
@@ -352,31 +352,31 @@ resources:
                         "expression": "SUM(p) - SUM(er)",
                         "label": "ProcessSuccesses",
                         "id": "e2",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND process ', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND process `, `Sum`, 300 )",
                         "label": "All ProcessInvocations",
                         "id": "p",
                         "visible": false,
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND process', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND process`, `Sum`, 300 )",
                         "label": "All ProcessErrors",
                         "id": "er",
                         "visible": false,
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": true,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -405,25 +405,25 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND ${self:custom.stage} AND process ', 'Sum', 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND process `, `Sum`, 300)",
                         "label": "",
                         "id": "p",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ],
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND ${self:custom.stage} AND process', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND process`, `Sum`, 300 )",
                         "label": "All ProcessErrors",
                         "id": "er",
                         "visible": false,
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "legend": {
@@ -472,16 +472,16 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND ${self:custom.stage} AND ingest', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND \${self:custom.stage} AND ingest`, `Sum`, 300 )",
                         "label": "Expression1",
                         "id": "e1",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Average",
                   "period": 300,
                   "legend": {
@@ -509,16 +509,16 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(' {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND ${self:custom.stage} AND process', 'Sum', 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND \${self:custom.stage} AND process`, `Sum`, 300 )",
                         "label": "Duration",
                         "id": "e1",
-                        "region": "${self:provider.region}"
+                        "region": "\${self:provider.region}"
                       }
                     ]
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Average",
                   "period": 300,
                   "legend": {
@@ -537,14 +537,14 @@ resources:
                 }
               }
             ]
-          }
+          }'
 
     DataApiDashboard:
       Type: AWS::CloudWatch::Dashboard
       Properties:
         DashboardName: ${self:custom.stage}-dataAPI-dashboard
-        DashboardBody: >-
-          {
+        DashboardBody:
+          '{
             "widgets": [
               {
                 "type": "metric",
@@ -558,7 +558,7 @@ resources:
                       "AWS/ApiGateway",
                       "Count",
                       "ApiName",
-                      "${self:custom.stage}-DataAPI"
+                      "\${self:custom.stage}-DataAPI"
                     ],
                     [
                       ".",
@@ -575,7 +575,7 @@ resources:
                   ],
                   "view": "timeSeries",
                   "stacked": false,
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 300,
                   "liveData": true
@@ -593,7 +593,7 @@ resources:
                       "AWS/ApiGateway",
                       "Count",
                       "ApiName",
-                      "${self:custom.stage}-DataAPI"
+                      "\${self:custom.stage}-DataAPI"
                     ],
                     [
                       ".",
@@ -609,7 +609,7 @@ resources:
                     ]
                   ],
                   "view": "singleValue",
-                  "region": "${self:provider.region}",
+                  "region": "\${self:provider.region}",
                   "stat": "Sum",
                   "period": 3600,
                   "title": "Requests",
@@ -624,8 +624,8 @@ resources:
                 "width": 24,
                 "height": 12,
                 "properties": {
-                  "query": "SOURCE '/aws/api-gateway/DataAPI-${self:custom.stage}' | fields @timestamp, @message\n| sort @timestamp desc\n| limit 100\n| filter @message not like \"200\"",
-                  "region": "${self:provider.region}",
+                  "query": "SOURCE `/aws/api-gateway/DataAPI-\${self:custom.stage}` | fields @timestamp, @message\n| sort @timestamp desc\n| limit 100\n| filter @message not like \"200\"",
+                  "region": "\${self:provider.region}",
                   "stacked": false,
                   "title": "Non 200 Logs",
                   "view": "table"
@@ -638,8 +638,8 @@ resources:
                "width": 24,
                "height": 12,
                "properties": {
-                 "query": "SOURCE '/aws/api-gateway/DataAPI-${self:custom.stage}' | fields @timestamp, @message\n| parse @message \"sub: *,\" as @userId\n| stats count_distinct(@userId) by bin(5m)",
-                 "region": "${self:provider.region}",
+                 "query": "SOURCE `/aws/api-gateway/DataAPI-\${self:custom.stage}` | fields @timestamp, @message\n| parse @message \"sub: *,\" as @userId\n| stats count_distinct(@userId) by bin(5m)",
+                 "region": "\${self:provider.region}",
                  "stacked": false,
                  "title": "Number of unique users",
                  "view": "table"
@@ -652,15 +652,15 @@ resources:
                  "width": 24,
                  "height": 12,
                  "properties": {
-                   "query": "SOURCE '/aws/api-gateway/DataAPI-${self:custom.stage}' | fields @timestamp, @message \n| parse @message \"sub: *,\" as @userId\n| stats count(*) by @userId",
-                   "region": "${self:provider.region}",
+                   "query": "SOURCE `/aws/api-gateway/DataAPI-\${self:custom.stage}` | fields @timestamp, @message \n| parse @message \"sub: *,\" as @userId\n| stats count(*) by @userId",
+                   "region": "\${self:provider.region}",
                    "stacked": false,
                    "title": "Number of request per user",
                    "view": "table"
                 }
               }
             ]
-          }
+          }'
 
     LambdaAlarm:
       Type: AWS::CloudWatch::Alarm
