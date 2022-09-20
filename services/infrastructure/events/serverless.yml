@@ -1,4 +1,5 @@
 service: events
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
