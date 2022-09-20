@@ -1,4 +1,5 @@
 service: cloudtrail
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -21,7 +22,6 @@ provider:
 
 resources:
   Resources:
-
     CloudTrailS3Bucket:
       Type: AWS::S3::Bucket
       DeletionPolicy: Retain
