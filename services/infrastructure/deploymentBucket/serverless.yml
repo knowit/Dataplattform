@@ -17,6 +17,7 @@ provider:
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}
+  runtime: nodejs16.x
 
   # Lag en fil config.yml med feltet "bucketName" hvor du skriver inn et globalt unikt navn for deploymentbucket
   deploymentBucket:
