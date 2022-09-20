@@ -1,4 +1,5 @@
 service: metadata
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -72,6 +73,3 @@ resources:
       Value: !GetAtt PersonalMetadataTable.Arn
       Export:
         Name: ${self:custom.stage}-personal-metadata-tableArn
-
-plugins:
-  - serverless-pseudo-parameters

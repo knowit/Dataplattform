@@ -1,4 +1,5 @@
 service: kms
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
