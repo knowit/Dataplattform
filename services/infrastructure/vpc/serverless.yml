@@ -1,11 +1,9 @@
 service: vpc
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
     - ../deploymentBucket
-
-plugins:
-  - serverless-pseudo-parameters
 
 custom:
   project: dataplattform
@@ -32,7 +30,7 @@ custom:
     pre-prod: 10.194.131.0/24
     prod: 10.194.195.0/24
 
-  PersonalMetadataTable: arn:aws:dynamodb:${self:provider.region}:#{AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table
+  PersonalMetadataTable: !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table'
 
 provider:
   name: aws
