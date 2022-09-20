@@ -1,4 +1,5 @@
 service: api-documentation
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -8,13 +9,12 @@ dataplattform:
     - ../../infrastructure/routes
 
 plugins:
-  - serverless-pseudo-parameters
   - serverless-plugin-scripts
 
 custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
-  bucketName: ${self:custom.service}-staticweb-#{AWS::AccountId}
+  bucketName: ${self:custom.service}-staticweb
   distributionAlias:
     - ${ssm:/${self:custom.stage}/routes/domain_name}
     - doc.${ssm:/${self:custom.stage}/routes/domain_name}
@@ -29,7 +29,7 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   stackName: ${self:custom.service}
   timeout: 25
   deploymentBucket:
@@ -40,7 +40,7 @@ resources:
     StaticS3Bucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.bucketName}
+        BucketName: !Sub '${self:custom.bucketName}-${AWS::AccountId}'
         AccessControl: PublicRead
         WebsiteConfiguration:
           IndexDocument: index.html
@@ -82,7 +82,7 @@ resources:
               Principal: "*"
               Action:
                 - s3:GetObject
-              Resource: arn:aws:s3:::${self:custom.bucketName}/*
+              Resource: !Sub 'arn:aws:s3:::${self:custom.bucketName}-${AWS::AccountId}/*'
 
     Distribution:
       Type: AWS::CloudFront::Distribution
@@ -91,7 +91,7 @@ resources:
           Enabled: true
           Aliases: ${self:custom.distributionAlias}
           Origins:
-            - DomainName: ${self:custom.bucketName}.s3-website.${self:provider.region}.amazonaws.com
+            - DomainName: !Sub '${self:custom.bucketName}-${AWS::AccountId}.s3-website.${self:provider.region}.amazonaws.com'
               Id: ${self:custom.service}-default-origin
               CustomOriginConfig:
                 HTTPPort: 80
