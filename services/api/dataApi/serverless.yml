@@ -1,4 +1,5 @@
 service: DataAPI
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -12,7 +13,7 @@ dataplattform:
 custom:
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service} #this service definition includes stage
+  service: ${self:custom.stage}-${self:service}
   wsgi:
     app: app.app
     packRequirements: false
@@ -197,7 +198,7 @@ resources:
                     - dynamodb:Scan
                     - dynamodb:GetItem
                     - dynamodb:UpdateItem
-                  Resource: !Sub 'arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_reports_table'
+                  Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_reports_table'
                 - Effect: Allow
                   Action:
                     - s3:GetObject
@@ -268,7 +269,7 @@ resources:
                   Action:
                     - athena:ListTableMetadata
                     - athena:ListDatabases
-                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:datacatalog/AwsDataCatalog'
+                  Resource: !Sub 'arn:aws:athena:${AWS::Region}:${AWS::AccountId}:datacatalog/AwsDataCatalog'
                 - Effect: Allow
                   Action:
                     - athena:ListDataCatalogs
@@ -277,16 +278,16 @@ resources:
                   Action:
                     - athena:StartQueryExecution
                     - athena:GetQueryExecution
-                  Resource: !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary'
+                  Resource: !Sub 'arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary'
                 - Effect: Allow
                   Action:
                     - glue:GetTable
                     - glue:GetDatabase
                     - glue:GetPartitions
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
 
   Outputs:
     ApiUrl:
@@ -302,4 +303,3 @@ plugins:
   - serverless-python-requirements
   - serverless-plugin-scripts
   - serverless-wsgi
-  - serverless-pseudo-parameters
