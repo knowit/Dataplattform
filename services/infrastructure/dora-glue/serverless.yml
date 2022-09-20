@@ -1,4 +1,5 @@
 service: dora-glue
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
