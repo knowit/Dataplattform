@@ -1,7 +1,23 @@
+const YAML = require('yaml')
+const fs = require('fs')
+const file = fs.readFileSync('./serverless.yml', 'utf8')
+
+// Parse serverless yaml-file without unknown tag warnings
+const parsedYaml = YAML.parse(file, options={
+    customTags: [["!Ref", "!Sub", "!ImportValue", "!GetAtt"].map(tag => {
+        return {
+            identify: (value) => typeof value === "string",
+            tag: tag,
+            resolve(str){
+                return str
+            }
+        }
+    })]
+})
 
 module.exports = serverless => {
-    const stage = serverless.service.custom.stage;
-    const service = serverless.service.service
+    const stage = parsedYaml.custom.stage;
+    const service = parsedYaml.service.service
 
     const commonStatement = [
         {
