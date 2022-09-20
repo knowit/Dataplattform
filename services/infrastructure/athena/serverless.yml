@@ -1,4 +1,5 @@
 service: athena
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
