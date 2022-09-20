@@ -1,4 +1,5 @@
 service: ingestApiGateway
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
