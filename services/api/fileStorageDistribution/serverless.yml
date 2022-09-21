@@ -46,7 +46,7 @@ provider:
   stackName: ${self:custom.service}
   runtime: python3.7
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../..infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:
