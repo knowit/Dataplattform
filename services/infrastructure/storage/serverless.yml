@@ -63,7 +63,7 @@ resources:
     PublicBucketName:
       Value: ${self:resources.Resources.PublicRawStorageBucket.Properties.BucketName}
       Export:
-        Name: !Sub '${self:custom.stage}-publicBucketName-${AWS::AccountId}'
+        Name: !Sub '${self:custom.stage}-publicBucketName'
     PublicBucketArn:
       Value: !GetAtt PublicRawStorageBucket.Arn
       Export:

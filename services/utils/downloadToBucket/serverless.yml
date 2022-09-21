@@ -1,4 +1,5 @@
 service: downloadToBucket
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -24,9 +25,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: |-
-      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
-      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
@@ -87,5 +86,4 @@ resources:
 
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters
   - serverless-function-outputs
