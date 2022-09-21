@@ -1,4 +1,5 @@
 service: googleSheetsWebhook
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -34,7 +35,6 @@ custom:
     noDeploy:
       - boto3
       - botocore
-
   apiKeys:
     - name: ${self:custom.stage}-main-ingest-api-key
 
@@ -45,20 +45,15 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: |-
-      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
-      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
-
   apiGateway:
     restApiId:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
     restApiRootResourceId:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-rootResourceId
-
-
   tags:
     project: ${self:custom.project}
     layer: ingestion
@@ -67,9 +62,7 @@ provider:
     project: ${self:custom.project}
     layer: ingestion
     ingestion: webHooks
-
   tracing:
-    apiGateway: true
     lambda: true
 
 package:
@@ -94,7 +87,6 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-
     events:
       - http:
           path: sheets-data-callback
@@ -109,7 +101,6 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-
     name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
@@ -124,7 +115,6 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
-
 
 resources:
   Resources:
@@ -225,10 +215,10 @@ resources:
                     - glue:GetCrawler
                     - glue:UpdateCrawler
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -247,8 +237,6 @@ resources:
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true
 
-
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters
   - serverless-add-api-key
