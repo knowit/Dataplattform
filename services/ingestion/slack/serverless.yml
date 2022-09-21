@@ -1,4 +1,5 @@
 service: slackWebhook
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -11,7 +12,6 @@ dataplattform:
   glue:
     tableName: slack
     accessLevel: 2
-
 
 custom:
   editable:
@@ -41,15 +41,9 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
-    name: |-
-      ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml)
-      :bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
   memorySize: 1024
-
-#  apiKeys:
-#    - name: ${self:custom.stage}-mainIngestKey #when value is not set, AWS automatically generates API key
-
   # imports api gateway resources exported by ingestApiGateway service
   apiGateway:
     restApiId:
@@ -57,9 +51,7 @@ provider:
     restApiRootResourceId:
       'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-rootResourceId
   tracing:
-    apiGateway: true
     lambda: true
-
   tags:
     project: ${self:custom.project}
     layer: ingestion
@@ -97,7 +89,6 @@ functions:
           path: slack-webhook/
           method: post
           private: false
-
   process:
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
     events:
@@ -107,7 +98,6 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-
     name: ${self:custom.stage}-${self:service}-process
     timeout: ${self:custom.editable.timeout}
     description: ${self:custom.editable.description}
@@ -175,7 +165,7 @@ resources:
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -231,11 +221,10 @@ resources:
                     - glue:GetCrawler
                     - glue:UpdateCrawler
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
-
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -247,7 +236,6 @@ resources:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
           maxReceiveCount: 1
-
     EventQueueDL: # Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:
@@ -255,7 +243,5 @@ resources:
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true # Assume all message bodies are unique, by design given as an uuid1
 
-
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters

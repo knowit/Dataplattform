@@ -2,11 +2,8 @@
   "name": "filestoragedistribution",
   "version": "1.0.0",
   "description": "",
-  "dependencies": {
-    "serverless": "^2.4.0",
-    "serverless-plugin-scripts": "^1.0.2"
-  },
   "devDependencies": {
-    "serverless-python-requirements": "knowit/serverless-python-requirements"
+    "serverless-python-requirements": "knowit/serverless-python-requirements",
+    "serverless-plugin-scripts": "^1.0.2"
   }
 }

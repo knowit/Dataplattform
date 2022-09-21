@@ -1,15 +1,13 @@
 service: raw-storage-for-dataplattform
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
     - ../deploymentBucket
 
-plugins:
-  - serverless-pseudo-parameters
-
 custom:
   stage: ${opt:stage, self:provider.stage}
-  publicBucketName: public-raw-storagebucket-#{AWS::AccountId}
+  publicBucketName: public-raw-storagebucket
   stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName}
   service: ${self:custom.stage}-${self:service}
 
@@ -20,13 +18,14 @@ provider:
   stackName: ${self:custom.service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+  runtime: nodejs16.x
 
 resources:
   Resources:
     PublicRawStorageBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.stagePublicBucketName}
+        BucketName: !Sub '${self:custom.stagePublicBucketName}-${AWS::AccountId}'
         AccessControl: PublicRead
 
     PublicCloudFrontOriginAccessIdentity:
@@ -46,7 +45,7 @@ resources:
             - Action:
                 - "s3:GetObject"
               Effect: "Allow"
-              Resource: arn:aws:s3:::${self:custom.stagePublicBucketName}/*
+              Resource: !Sub 'arn:aws:s3:::${self:custom.stagePublicBucketName}-${AWS::AccountId}/*'
               Principal:
                 CanonicalUser: !GetAtt PublicCloudFrontOriginAccessIdentity.S3CanonicalUserId
             - Action:
@@ -64,7 +63,7 @@ resources:
     PublicBucketName:
       Value: ${self:resources.Resources.PublicRawStorageBucket.Properties.BucketName}
       Export:
-        Name: ${self:custom.stage}-publicBucketName
+        Name: !Sub '${self:custom.stage}-publicBucketName'
     PublicBucketArn:
       Value: !GetAtt PublicRawStorageBucket.Arn
       Export:
