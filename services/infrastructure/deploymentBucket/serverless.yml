@@ -25,7 +25,6 @@ provider:
     name: ${self:custom.stage}-${file(./config.yml):bucketName, self:defaultBucketName}
     serverSideEncryption: AES256
 
-# Stack will not deploy unless at least one CF resource is defined.
 resources:
   Resources:
     NullResource:
