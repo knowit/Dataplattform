@@ -1,4 +1,3 @@
-# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: yrWeatherPoller
 
 dataplattform:
@@ -13,7 +12,6 @@ dataplattform:
     accessLevel: 1
 
 custom:
-  #Edit these variables###########################
   editable:
     timeout: 12
     srcDir: lib/yrweather
@@ -24,16 +22,14 @@ custom:
     scheduleRate: rate(1 hour)
     accessLevel: level-1
     dataFolder: yr
-
-  ################################################
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+  stage: ${opt:stage, self:provider.stage}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3 # Default in lambda rt
+      - boto3
       - botocore
 
 provider:
@@ -44,23 +40,15 @@ provider:
   deploymentBucket:
     name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
-  memorySize: 1024 # MB
-  timeout: ${self:custom.editable.timeout} # seconds
-  tags: # Tags that will be added to each of the deployment resources.
-    Project: Dataplattform # When used for sub-projects like eventBox change project tag to eventBox
-    Layer: Ingestion # ingestion, processing, restApi, infrastructure
-    Ingestion: Pollers #webHooks, Pollers, iot
-    #processing: linkedIn
-    #restApi: linkedIn
-    #infrastructure: s3
-    # key: value
-  stackTags: # Tags for cloud formation
-    # key: value
-  environment: # Service wide environment variables
+  memorySize: 1024
+  timeout: ${self:custom.editable.timeout}
+  tags:
+    Project: Dataplattform
+    Layer: Ingestion
+    Ingestion: Pollers
   tracing:
     apiGateway: true
     lambda: true
-
 
 package:
   individually: true
@@ -68,15 +56,15 @@ package:
     - "./**" # Exclude everything and include what you need in the functions below
 
 functions:
-  ingest: # A Function
+  ingest:
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
-    name: ${self:custom.stage}-${self:service}-ingest # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
-        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - '${self:custom.editable.srcDir}/*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -84,31 +72,28 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-    tags: # Tag for this function. Every function are tagged with stage by default
-
-    events: # The Events that trigger this Function
+    events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
-  process: # A Function
+  process:
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.processHandlerFile}.handler
-    events: # The Events that trigger this Function
+    events:
       - sqs:
           arn:
             Fn::GetAtt:
               - EventQueue
               - Arn
           batchSize: 1
-
-    name: ${self:custom.stage}-${self:service}-process # Always begin name with stage
+    name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
     package:
       include:
-        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - '${self:custom.editable.srcDir}/*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
@@ -116,9 +101,8 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
-    tags: # Tag for this function. Every function are tagged with stage by default
 
-resources: # The resources your functions use
+resources:
   Resources:
     IngestLambdaRole:
       Type: AWS::IAM::Role
@@ -169,7 +153,7 @@ resources: # The resources your functions use
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -225,11 +209,10 @@ resources: # The resources your functions use
                     - glue:GetCrawler
                     - glue:UpdateCrawler
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
-
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -240,7 +223,6 @@ resources: # The resources your functions use
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           maxReceiveCount: 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
-
     EventQueueDL: #Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:
@@ -248,9 +230,5 @@ resources: # The resources your functions use
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
 
-
-  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
-
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters
