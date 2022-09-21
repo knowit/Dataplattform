@@ -38,7 +38,6 @@ custom:
   apiKeys:
     - name: ${self:custom.stage}-main-ingest-api-key
 
-
 provider:
   name: aws
   stage: dev
