@@ -29,6 +29,7 @@ provider:
   stackName: ${self:service}-${self:custom.stage}
   tracing:
     lambda: true
+  versionFunctions: false
 
 package:
   individually: true
