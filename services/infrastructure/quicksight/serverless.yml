@@ -1,4 +1,5 @@
 service: quicksight
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
