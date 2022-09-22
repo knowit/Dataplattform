@@ -47,11 +47,13 @@ jobs:
           get_changed_files
 
           echo -e "\nServices to be deployed:"
-          SRVS="$(get_changed_services)"
-          SERVICES=( $SRVS )
-          while IFS= read -r FILE; do
-            echo "test: $FILE"
-          done <<< "${SERVICES[@]}"
+          SERVICES="$(get_changed_services)"
+          IFS=' '
+          read -a FILES <<< "$SERVICES"
+          for file in "${FILES[@]}"
+          do
+            echo "test: $file"
+          done
 
 #      - uses: actions/setup-node@v3
 #        with:
