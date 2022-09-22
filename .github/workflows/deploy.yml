@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/main-cicd
+      - main
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -16,6 +16,7 @@ env:
   AWS_ACCESS_KEY_ID: ${{ github.event_name == 'release' && secrets.PROD_AWS_ACCESS_KEY_ID || secrets.DEV_AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ github.event_name == 'release' && secrets.PROD_AWS_SECRET_ACCESS_KEY || secrets.DEV_AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: eu-central-1
+  EVENT_TYPE: ${{ github.event_name }}
 
 jobs:
   deploy:
@@ -33,8 +34,10 @@ jobs:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: |
-          echo "${{ steps.changed_files.outputs.added_modified }}"
+      - name: Test stuff
+        if: ${{ github.event_name == 'release' }}
+        run: |
+          gh release list --exclude-drafts --limit 10
 
 #      - uses: actions/setup-node@v3
 #        with:
