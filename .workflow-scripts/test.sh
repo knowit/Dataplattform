@@ -101,7 +101,7 @@ function get_changed_files {
       fi
   fi
   IFS=' '
-  read -A FILES <<< "$CHANGED_FILES"
+  read -a FILES <<< "$CHANGED_FILES"
   for file in $FILES
   do
     echo "$file"
@@ -126,7 +126,7 @@ function get_related_serverless_file {
   fi
   local SERVICE_PATH=""
   IFS="/"
-  read -A FILES <<< "$SERVICE_FILE"
+  read -a FILES <<< "$SERVICE_FILE"
   for i in $FILES
   do
     SERVICE_PATH="$SERVICE_PATH$i/"
