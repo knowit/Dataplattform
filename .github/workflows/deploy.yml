@@ -1,0 +1,30 @@
+name: Deploy dataplattform
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feature/main-cicd
+    paths:
+      - 'services/**'
+      - '.config/.serverless'
+      - '.github/workflows/deploy.yml'
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Test shit
+        env:
+          EVENT: ${{ github.event.action }}
+        run: |
+          echo "Event: $EVENT"
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 16
+#
+#      - name: Install Serverless Framework
+#        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
