@@ -101,7 +101,7 @@ function get_changed_files {
 
   IFS=' '
   read -a FILES <<< "$CHANGED_FILES"
-  for file in $FILES
+  for file in "${FILES[@]}"
   do
     echo "$file"
   done
