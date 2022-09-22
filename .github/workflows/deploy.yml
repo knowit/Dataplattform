@@ -19,6 +19,7 @@ env:
   EVENT_TYPE: ${{ github.event_name }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+
 jobs:
   deploy:
     name: deploy
