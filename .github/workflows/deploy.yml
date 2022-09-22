@@ -23,7 +23,7 @@ jobs:
         env:
           EVENT: ${{ github.event }}
         run: |
-          echo "Event: ${{ github.event }}"
+          echo "Event: $EVENT"
 #      - uses: actions/setup-node@v3
 #        with:
 #          node-version: 16
