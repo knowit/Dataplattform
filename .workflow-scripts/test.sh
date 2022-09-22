@@ -127,7 +127,7 @@ function get_related_serverless_file {
   local SERVICE_PATH=""
   IFS="/"
   read -a FILES <<< "$SERVICE_FILE"
-  for i in $FILES
+  for i in "${FILES[@]}"
   do
     SERVICE_PATH="$SERVICE_PATH$i/"
     SERVERLESS_PATH="${SERVICE_PATH}serverless.yml"
@@ -144,7 +144,7 @@ function get_changed_services {
   while IFS= read -r FILE; do
     if ! SERVERLESS_FILE="$(get_related_serverless_file "$FILE")"
     then
-      echo "Failed to find related serverless file to $FILE"
+      echo "Failed to find related serverless file: $FILE"
       echo "$SERVERLESS_FILE"
       return 1
     fi
