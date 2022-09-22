@@ -17,6 +17,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ github.event_name == 'release' && secrets.PROD_AWS_SECRET_ACCESS_KEY || secrets.DEV_AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: eu-central-1
   EVENT_TYPE: ${{ github.event_name }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   deploy:
