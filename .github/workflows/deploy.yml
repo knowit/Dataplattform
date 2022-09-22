@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - feature/main-cicd
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -29,23 +29,30 @@ jobs:
           ref: feature/main-cicd
           fetch-depth: 0
 
-      - name: 'Get changed files'
-        id: changed_files
+      - name: 'Get changed files (push)'
+        id: changed_files_push
         if: ${{ github.event_name == 'push' }}
         uses: jitterbit/get-changed-files@v1
         with:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "Get changes since last release"
-        if: ${{ github.event_name == 'release' }}
-        id: changes_release
-        uses: jsmith/changes-since-last-tag@v0.3.3
+      - name: 'Get changed services (push)'
+        if: ${{ github.event_name == 'push' }}
+        run: |
+          SERVICES=""
+          while IFS= read -r FILE; do
+            if [[ -f "$FILE" ]]
+            then
+              SERVICES="$SERVICES ${FILE%%"/serverless.yml"}"
+              echo "Changed file: $FILE"
+            fi
+          done <<< "$(echo "${{ steps.changed_files_push }}" | grep "serverless.yml")"
+          echo "\nServices:"
+          echo "$SERVICES"
 
-      - name: Test stuff
+      - name: 'Get changed services (release)'
         if: ${{ github.event_name == 'release' }}
-        env:
-          PREVIOUS_TAG: ${{ steps.previoustag.outputs.tag }}
         run: |
           echo "Previous tag: ${{ steps.changes_release.outputs.files }}"
 
