@@ -100,8 +100,8 @@ function get_changed_files {
         return 1
       fi
   fi
-
-  read -A FILES <<< $CHANGED_FILES
+  IFS=' '
+  read -A FILES <<< "$CHANGED_FILES"
   for file in $FILES
   do
     echo "$file"
@@ -110,11 +110,46 @@ function get_changed_files {
 
 function get_changed_service_files {
   while IFS= read -r FILE; do
-    if [[ "$FILE" == "services/*" ]]
+    if [[ "$FILE" == services/* ]]
     then
       echo "$FILE"
     fi
   done <<< "$(get_changed_files)"
+}
+
+function get_related_serverless_file {
+  local SERVICE_FILE="$1"
+  if [[ "$SERVICE_FILE" == "" ]]
+  then
+    echo "Missing argument: SERVICE_FILE"
+    return 1
+  fi
+  local SERVICE_PATH=""
+  IFS="/"
+  read -A FILES <<< "$SERVICE_FILE"
+  for i in $FILES
+  do
+    SERVICE_PATH="$SERVICE_PATH$i/"
+    SERVERLESS_PATH="${SERVICE_PATH}serverless.yml"
+    if [[ -f "$SERVERLESS_PATH" ]]
+    then
+      echo "$SERVERLESS_PATH"
+      return
+    fi
+  done
+}
+
+function get_changed_services {
+  local SERVICES=()
+  while IFS= read -r FILE; do
+    SERVERLESS_FILE="$(get_related_serverless_file "$FILE")"
+    SERVICE="${SERVERLESS_FILE%%"/serverless.yml"}"
+    if ! [[ " ${SERVICES[*]} " =~ ${SERVICE} ]]
+    then
+      SERVICES+=("$SERVICE")
+    fi
+  done <<< "$(get_changed_service_files)"
+  echo "${SERVICES[@]}"
 }
 
 function get_changed_services_in_release {
