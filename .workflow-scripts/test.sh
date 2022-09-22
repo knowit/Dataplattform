@@ -79,8 +79,6 @@ function get_changed_files_in_release {
 }
 
 function get_changed_files {
-  local CHANGED_FILES
-
   if [[ "$EVENT_TYPE" == "" ]]
   then
     echo "Missing environment variable: EVENT_TYPE"
