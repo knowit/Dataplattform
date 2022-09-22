@@ -158,7 +158,7 @@ function get_changed_services {
     if ! [[ " ${SERVICES[*]} " =~ ${SERVICE} ]]
     then
       SERVICES+=("$SERVICE")
-      echo "$SERVICE"
     fi
   done <<< "$(get_changed_service_files)"
+  echo "${SERVICES[*]}"
 }

@@ -45,12 +45,8 @@ jobs:
           source .workflow-scripts/test.sh
           echo "Changed files:"
           get_changed_files
-          echo -e "\n\nServices to be deployed:"
+          echo -e "\nServices to be deployed:"
           get_changed_services
-          echo -e "\nServices delimited by space:"
-          SERVICES="$(get_changed_services)"
-          SERVICES=("$SERVICES")
-          echo "${SERVICES[*]}"
 
 #      - uses: actions/setup-node@v3
 #        with:
