@@ -40,16 +40,7 @@ jobs:
       - name: 'Get changed services (push)'
         if: ${{ github.event_name == 'push' }}
         run: |
-          SERVICES=""
-          while IFS= read -r FILE; do
-            if [[ -f "$FILE" ]]
-            then
-              SERVICES="$SERVICES ${FILE%%"/serverless.yml"}"
-              echo "Changed file: $FILE"
-            fi
-          done <<< "$(echo "${{ steps.changed_files_push.outputs.all }}" | grep "serverless.yml")"
-          echo "\nServices:"
-          echo "$SERVICES"
+          echo "${{ steps.changed_files_push.outputs.all }}"
 
       - name: 'Get changed services (release)'
         if: ${{ github.event_name == 'release' }}
