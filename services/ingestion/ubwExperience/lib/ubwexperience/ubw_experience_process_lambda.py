@@ -45,7 +45,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             person = dict(row)
 
             examination_year = row["examination_year"]
-
             if not pd.isna(examination_year) and examination_year != "0":
                 experience = current_year - int(examination_year)
             else:
