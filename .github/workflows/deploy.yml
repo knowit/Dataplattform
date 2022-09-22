@@ -46,7 +46,8 @@ jobs:
           echo "Changed files:"
           get_changed_files
           echo -e "\nServices to be deployed:"
-          get_changed_services
+          SERVICES=( "$(get_changed_services)" )
+          echo "${SERVICES[@]}"
 
 #      - uses: actions/setup-node@v3
 #        with:
