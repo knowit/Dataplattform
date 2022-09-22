@@ -1,5 +1,20 @@
 #!/bin/bash
 
+function split_string_by_space {
+  local STRING="$1"
+  if [[ "$STRING" == "" ]]
+  then
+    echo "Missing argument: STRING"
+    return 1
+  fi
+  IFS=' '
+  read -a WORDS <<< "$STRING"
+  for word in "${WORDS[@]}"
+  do
+    echo "$word"
+  done
+}
+
 function get_previous_release {
   local LATEST_TAG
   local LATEST_TAG_BRANCH
@@ -99,12 +114,7 @@ function get_changed_files {
     return 1
   fi
 
-  IFS=' '
-  read -a FILES <<< "$CHANGED_FILES"
-  for file in "${FILES[@]}"
-  do
-    echo "$file"
-  done
+  split_string_by_space "$CHANGED_FILES"
 }
 
 function get_changed_service_files {

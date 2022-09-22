@@ -48,12 +48,10 @@ jobs:
 
           echo -e "\nServices to be deployed:"
           SERVICES="$(get_changed_services)"
-          IFS=' '
-          read -a FILES <<< "$SERVICES"
-          for file in "${FILES[@]}"
-          do
-            echo "test: $file"
-          done
+          split_string_by_space "$SERVICES"
+
+          echo -e "\nServices delimited by space:"
+          echo "${SERVICES}"
 
 #      - uses: actions/setup-node@v3
 #        with:
