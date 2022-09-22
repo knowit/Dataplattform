@@ -47,7 +47,8 @@ jobs:
           get_changed_files
 
           echo -e "\nServices to be deployed:"
-          SERVICES=( get_changed_services )
+          SRVS="$(get_changed_services)"
+          SERVICES=( $SRVS )
           while IFS= read -r FILE; do
             echo "test: $FILE"
           done <<< "${SERVICES[@]}"
