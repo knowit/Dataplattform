@@ -12,7 +12,7 @@ from pathlib import PurePosixPath
 handler = ProcessHandler()
 
 
-@handler.process(partitions={})
+@handler.process(partitions={}, overwrite=True, overwrite_all_versions=True)
 def process(data, events) -> Dict[str, pd.DataFrame]:
     data = [
         [dict(x, time=int(d['metadata']['timestamp'])) for x in d['data']]
