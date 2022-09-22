@@ -29,6 +29,7 @@ jobs:
           fetch-depth: 0
 
       - id: changed_files
+        if: ${{ github.event_name == 'push' }}
         uses: jitterbit/get-changed-files@v1
         with:
           format: space-delimited
