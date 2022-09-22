@@ -1,4 +1,5 @@
 service: cloudfront-raw-storage
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -11,8 +12,8 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
   userPoolRegion: eu-central-1
-  publicBucketName: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
-  S3PublicOriginAccessIdentity: ${cf.${self:custom.userPoolRegion}:${self:custom.stage}-raw-storage-for-dataplattform.S3PublicOriginAccessIdentity}
+  publicBucketName: ${cf:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
+  S3PublicOriginAccessIdentity: ${cf:${self:custom.stage}-raw-storage-for-dataplattform.S3PublicOriginAccessIdentity}
   publicDomainName: ${self:custom.publicBucketName}.s3.amazonaws.com
   publicDomainId: custom/${self:custom.publicDomainName}
   publicFrontOrigin:
@@ -21,7 +22,7 @@ custom:
     S3OriginConfig:
       OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PublicOriginAccessIdentity}
 
-  userPoolId: ${cf.${self:custom.userPoolRegion}:cognito-${self:custom.stage}.CognitoUserPoolId}
+  userPoolId: ${cf:cognito-${self:custom.stage}.CognitoUserPoolId}
   scripts:
     hooks:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
@@ -44,6 +45,8 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   runtime: python3.7
+  deploymentBucket:
+    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:

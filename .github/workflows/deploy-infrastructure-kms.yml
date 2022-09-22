@@ -21,9 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
       - name: Install Serverless Framework
-        run: npm install -g serverless@2
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
 
       - name: Run serverless deploy prod
         if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}

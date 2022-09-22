@@ -3543,13 +3543,6 @@ serverless-plugin-scripts@^1.0.2:
   resolved "https://registry.npmjs.org/serverless-plugin-scripts/-/serverless-plugin-scripts-1.0.2.tgz"
   integrity sha1-IYCMPP0KGoTkjAZgsPbzcLVmVIY=
 
-serverless-pseudo-parameters@^2.5.0:
-  version "2.6.1"
-  resolved "https://registry.npmjs.org/serverless-pseudo-parameters/-/serverless-pseudo-parameters-2.6.1.tgz"
-  integrity sha512-mHedRk4l7O6OlzFh3++WInQoBfwUy/B10VL0eHMiiV4xwA5hJui45lp00eMSe7Ga0qj1eV91LqeYv8wu98Vekw==
-  dependencies:
-    semver "^7.3.5"
-
 setimmediate@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"

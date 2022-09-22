@@ -6,7 +6,6 @@
   "devDependencies": {
     "serverless-disable-functions": "^0.1.0",
     "serverless-plugin-conditional-functions": "^1.0.6",
-    "serverless-pseudo-parameters": "^2.6.1",
     "serverless-python-requirements": "github:knowit/serverless-python-requirements"
   }
 }

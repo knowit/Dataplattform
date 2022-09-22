@@ -21,6 +21,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
+        with:
+          node-version: 16
       - uses: actions/setup-python@v2
         with:
           python-version: '3.7' # Version range or exact version of a Python version to use, using SemVer's version range syntax
@@ -28,9 +30,6 @@ jobs:
 
       - name: Install Serverless Framework
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
-
-      - name: Install dependencies
-        run: npm install
 
       - name: Run serverless deploy prod
         if: ${{ github.base_ref == 'master' || github.ref == 'refs/heads/master' }}

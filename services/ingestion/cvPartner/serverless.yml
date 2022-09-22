@@ -1,4 +1,5 @@
 service: cvPartnerPoller
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -212,7 +213,7 @@ resources:
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
 
     ProcessLambdaRole:
       Type: AWS::IAM::Role
@@ -273,10 +274,10 @@ resources:
                     - glue:GetCrawler
                     - glue:UpdateCrawler
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
 
     EventQueue:
       Type: AWS::SQS::Queue
@@ -301,5 +302,4 @@ resources:
 
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters
   - serverless-plugin-conditional-functions

@@ -1,5 +1,5 @@
-# More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: slackAlarmForwarder
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -7,18 +7,16 @@ dataplattform:
     - ../../infrastructure/events
 
 custom:
-  #Edit these variables###########################
   editable:
     timeout: 900
     srcDir: lib/slackalarmforwarder
     handlerFile: forwarder
-    description: Forwards Alarms from the ${self:custom.stage}-CloudwatchAlarms SNS topic to slack 
-  ################################################
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
+    description: Forwards Alarms from the ${self:custom.stage}-CloudwatchAlarms SNS topic to slack
+  stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
-      - boto3 # Default in lambda rt
+      - boto3
       - botocore
 
 provider:
@@ -29,24 +27,24 @@ provider:
   deploymentBucket:
     name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.7
-  memorySize: 1024 # MB
-  timeout: ${self:custom.editable.timeout} # seconds
-  
+  memorySize: 1024
+  timeout: ${self:custom.editable.timeout}
+
 package:
   individually: true
   exclude:
-    - "./**" # Exclude everything and include what you need in the functions below
+    - "./**"
 
 functions:
   forwarder:
-    handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler # fileName.functionNameInFile
-    name: ${self:custom.stage}-${self:service} # Always begin name with stage
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler
+    name: ${self:custom.stage}-${self:service}
     description: ${self:custom.editable.description}
     role: !GetAtt ForwarderRole.Arn
     package:
       include:
-        - '${self:custom.editable.srcDir}/*.py' # Files to include in deployment
-    environment: # Environment variables, often stored in SSM
+        - '${self:custom.editable.srcDir}/*.py'
+    environment:
       STAGE: ${self:custom.stage}
       SERVICE: ${self:service}
       SLACK_CALLBACK_SSM_NAME: slack_callback_url
@@ -54,8 +52,8 @@ functions:
       - sns:
           arn: !ImportValue ${self:custom.stage}-alarm-topic-arn
           topicName: ${self:custom.stage}-CloudwatchAlarms
-  
-resources: # The resources your functions use
+
+resources:
   Resources:
     ForwarderRole:
       Type: AWS::IAM::Role
@@ -80,10 +78,7 @@ resources: # The resources your functions use
                   Action:
                     - 'ssm:GetParameter*'
                     - 'ssm:PutParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
-      
-  Outputs:
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
 
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters

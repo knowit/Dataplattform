@@ -1,4 +1,5 @@
 service: deploymentBucket
+frameworkVersion: '3'
 
 plugins:
   - serverless-deployment-bucket
@@ -17,14 +18,14 @@ provider:
   stage: dev
   region: eu-central-1
   stackName: ${self:custom.service}
+  runtime: nodejs16.x
 
   # Lag en fil config.yml med feltet "bucketName" hvor du skriver inn et globalt unikt navn for deploymentbucket
   deploymentBucket:
     name: ${self:custom.stage}-${file(./config.yml):bucketName, self:defaultBucketName}
     serverSideEncryption: AES256
 
-# Stack will not deploy unless at least one CF resource is defined.
-functions:
-  null_function:
-    enabled: false
-    handler: handler.handler
+resources:
+  Resources:
+    NullResource:
+      Type: AWS::CloudFormation::WaitConditionHandle

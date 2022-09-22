@@ -1,4 +1,5 @@
 service: routes
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -14,6 +15,7 @@ provider:
   stackName: ${self:service}-${self:custom.stage}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+  runtime: nodejs16.x
 
 resources:
   Resources:
@@ -27,4 +29,4 @@ resources:
       Value:
         "Ref": BasicZone
       Export:
-        Name: ${self:custom.stage}-routes-zoneid #TODO: Make available in filestoragedistribution
+        Name: ${self:custom.stage}-routes-zoneid

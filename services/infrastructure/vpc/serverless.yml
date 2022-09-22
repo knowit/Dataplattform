@@ -1,12 +1,9 @@
 service: vpc
-frameworkVersion: "2"
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
     - ../deploymentBucket
-
-plugins:
-  - serverless-pseudo-parameters
 
 custom:
   project: dataplattform
@@ -33,7 +30,7 @@ custom:
     pre-prod: 10.194.131.0/24
     prod: 10.194.195.0/24
 
-  PersonalMetadataTable: arn:aws:dynamodb:${self:provider.region}:#{AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table
+  PersonalMetadataTable: !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table'
 
 provider:
   name: aws
@@ -41,6 +38,7 @@ provider:
   stackName: ${self:custom.service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+  runtime: nodejs16.x
 
 resources:
   Resources:
