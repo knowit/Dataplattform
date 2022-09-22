@@ -142,7 +142,12 @@ function get_related_serverless_file {
 function get_changed_services {
   local SERVICES=()
   while IFS= read -r FILE; do
-    SERVERLESS_FILE="$(get_related_serverless_file "$FILE")"
+    if ! SERVERLESS_FILE="$(get_related_serverless_file "$FILE")"
+    then
+      echo "Failed to find related serverless file to $FILE"
+      echo "$SERVERLESS_FILE"
+      return 1
+    fi
     SERVICE="${SERVERLESS_FILE%%"/serverless.yml"}"
     if ! [[ " ${SERVICES[*]} " =~ ${SERVICE} ]]
     then
