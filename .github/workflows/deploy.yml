@@ -43,6 +43,8 @@ jobs:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
           source .workflow-scripts/test.sh
+          get_changed_files
+          echo "\n\n"
           get_changed_services
 
 #      - uses: actions/setup-node@v3
