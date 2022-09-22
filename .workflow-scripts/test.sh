@@ -86,11 +86,6 @@ function get_changed_files {
     echo "Missing environment variable: EVENT_TYPE"
     return 1
 
-  elif [[ "$EVENT_TYPE" == "push" && "$CHANGED_FILES" == "" ]]
-  then
-    echo "Missing environment variable: CHANGED_FILES"
-    return 1
-
   elif [[ "$EVENT_TYPE" == "release" ]]
   then
       if ! CHANGED_FILES="$(get_changed_files_in_release)"
@@ -99,7 +94,13 @@ function get_changed_files {
         echo "$CHANGED_FILES"
         return 1
       fi
+
+  elif [[ "$CHANGED_FILES" == "" ]]
+  then
+    echo "Missing environment variable: CHANGED_FILES"
+    return 1
   fi
+
   IFS=' '
   read -a FILES <<< "$CHANGED_FILES"
   for file in $FILES
