@@ -63,7 +63,7 @@ jobs:
       - name: Deploy services
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: |
-          "Deploying services: $SERVICES"
+          echo "Deploying services: $SERVICES"
 
 #      - uses: actions/setup-node@v3
 #        with:
