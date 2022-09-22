@@ -21,7 +21,7 @@ jobs:
 
       - name: Test shit
         run: |
-          echo "Event: ${{ github.event }}"
+          echo "Event: ${{ github.event_name }}"
 #      - uses: actions/setup-node@v3
 #        with:
 #          node-version: 16
