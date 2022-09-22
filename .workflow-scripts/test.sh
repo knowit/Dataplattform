@@ -147,22 +147,7 @@ function get_changed_services {
     if ! [[ " ${SERVICES[*]} " =~ ${SERVICE} ]]
     then
       SERVICES+=("$SERVICE")
+      echo "$SERVICE"
     fi
   done <<< "$(get_changed_service_files)"
-  echo "${SERVICES[@]}"
-}
-
-function get_changed_services_in_release {
-  local SERVICES=""
-  while IFS= read -r FILE; do
-    if [[ -f "$FILE" ]]
-    then
-      SERVICES="$SERVICES ${FILE%%"/serverless.yml"}"
-    fi
-  done <<< "$(get_changed_files_in_release | grep "serverless.yml")"
-
-  if [[ "$SERVICES" != "" ]]
-  then
-    echo "$SERVICES"
-  fi
 }

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/main
+      - feature/main-cicd
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -41,12 +41,8 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
-          echo "${{ steps.changed_files_push.outputs.all }}"
-
-      - name: 'Get changed services (release)'
-        if: ${{ github.event_name == 'release' }}
-        run: |
-          echo "Previous tag: ${{ steps.changes_release.outputs.files }}"
+          source .workflow-scripts/test.sh
+          get_changed_services
 
 #      - uses: actions/setup-node@v3
 #        with:
