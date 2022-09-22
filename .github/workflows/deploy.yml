@@ -47,7 +47,7 @@ jobs:
               SERVICES="$SERVICES ${FILE%%"/serverless.yml"}"
               echo "Changed file: $FILE"
             fi
-          done <<< "$(echo "${{ steps.changed_files_push }}" | grep "serverless.yml")"
+          done <<< "$(echo "${{ steps.changed_files_push.outputs.all }}" | grep "serverless.yml")"
           echo "\nServices:"
           echo "$SERVICES"
 
