@@ -29,17 +29,27 @@ jobs:
           ref: feature/main-cicd
           fetch-depth: 0
 
-      - id: changed_files
+      - name: 'Get changed files'
+        id: changed_files
         if: ${{ github.event_name == 'push' }}
         uses: jitterbit/get-changed-files@v1
         with:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 'Get Previous tag'
+        if: ${{ github.event_name == 'release' }}
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          fallback: 1.0.0
+
       - name: Test stuff
         if: ${{ github.event_name == 'release' }}
+        env:
+          PREVIOUS_TAG: ${{ steps.previoustag.outputs.tag }}
         run: |
-          gh release list --exclude-drafts --limit 10
+          echo "Previous tag: $PREVIOUS_TAG"
 
 #      - uses: actions/setup-node@v3
 #        with:
