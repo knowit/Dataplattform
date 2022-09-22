@@ -44,10 +44,14 @@ jobs:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
           source .workflow-scripts/test.sh
+          echo "-------------------------"
           echo "Changed files:"
+          echo "-------------------------"
           get_changed_files
 
-          echo -e "\nServices to be deployed:"
+          echo -e "\n-------------------------"
+          echo "Services to be deployed:"
+          echo "-------------------------"
           SERVICES="$(get_changed_services)"
           if [[ "$SERVICES" == "" ]]
           then
