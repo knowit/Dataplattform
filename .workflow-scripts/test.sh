@@ -60,7 +60,61 @@ function get_changed_files_in_release {
     return 1
   fi
 
-  get_diff_by_sha "$PREV_SHA"
+  local DIFF
+  if ! DIFF="$(get_diff_by_sha "$PREV_SHA")"
+  then
+    echo "$DIFF"
+    return 1
+  fi
+
+  local FILES=""
+  while IFS= read -r FILE; do
+    FILES="$FILES $FILE"
+  done <<< "$DIFF"
+
+  if [[ "$FILES" != "" ]]
+  then
+    echo "$FILES"
+  fi
+}
+
+function get_changed_files {
+  local CHANGED_FILES
+
+  if [[ "$EVENT_TYPE" == "" ]]
+  then
+    echo "Missing environment variable: EVENT_TYPE"
+    return 1
+
+  elif [[ "$EVENT_TYPE" == "push" && "$CHANGED_FILES" == "" ]]
+  then
+    echo "Missing environment variable: CHANGED_FILES"
+    return 1
+
+  elif [[ "$EVENT_TYPE" == "release" ]]
+  then
+      if ! CHANGED_FILES="$(get_changed_files_in_release)"
+      then
+        echo "Failed to get changed files in release"
+        echo "$CHANGED_FILES"
+        return 1
+      fi
+  fi
+
+  read -A FILES <<< $CHANGED_FILES
+  for file in $FILES
+  do
+    echo "$file"
+  done
+}
+
+function get_changed_service_files {
+  while IFS= read -r FILE; do
+    if [[ "$FILE" == "services/*" ]]
+    then
+      echo "$FILE"
+    fi
+  done <<< "$(get_changed_files)"
 }
 
 function get_changed_services_in_release {

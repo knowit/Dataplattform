@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/main-cicd
+      - feature/main
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -37,8 +37,9 @@ jobs:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Get changed services (push)'
-        if: ${{ github.event_name == 'push' }}
+      - name: 'Get changed services'
+        env:
+          CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
           echo "${{ steps.changed_files_push.outputs.all }}"
 
