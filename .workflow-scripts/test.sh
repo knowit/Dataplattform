@@ -121,7 +121,7 @@ function get_changed_service_files {
     then
       echo "$FILE"
     fi
-  done <<< "${CHANGED_FILES[@]}"
+  done <<< "${CHANGED_FILES}"
 }
 
 function get_related_serverless_file {
