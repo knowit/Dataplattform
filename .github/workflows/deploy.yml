@@ -2,7 +2,7 @@ name: Deploy dataplattform
 
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
   push:
     branches:
@@ -12,6 +12,11 @@ on:
       - '.config/.serverless'
       - '.github/workflows/deploy.yml'
 
+env:
+  AWS_ACCESS_KEY_ID: ${{ github.event_name == 'release' && secrets.PROD_AWS_ACCESS_KEY_ID || secrets.DEV_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ github.event_name == 'release' && secrets.PROD_AWS_SECRET_ACCESS_KEY || secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: eu-central-1
+
 jobs:
   deploy:
     name: deploy
@@ -20,10 +25,23 @@ jobs:
       - uses: actions/checkout@v2
         with:
           ref: feature/main-cicd
+          fetch-depth: 0
 
-      - name: Test shit
-        run: |
-          echo "Event: ${{ github.event_name }}"
+      - id: changed_files
+        uses: jitterbit/get-changed-files@v1
+        with:
+          format: space-delimited
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          for changed_file in ${{ steps.changed_files.outputs.added_modified }}; do
+            echo "Do something with this ${changed_file}."
+          done
+
+
+
+
+
 #      - uses: actions/setup-node@v3
 #        with:
 #          node-version: 16
