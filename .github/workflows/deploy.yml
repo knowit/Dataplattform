@@ -44,7 +44,7 @@ jobs:
         run: |
           source .workflow-scripts/test.sh
           get_changed_files
-          echo "\n\n"
+          echo -e "\n\n"
           get_changed_services
 
 #      - uses: actions/setup-node@v3
