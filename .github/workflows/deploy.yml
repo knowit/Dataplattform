@@ -61,7 +61,7 @@ jobs:
           echo "::set-output name=should_deploy::$SHOULD_DEPLOY"
 
       - name: Deploy services
-        if: ${{ steps.get_changed_services.outputs.should_deploy }}
+        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: |
           "Deploying services: $SERVICES"
 
