@@ -43,10 +43,13 @@ jobs:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
           source .workflow-scripts/test.sh
-          echo "Changed files since last commit:"
+          echo "Changed files:"
           get_changed_files
           echo -e "\n\nServices to be deployed:"
           get_changed_services
+          echo -e "\nServices delimited by space:"
+          SERVICES="$(get_changed_services)"
+          echo "${SERVICES[*]}"
 
 #      - uses: actions/setup-node@v3
 #        with:
