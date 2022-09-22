@@ -37,19 +37,17 @@ jobs:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Get Previous tag'
+      - name: "Get changes since last release"
         if: ${{ github.event_name == 'release' }}
-        id: previoustag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          fallback: 1.0.0
+        id: changes_release
+        uses: jsmith/changes-since-last-tag@v0.3.3
 
       - name: Test stuff
         if: ${{ github.event_name == 'release' }}
         env:
           PREVIOUS_TAG: ${{ steps.previoustag.outputs.tag }}
         run: |
-          echo "Previous tag: $PREVIOUS_TAG"
+          echo "Previous tag: ${{ steps.changes_release.outputs.files }}"
 
 #      - uses: actions/setup-node@v3
 #        with:
