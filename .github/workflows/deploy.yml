@@ -38,7 +38,8 @@ jobs:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: 'Get changed services'
+      - name: Get changed services
+        id: get_changed_services
         env:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
@@ -48,10 +49,21 @@ jobs:
 
           echo -e "\nServices to be deployed:"
           SERVICES="$(get_changed_services)"
-          split_string_by_space "$SERVICES"
+          if [[ "$SERVICES" == "" ]]
+          then
+            SHOULD_DEPLOY="false"
+            echo "None"
+          else
+            SHOULD_DEPLOY="true"
+            echo -e "SERVICES=\"${SERVICES}\"" >> $GITHUB_ENV
+            split_string_by_space "$SERVICES"
+          fi
+          echo "::set-output name=should_deploy::$SHOULD_DEPLOY"
 
-          echo -e "\nServices delimited by space:"
-          echo "${SERVICES}"
+      - name: Deploy services
+        if: ${{ steps.get_changed_services.outputs.should_deploy }}
+        run: |
+          "Deploying services: $SERVICES"
 
 #      - uses: actions/setup-node@v3
 #        with:
