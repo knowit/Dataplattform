@@ -11,6 +11,7 @@ on:
       - 'services/**'
       - '.config/.serverless'
       - '.github/workflows/deploy.yml'
+      - '.workflow-scripts/**'
 
 env:
   AWS_ACCESS_KEY_ID: ${{ github.event_name == 'release' && secrets.PROD_AWS_ACCESS_KEY_ID || secrets.DEV_AWS_ACCESS_KEY_ID }}
