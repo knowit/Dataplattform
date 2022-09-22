@@ -49,6 +49,7 @@ jobs:
           get_changed_services
           echo -e "\nServices delimited by space:"
           SERVICES="$(get_changed_services)"
+          SERVICES=("$SERVICES")
           echo "${SERVICES[*]}"
 
 #      - uses: actions/setup-node@v3
