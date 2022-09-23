@@ -44,7 +44,7 @@ jobs:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
           source .workflow-scripts/test.sh
-          get_changed_services
+          get_changed_files
 
       - name: Look for changed services
         id: get_changed_services
