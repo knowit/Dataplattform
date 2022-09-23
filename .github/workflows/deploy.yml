@@ -39,13 +39,6 @@ jobs:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Test stuff
-        env:
-          CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
-        run: |
-          source .workflow-scripts/test.sh
-          get_changed_service_files
-
       - name: Look for changed services
         id: get_changed_services
         env:
@@ -60,7 +53,12 @@ jobs:
           echo -e "\n\n------------------------------"
           echo "| Services to be deployed:"
           echo "------------------------------"
-          SERVICES="$(get_changed_services)"
+          if ! SERVICES="$(get_changed_services)"
+          then
+            echo "Failed to get changed services"
+            echo "$SERVICES"
+            return 1
+          fi
           if [[ "$SERVICES" == "" ]]
           then
             echo "None"
