@@ -43,6 +43,7 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
+          source .workflow-scripts/test.sh
           get_changed_service_files
 
       - name: Look for changed services
