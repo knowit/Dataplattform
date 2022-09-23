@@ -39,6 +39,12 @@ jobs:
           format: space-delimited
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Test stuff
+        env:
+          CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
+        run: |
+          get_changed_service_files
+
       - name: Look for changed services
         id: get_changed_services
         env:
