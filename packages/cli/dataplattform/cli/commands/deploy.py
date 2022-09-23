@@ -19,6 +19,7 @@ ignore = [
 # Pre-deployment commands upon detected config files
 install_commands = dict({
     'requirements.txt': 'pip install -r requirements.txt',
+    'requirements-postDeploy.txt': 'pip install -r requirements-postDeploy.txt',
     'package.json': 'npm install',
     'yarn.lock': 'yarn install --frozen-lockfile'
 })

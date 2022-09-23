@@ -58,6 +58,10 @@ jobs:
           python-version: '3.7'
           architecture: 'x64'
 
+      - name: Install Yarn
+        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
+        run: npm install -g yarn
+
       - name: Install Serverless Framework
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' .config/.serverless)
