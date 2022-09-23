@@ -164,6 +164,12 @@ function get_changed_services {
     echo "$CHANGED_SERVICE_FILES"
     return 1
   fi
+
+  if [[ "$CHANGED_SERVICE_FILES" == "" ]]
+  then
+    return
+  fi
+
   while IFS= read -r FILE; do
     if ! SERVERLESS_FILE="$(get_related_serverless_file "$FILE")"
     then
