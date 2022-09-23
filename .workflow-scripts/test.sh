@@ -118,11 +118,11 @@ function get_changed_files {
 }
 
 function get_changed_service_files {
-  local CHANGED_FILES
-  if ! CHANGED_FILES="$(get_changed_files)"
+  local CHANGED_FILES_ARRAY
+  if ! CHANGED_FILES_ARRAY="$(get_changed_files)"
   then
     echo "Failed to get changed files"
-    echo "$CHANGED_FILES"
+    echo "$CHANGED_FILES_ARRAY"
     return 1
   fi
   while IFS= read -r FILE; do
@@ -130,7 +130,7 @@ function get_changed_service_files {
     then
       echo "$FILE"
     fi
-  done <<< "${CHANGED_FILES[@]}"
+  done <<< "${CHANGED_FILES_ARRAY[@]}"
 }
 
 function get_related_serverless_file {
