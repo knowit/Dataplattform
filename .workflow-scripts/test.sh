@@ -179,3 +179,40 @@ function get_changed_services {
   done <<< "${CHANGED_SERVICE_FILES[@]}"
   echo "${SERVICES[*]}"
 }
+
+function print_header {
+  local MSG="$1"
+  if [[ "$MSG" == "" ]]
+  then
+    echo "Missing argument: MSG"
+    return 1
+  fi
+  echo -e "\n------------------------------"
+  echo "| $MSG"
+  echo "------------------------------"
+}
+
+function look_for_changed_services {
+  print_header "Changed files:"
+  get_changed_files
+
+  print_header "Services to be deployed:"
+
+  local SERVICES
+  if ! SERVICES="$(get_changed_services)"
+  then
+    echo "Failed to get changed services"
+    echo "${SERVICES}"
+    exit 1
+
+  elif [[ "${SERVICES}" == "" ]]
+  then
+    echo "None"
+
+  else
+    echo "::set-output name=should_deploy::true"
+    echo -e "SERVICES=\"${SERVICES}\"" >> $GITHUB_ENV
+    echo "$SERVICES"
+    split_string_by_space "$SERVICES"
+  fi
+}

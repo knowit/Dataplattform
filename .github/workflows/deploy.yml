@@ -45,29 +45,7 @@ jobs:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
           source .workflow-scripts/test.sh
-          echo "------------------------------"
-          echo "| Changed files:"
-          echo "------------------------------"
-          get_changed_files
-
-          echo -e "\n\n------------------------------"
-          echo "| Services to be deployed:"
-          echo "------------------------------"
-          if ! SERVICES="$(get_changed_services)"
-          then
-            echo "Failed to get changed services"
-            echo "$SERVICES"
-            return 1
-          fi
-          if [[ "$SERVICES" == "" ]]
-          then
-            echo "None"
-          else
-            echo "::set-output name=should_deploy::true"
-            echo -e "SERVICES=\"${SERVICES}\"" >> $GITHUB_ENV
-            echo "$SERVICES"
-            split_string_by_space "$SERVICES"
-          fi
+          look_for_changed_services
 
       - uses: actions/setup-node@v3
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
