@@ -60,7 +60,7 @@ jobs:
 
       - name: Install Serverless Framework
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
-        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' ../../../.config/.serverless)
+        run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' .config/.serverless)
 
       - name: Install local packages
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}

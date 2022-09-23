@@ -218,7 +218,6 @@ function look_for_changed_services {
   else
     echo "::set-output name=should_deploy::true"
     echo -e "SERVICES=\"${SERVICES}\"" >> $GITHUB_ENV
-    echo "$SERVICES"
     split_string_by_space "$SERVICES"
   fi
 }
