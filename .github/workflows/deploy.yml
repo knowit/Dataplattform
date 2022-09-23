@@ -70,4 +70,5 @@ jobs:
       - name: Deploy services
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: |
-          echo -e "Deploying services to stage $STAGE: $SERVICES \n"
+          echo -e "Deploying services to stage $STAGE\n"
+          dataplattform deploy -s "$SERVICES" --stage "$STAGE"
