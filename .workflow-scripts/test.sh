@@ -200,12 +200,30 @@ function print_header {
 
 function look_for_changed_services {
   print_header "Changed files:"
-  get_changed_files
+  local CHANGED_FILES_ARRAY
+  if ! CHANGED_FILES_ARRAY="$(get_changed_files)"
+  then
+    echo "Failed to get changed files"
+    echo "${CHANGED_FILES_ARRAY[@]}"
+    return 1
+  fi
+  local DEPLOY_ALL="false"
+  while IFS= read -r FILE; do
+    if [[ "$FILE" == packages/query/* ]] || [[ "$FILE" == packages/api/* ]] || [[ "$FILE" == packages/common/* ]]
+    then
+      DEPLOY_ALL="true"
+    fi
+  done <<< "${CHANGED_FILES_ARRAY[@]}"
 
   print_header "Services to be deployed:"
-
   local SERVICES
-  if ! SERVICES="$(get_changed_services)"
+  if [[ "$DEPLOY_ALL" == "true" ]]
+  then
+    echo "All"
+    echo "::set-output name=should_deploy::true"
+    echo "SERVICES=." >> $GITHUB_ENV
+
+  elif ! SERVICES="$(get_changed_services)"
   then
     echo "Failed to get changed services"
     echo "${SERVICES}"
@@ -217,7 +235,7 @@ function look_for_changed_services {
 
   else
     echo "::set-output name=should_deploy::true"
-    echo -e "SERVICES=${SERVICES}" >> $GITHUB_ENV
+    echo "SERVICES=${SERVICES}" >> $GITHUB_ENV
     split_string_by_space "$SERVICES"
   fi
 }

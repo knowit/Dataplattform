@@ -11,6 +11,11 @@ dataplattform:
   glue:
     tableName: ubw_customer_per_resource
     accessLevel: 3
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: command
+      value: '[[ "$SERVERLESS_STAGE" == "prod" ]] && sls invoke -f ingest $SERVERLESS_STAGE_FLAG $SERVERLESS_AWS_PROFILE_FLAG || sls invoke -f mock $SERVERLESS_STAGE_FLAG $SERVERLESS_AWS_PROFILE_FLAG'
 
 custom:
   editable:

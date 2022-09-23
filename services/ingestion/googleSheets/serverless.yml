@@ -12,6 +12,11 @@ dataplattform:
   glue:
     tableName: google_sheets
     accessLevel: 3
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:
@@ -228,7 +233,6 @@ resources:
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           maxReceiveCount: 1
-
     EventQueueDL:
       Type: AWS::SQS::Queue
       Properties:

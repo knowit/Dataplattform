@@ -12,6 +12,11 @@ dataplattform:
   glue:
     tableName: slack
     accessLevel: 2
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:

@@ -17,6 +17,7 @@ custom:
     configureDescription: "Perform necessary post-deployment configurations for cognito to function properly."
   scripts:
     hooks:
+      before:deploy:deploy: pip install -r requirements-postDeploy.txt
       after:deploy:finalize: python postDeploy.py --stack-name ${self:provider.stackName} --param-name ${self:custom.ssmParamName} --region ${self:provider.region}
 
 provider:

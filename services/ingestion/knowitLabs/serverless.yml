@@ -11,6 +11,11 @@ dataplattform:
   glue:
     tableName: knowit_labs
     accessLevel: 1
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:
@@ -45,8 +50,8 @@ provider:
   timeout: ${self:custom.editable.timeout}
   tags:
     Project: Dataplattform
-    Layer: Ingestion # ingestion, processing, restApi, infrastructure
-    Ingestion: Pollers # webHooks, Pollers, iot
+    Layer: Ingestion
+    Ingestion: Pollers
   tracing:
     apiGateway: true
     lambda: true

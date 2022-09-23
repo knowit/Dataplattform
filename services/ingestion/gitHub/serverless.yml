@@ -12,6 +12,11 @@ dataplattform:
   glue:
     tableName: github
     accessLevel: 2
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: pollerIngest
 
 custom:
   editable:
@@ -25,14 +30,12 @@ custom:
     description: Endpoint for github webhooks and scheduled events
     accessLevel: level-2
     dataFolder: github/repos
-
   project: dataplattform
   stage: ${opt:stage, self:provider.stage}
   service: ${self:custom.stage}-${self:service}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
-
   pythonRequirements:
     dockerizePip: non-linux
     noDeploy:
@@ -90,14 +93,12 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-
     events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
-
   webhookIngest:
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.webhookIngestHandlerFile}.handler
     name: ${self:custom.stage}-${self:service}-webhook-ingest
@@ -340,15 +341,12 @@ resources:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
           maxReceiveCount: 1
-
     EventQueueDL: # Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true # Assume all message bodies are unique, by design given as an uuid1
-
-  Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:
   - serverless-python-requirements

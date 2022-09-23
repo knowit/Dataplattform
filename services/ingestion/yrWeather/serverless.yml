@@ -10,6 +10,11 @@ dataplattform:
   glue:
     tableName: yr_weather
     accessLevel: 1
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:
