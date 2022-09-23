@@ -45,7 +45,7 @@ jobs:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
           source .workflow-scripts/test.sh
-          look_for_changed_services
+          get_changed_service_files
 
       - uses: actions/setup-node@v3
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
