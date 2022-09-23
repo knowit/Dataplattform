@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - feature/main-cicd
     paths:
       - 'services/**'
       - '.config/.serverless'
