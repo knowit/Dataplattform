@@ -157,6 +157,13 @@ function get_related_serverless_file {
 
 function get_changed_services {
   local SERVICES=()
+  local CHANGED_SERVICE_FILES
+  if ! CHANGED_SERVICE_FILES="$(get_changed_service_files)"
+  then
+    echo "Failed to get changed service files"
+    echo "$CHANGED_SERVICE_FILES"
+    return 1
+  fi
   while IFS= read -r FILE; do
     if ! SERVERLESS_FILE="$(get_related_serverless_file "$FILE")"
     then
@@ -169,6 +176,6 @@ function get_changed_services {
     then
       SERVICES+=("$SERVICE")
     fi
-  done <<< "$(get_changed_service_files)"
+  done <<< "${CHANGED_SERVICE_FILES[@]}"
   echo "${SERVICES[*]}"
 }
