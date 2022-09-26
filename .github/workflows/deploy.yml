@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - feature/main-cicd
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -28,7 +29,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: main
+          ref: feature/main-cicd
           fetch-depth: 0
 
       - name: 'Get changed files (push)'

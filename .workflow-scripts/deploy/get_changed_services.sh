@@ -207,6 +207,7 @@ function look_for_changed_services {
     echo "${CHANGED_FILES_ARRAY[@]}"
     return 1
   fi
+  echo "${CHANGED_FILES_ARRAY[@]}"
   local DEPLOY_ALL="false"
   while IFS= read -r FILE; do
     if [[ "$FILE" == packages/query/* ]] || [[ "$FILE" == packages/api/* ]] || [[ "$FILE" == packages/common/* ]]
