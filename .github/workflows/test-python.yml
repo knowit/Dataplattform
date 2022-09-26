@@ -37,12 +37,6 @@ jobs:
         run: |
           source .workflow-scripts/test-python/get_tox_changes.sh
           look_for_changed_tox_directories
-#
-#      - name: Set up Python 3.7
-#        if: ${{ steps.get_changed_tox.outputs.should_test == 'true' }}
-#        uses: actions/setup-python@v1
-#        with:
-#          python-version: 3.7
 
       - name: Install Tox
         if: ${{ steps.get_changed_tox.outputs.should_test == 'true' }}
