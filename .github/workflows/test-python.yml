@@ -1,15 +1,16 @@
 name: Run Python tests
 
 on:
-  push:
-    branches:
-      - feature/main-cicd
   pull_request:
     branches:
       - main
     paths:
       - 'services/**'
       - 'packages/**'
+
+env:
+  EVENT_TYPE: ${{ github.event_name }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   test:
