@@ -9,7 +9,6 @@ setup(){
   export ROOT_DIR="$(pwd)"
 
   function tox {
-    local ARG_1="$1"
     local TOX_DIR
     TOX_DIR="$(pwd)"
     echo "${TOX_DIR##"$ROOT_DIR"}"

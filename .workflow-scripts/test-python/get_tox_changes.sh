@@ -33,7 +33,7 @@ function get_changed_tox_directories {
     return 1
   fi
 
-  local CHANGED_TOX_FILES=()
+  local CHANGED_TOX_DIRECTORIES=()
   local RELATED_TOX_FILE
   while IFS= read -r CHANGED_FILE; do
     if ! RELATED_TOX_FILE="$(get_related_tox_file "$CHANGED_FILE")"
@@ -43,13 +43,18 @@ function get_changed_tox_directories {
       return 1
     elif [[ "$RELATED_TOX_FILE" != "" ]]
     then
-      if ! [[ " ${CHANGED_TOX_FILES[*]} " =~ ${RELATED_TOX_FILE} ]]
+      local CHANGED_TOX_DIRECTORY="${RELATED_TOX_FILE%%"/tox.ini"}"
+      if ! [[ " ${CHANGED_TOX_DIRECTORIES[*]} " =~ ${CHANGED_TOX_DIRECTORY} ]]
       then
-        CHANGED_TOX_FILES+=("$RELATED_TOX_FILE")
-        echo "${RELATED_TOX_FILE%%"/tox.ini"}"
+        CHANGED_TOX_DIRECTORIES+=("$CHANGED_TOX_DIRECTORY")
       fi
     fi
   done <<< "${CHANGED_FILES_ARRAY[@]}"
+
+  if ! [[ "${CHANGED_TOX_DIRECTORIES[*]}" == "" ]]
+  then
+    echo "${CHANGED_TOX_DIRECTORIES[*]}"
+  fi
 }
 
 function look_for_changed_tox_directories {
