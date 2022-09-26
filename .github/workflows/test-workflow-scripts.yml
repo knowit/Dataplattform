@@ -1,11 +1,11 @@
-name: Test deploy dataplattform
+name: Test workflow scripts
 
 on:
   pull_request:
     branches:
       - main
     paths:
-      - '.workflow-scripts/deploy/**'
+      - '.workflow-scripts/**'
 
 jobs:
   test_deploy:
@@ -22,4 +22,4 @@ jobs:
           fetch-depth: 0
 
       - name: Run tests
-        run: bats -r .workflow-scripts/deploy/test/.
+        run: bats -r .workflow-scripts/.

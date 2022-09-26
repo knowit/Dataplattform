@@ -1,4 +1,4 @@
-name: Lint YAML
+name: Lint Python
 
 on:
   workflow_dispatch:
@@ -6,9 +6,8 @@ on:
     branches:
       - main
     paths:
-      - '**.yml'
-      - '**.yaml'
-      - '.config/.yamllint'
+      - '**.py'
+      - '.config/.flake8'
 
 jobs:
   lint:
@@ -19,7 +18,7 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name: Lint with yamllint
+      - name: Lint with Flake8
         run: |
-          pip install yamllint
-          yamllint -c ./.config/.yamllint .
+          pip install flake8
+          flake8 --config=./.config/.flake8
