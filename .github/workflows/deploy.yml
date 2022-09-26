@@ -4,7 +4,6 @@ on:
   release:
     types: [published]
   workflow_dispatch:
-    inputs:
   push:
     branches:
       - feature/main-cicd
@@ -45,7 +44,7 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
         run: |
-          source .workflow-scripts/test.sh
+          source .workflow-scripts/deploy/get_changed_services.sh
           look_for_changed_services
 
       - uses: actions/setup-node@v3

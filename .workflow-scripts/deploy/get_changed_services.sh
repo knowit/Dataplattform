@@ -20,7 +20,7 @@ function get_previous_release {
   local LATEST_TAG_BRANCH
   LATEST_TAG="$(gh api repos/knowit/dataplattform/releases/latest --jq .tag_name)"
   LATEST_TAG_BRANCH="$(gh api repos/knowit/dataplattform/releases/latest --jq .target_commitish)"
-  gh api repos/knowit/dataplattform/releases | jq -r -c ".[] | select( .target_commitish == \"$LATEST_TAG_BRANCH\" ) | select( .name != \"$LATEST_TAG\" ) | .tag_name"
+  gh api repos/knowit/dataplattform/releases | jq -r -c ".[] | select( .target_commitish == \"$LATEST_TAG_BRANCH\" ) | select( .tag_name != \"$LATEST_TAG\" ) | .tag_name"
 }
 
 function get_tag_sha {

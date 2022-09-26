@@ -1,0 +1,28 @@
+name: Test deploy dataplattform
+
+on:
+  push:
+    branches:
+      - feature/main-cicd
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.workflow-scripts/deploy/**'
+
+jobs:
+  test_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.2.1
+
+      - uses: actions/checkout@v2
+        with:
+          ref: feature/main-cicd
+          fetch-depth: 0
+
+      - name: Run tests
+        run: bats -r .workflow-scripts/deploy/test/.
