@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - feature/main-cicd
+      - main
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: feature/main-cicd
+          ref: main
           fetch-depth: 0
 
       - name: 'Get changed files (push)'

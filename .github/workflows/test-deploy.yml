@@ -1,9 +1,6 @@
 name: Test deploy dataplattform
 
 on:
-  push:
-    branches:
-      - feature/main-cicd
   pull_request:
     branches:
       - main
