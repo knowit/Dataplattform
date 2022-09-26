@@ -101,9 +101,9 @@ resources: # The resources your functions use
                     - s3:DeleteObjects
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
   Outputs: # The outputs that your AWS CloudFormation Stack should produce. This allows references between services.
 
 plugins:

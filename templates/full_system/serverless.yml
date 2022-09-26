@@ -12,7 +12,7 @@ custom:
     scheduleRate: rate(1 day)
     accessLevel: level-1
     dataFolder: sqs_integration_data_folder
-    
+
   ################################################
   stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
@@ -49,8 +49,8 @@ provider:
   tracing:
     apiGateway: true
     lambda: true
-     
-  
+
+
 package:
   individually: true
   exclude:
@@ -75,7 +75,7 @@ functions:
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
     tags: # Tag for this function. Every function are tagged with stage by default
-    
+
     events: # The Events that trigger this Function
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
@@ -85,7 +85,7 @@ functions:
   process: # A Function
     handler: ${self:custom.editable.processHandlerFile}.handler
     events: # The Events that trigger this Function
-      - sqs: 
+      - sqs:
           arn:
             Fn::GetAtt:
               - EventQueue
@@ -137,21 +137,21 @@ resources: # The resources your functions use
                     - s3:GetObject
                     - s3:CopyObject
                     - s3:DeleteObjects
-                    - s3:ListObjectVersions 
+                    - s3:ListObjectVersions
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
-                  Action: 
-                   - sqs:GetQueueUrl
-                   - sqs:SendMessageBatch
-                   - sqs:SendMessage
+                  Action:
+                    - sqs:GetQueueUrl
+                    - sqs:SendMessageBatch
+                    - sqs:SendMessage
                   Resource: !GetAtt EventQueue.Arn
     ProcessLambdaRole:
       Type: AWS::IAM::Role
@@ -186,9 +186,9 @@ resources: # The resources your functions use
                     - s3:DeleteObjectVersion
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - /${self:custom.accessPath}*
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - /${self:custom.accessPath}*
           - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -200,9 +200,9 @@ resources: # The resources your functions use
                     - s3:GetBucketLocation
                   Resource:
                     - Fn::Join:
-                      - "" 
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
-                        - '*'
+                        - ""
+                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                          - '*'
           - PolicyName: ${self:custom.stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
@@ -218,17 +218,17 @@ resources: # The resources your functions use
                     - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
     EventQueue:
       Type: AWS::SQS::Queue
-      Properties: 
+      Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, , by design given as an uuid1
-        RedrivePolicy: 
-          deadLetterTargetArn : !GetAtt EventQueueDL.Arn
-          maxReceiveCount : 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
+        RedrivePolicy:
+          deadLetterTargetArn: !GetAtt EventQueueDL.Arn
+          maxReceiveCount: 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
 
     EventQueueDL: #Messages that fail are put here
       Type: AWS::SQS::Queue
-      Properties: 
+      Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1

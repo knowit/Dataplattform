@@ -9,3 +9,6 @@ rules:
   new-lines: disable
   document-start: disable
   document-end: disable
+
+ignore: |
+  **/node_modules/**

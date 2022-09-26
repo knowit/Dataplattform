@@ -1,0 +1,25 @@
+name: Lint YAML
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**.yml'
+      - '**.yaml'
+      - '.config/.yamllint'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Lint with yamllint
+        run: |
+          pip install yamllint
+          yamllint -c ./.config/.yamllint .
