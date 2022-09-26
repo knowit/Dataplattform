@@ -30,7 +30,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                             'default_branch',
                             'time']
 
-
     repos_status_table_coloumns = ['id',
                                    'updated_at',
                                    'pushed_at',
@@ -49,8 +48,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             reg_ids_df.id)]
 
         repos_table = github_dataframe.loc[:, repos_table_coloumns]
-        repos_status_table = github_dataframe.loc[:,
-                                                  repos_status_table_coloumns]
+        repos_status_table = github_dataframe.loc[:, repos_status_table_coloumns]
 
     except OperationalError as err:  # Workaround for inital construction of tables when changing names
         print(f'OperationalError {err}')

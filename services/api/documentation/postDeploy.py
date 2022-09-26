@@ -43,7 +43,3 @@ if __name__ == '__main__':
         run_command("aws cloudfront create-invalidation --paths /  --distribution-id " + outputs["DistributionId"])
     except Exception as e:
         raise e
-
-
-
-

@@ -1,4 +1,3 @@
-
 from flask import Flask
 from flask_restx import Api
 from os import environ
@@ -8,8 +7,6 @@ from dataplattform.api import flask_ext
 from apis.query import ns as query_ns
 from apis.report import ns as report_ns
 from apis.catalogue import ns as catalogue_ns
-
-
 
 auth_url = environ.get('AUTHURL')
 

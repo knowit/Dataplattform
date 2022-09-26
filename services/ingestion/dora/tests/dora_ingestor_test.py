@@ -4,24 +4,31 @@ from json import loads, load
 from responses import RequestsMock, GET
 from os import path
 
+
 @fixture
 def mocked_responses():
     with RequestsMock() as reqs:
         yield reqs
+
 
 @fixture
 def test_data():
     with open(path.join(path.dirname(__file__), 'test_data/test_data_github_events.json'), 'r') as json_file:
         yield load(json_file)
 
+
 @fixture
 def test_defaultbranch_data():
     with open(path.join(path.dirname(__file__), 'test_data/test_data_defaultBranch.json'), 'r') as json_file:
         yield load(json_file)
 
+
 def test_handler_data_content(s3_bucket, mocked_responses, test_data, test_defaultbranch_data):
     mocked_responses.add(GET, 'https://api.github.com/repos/knowit/Dataplattform/events', json=test_data, status=200)
-    mocked_responses.add(GET, 'https://api.github.com/repos/knowit/dataplattform', json=test_defaultbranch_data, status=200)
+    mocked_responses.add(
+        GET,
+        'https://api.github.com/repos/knowit/dataplattform',
+        json=test_defaultbranch_data, status=200)
 
     handler(None, None)
     response = s3_bucket.Object(next(iter(s3_bucket.objects.all())).key).get()

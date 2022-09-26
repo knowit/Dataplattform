@@ -23,6 +23,7 @@ install_commands = dict({
     'yarn.lock': 'yarn install --frozen-lockfile'
 })
 
+
 # Yaml-parser that will ignore Serverless tags
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node):
@@ -264,7 +265,7 @@ def run(args: Namespace, _):
     paths = topological_sort(targets)
 
     # Ignore provided services (if any)
-    # Paths to ignore are assumed to be 
+    # Paths to ignore are assumed to be
     # provided without leading './'
     for item in args.ignore:
         try:

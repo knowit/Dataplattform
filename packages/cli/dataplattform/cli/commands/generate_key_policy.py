@@ -39,7 +39,10 @@ def run(args: Namespace, _):
             "Resource": "*",
             "Condition": {
                 "ArnLike": {
-                    "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:eu-central-1:" + str(get_account_id()) + ":log-group:/aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations"
+                    "kms:EncryptionContext:aws:logs:arn": "arn:aws:logs:eu-central-1:" +
+                                                          str(get_account_id()) +
+                                                          ":log-group:/aws-glue/crawlers-role/Level4GlueRole-"
+                                                          "KMSGlueEncryptionConfigurations"
                 }
             }
         }
@@ -75,4 +78,3 @@ def run(args: Namespace, _):
 
     with open("my_key_policy.json", "w") as outfile:
         json.dump(policy, outfile, indent=4)
-

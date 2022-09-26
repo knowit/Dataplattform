@@ -57,8 +57,8 @@ def db_person_data():
          'distinguished_name': 'Lisa Nordmann', 'manager': 'Per Nordmann'},
 
         {'guid': 'b051b402346144a6cdcceb0027f6e80d29019f50', 'email': 'fredrik.arnesen@knowit.no',
-         'displayName': 'Fredrik Arnesen', 'alias': 'frearn', 'company': 'Knowit Objectnet', 'knowitBranch': 'Objectnet',
-         'distinguished_name': 'Fredrik Arnesen', 'manager': 'Karoline Hauge'},
+         'displayName': 'Fredrik Arnesen', 'alias': 'frearn', 'company': 'Knowit Objectnet',
+         'knowitBranch': 'Objectnet', 'distinguished_name': 'Fredrik Arnesen', 'manager': 'Karoline Hauge'},
 
         {'guid': '5d79f8b771cd4921b667f9227aece292213806d6', 'email': 'einar.halvorsen@knowit.no',
          'displayName': 'Einar Halvorsen', 'alias': 'einhal', 'company': 'Knowit Experience',

@@ -1,6 +1,7 @@
 import boto3
 from os import environ
 
+
 def migrate_user(event, context):
     try:
         client = boto3.client('cognito-idp')

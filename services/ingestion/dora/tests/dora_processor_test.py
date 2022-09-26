@@ -6,15 +6,18 @@ import pandas as pd
 from responses import RequestsMock
 from os import path
 
+
 @fixture
 def mocked_responses():
     with RequestsMock() as reqs:
         yield reqs
 
+
 @fixture
 def test_data_poller():
     with open(path.join(path.dirname(__file__), 'test_data/test_data_processing.json'), 'r') as json_file:
         yield load(json_file)
+
 
 @fixture
 def setup_queue_event(s3_bucket):
@@ -32,6 +35,7 @@ def setup_queue_event(s3_bucket):
             }]
         }
     yield make_queue_event
+
 
 def test_process_data_poller(setup_queue_event, test_data_poller, create_table_mock):
     event = setup_queue_event(

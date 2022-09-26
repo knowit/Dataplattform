@@ -41,8 +41,8 @@ def handler(event, context):
     partitions = glue_client.get_partitions(DatabaseName='dev_level_4_database', TableName='github_dora_repos')
     partition_names = [partition['Values'][-1] for partition in partitions['Partitions']]
 
-    created_groups = [create_quicksight_group(partition_name) for partition_name in partition_names
-                      if partition_name not in group_names]
+    [create_quicksight_group(partition_name) for partition_name in partition_names
+     if partition_name not in group_names]
 
     update_role_bindings(partition_names)
 

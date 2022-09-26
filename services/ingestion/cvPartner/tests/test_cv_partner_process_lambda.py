@@ -6,6 +6,7 @@ from json import load
 import pandas as pd
 from io import BytesIO
 
+
 @fixture
 def test_data():
     with open(path.join(path.dirname(__file__), 'test_data.json'), 'r') as json_file:
@@ -164,9 +165,7 @@ therefore the data frame should not be made
 """
 
 
-def test_process_courses_table_content_empty(setup_queue_event, test_data,
-                                                 create_table_mock, dynamodb_resource):
-
+def test_process_courses_table_content_empty(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
     tmp_data = test_data['data']
     tmp_data[0]['cv']['courses'] = []
 
@@ -320,9 +319,7 @@ def test_tag_value_none(setup_queue_event, test_data,
         }))
 
 
-def test_tag_value_none_2(setup_queue_event, test_data,
-                        create_table_mock, dynamodb_resource):
-
+def test_tag_value_none_2(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
     tmp_data = test_data['data']
     tmp_data[1]['cv']['technologies'][0]['technology_skills'][0]['tags'] = None
 

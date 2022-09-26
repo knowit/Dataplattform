@@ -85,7 +85,7 @@ def test_initial_ingest(s3_bucket, s3_public_bucket):
     assert len(list(s3_bucket.objects.filter(Prefix=datalake_prefix))) == 1
     assert 'jpg' in data['data'][0]['image_key']
 
-    
+
 def test_png(s3_bucket):
     base_url = 'https://knowittest2.cvpartner.com/api'
     user_id = '1'

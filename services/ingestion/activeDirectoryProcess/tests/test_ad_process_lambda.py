@@ -37,8 +37,8 @@ def test_process(s3_bucket, setup_queue_event, dynamodb_resource):
     test_person_2 = ad_data.loc[ad_data['guid'] == "491b9fa9bfac17563882b0fdc6f3a8a97417bd99"]
     test_person_3 = ad_data.loc[ad_data['guid'] == "5edbcdf460809039eb4897ccf8ce3bb5e501884d"]
     assert 'guid' in test_person_1.columns
-    assert 'displayName' in test_person_1.columns 
-    assert 'email' in test_person_1.columns 
+    assert 'displayName' in test_person_1.columns
+    assert 'email' in test_person_1.columns
     assert 'manager' in test_person_1.columns
     assert test_person_1.columns.size == 4
     assert test_person_1['displayName'][0] == "Per Nordmann"

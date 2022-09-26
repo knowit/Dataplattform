@@ -26,6 +26,7 @@ class FakeResponse:
             return self.content_type
         return None
 
+
 class FakePngResponse:
     status: int
     data: bytes
@@ -53,4 +54,3 @@ class FakePngResponse:
         if (name == 'Content-Type'):
             return self.content_type
         return None
-        
