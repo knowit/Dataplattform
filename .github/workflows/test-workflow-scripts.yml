@@ -18,7 +18,6 @@ jobs:
 
       - uses: actions/checkout@v2
         with:
-          ref: feature/main-cicd
           fetch-depth: 0
 
       - name: Run tests
