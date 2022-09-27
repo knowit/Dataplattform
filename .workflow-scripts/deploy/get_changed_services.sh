@@ -2,6 +2,7 @@
 source .workflow-scripts/utils/utils.sh
 source .workflow-scripts/utils/get_changed_files.sh
 
+# Printer en liste av alle endrede filer som befinner seg i services-mappen
 function get_changed_service_files {
   local CHANGED_FILES_ARRAY
   if ! CHANGED_FILES_ARRAY="$(get_changed_files)"
@@ -18,6 +19,7 @@ function get_changed_service_files {
   done <<< "${CHANGED_FILES_ARRAY[@]}"
 }
 
+# Finner en serverless.yml fil i pathen til en gitt fil
 function get_related_serverless_file {
   local SERVICE_FILE="$1"
   if [[ "$SERVICE_FILE" == "" ]]
@@ -40,6 +42,7 @@ function get_related_serverless_file {
   done
 }
 
+# Printer en liste av alle mapper som inneholder både en serverless.yml fil og endrede filer
 function get_changed_services {
   local SERVICES=()
   local CHANGED_SERVICE_FILES
@@ -71,6 +74,9 @@ function get_changed_services {
   echo "${SERVICES[*]}"
 }
 
+# Printer en liste med alle endrede filer
+# Printer deretter en liste med alle mapper med serverless.yml fil som også inneholder endrede filer
+# Til slutt settes nødvendige outputs for å kunne kjøre dataplattform deploy i neste steg i workflowen
 function look_for_changed_services {
   local CHANGED_FILES_ARRAY
   if ! CHANGED_FILES_ARRAY="$(get_changed_files)"

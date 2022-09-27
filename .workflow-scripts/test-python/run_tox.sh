@@ -1,6 +1,7 @@
 #!/bin/bash
 source .workflow-scripts/utils/utils.sh
 
+# Kjører tox i en gitt liste av mapper. Listen er en enkelt streng delt med mellomrom
 function run_tox {
   local TOX_DIRS="$1"
   if [[ "$TOX_DIRS" == "" ]]

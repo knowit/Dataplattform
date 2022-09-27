@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Deler opp en streng slik at hvert ord havner på en egen linje
 function split_string_by_space {
   local STRING="$1"
   if [[ "$STRING" == "" ]]

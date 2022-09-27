@@ -2,6 +2,7 @@
 source .workflow-scripts/utils/get_changed_files.sh
 source .workflow-scripts/utils/utils.sh
 
+# Ser etter en tox.ini fil i pathen til en gitt fil.
 function get_related_tox_file {
   local FILE_ARG="$1"
   if [[ "$FILE_ARG" == "" ]]
@@ -24,6 +25,7 @@ function get_related_tox_file {
   done
 }
 
+# Printer en liste av alle mapper som både inneholder en endret fil og en tox.ini fil.
 function get_changed_tox_directories {
   local CHANGED_FILES_ARRAY
   if ! CHANGED_FILES_ARRAY="$(get_changed_files)"
@@ -57,6 +59,9 @@ function get_changed_tox_directories {
   fi
 }
 
+# Printer en liste med alle endrede filer
+# Printer deretter en liste med alle mapper med tox.ini fil som også inneholder endrede filer
+# Til slutt settes nødvendige outputs for å kunne kjøre run_tox.sh i neste steg i workflowen
 function look_for_changed_tox_directories {
   local CHANGED_FILES_ARRAY
   if ! CHANGED_FILES_ARRAY="$(get_changed_files)"

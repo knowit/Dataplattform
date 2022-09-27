@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# Finn taggen til forrige release, altså den som kom før "latest"
 function get_previous_release {
   local LATEST_TAG
   local LATEST_TAG_BRANCH
@@ -8,6 +9,7 @@ function get_previous_release {
   gh api repos/knowit/dataplattform/releases | jq -r -c ".[] | select( .target_commitish == \"$LATEST_TAG_BRANCH\" ) | select( .tag_name != \"$LATEST_TAG\" ) | .tag_name"
 }
 
+# Printer SHA til en gitt tag
 function get_tag_sha {
   local TAG_NAME="$1"
   if [[ "$TAG_NAME" == "" ]]
@@ -21,6 +23,7 @@ function get_tag_sha {
   git show-ref "$TAG_NAME" | cut -f 1 -d " "
 }
 
+# Printer SHA til forrige release
 function get_previous_release_sha {
   local TAG_NAME
   if ! TAG_NAME="$(get_previous_release)"
@@ -39,6 +42,7 @@ function get_previous_release_sha {
   echo "$TAG_SHA"
 }
 
+# Printer diffen mellom nåværende branch og en gitt SHA
 function get_diff_by_sha {
   local TARGET_SHA="$1"
   if [[ "$TARGET_SHA" == "" ]]
@@ -51,6 +55,7 @@ function get_diff_by_sha {
   git diff --name-only "$TARGET_SHA"
 }
 
+# Printer en liste med alle filer som er endret i nåværende release
 function get_changed_files_in_release {
   local PREV_SHA
   if ! PREV_SHA="$(get_previous_release_sha)"
