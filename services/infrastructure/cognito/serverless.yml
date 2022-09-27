@@ -24,7 +24,7 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
-  runtime: python3.7
+  runtime: python3.9
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   stackName: ${self:service}-${self:custom.stage}
