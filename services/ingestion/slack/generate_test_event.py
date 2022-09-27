@@ -1,13 +1,14 @@
 import json
-import os 
+import os
+from dataplattform.common.aws import SSM
+from hmac import new
+from hashlib import sha256
+
 # must be done before dataplattform.common.aws is imported
 os.environ["AWS_XRAY_SDK_ENABLED"] = "false"
 os.environ["STAGE"] = "dev"
 os.environ["SERVICE"] = "slackWebhook"
 
-from dataplattform.common.aws import SSM 
-from hmac import new
-from hashlib import sha256
 
 with open("tests/test_message_data.json") as f:
     body = json.dumps(json.load(f))

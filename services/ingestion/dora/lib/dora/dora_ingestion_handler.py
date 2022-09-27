@@ -40,7 +40,7 @@ def ingest(event) -> Data:
         except:
             api_token_default_branch = SSM(with_decryption=True).get('github/apikey/' + repo)
             res_default_branch = requests.get(SSM(with_decryption=False).get('github/defaultBranch/' + repo),
-                                            headers={'Authorization': f'Bearer {api_token_default_branch}'})
+                                              headers={'Authorization': f'Bearer {api_token_default_branch}'})
             event_default_branch = res_default_branch.json()
             return event_default_branch['default_branch']
 

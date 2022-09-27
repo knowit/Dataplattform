@@ -9,6 +9,8 @@ dataplattform:
     - ../monitoring
     - ../glue
     - ../kms
+    - ../dora-glue
+    - ../../ingestion/dora
 
 custom:
   stage: ${opt:stage, self:provider.stage}

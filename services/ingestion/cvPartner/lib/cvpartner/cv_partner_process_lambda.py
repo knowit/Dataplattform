@@ -21,10 +21,12 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             return ''
         else:
             return str(tmp_str)
+
     """
     Workaround for known pandas issue with conversion to int in
     the presence of nullable integers.
     """
+
     def column_type_to_int(col):
         col = pd.to_numeric(col, errors='coerce')
         col = col.fillna(value=-1)
@@ -44,7 +46,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         'cv.twitter',
         'cv.title.no',
         'image_key'
-        ]
+    ]
 
     df = pd.concat([make_dataframe(d) for d in data])
     employee_df = df[employee_table].copy()
@@ -101,6 +103,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     @param: list1
     @param: topic_list
     """
+
     def create_from_topic(elem_tag, list1, topic_list):
         def create_df_for_each_elem(elem_tag, list1_elem, topic):
             if not isinstance(topic, list):
@@ -109,11 +112,11 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 return None
             return pd.DataFrame.from_records(np.array([{elem_tag: list1_elem, **x} for x in topic]))
 
-        tmp_df_list = [create_df_for_each_elem(elem_tag, l, t) for l, t in zip(list1, topic_list)]
+        tmp_df_list = [create_df_for_each_elem(elem_tag, l_var, t) for l_var, t in zip(list1, topic_list)]
         if np.sum(x is not None for x in tmp_df_list) == 0:
             return None
         return pd.concat([create_df_for_each_elem(elem_tag,
-                         list1[indx], topic_list[indx]) for indx in range(topic_list.size)],
+                                                  list1[indx], topic_list[indx]) for indx in range(topic_list.size)],
                          ignore_index=True)
 
     """
@@ -158,7 +161,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             tmp_df[col] = normalize_coloums(tmp_df, col, 'no')
             tmp_df[col].replace(np.nan, '', regex=True, inplace=True)
 
-
         return tmp_df
 
     """
@@ -184,6 +186,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     @param tag - key on othermost dictonary
     @param sub_tag - key on innermost dictonary
     """
+
     def make_custom_lists(tmp, df_col, new_col_name, tag, sub_tag):
         out_tmp = tmp.copy()
         new_col = []
@@ -193,7 +196,9 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 continue
             tmp_string = ""
             for elem in col_list:
-                tmp_string = tmp_string + ";" + f"{none_to_empty_str(elem.get(tag, {}).get(sub_tag, '')) if elem is not None and elem.get(tag, {}) is not None else ''}"
+                f_string = none_to_empty_str(elem.get(tag, {}).get(sub_tag, '')) \
+                    if elem is not None and elem.get(tag, {}) is not None else ''
+                tmp_string = tmp_string + ";" + f"{f_string}"
             new_col.append(tmp_string[1:])
         out_tmp[new_col_name] = new_col
         return out_tmp

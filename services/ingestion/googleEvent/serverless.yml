@@ -11,6 +11,11 @@ dataplattform:
   glue:
     tableName: google_event
     accessLevel: 2
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:

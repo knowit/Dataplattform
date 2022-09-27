@@ -13,6 +13,11 @@ dataplattform:
   glue:
     tableName: active_directory
     accessLevel: 3
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:

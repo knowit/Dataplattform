@@ -12,6 +12,11 @@ dataplattform:
   glue:
     tableName: google_forms
     accessLevel: 3
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:
@@ -34,10 +39,8 @@ custom:
     noDeploy:
       - boto3
       - botocore
-
   apiKeys:
     - name: ${self:custom.stage}-main-ingest-api-key
-
 
 provider:
   name: aws
@@ -87,7 +90,6 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-
     events:
       - http:
           path: forms-data-callback
@@ -103,7 +105,6 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-
     name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
@@ -222,7 +223,6 @@ resources:
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
-
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -234,7 +234,6 @@ resources:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
           maxReceiveCount: 1
-
     EventQueueDL: # Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:

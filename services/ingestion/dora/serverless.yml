@@ -8,10 +8,16 @@ dataplattform:
     - ../../infrastructure/events
     - ../../infrastructure/monitoring
     - ../../infrastructure/glue
+    - ../../infrastructure/dora-glue
     - ../../infrastructure/kms
   glue:
     tableName: dora
     accessLevel: 4
+  hooks:
+    - name: 'Configuration'
+      trigger: postDeploy
+      type: invoke
+      value: configuration
 
 custom:
   editable:
@@ -54,8 +60,6 @@ provider:
     Project: Dataplattform
     Layer: Ingestion
     Ingestion: Pollers
-  stackTags:
-  environment:
 
 package:
   individually: true

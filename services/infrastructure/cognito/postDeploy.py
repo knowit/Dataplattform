@@ -13,6 +13,7 @@ def get_cf_outputs(stack_name: str, region: str) -> dict:
         result[key] = value
     return result
 
+
 def set_ssm_parameter(name: str, value: str, region: str, param_type: str = "String"):
     client = boto3.client('ssm', region_name=region)
     try:

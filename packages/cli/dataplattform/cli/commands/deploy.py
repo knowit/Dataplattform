@@ -141,24 +141,81 @@ def print_status(status: str = None) -> None:
         print("\n" + line + message + line)
 
 
-def get_deployment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
-    message = "Deploying service: " + path
-    commands = ['echo ' + message, 'cd ' + path]
+def get_install_commands(path: str) -> list:
+    commands = []
     for file in os.listdir(path):
         if file in install_commands.keys():
             commands.append(install_commands[file])
+    return commands
+
+
+def validate_hook(hook: dict) -> None:
+    valid_triggers = ['preDeploy', 'postDeploy']
+    valid_types = ['invoke', 'command']
+    for key in ['name', 'trigger', 'type', 'value']:
+        if key not in hook.keys():
+            raise Exception("Hook key is missing: " + str(key))
+        if not isinstance(hook[key], str):
+            raise Exception("Hook property must be of type string: " + str(key) + "\nFound: " + str(type(hook[key])))
+        if hook['trigger'] not in valid_triggers:
+            raise Exception("Hook trigger must be one of " + str(valid_triggers) + "\nFound: " + str(hook['trigger']))
+        if hook['type'] not in valid_types:
+            raise Exception("Hook type must be one of " + str(valid_types) + "\nFound: " + str(hook['type']))
+
+
+def get_hooks(path: str) -> list:
+    config = parse_yaml(path + "/serverless.yml")
+    if 'dataplattform' in config.keys() and 'hooks' in config['dataplattform'].keys():
+        hooks = config['dataplattform']['hooks']
+        for hook in hooks:
+            validate_hook(hook)
+        return hooks
+    else:
+        return []
+
+
+def transform_hook(hook: dict, aws_profile: str, stage: str) -> str:
+    header_str = 'echo "\n\nInvoking ' + hook['trigger'] + ' hook: ' + str(hook['name'] + ' " &&')
+    footer_str = ' && echo ""'
+    if hook['type'] == 'invoke':
+        return header_str \
+               + "sls invoke -f " + hook['value'] \
+               + ((" --aws-profile " + aws_profile) if aws_profile is not None else "") \
+               + ((" --stage " + stage) if stage is not None else "") \
+               + footer_str
+    elif hook['type'] == 'command':
+        return header_str + hook['value'] + footer_str
+
+
+def get_environment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
+    return [
+        'export SERVERLESS_STAGE="' + stage if stage is not None else 'dev' + '"',
+        'export SERVERLESS_STAGE_FLAG="' + ('--stage ' + stage) if stage is not None else '' + '"',
+        'export SERVERLESS_AWS_PROFILE_FLAG="'
+        + (('--aws-profile ' + aws_profile) if aws_profile is not None else '') + '"'
+    ]
+
+
+def get_deployment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
+    hooks = get_hooks(path)
+    pre_deploy_hooks = list(filter(lambda hook: hook['trigger'] == 'preDeploy', hooks))
+    post_deploy_hooks = list(filter(lambda hook: hook['trigger'] == 'postDeploy', hooks))
+
+    commands = ['echo "\nDeploying service: ' + path + '"', 'cd ' + path]
+    commands.extend(get_environment_commands(path, aws_profile, stage))
+    commands.extend(list(map(lambda hook: transform_hook(hook, aws_profile, stage), pre_deploy_hooks)))
+    commands.extend(get_install_commands(path))
     commands.append('sls deploy'
                     + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
                     + ((" --stage " + stage) if stage is not None else ""))
+    commands.extend(list(map(lambda hook: transform_hook(hook, aws_profile, stage), post_deploy_hooks)))
     return commands
 
 
 def get_remove_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
     message = "Removing service: " + path
     commands = ['echo ' + message, 'cd ' + path]
-    for file in os.listdir(path):
-        if file in install_commands.keys():
-            commands.append(install_commands[file])
+    commands.extend(get_install_commands(path))
     commands.append('sls remove'
                     + ((" --aws-profile " + aws_profile) if aws_profile is not None else "")
                     + ((" --stage " + stage) if stage is not None else ""))
@@ -208,7 +265,7 @@ def run(args: Namespace, _):
     paths = topological_sort(targets)
 
     # Ignore provided services (if any)
-    # Paths to ignore are assumed to be 
+    # Paths to ignore are assumed to be
     # provided without leading './'
     for item in args.ignore:
         try:

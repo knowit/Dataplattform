@@ -1,0 +1,51 @@
+name: Run Python tests
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'services/**'
+      - 'packages/**'
+
+env:
+  EVENT_TYPE: ${{ github.event_name }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: lambci/lambda:build-python3.7
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: feature/main-cicd
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed_files
+        uses: jitterbit/get-changed-files@v1
+        with:
+          format: space-delimited
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Look for Tox folders affected by change
+        id: get_changed_tox
+        env:
+          CHANGED_FILES: ${{ steps.changed_files.outputs.all }}
+        run: |
+          source .workflow-scripts/test-python/get_tox_changes.sh
+          look_for_changed_tox_directories
+
+      - name: Install Tox
+        if: ${{ steps.get_changed_tox.outputs.should_test == 'true' }}
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install tox
+
+      - name: Run Tox
+        if: ${{ steps.get_changed_tox.outputs.should_test == 'true' }}
+        run: |
+          source .workflow-scripts/test-python/run_tox.sh
+          run_tox "$TOX_DIRS"

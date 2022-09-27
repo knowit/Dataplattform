@@ -12,6 +12,11 @@ dataplattform:
   glue:
     tableName: jira_sales
     accessLevel: 2
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: pollerIngest
 
 custom:
   editable:

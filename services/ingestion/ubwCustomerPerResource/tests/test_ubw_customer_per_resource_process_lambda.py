@@ -7,11 +7,9 @@ import numpy as np
 import fastparquet as fp
 import s3fs
 from os import path
-import numpy as np
 from json import load
 from dataplattform.common import schema
 from datetime import datetime, timedelta
-from dataplattform.common.aws import S3
 
 
 @fixture
@@ -27,6 +25,7 @@ def test_data_old():
         for i in range(len(json['data'])):  # Update reg_period to simulate recent data
             json['data'][i]['reg_period'] = create_date_string(i)
         yield json
+
 
 def create_date_string(num_weeks_back):
     date = datetime.now()
@@ -54,7 +53,13 @@ def setup_queue_event(s3_bucket):
     yield make_queue_event
 
 
-def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_data, test_data_old, dynamodb_resource, s3_bucket):
+def test_process_data_reg_period_1(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        test_data_old,
+        dynamodb_resource,
+        s3_bucket):
     os.environ['NUM_WEEKS'] = '4'
 
     event_old_data = setup_queue_event(
@@ -77,7 +82,7 @@ def test_process_data_reg_period_1(create_table_mock, setup_queue_event, test_da
 
     handler(event, None)
 
-    #cur_year, cur_week = datetime.now().isocalendar()[0:2]
+    # cur_year, cur_week = datetime.now().isocalendar()[0:2]
     new_data = pd.Series(['202053',
                           '202053',
                           '202053',
@@ -147,7 +152,11 @@ def test_process_data_test_weigth_reg_period_2(create_table_mock, setup_queue_ev
         pd.Series(['Entur AS', 'Entur AS']))
 
 
-def test_process_data_test_used_hrs_zero_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_test_used_hrs_zero_reg_period_1(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     test_data['reg_period_1'][0]['used_hrs'] = 0
 
     event = setup_queue_event(
@@ -168,7 +177,11 @@ def test_process_data_test_used_hrs_zero_reg_period_1(create_table_mock, setup_q
         pd.Series(['customer 2', 'customer 3']))
 
 
-def test_process_data_test_used_hrs_zero_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_test_used_hrs_zero_reg_period_2(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     test_data['reg_period_1'][0]['used_hrs'] = 0
 
     event = setup_queue_event(
@@ -189,7 +202,11 @@ def test_process_data_test_used_hrs_zero_reg_period_2(create_table_mock, setup_q
         pd.Series(['Entur AS', 'Entur AS']))
 
 
-def test_process_data_test_dataframe_content_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_test_dataframe_content_reg_period_1(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -214,7 +231,11 @@ def test_process_data_test_dataframe_content_reg_period_1(create_table_mock, set
         }))
 
 
-def test_process_data_test_dataframe_content_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_data_test_dataframe_content_reg_period_2(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -238,7 +259,11 @@ def test_process_data_test_dataframe_content_reg_period_2(create_table_mock, set
         }))
 
 
-def test_process_per_project_data_content_reg_period_1(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_per_project_data_content_reg_period_1(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
@@ -257,7 +282,11 @@ def test_process_per_project_data_content_reg_period_1(create_table_mock, setup_
         }))
 
 
-def test_process_per_project_data_content_reg_period_2(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_per_project_data_content_reg_period_2(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
@@ -276,7 +305,11 @@ def test_process_per_project_data_content_reg_period_2(create_table_mock, setup_
         }))
 
 
-def test_process_per_project_data_content_reg_period_3(create_table_mock, setup_queue_event, test_data, dynamodb_resource):
+def test_process_per_project_data_content_reg_period_3(
+        create_table_mock,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
@@ -295,7 +328,11 @@ def test_process_per_project_data_content_reg_period_3(create_table_mock, setup_
         }))
 
 
-def test_process_only_appending_historical_data_reg_period_1(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+def test_process_only_appending_historical_data_reg_period_1(
+        s3_bucket,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
@@ -317,7 +354,12 @@ def test_process_only_appending_historical_data_reg_period_1(s3_bucket, setup_qu
     assert len(expected_keys) == len(keys_in_s3)
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
 
-def test_process_only_appending_historical_data_reg_period_2(s3_bucket, setup_queue_event, test_data, dynamodb_resource):
+
+def test_process_only_appending_historical_data_reg_period_2(
+        s3_bucket,
+        setup_queue_event,
+        test_data,
+        dynamodb_resource):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),

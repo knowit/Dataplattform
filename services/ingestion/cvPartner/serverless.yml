@@ -14,6 +14,11 @@ dataplattform:
   glue:
     tableName: cv_partner
     accessLevel: 3
+  hooks:
+    - name: 'Invoke ingestor'
+      trigger: postDeploy
+      type: invoke
+      value: ingest
 
 custom:
   editable:
@@ -53,8 +58,6 @@ provider:
     Project: Dataplattform
     Layer: Ingestion
     Ingestion: Pollers
-  stackTags:
-  environment:
   tracing:
     apiGateway: true
     lambda: true
@@ -85,8 +88,6 @@ functions:
       DOWNLOAD_LAMBDA: !ImportValue ${self:custom.stage}-downloadToBucketArn
       PUBLIC_BUCKET: !ImportValue ${self:custom.stage}-publicBucketName
       PUBLIC_PREFIX: ${self:custom.editable.publicS3Prefix}
-    tags:
-
     events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
@@ -102,7 +103,6 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-
     name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
@@ -118,7 +118,6 @@ functions:
       DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
       PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
-    tags:
 
 resources:
   Resources:
@@ -164,7 +163,6 @@ resources:
                       - ""
                       - - !ImportValue ${self:custom.stage}-datalakeArn
                         - /${self:custom.accessPath}*
-
           - PolicyName: ${self:custom.stage}-Bucket-${self:service}-List
             PolicyDocument:
               Version: "2012-10-17"
@@ -214,7 +212,6 @@ resources:
                   Action:
                     - 'ssm:GetParameter*'
                   Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
-
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -278,7 +275,6 @@ resources:
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
-
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:
@@ -289,16 +285,12 @@ resources:
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           maxReceiveCount: 1
-
     EventQueueDL:
       Type: AWS::SQS::Queue
       Properties:
         FifoQueue: true
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true
-
-
-  Outputs:
 
 plugins:
   - serverless-python-requirements
