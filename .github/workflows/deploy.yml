@@ -19,7 +19,7 @@ env:
   STAGE: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
   EVENT_TYPE: ${{ github.event_name }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  CURRENT_BRANCH_NAME: ${{ git.ref }}
+  CURRENT_BRANCH_NAME: ${{ github.ref }}
 
 jobs:
   deploy:
