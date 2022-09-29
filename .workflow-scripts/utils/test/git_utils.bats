@@ -45,6 +45,19 @@ setup() {
   [ "${lines[2]}" == "some/path/file_3" ]
 }
 
+@test "list_all_files_in_branch" {
+  run list_all_files_in_branch
+  [ "$status" -eq 1 ]
+  [ "$output" == "Missing environment variable: CURRENT_BRANCH_NAME" ]
+
+  export CURRENT_BRANCH_NAME="main"
+  run list_all_files_in_branch
+  [ "$status" -eq 0 ]
+  [ "${lines[0]}" == "some/path/file_1" ]
+  [ "${lines[1]}" == "some/path/file_2" ]
+  [ "${lines[2]}" == "some/path/file_3" ]
+}
+
 @test "get_changed_files_in_release" {
   run get_changed_files_in_release
   [ "$status" -eq 0 ]

@@ -28,13 +28,18 @@ function get_previous_release_sha {
   local TAG_NAME
   if ! TAG_NAME="$(get_previous_release)"
   then
+    echo "Failed to get previous release name"
     echo "$TAG_NAME"
     return 1
+  elif [[ "$TAG_NAME" == "" ]]
+  then
+    return 0
   fi
 
   local TAG_SHA
   if ! TAG_SHA="$(get_tag_sha "$TAG_NAME")"
   then
+    echo "Failed to get SHA for tag $TAG_NAME"
     echo "$TAG_SHA"
     return 1
   fi
@@ -55,30 +60,50 @@ function get_diff_by_sha {
   git diff --name-only "$TARGET_SHA"
 }
 
+function list_all_files_in_branch {
+  if [[ "$CURRENT_BRANCH_NAME" == "" ]]
+  then
+    echo "Missing environment variable: CURRENT_BRANCH_NAME"
+    return 1
+  fi
+  git ls-tree -r "$CURRENT_BRANCH_NAME" --name-only
+}
+
 # Printer en liste med alle filer som er endret i nåværende release
 function get_changed_files_in_release {
   local PREV_SHA
+  local DIFF
   if ! PREV_SHA="$(get_previous_release_sha)"
   then
     echo "Failed to fetch list of changed files in release"
     echo "$PREV_SHA"
     return 1
-  fi
 
-  local DIFF
-  if ! DIFF="$(get_diff_by_sha "$PREV_SHA")"
+  # Dersom det ikke finnes noen release fra før, print alle filer
+  elif [[ "$PREV_SHA" == "" ]]
   then
-    echo "$DIFF"
-    return 1
-  fi
+    if ! DIFF="$(list_all_files_in_branch)"
+    then
+      echo "$DIFF"
+      return 1
+    fi
 
-  local FILES=""
-  while IFS= read -r FILE; do
-    FILES="$FILES $FILE"
-  done <<< "$DIFF"
+  # Dersom det finnes en tidligere release, print diff mellom denne og forrige release
+  else
+    if ! DIFF="$(get_diff_by_sha "$PREV_SHA")"
+    then
+      echo "$DIFF"
+      return 1
+    fi
 
-  if [[ "$FILES" != "" ]]
-  then
-    echo "$FILES"
+    # Print liste med filer på samme linje separert med mellomrom
+    local FILES=""
+    while IFS= read -r FILE; do
+      FILES="$FILES $FILE"
+    done <<< "$DIFF"
+    if [[ "$FILES" != "" ]]
+    then
+      echo "$FILES"
+    fi
   fi
 }
