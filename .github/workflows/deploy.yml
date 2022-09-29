@@ -27,8 +27,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: main
+          ref: fix/deploy-first-release
           fetch-depth: 0
+
+      - name: Test stuff
+        run: |
+          echo "Test"
 
       - name: 'Get changed files (push)'
         id: changed_files_push
@@ -74,4 +78,5 @@ jobs:
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: |
           echo -e "Deploying services to stage $STAGE\n"
-          dataplattform deploy -s $SERVICES --stage $STAGE
+          echo "$SERVICES"
+#          dataplattform deploy -s $SERVICES --stage $STAGE
