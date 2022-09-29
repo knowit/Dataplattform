@@ -17,7 +17,7 @@ provider:
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
-  runtime: python3.7
+  runtime: python3.9
 
   tags:
     project: dataplattform

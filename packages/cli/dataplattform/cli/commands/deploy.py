@@ -4,6 +4,7 @@ import subprocess
 import traceback
 from argparse import ArgumentParser, Namespace
 import yaml
+from sys import exit
 
 targets = dict()
 
@@ -246,6 +247,7 @@ def run_process_per_path(
             break
 
     print_status(complete_message if success else failed_message)
+    exit(0 if success else 1)
 
 
 def init(parser: ArgumentParser):

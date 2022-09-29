@@ -26,7 +26,7 @@ provider:
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
-  runtime: python3.7
+  runtime: python3.9
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
 
