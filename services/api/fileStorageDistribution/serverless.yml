@@ -32,21 +32,21 @@ custom:
 package:
   individually: true
   exclude:
-    - "./**" # Exclude everything and include what you need in the functions below
+    - "./**"
 
 pythonRequirements:
   dockerizePip: non-linux
   noDeploy:
-    - boto3 # Default in lambda rt
+    - boto3
     - botocore
 
 provider:
   name: aws
   region: eu-central-1
   stackName: ${self:custom.service}
-  runtime: python3.7
+  runtime: python3.9
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:
