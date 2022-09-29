@@ -2,11 +2,22 @@
 
 # Finn taggen til forrige release, altså den som kom før "latest"
 function get_previous_release {
-  local LATEST_TAG
-  local LATEST_TAG_BRANCH
-  LATEST_TAG="$(gh api repos/knowit/dataplattform/releases/latest --jq .tag_name)"
-  LATEST_TAG_BRANCH="$(gh api repos/knowit/dataplattform/releases/latest --jq .target_commitish)"
-  gh api repos/knowit/dataplattform/releases | jq -r -c ".[] | select( .target_commitish == \"$LATEST_TAG_BRANCH\" ) | select( .tag_name != \"$LATEST_TAG\" ) | .tag_name"
+  local GH_RELEASES
+  if ! GH_RELEASES="$(gh api repos/knowit/dataplattform/releases)"
+  then
+    echo "Failed to fetch list of releases from github"
+    echo "$GH_RELEASES"
+    return 1
+  elif [[ "$GH_RELEASES" == "[]" ]]
+  then
+    return 0
+  else
+    local LATEST_TAG
+    local LATEST_TAG_BRANCH
+    LATEST_TAG="$(gh api repos/knowit/dataplattform/releases/latest --jq .tag_name)"
+    LATEST_TAG_BRANCH="$(gh api repos/knowit/dataplattform/releases/latest --jq .target_commitish)"
+    echo "$GH_RELEASES" | jq -r -c ".[] | select( .target_commitish == \"$LATEST_TAG_BRANCH\" ) | select( .tag_name != \"$LATEST_TAG\" ) | .tag_name"
+  fi
 }
 
 # Printer SHA til en gitt tag
@@ -79,7 +90,7 @@ function get_changed_files_in_release {
     echo "$PREV_SHA"
     return 1
 
-  # Dersom det ikke finnes noen release fra før, print alle filer
+  # Dersom det ikke finnes noen release fra før, sett diff til å være alle filer
   elif [[ "$PREV_SHA" == "" ]]
   then
     if ! DIFF="$(list_all_files_in_branch)"
@@ -88,15 +99,16 @@ function get_changed_files_in_release {
       return 1
     fi
 
-  # Dersom det finnes en tidligere release, print diff mellom denne og forrige release
+  # Dersom det finnes en tidligere release, hent diff mellom denne og forrige release
   else
     if ! DIFF="$(get_diff_by_sha "$PREV_SHA")"
     then
       echo "$DIFF"
       return 1
     fi
+  fi
 
-    # Print liste med filer på samme linje separert med mellomrom
+  # Print liste med filer på samme linje separert med mellomrom
     local FILES=""
     while IFS= read -r FILE; do
       FILES="$FILES $FILE"
@@ -105,5 +117,4 @@ function get_changed_files_in_release {
     then
       echo "$FILES"
     fi
-  fi
 }
