@@ -89,7 +89,7 @@ def test_s3_key(path, expected_key_pattern):
         schema.Data(
             metadata=schema.Metadata(timestamp=1234),
             data=''),
-        path=path)
+        s3_path=path)
 
     assert re.fullmatch(expected_key_pattern, key)
 
@@ -109,7 +109,7 @@ def test_s3_put_raw_data(s3_bucket):
     s3 = aws.S3()
     input_bytes = 'some bytes'
     ext = 'txt'
-    key = s3.put_raw(input_bytes, path='', ext=ext)
+    key = s3.put_raw(input_bytes, s3_path='', ext=ext)
     res = s3_bucket.Object(key).get()['Body'].read().decode('utf-8')
 
     assert res == input_bytes
@@ -120,7 +120,7 @@ def test_s3_put_raw_data_none(s3_bucket):
     s3 = aws.S3()
     input_bytes = None
     ext = 'txt'
-    key = s3.put_raw(input_bytes, path='', ext=ext)
+    key = s3.put_raw(input_bytes, s3_path='', ext=ext)
     assert key is None
 
 
@@ -136,7 +136,7 @@ def test_s3_put_raw_data_with_path(s3_bucket):
     s3 = aws.S3(access_path='')
     input_bytes = 'some_bytes'
     input_key = 'test_file.txt'
-    key = s3.put_raw(input_bytes, key=input_key, path='test')
+    key = s3.put_raw(input_bytes, key=input_key, s3_path='test')
     assert key == f'test/{input_key}'
 
 
@@ -154,7 +154,7 @@ def test_ssm_get_paramenter(ssm_client):
         Type='String',
         Tier='Standard')
 
-    ssm = aws.SSM(path='/test')
+    ssm = aws.SSM(ssm_path='/test')
     assert ssm.get('param') == 'hello world'
 
 
@@ -165,7 +165,7 @@ def test_ssm_get_paramenter_strip_whitespaces(ssm_client):
         Type='String',
         Tier='Standard')
 
-    ssm = aws.SSM(path='/test')
+    ssm = aws.SSM(ssm_path='/test')
     assert ssm.get('param') == 'hello world'
 
 
@@ -176,7 +176,7 @@ def test_ssm_get_list_1_paramenter(ssm_client):
         Type='StringList',
         Tier='Standard')
 
-    ssm = aws.SSM(path='/test')
+    ssm = aws.SSM(ssm_path='/test')
     assert ssm.get('param') == ['hello world']
 
 
@@ -187,7 +187,7 @@ def test_ssm_get_list_2_paramenter(ssm_client):
         Type='StringList',
         Tier='Standard')
 
-    ssm = aws.SSM(path='/test')
+    ssm = aws.SSM(ssm_path='/test')
     assert ssm.get('param') == ['hello', 'world']
 
 
@@ -198,7 +198,7 @@ def test_ssm_get_list_2_paramenter_strip_whitespaces(ssm_client):
         Type='StringList',
         Tier='Standard')
 
-    ssm = aws.SSM(path='/test')
+    ssm = aws.SSM(ssm_path='/test')
     assert ssm.get('param') == ['hello', 'world']
 
 
@@ -206,7 +206,7 @@ def test_SSM_put():
     ssm = aws.SSM()
     ssm.put(name='/test/param',
             value='hello world')
-    ssm = aws.SSM(path='/test')
+    ssm = aws.SSM(ssm_path='/test')
     assert ssm.get('param') == 'hello world'
 
 
@@ -214,7 +214,7 @@ def test_SSM_put_overwrite_true():
     ssm = aws.SSM()
     ssm.put(name='/test/param',
             value='hello world')
-    ssm = aws.SSM(path='/test')
+    ssm = aws.SSM(ssm_path='/test')
     assert ssm.get('param') == 'hello world'
     ssm.put(name='param',
             value='hello new world',
