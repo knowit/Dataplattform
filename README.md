@@ -21,6 +21,8 @@ The indvidual services are deployed to AWS using
 ## Contributing
 Contributing by adding a new datasource or other small improvements can be done by creating a pull request as local testing can be utilized and AWS connections mocked. For cloud testing one must be member of the Dataplattform team at Knowit Objectnet.
 
+For more information about the CI/CD pipeline of this repo, see [Dataplattform: CI CD Pipeline](https://github.com/knowit/Dataplattform-issues/wiki/Dataplattform:-CI-CD-Pipeline)
+
 ### Protected branches
 Branches that are not named using the `feature/` or `fix/` prefixes are automatically protected, meaning that it is not possible to push directly to these branches. Instead, one must create a pull request into these branches, and these pull requests must be approved by another contributor in order to enable merge. 
 
