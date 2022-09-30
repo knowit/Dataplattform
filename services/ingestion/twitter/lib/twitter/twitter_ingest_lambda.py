@@ -17,8 +17,8 @@ def as_separated_list(entities, value_key, separator=';'):
 
 @handler.ingest()
 def ingest(event) -> Data:
-    consumer_key, consumer_secret, access_token, access_secret = SSM(with_decryption=True).get(
-        'twitter_comsumer_key', 'twitter_comsumer_secret', 'twitter_access_token', 'twitter_access_secret')
+    consumer_key, consumer_secret, access_token, access_secret = SSM(with_decryption=True)\
+        .get('twitter_consumer_key', 'twitter_consumer_secret', 'twitter_access_token', 'twitter_access_secret')
 
     auth = OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_secret)

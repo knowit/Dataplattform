@@ -28,6 +28,8 @@ custom:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
   distributionAlias: storage.${ssm:/${self:custom.stage}/routes/domain_name}
   certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
+  pythonRequirements:
+    dockerImage: public.ecr.aws/sam/build-python3.9
 
 package:
   individually: true

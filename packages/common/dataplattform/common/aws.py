@@ -49,11 +49,11 @@ class Glue:
         crawler_metadata = self.get_crawler()
         if crawler_metadata is not None:
             current_targets = crawler_metadata.get('Crawler', {}).get('Targets', {}).get('S3Targets', [])
-            path = f's3://{self.bucket}/{self.access_path}structured/{table_name}'
+            glue_path = f's3://{self.bucket}/{self.access_path}structured/{table_name}'
 
-            if path not in [target.get('Path', None) for target in current_targets]:
+            if glue_path not in [target.get('Path', None) for target in current_targets]:
                 targets = [*current_targets, {
-                        'Path': path,
+                        'Path': glue_path,
                         'Exclusions': ['*_metadata']
                     }
                 ]
@@ -79,16 +79,16 @@ class S3:
         self.bucket = bucket or environ.get('DATALAKE')
         self.s3 = boto3.resource('s3')
 
-    def put(self, data: Data, path: str = ''):
+    def put(self, data: Data, s3_path: str = ''):
         data_json = data.to_json().encode('utf-8')
-        return self.put_raw(data_json, ext='json', path=path)
+        return self.put_raw(data_json, ext='json', s3_path=s3_path)
 
-    def put_raw(self, data: bytes, ext: str = '', path: str = '', key: str = None):
+    def put_raw(self, data: bytes, ext: str = '', s3_path: str = '', key: str = None):
         if data is not None:
             if key is None:
-                key = path_join(self.access_path, path, f'{uuid4()}.{ext}')
+                key = path_join(self.access_path, s3_path, f'{uuid4()}.{ext}')
             else:
-                key = path_join(self.access_path, path, key)
+                key = path_join(self.access_path, s3_path, key)
             s3_object = self.s3.Object(self.bucket, key)
             s3_object.put(Body=data)
             return key
@@ -105,8 +105,8 @@ class S3:
             return S3Result(None, error=e)
 
     # Filter is used to be able to specify the files that you wish to delete and keep the rest, handle with care.
-    def empty_content_in_path(self, path, delete_all_versions=False, filter_val=None):
-        prefix = path_join(self.access_path, path)
+    def empty_content_in_path(self, s3_path, delete_all_versions=False, filter_val=None):
+        prefix = path_join(self.access_path, s3_path)
         bucket = self.s3.Bucket(self.bucket)
         if delete_all_versions:
             objects_to_be_deleted = bucket.object_versions.filter(Prefix=prefix)
@@ -145,37 +145,37 @@ class S3:
                 return path_join(full_access_path, k)
 
         class S3FileSystemProxy(S3FileSystem):
-            def open(self, path, *args, **kwargs):
-                return S3FileSystem.open(self, get_key(path), *args, **kwargs)
+            def open(self, s3_path, *args, **kwargs):
+                return S3FileSystem.open(self, get_key(s3_path), *args, **kwargs)
 
-            def exists(self, path):
-                return S3FileSystem.exists(self, get_key(path))
+            def exists(self, s3_path):
+                return S3FileSystem.exists(self, get_key(s3_path))
 
-            def ls(self, path, **kwargs):
-                return S3FileSystem.ls(self, get_key(path), **kwargs)
+            def ls(self, s3_path, **kwargs):
+                return S3FileSystem.ls(self, get_key(s3_path), **kwargs)
 
-            def isdir(self, path):
-                return S3FileSystem.isdir(self, get_key(path))
+            def isdir(self, s3_path):
+                return S3FileSystem.isdir(self, get_key(s3_path))
 
-            def walk(self, path, *args, **kwargs):
-                return S3FileSystem.walk(self, get_key(path), *args, **kwargs)
+            def walk(self, s3_path, *args, **kwargs):
+                return S3FileSystem.walk(self, get_key(s3_path), *args, **kwargs)
 
-            def find(self, path, *args, **kwargs):
-                return S3FileSystem.find(self, get_key(path), *args, **kwargs)
+            def find(self, s3_path, *args, **kwargs):
+                return S3FileSystem.find(self, get_key(s3_path), *args, **kwargs)
 
             def copy(self, path1, path2, **kwargs):
                 return S3FileSystem.copy(self, get_key(path1), get_key(path2), **kwargs)
 
-            def rm(self, path, **kwargs):
-                return S3FileSystem.rm(self, get_key(path), **kwargs)
+            def rm(self, s3_path, **kwargs):
+                return S3FileSystem.rm(self, get_key(s3_path), **kwargs)
 
         self.fs_cache = S3FileSystemProxy(anon=False)
         return self.fs_cache
 
 
 class SSM:
-    def __init__(self, with_decryption: bool = False, path: str = None):
-        self.path = path or path_join('/', environ.get("STAGE"), environ.get("SERVICE"))
+    def __init__(self, with_decryption: bool = False, ssm_path: str = None):
+        self.path = ssm_path if ssm_path is not None else path_join('/', environ.get("STAGE"), environ.get("SERVICE"))
         self.with_decryption = with_decryption
         self.client = boto3.client('ssm')
 
@@ -187,9 +187,8 @@ class SSM:
 
     def __get(self, *names):
         for name in names:
-            param = self.client.get_parameter(
-                Name=path_join('/', self.path, name),
-                WithDecryption=self.with_decryption).get('Parameter', {})
+            param = self.client.get_parameter(Name=path_join('/', self.path, name),
+                                              WithDecryption=self.with_decryption).get('Parameter', {})
             yield param.get('Value', None).strip() \
                 if param.get('Type', '') != 'StringList' \
                 else list(map(str.strip, param.get('Value', None).split(',')))

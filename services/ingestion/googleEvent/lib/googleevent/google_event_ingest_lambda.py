@@ -22,7 +22,8 @@ def ingest(event) -> Data:
         """
         :return: A list containing the all latest for the calendar ids stored in SSM
         """
-        credentials_from_ssm, calendar_ids_from_ssm = SSM(with_decryption=False).get('credentials', 'calendarIds')
+        credentials_from_ssm = SSM(with_decryption=True).get('credentials')
+        calendar_ids_from_ssm = SSM(with_decryption=False).get('calendarIds')
         service = get_calender_service(credentials_from_ssm)
 
         all_events = []
@@ -60,7 +61,6 @@ def ingest(event) -> Data:
         :param credentials_from_ssm:
         :return: A autorized calendar service using credentials from SSM
         """
-
         credsentials_json = json.loads(credentials_from_ssm)
         scope = ["https://www.googleapis.com/auth/calendar.readonly"]
         credentials = ServiceAccountCredentials.from_service_account_info(credsentials_json)
