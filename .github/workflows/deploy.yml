@@ -3,7 +3,6 @@ name: Deploy dataplattform
 on:
   release:
     types: [published]
-  workflow_dispatch:
   push:
     branches:
       - main
@@ -19,6 +18,7 @@ env:
   STAGE: ${{ github.event_name == 'release' && 'prod' || 'dev' }}
   EVENT_TYPE: ${{ github.event_name }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CURRENT_BRANCH_NAME: ${{ github.ref }}
 
 jobs:
   deploy:
@@ -27,7 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: main
           fetch-depth: 0
 
       - name: 'Get changed files (push)'

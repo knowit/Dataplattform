@@ -7,7 +7,7 @@ function setup_git {
     if [[ "$ARG_1" == "show-ref" ]]
     then
       echo "abseafeawmawlwaef $ARG_2"
-    elif [[ "$ARG_1" == "diff" ]]
+    elif [[ "$ARG_1" == "diff" || "$ARG_1" == "ls-tree" ]]
     then
       echo -e "some/path/file_1\nsome/path/file_2\nsome/path/file_3"
     fi
