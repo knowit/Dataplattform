@@ -23,4 +23,4 @@ def save_document(http_request, filename, filetype, private=True):
 
 def empty_content_in_path(bucket, prefix, delete_all_versions=False, filter_val=None):
     s3 = S3(bucket=bucket, access_path='')
-    s3.empty_content_in_path(path=prefix, delete_all_versions=delete_all_versions, filter_val=filter_val)
+    s3.empty_content_in_path(s3_path=prefix, delete_all_versions=delete_all_versions, filter_val=filter_val)

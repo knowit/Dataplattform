@@ -12,11 +12,6 @@ dataplattform:
   glue:
     tableName: google_forms
     accessLevel: 3
-  hooks:
-    - name: 'Invoke ingestor'
-      trigger: postDeploy
-      type: invoke
-      value: ingest
 
 custom:
   editable:
@@ -35,6 +30,7 @@ custom:
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
+    dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
     noDeploy:
       - boto3

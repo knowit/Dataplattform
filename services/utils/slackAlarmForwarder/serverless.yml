@@ -14,6 +14,7 @@ custom:
     description: Forwards Alarms from the ${self:custom.stage}-CloudwatchAlarms SNS topic to slack
   stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
+    dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
     noDeploy:
       - boto3

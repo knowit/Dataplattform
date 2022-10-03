@@ -14,6 +14,7 @@ custom:
     description: Downloads documents to a public raw storage bucket
   stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
+    dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
     noDeploy:
       - boto3
