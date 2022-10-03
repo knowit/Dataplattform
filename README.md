@@ -5,9 +5,9 @@ The main architecture consists of [AWS Lambda](https://aws.amazon.com/lambda/)-f
 
 Currently the platform gathers data from several different datasources, both as scheduled event polls and web hook events. Amongst the supported datasources are [yr](yr.no), github-repos and the internal CV database for Knowit, CV Partner.  
 ### Dependecies
-1. [python 3.7](https://www.python.org/downloads/)
-2. [nodejs and npm](https://www.npmjs.com/get-npm)
-3. [serverless](https://serverless.com/framework/docs/getting-started#install-via-npm): `npm install -g serverless`
+1. [python 3.9](https://www.python.org/downloads/)
+2. [nodejs v16 and npm](https://www.npmjs.com/get-npm)
+3. [serverless v3](https://serverless.com/framework/docs/getting-started#install-via-npm): `npm install -g serverless@3.22.0`
 4. [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
 It is also highly recommended that you use a virtual environment or similar to manage pip packages and dependencies. 
 To configure `aws-cli`, please contact an existing member of the team for credentials.
