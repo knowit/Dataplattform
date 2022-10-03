@@ -62,7 +62,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         return pd.DataFrame(experiences)
 
     ubw_experience = get_experience(experience_df)
-    print("working!!!", ubw_experience)
+    print("Sucessful, reading ", len(ubw_experience), "people")
 
     return {
         'ubw_experience': ubw_experience
