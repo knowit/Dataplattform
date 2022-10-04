@@ -52,8 +52,8 @@ resources:
       Properties:
         Name: DoraCrawlers
         CrawlerSecurityConfiguration: !Ref GlueEncryptionConfigurations
-        Role: !ImportValue dev-level-4-glue-access
-        DatabaseName: dev_level_4_database
+        Role: !ImportValue ${self:custom.stage}-level-4-glue-access
+        DatabaseName: !Sub ${self:custom.stage}_level_4_database
         Targets:
           S3Targets:
             - Path: !Sub ${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos

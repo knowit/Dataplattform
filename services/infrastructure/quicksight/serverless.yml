@@ -37,7 +37,7 @@ resources:
         Type: ATHENA
         DataSourceId: DoraWorkGroup-AthenaID
         Permissions:
-          - Principal: ${ssm:/dev/dora/quicksight_principal}
+          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSourcePermissions
               - quicksight:DescribeDataSource
@@ -58,7 +58,7 @@ resources:
               Bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
               Key: data/level-3/dora/manifest.json
         Permissions:
-          - Principal: ${ssm:/dev/dora/quicksight_principal}
+          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSourcePermissions
               - quicksight:DescribeDataSource
@@ -88,7 +88,7 @@ resources:
                 ContainsHeader: true
                 Delimiter: ','
         Permissions:
-          - Principal: ${ssm:/dev/dora/quicksight_principal}
+          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSetPermissions
               - quicksight:DescribeDataSet
@@ -112,7 +112,7 @@ resources:
             CustomSql:
               DataSourceArn: !GetAtt AthenaDataSource.Arn
               Name: deploymentFrequency
-              SqlQuery: 'SELECT * FROM AwsDataCatalog.dev_level_4_database.deploymentfrequency'
+              SqlQuery: !Sub 'SELECT * FROM AwsDataCatalog.${self:custom.stage}_level_4_database.deploymentfrequency'
               Columns:
                 - Name: partition_1
                   Type: STRING
@@ -123,7 +123,7 @@ resources:
           FormatVersion: VERSION_1
           PermissionPolicy: GRANT_ACCESS
         Permissions:
-          - Principal: ${ssm:/dev/dora/quicksight_principal}
+          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSetPermissions
               - quicksight:DescribeDataSet
@@ -147,7 +147,7 @@ resources:
             CustomSql:
               DataSourceArn: !GetAtt AthenaDataSource.Arn
               Name: DeploymentsNullValues
-              SqlQuery: 'SELECT * FROM AwsDataCatalog.dev_level_4_database.github_deployments_with_null_values'
+              SqlQuery: !Sub 'SELECT * FROM AwsDataCatalog.${self:custom.stage}_level_4_database.github_deployments_with_null_values'
               Columns:
                 - Name: date_column
                   Type: DATETIME
@@ -160,7 +160,7 @@ resources:
           FormatVersion: VERSION_1
           PermissionPolicy: GRANT_ACCESS
         Permissions:
-          - Principal: ${ssm:/dev/dora/quicksight_principal}
+          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSetPermissions
               - quicksight:DescribeDataSet

@@ -177,21 +177,19 @@ def get_hooks(path: str) -> list:
 
 def transform_hook(hook: dict, aws_profile: str, stage: str) -> str:
     header_str = 'echo "\n\nInvoking ' + hook['trigger'] + ' hook: ' + str(hook['name'] + ' " &&')
-    footer_str = ' && echo ""'
     if hook['type'] == 'invoke':
         return header_str \
-               + "sls invoke -f " + hook['value'] \
-               + ((" --aws-profile " + aws_profile) if aws_profile is not None else "") \
-               + ((" --stage " + stage) if stage is not None else "") \
-               + footer_str
+               + 'sls invoke -f ' + hook['value'] \
+               + ((' --aws-profile ' + aws_profile) if aws_profile is not None else '') \
+               + ((' --stage ' + stage) if stage is not None else '')
     elif hook['type'] == 'command':
-        return header_str + hook['value'] + footer_str
+        return header_str + hook['value']
 
 
 def get_environment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
     return [
-        'export SERVERLESS_STAGE="' + stage if stage is not None else 'dev' + '"',
-        'export SERVERLESS_STAGE_FLAG="' + ('--stage ' + stage) if stage is not None else '' + '"',
+        'export SERVERLESS_STAGE="' + (stage if stage is not None else 'dev') + '"',
+        'export SERVERLESS_STAGE_FLAG="' + (('--stage ' + stage) if stage is not None else '') + '"',
         'export SERVERLESS_AWS_PROFILE_FLAG="'
         + (('--aws-profile ' + aws_profile) if aws_profile is not None else '') + '"'
     ]
