@@ -110,7 +110,7 @@ resources:
     AthenaDeploymentFrequency:
       Type: AWS::Athena::NamedQuery
       Properties:
-        Database: !Sub ${self:custom.stage}_level_4_database
+        Database: ${self:custom.stage}_level_4_database
         Description: "A query that calculates the deployment frequence for each repo"
         Name: "DeploymentFrequency"
         WorkGroup: !Ref DoraWorkgroup
@@ -174,7 +174,7 @@ resources:
     AthenaFrequencyTable:
       Type: AWS::Athena::NamedQuery
       Properties:
-        Database: !Sub ${self:custom.stage}_level_4_database
+        Database: ${self:custom.stage}_level_4_database
         Description: "Creates a reference table used in DeploymentFrequency calculation "
         Name: "Frequency"
         WorkGroup: !Ref DoraWorkgroup
