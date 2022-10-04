@@ -1,13 +1,8 @@
-import re
-from dataplattform.common.aws import S3
 from dataplattform.common.handlers.process import ProcessHandler
 from typing import Dict
-from datetime import datetime
 from datetime import date
-import os
 import pandas as pd
 import numpy as np
-from pathlib import PurePosixPath
 
 handler = ProcessHandler()
 
@@ -50,7 +45,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             person = dict(row)
 
             examination_year = row["examination_year"]
-            
+
             if not pd.isna(examination_year) and examination_year != "0":
                 experience = current_year - int(examination_year)
             else:
