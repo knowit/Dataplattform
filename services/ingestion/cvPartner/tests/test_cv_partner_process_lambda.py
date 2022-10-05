@@ -98,7 +98,7 @@ def test_process_table_content_missing_born_date(setup_queue_event, test_data, c
             'navn': ['Einar Halvorsen', 'Fredrik Arnesen'],
             'email': ['einar.halvorsen@knowit.no', 'fredrik.arnesen@knowit.no'],
             'telefon': ['12345678', '87654321'],
-            'born_year': [-1, 1995],
+            'born_year': [0, 1995],
             'nationality': ["Norwegian", "Norwegian"],
             'place_of_residence': ['', 'Sandvika'],
             'twitter': ['', '']
@@ -156,7 +156,7 @@ def test_process_education_table_content_missing(setup_queue_event, test_data,
             'school': ['Universitetet i Oslo', 'Universitetet i Oslo'],
             'year_from': [2015, 2018],
             'year_to': [2018, 2020]
-            }))
+        }))
 
 
 """
@@ -204,7 +204,7 @@ def test_project_experiences_df(setup_queue_event, test_data, create_table_mock,
             'project_experience_skills': ["aws;smidig utvikling;fullstack", "serverless;azure;svelte"],
             'roles': ["Teamlead;Scrum master",
                       "Utvikler"]
-            }))
+        }))
 
 
 """
@@ -215,7 +215,8 @@ Case: project skills not defined for a project
 def test_project_experiences_df_project_skills_missing(setup_queue_event, test_data, create_table_mock,
                                                        dynamodb_resource):
     tmp_data = test_data['data']
-    tmp_data[0]['cv']['project_experiences'][0].pop('project_experience_skills', None)
+    tmp_data[0]['cv']['project_experiences'][0].pop(
+        'project_experience_skills', None)
 
     event = setup_queue_event(
         schema.Data(
@@ -233,7 +234,7 @@ def test_project_experiences_df_project_skills_missing(setup_queue_event, test_d
             'project_experience_skills': ["", "serverless;azure;svelte"],
             'roles': ["Teamlead;Scrum master",
                       "Utvikler"]
-            }))
+        }))
 
 
 """
@@ -261,7 +262,7 @@ def test_project_experiences_df_costumer_missing(setup_queue_event, test_data, c
             'project_experience_skills': ["aws;smidig utvikling;fullstack", "serverless;azure;svelte"],
             'roles': ["Teamlead;Scrum master",
                       "Utvikler"]
-            }))
+        }))
 
 
 """
@@ -281,14 +282,14 @@ def test_work_experiences_df_missing(setup_queue_event, test_data,
             data=tmp_data))
 
     exp_df = pd.DataFrame({
-            'user_id': ['60cc81232e97ff100ca405c6', '60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
-            'month_from': [6, -1, 11]
-            })
+        'user_id': ['60cc81232e97ff100ca405c6', '60cc81232e97ff100ca405c6', '60cc7fce68679f0fc4336177'],
+        'month_from': [6, 0, 11]
+    })
 
     handler(event, None)
     create_table_mock.assert_table_data_contains_df(
         'cv_partner_work_experience', exp_df
-        )
+    )
 
 
 """
@@ -350,8 +351,10 @@ def test_set_guid_from_ad_data(s3_bucket, setup_queue_event, test_data, dynamodb
 
     handler(event, None)
 
-    cv_partner_employees_object = s3_bucket.Object("data/test/structured/cv_partner_employees/part.0.parquet")
-    cv_partner_employees = pd.read_parquet(BytesIO(cv_partner_employees_object.get()['Body'].read()))
+    cv_partner_employees_object = s3_bucket.Object(
+        "data/test/structured/cv_partner_employees/part.0.parquet")
+    cv_partner_employees = pd.read_parquet(
+        BytesIO(cv_partner_employees_object.get()['Body'].read()))
     assert cv_partner_employees.loc[cv_partner_employees['user_id'] == "60cc81232e97ff100ca405c6"]['guid'][0] \
-           == "5d79f8b771cd4921b667f9227aece292213806d6"
+        == "5d79f8b771cd4921b667f9227aece292213806d6"
     assert len(cv_partner_employees) == 1
