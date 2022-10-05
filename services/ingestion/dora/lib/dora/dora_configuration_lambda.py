@@ -1,19 +1,22 @@
 import boto3
 import time
+import os
 
-glue_client = boto3.client('glue', region_name='eu-central-1')
-cf_client = boto3.client('cloudformation')
-athena_client = boto3.client('athena')
-lambda_client = boto3.client('lambda')
+session = boto3.Session()
+glue_client = session.client('glue', region_name='eu-central-1')
+cf_client = session.client('cloudformation')
+athena_client = session.client('athena')
+lambda_client = session.client('lambda')
 
 workgroup = "DoraWorkgroups"
+stage = os.environ["STAGE"]
 
 
 def handler(event, context):
     def s3_ingestion():
         # Performs an ingestion
         response = lambda_client.invoke(
-            FunctionName='dev-dora-ingest',
+            FunctionName=str(stage) + '-dora-ingest',
             InvocationType='RequestResponse'
         )
         return response
@@ -63,7 +66,7 @@ def handler(event, context):
         athena_client.start_query_execution(
             QueryString=query_string,
             QueryExecutionContext={
-                'Database': 'dev_level_4_database',
+                'Database': str(stage) + '_level_4_database',
                 'Catalog': 'AWSDataCatalog'
             },
             WorkGroup=workgroup

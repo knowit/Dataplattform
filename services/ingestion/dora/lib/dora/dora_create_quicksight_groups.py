@@ -1,5 +1,6 @@
 import boto3
 import pandas as pd
+import os
 
 quicksight_client = boto3.client('quicksight')
 glue_client = boto3.client('glue')
@@ -8,11 +9,12 @@ s3_client = boto3.client('s3')
 s3 = boto3.resource('s3')
 
 role_bindings_filename = 'data/level-3/dora/quicksight_role_bindings.csv'
+stage = os.environ["STAGE"]
 
 
 def handler(event, context):
     account_id = sts_client.get_caller_identity().get('Account')
-    s3_bucket = s3.Bucket(f'dev-datalake-bucket-{account_id}')
+    s3_bucket = s3.Bucket(f'{stage}-datalake-bucket-{account_id}')
 
     def create_quicksight_group(partition):
         return quicksight_client.create_group(
@@ -38,7 +40,7 @@ def handler(event, context):
     )
 
     group_names = [group['GroupName'] for group in groups['GroupList']]
-    partitions = glue_client.get_partitions(DatabaseName='dev_level_4_database', TableName='github_dora_repos')
+    partitions = glue_client.get_partitions(DatabaseName=stage + '_level_4_database', TableName='github_dora_repos')
     partition_names = [partition['Values'][-1] for partition in partitions['Partitions']]
 
     [create_quicksight_group(partition_name) for partition_name in partition_names

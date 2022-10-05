@@ -45,7 +45,7 @@ resources:
     AthenaGithubDeployments:
       Type: AWS::Athena::NamedQuery
       Properties:
-        Database: "dev_level_4_database"
+        Database: ${self:custom.stage}_level_4_database
         Description: "A query that gets all distinct deployments and groups them by repo and date"
         Name: "GithubDeployments"
         WorkGroup: !Ref DoraWorkgroup
@@ -62,7 +62,7 @@ resources:
     AthenaGithubDeploymentsWithNullValues:
       Type: AWS::Athena::NamedQuery
       Properties:
-        Database: "dev_level_4_database"
+        Database: ${self:custom.stage}_level_4_database
         Description: "A query that adds zero deployments to all dates within the last 3 months with missing values"
         Name: "GithubDeploymentsWithNullValues"
         WorkGroup: !Ref DoraWorkgroup
@@ -110,7 +110,7 @@ resources:
     AthenaDeploymentFrequency:
       Type: AWS::Athena::NamedQuery
       Properties:
-        Database: "dev_level_4_database"
+        Database: ${self:custom.stage}_level_4_database
         Description: "A query that calculates the deployment frequence for each repo"
         Name: "DeploymentFrequency"
         WorkGroup: !Ref DoraWorkgroup
@@ -174,12 +174,12 @@ resources:
     AthenaFrequencyTable:
       Type: AWS::Athena::NamedQuery
       Properties:
-        Database: "dev_level_4_database"
+        Database: ${self:custom.stage}_level_4_database
         Description: "Creates a reference table used in DeploymentFrequency calculation "
         Name: "Frequency"
         WorkGroup: !Ref DoraWorkgroup
         QueryString: !Sub >
-          CREATE EXTERNAL TABLE IF NOT EXISTS `dev_level_4_database`.`frequency` (
+          CREATE EXTERNAL TABLE IF NOT EXISTS `${self:custom.stage}_level_4_database`.`frequency` (
           `id` int,
           `frequency` string
           )
@@ -187,7 +187,7 @@ resources:
           WITH SERDEPROPERTIES (
           'serialization.format' = ',',
           'field.delim' = ','
-          ) LOCATION 's3://dev-datalake-bucket-${AWS::AccountId}/data/level-3/dora/frequency/'
+          ) LOCATION 's3://${self:custom.stage}-datalake-bucket-${AWS::AccountId}/data/level-3/dora/frequency/'
           TBLPROPERTIES ('has_encrypted_data'='false');
     AthenaSetupRole:
       Type: AWS::IAM::Role

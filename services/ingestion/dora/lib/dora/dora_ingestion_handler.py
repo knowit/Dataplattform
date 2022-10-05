@@ -5,15 +5,17 @@ from datetime import datetime
 import requests
 from dateutil.parser import isoparse
 import boto3
+import os
 
 handler = IngestHandler()
+stage = os.environ["STAGE"]
 
 
 @handler.ingest()
 def ingest(event) -> Data:
     client = boto3.client('ssm')
     repos = client.get_parameters_by_path(
-        Path='/dev/dora/github/repos/',
+        Path='/' + stage + '/dora/github/repos/',
         Recursive=True
     )
 
