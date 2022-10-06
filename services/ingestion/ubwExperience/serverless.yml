@@ -1,4 +1,5 @@
 service: ubwExperience
+frameworkVersion: '3'
 
 dataplattform:
   dependencies:
@@ -31,12 +32,12 @@ custom:
   ingestEnabled:
     prod: true
     dev: true
-
   stage: ${opt:stage, self:provider.stage}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
   sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
+    dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
     noDeploy:
       - boto3
@@ -49,18 +50,16 @@ provider:
   stackName: ${self:custom.stage}-${self:service}
   deploymentBucket:
     name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
-  runtime: python3.7
+  runtime: python3.9
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
   tags:
     Project: Dataplattform
     Layer: Ingestion
     Ingestion: Pollers
-  environment:
   tracing:
     apiGateway: true
     lambda: true
-
 
 package:
   individually: true
@@ -85,7 +84,6 @@ functions:
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
       SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
-
     events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-timer
@@ -101,7 +99,6 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-
     name: ${self:custom.stage}-${self:service}-process
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
@@ -175,7 +172,6 @@ resources:
                     - sqs:SendMessageBatch
                     - sqs:SendMessage
                   Resource: !GetAtt EventQueue.Arn
-
     IngestLambdaRole:
       Condition: CreateIngestLambdaRole
       Type: AWS::IAM::Role
@@ -241,7 +237,7 @@ resources:
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:#{AWS::Region}:#{AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
@@ -269,9 +265,9 @@ resources:
                     - 'glue:GetTable'
                     - 'glue:GetDatabase'
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
           - PolicyName: ${self:custom.stage}-Athena-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -282,7 +278,7 @@ resources:
                     - 'athena:GetQueryExecution'
                     - 'athena:GetQueryResults'
                   Resource:
-                    !Sub 'arn:aws:athena:#{AWS::Region}:#{AWS::AccountId}:workgroup/primary' # TODO: dedicated work groups?
+                     !Sub 'arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary' # TODO: dedicated work groups?
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
@@ -323,10 +319,10 @@ resources:
                     - glue:GetCrawler
                     - glue:UpdateCrawler
                   Resource:
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:#{AWS::Region}:#{AWS::AccountId}:crawler/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
 
     EventQueue:
       Type: AWS::SQS::Queue
@@ -338,7 +334,6 @@ resources:
         RedrivePolicy:
           deadLetterTargetArn: !GetAtt EventQueueDL.Arn
           maxReceiveCount: 1 # The number of times a message is delivered to the source queue before being moved to the dead-letter queue.
-
     EventQueueDL: #Messages that fail are put here
       Type: AWS::SQS::Queue
       Properties:
@@ -346,9 +341,7 @@ resources:
         QueueName: ${self:custom.sqsQueueDLName}
         ContentBasedDeduplication: true #Assume all message bodies are unique, by design given as an uuid1
 
-
 plugins:
   - serverless-python-requirements
-  - serverless-pseudo-parameters
   - serverless-plugin-conditional-functions
   - serverless-disable-functions

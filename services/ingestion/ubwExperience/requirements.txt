@@ -1,3 +1,4 @@
 file:../../../packages/common
 zeep==3.4
 xmltodict==0.12
+numpy==1.22.0
