@@ -233,7 +233,7 @@ def run_process_per_path(
     for path in paths:
         commands = get_cmd_func(path)
         try:
-            retcode = subprocess.call(' && '.join(commands), shell=True, executable='/bin/bash')
+            retcode = subprocess.call(' && '.join(commands), shell=True)
             if retcode != 0:
                 raise Exception(str("\nAn error occurred while running a subprocess at " + path) if len(path) > 0
                                 else "\nAn error occurred while running a subprocess")
