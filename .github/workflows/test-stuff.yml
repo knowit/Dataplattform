@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - fix/ubwcustomerperresource-postdeploy-hook
-    paths:
-      - 'services/**'
-      - '.config/.serverless'
-      - '.github/workflows/deploy.yml'
 
 env:
   AWS_ACCESS_KEY_ID: ${{ github.event_name == 'release' && secrets.PROD_AWS_ACCESS_KEY_ID || secrets.DEV_AWS_ACCESS_KEY_ID }}
