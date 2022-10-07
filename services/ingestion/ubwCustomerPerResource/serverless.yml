@@ -15,7 +15,7 @@ dataplattform:
     - name: 'Invoke ingestor'
       trigger: postDeploy
       type: command
-      value: 'source postDeploy.sh'
+      value: 'sh ./postDeploy.sh'
 
 custom:
   editable:
