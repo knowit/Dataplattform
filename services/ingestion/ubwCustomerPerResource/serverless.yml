@@ -15,7 +15,7 @@ dataplattform:
     - name: 'Invoke ingestor'
       trigger: postDeploy
       type: command
-      value: 'if [[ "$SERVERLESS_STAGE" == "prod" ]]; then sls invoke -f ingest $SERVERLESS_STAGE_FLAG $SERVERLESS_AWS_PROFILE_FLAG; else sls invoke -f mock $SERVERLESS_STAGE_FLAG $SERVERLESS_AWS_PROFILE_FLAG; fi'
+      value: 'sh postDeploy.sh'
 
 custom:
   editable:
