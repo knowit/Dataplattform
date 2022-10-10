@@ -183,25 +183,19 @@ def transform_hook(hook: dict, aws_profile: str, stage: str) -> str:
                + ((' --aws-profile ' + aws_profile) if aws_profile is not None else '') \
                + ((' --stage ' + stage) if stage is not None else '')
     elif hook['type'] == 'command':
-        return header_str + hook['value']
-
-
-def get_environment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
-    return [
-        'export SERVERLESS_STAGE="' + (stage if stage is not None else 'dev') + '"',
-        'export SERVERLESS_STAGE_FLAG="' + (('--stage ' + stage) if stage is not None else '') + '"',
-        'export SERVERLESS_AWS_PROFILE_FLAG="'
-        + (('--aws-profile ' + aws_profile) if aws_profile is not None else '') + '"'
-    ]
+        exports = f'export SERVERLESS_STAGE="{stage if stage is not None else "dev"}" && ' \
+                  + f'export SERVERLESS_STAGE_FLAG="--stage {stage if stage is not None else "dev"}" && ' \
+                  + 'export SERVERLESS_AWS_PROFILE_FLAG="' \
+                  + (("--aws-profile " + aws_profile) if aws_profile is not None else '') + '"' \
+                  + " && "
+        return exports + header_str + hook['value']
 
 
 def get_deployment_commands(path: str, aws_profile: str = None, stage: str = None) -> list:
     hooks = get_hooks(path)
     pre_deploy_hooks = list(filter(lambda hook: hook['trigger'] == 'preDeploy', hooks))
     post_deploy_hooks = list(filter(lambda hook: hook['trigger'] == 'postDeploy', hooks))
-
     commands = ['echo "\nDeploying service: ' + path + '"', 'cd ' + path]
-    commands.extend(get_environment_commands(path, aws_profile, stage))
     commands.extend(list(map(lambda hook: transform_hook(hook, aws_profile, stage), pre_deploy_hooks)))
     commands.extend(get_install_commands(path))
     commands.append('sls deploy'
@@ -233,7 +227,7 @@ def run_process_per_path(
     for path in paths:
         commands = get_cmd_func(path)
         try:
-            retcode = subprocess.call(' && '.join(commands), shell=True, executable='/bin/bash')
+            retcode = subprocess.call(' && '.join(commands), shell=True)
             if retcode != 0:
                 raise Exception(str("\nAn error occurred while running a subprocess at " + path) if len(path) > 0
                                 else "\nAn error occurred while running a subprocess")
