@@ -185,7 +185,7 @@ def transform_hook(hook: dict, aws_profile: str, stage: str) -> str:
     elif hook['type'] == 'command':
         exports = f'export SERVERLESS_STAGE="{stage if stage is not None else "dev"}" && ' \
                   + f'export SERVERLESS_STAGE_FLAG="--stage {stage if stage is not None else "dev"}" && ' \
-                  + f'export SERVERLESS_AWS_PROFILE_FLAG="' \
+                  + 'export SERVERLESS_AWS_PROFILE_FLAG="' \
                   + (("--aws-profile " + aws_profile) if aws_profile is not None else '') + '"' \
                   + " && "
         return exports + header_str + hook['value']
