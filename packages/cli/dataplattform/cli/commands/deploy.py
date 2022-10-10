@@ -181,7 +181,7 @@ def transform_hook(hook: dict, aws_profile: str, stage: str) -> str:
         return header_str \
                + 'sls invoke -f ' + hook['value'] \
                + ((' --aws-profile ' + aws_profile) if aws_profile is not None else '') \
-               + ((' --stage ' + stage) if stage is not None else 'dev')
+               + ((' --stage ' + stage) if stage is not None else '')
     elif hook['type'] == 'command':
         exports = f'export SERVERLESS_STAGE="{stage if stage is not None else "dev"}" && ' \
                   + f'export SERVERLESS_STAGE_FLAG="--stage {stage if stage is not None else "dev"}" && ' \
