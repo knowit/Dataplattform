@@ -75,6 +75,7 @@ functions:
         - 'app.py'
         - 'apis/**/*.py'
         - 'common_lib/**/*.py'
+        - 'common_lib/requirements.txt'
     environment:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
