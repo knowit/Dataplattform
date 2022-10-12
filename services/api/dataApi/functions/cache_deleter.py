@@ -1,5 +1,5 @@
 import json
-from common.services.cache_table_service import delete_cache_table
+from common_lib.common.services.cache_table_service import delete_cache_table
 
 
 def handler(event, context):

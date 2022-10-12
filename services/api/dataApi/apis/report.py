@@ -1,7 +1,7 @@
 # from api import api
 from flask_restx import Resource, Namespace, fields
-import common_lib.common.repositories.reports.ReportsRepository as ReportsRepository
-import common_lib.common.services.report_service as report_service
+from common_lib.common.repositories.reports import ReportsRepository
+from common_lib.common.services import report_service
 
 ns = Namespace('Report', path='/data')
 
