@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - main
+      - fix/test-deploy
     paths:
       - 'services/**'
       - '.config/.serverless'
