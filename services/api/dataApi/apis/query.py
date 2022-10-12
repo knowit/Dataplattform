@@ -1,4 +1,4 @@
-from common_lib.common.services.athena_engine as engine, cache_table_service as cache_table_service
+from common_lib.common.services import athena_engine as engine, cache_table_service as cache_table_service
 import common_lib.common.repositories.reports.ReportsRepository as ReportsRepository
 from flask_restx import Resource, Namespace, fields
 from flask import Response
