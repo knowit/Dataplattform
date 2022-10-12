@@ -74,4 +74,4 @@ jobs:
         if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: |
           echo -e "Deploying services to stage $STAGE\n"
-          dataplattform deploy -s $SERVICES --stage $STAGE --ignore services/infrastructure/quicksight
+          dataplattform deploy -s services/api/dataApi --stage $STAGE --ignore services/infrastructure/quicksight
