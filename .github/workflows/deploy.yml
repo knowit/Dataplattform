@@ -30,48 +30,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 'Get changed files (push)'
-        id: changed_files_push
-        if: ${{ github.event_name == 'push' }}
-        uses: jitterbit/get-changed-files@v1
-        with:
-          format: space-delimited
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Look for changed services
-        id: get_changed_services
-        env:
-          CHANGED_FILES: ${{ steps.changed_files_push.outputs.all }}
-        run: |
-          source .workflow-scripts/deploy/get_changed_services.sh
-          look_for_changed_services
-
       - uses: actions/setup-node@v3
-        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         with:
           node-version: 16
 
       - uses: actions/setup-python@v4
-        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         with:
           python-version: '3.9'
           architecture: 'x64'
 
       - name: Install Yarn
-        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: npm install -g yarn
 
       - name: Install Serverless Framework
-        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: npm install -g $(awk -F ":" '/SERVERLESS_VERSION/ {print $2}' .config/.serverless)
 
       - name: Install local packages
-        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: |
           pip install -e packages/api packages/cli packages/common packages/query packages/testing
 
       - name: Deploy services
-        if: ${{ steps.get_changed_services.outputs.should_deploy == 'true' }}
         run: |
           echo -e "Deploying services to stage $STAGE\n"
           dataplattform deploy -s services/api/dataApi --stage $STAGE --ignore services/infrastructure/quicksight
