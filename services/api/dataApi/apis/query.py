@@ -1,8 +1,8 @@
-import common.services.athena_engine as engine
+import common_lib.common.services.athena_engine as engine
 from flask_restx import Resource, Namespace, fields
 from flask import Response
-from common.repositories.reports import ReportsRepository
-import common.services.cache_table_service as cache_table_service
+from common_lib.common.repositories.reports import ReportsRepository
+import common_lib.common.services.cache_table_service as cache_table_service
 
 
 ns = Namespace('Query', path='/data')

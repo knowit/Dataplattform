@@ -7,4 +7,5 @@ pandas==1.3.4
 markupsafe==2.0.1
 numpy==1.22.0
 file:./common_lib
+file:./apis
 file:../../../packages/api
