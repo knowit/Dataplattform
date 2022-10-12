@@ -1,5 +1,5 @@
 from flask_restx import Resource, fields, Namespace
-from common_lib.common.repositories.catalogue import (
+from ..common_lib.common.repositories.catalogue import (
     TableRepository, DatabaseRepository,
     GlueRepositoryException, GlueRepositoryNotFoundException
 )
