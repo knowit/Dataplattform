@@ -10,3 +10,4 @@ sqlparse==0.4.2
 cachetools==4.2.4
 file:../../../packages/api
 file:./common_lib
+file:./common_lib/common
