@@ -1,5 +1,5 @@
-from common.repositories.reports import ReportsRepository
-from common.services.athena_engine import process_sql
+from common_lib.common.repositories.reports import ReportsRepository
+from common_lib.common.services.athena_engine import process_sql
 from typing import Dict
 from functools import reduce
 import re
