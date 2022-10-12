@@ -1,2 +1,1 @@
-.
-file:../common_lib
+file:../common_lib/common
