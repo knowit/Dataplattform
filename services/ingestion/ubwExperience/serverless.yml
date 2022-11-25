@@ -28,10 +28,10 @@ custom:
     mockRate: rate(7 days)
   mockEnabled:
     prod: false
-    dev: false
+    dev: true
   ingestEnabled:
     prod: true
-    dev: true
+    dev: false
   stage: ${opt:stage, self:provider.stage}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
   sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
@@ -67,6 +67,30 @@ package:
     - "./**"
 
 functions:
+  mock:
+    enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
+    handler: ${self:custom.editable.srcDir}/${self:custom.editable.mockIngestHandlerFile}.handler
+    name: ${self:custom.stage}-${self:service}-mock-ingest
+    description: ${self:custom.editable.mockDescription}
+    role: !GetAtt MockLambdaRole.Arn
+    package:
+      include:
+        - '${self:custom.editable.srcDir}/*.py'
+        - 'tests/test_data.json'
+    environment:
+      STAGE: ${self:custom.stage}
+      SERVICE: ${self:service}
+      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      ACCESS_PATH: ${self:custom.accessPath}
+      DEFAULT_DATABASE: ${self:custom.editable.databaseName}
+      SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
+      SQS_MESSAGE_GROUP_ID: ${self:custom.sqsQueueName}-group1
+    events:
+      - schedule:
+          name: ${self:custom.stage}-${self:service}-mock-timer
+          description: ${self:custom.editable.description}
+          rate: ${self:custom.editable.scheduleRate}
+          enabled: true
   ingest: # A Function
     enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
