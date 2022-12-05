@@ -2,74 +2,76 @@
   "metadata": {
     "timestamp": 1601294392.604705
   },
-  "person_1": [{
+  "data": [
+  {
     "resource_id": "FREARN",
     "name": "Fredrik Arnesen",
     "r0_x0023_exami0_x0023_612": "1990",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_2": [{
+  },
+  {
     "resource_id": "EINHAL",
     "name": "Einar Halvorsen",
     "r0_x0023_exami0_x0023_612": "2000",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_3": [{
+  },
+  {
     "resource_id": "SANAHM",
     "name": "Sander Ahmed",
     "r0_x0023_exami0_x0023_612": "2010",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_4": [{
+  },
+  {
     "resource_id": "CATKRI",
     "name": "Cathrine Kristiansen",
     "r0_x0023_exami0_x0023_612": "1980",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_5": [{
+  },
+  {
     "resource_id": "TORAMU",
     "name": "Tor Amundsen",
     "r0_x0023_exami0_x0023_612": "1985",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_6": [{
+  },
+  {
     "resource_id": "CATMAD",
     "name": "Cathrine Madsen",
     "r0_x0023_exami0_x0023_612": "1995",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_7": [{
+  },
+  {
     "resource_id": "DANBAK",
     "name": "Daniel Bakke",
     "r0_x0023_exami0_x0023_612": "2005",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_8": [{
+  },
+  {
     "resource_id": "HELENG",
     "name": "Helge Engen",
     "r0_x0023_exami0_x0023_612": "1975",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_9": [{
+  },
+  {
     "resource_id": "OLABER",
     "name": "Ola Berge",
     "r0_x0023_exami0_x0023_612": "1970",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }],
-  "person_10": [{
+  },
+  {
     "resource_id": "KNUAHM",
     "name": "Knut Ahmed",
     "r0_x0023_exami0_x0023_612": "1814",
     "xr0_x0023_e1_x0023_611_x0023_U00": "Master of Science",
     "date_from": "2020-03-16T00:00:00+01:00"
-  }]
+  }
+]
 }
