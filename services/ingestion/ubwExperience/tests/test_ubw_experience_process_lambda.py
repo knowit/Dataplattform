@@ -1,12 +1,7 @@
-import os
 from pathlib import PurePosixPath
 from pytest import fixture
 from ubwexperience.ubw_experience_process_lambda import handler
 import pandas as pd
-import numpy as np
-import fastparquet as fp
-import s3fs
-from os import path
 from json import load
 from dataplattform.common import schema
 from datetime import date, datetime, timedelta
@@ -16,6 +11,7 @@ def test_data():
     with open(path.join(path.dirname(__file__), 'test_data.json'), 'r') as json_file:
         yield load(json_file)
 
+
 @fixture
 def test_data_old():
     with open(path.join(path.dirname(__file__), 'test_old_data.json'), 'r') as json_file:
@@ -24,11 +20,13 @@ def test_data_old():
             json['data'][i] = create_date_string(i)
         yield json
 
+
 def create_date_string(num_weeks_back):
     date = datetime.now()
     delta = timedelta(weeks=num_weeks_back)
     tmp_year, tmp_week = (date - delta).isocalendar()[0:2]
     return str(tmp_year) + str(tmp_week)
+
 
 @fixture
 def setup_queue_event(s3_bucket):
@@ -47,6 +45,7 @@ def setup_queue_event(s3_bucket):
         }
 
     yield make_queue_event
+
 
 def test_process_data_person_1(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
@@ -97,6 +96,7 @@ def test_process_data_person_1(create_table_mock, setup_queue_event, test_data):
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
+
 def test_process_data_person_2(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
@@ -145,6 +145,7 @@ def test_process_data_person_2(create_table_mock, setup_queue_event, test_data):
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
+
 
 def test_process_data_person_3(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
@@ -245,6 +246,7 @@ def test_process_data_person_4(create_table_mock, setup_queue_event, test_data):
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
+
 def test_process_data_person_5(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
@@ -293,6 +295,7 @@ def test_process_data_person_5(create_table_mock, setup_queue_event, test_data):
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
+
 
 def test_process_data_person_6(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
@@ -343,6 +346,7 @@ def test_process_data_person_6(create_table_mock, setup_queue_event, test_data):
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
+
 def test_process_data_person_7(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
@@ -391,6 +395,7 @@ def test_process_data_person_7(create_table_mock, setup_queue_event, test_data):
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
+
 
 def test_process_data_person_8(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
@@ -441,6 +446,7 @@ def test_process_data_person_8(create_table_mock, setup_queue_event, test_data):
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
+
 def test_process_data_person_9(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
@@ -490,6 +496,7 @@ def test_process_data_person_9(create_table_mock, setup_queue_event, test_data):
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
+
 def test_process_data_person_10(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
@@ -538,6 +545,7 @@ def test_process_data_person_10(create_table_mock, setup_queue_event, test_data)
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
+
 
 def test_process_only_appending_historical_data_person_1(s3_bucket, setup_queue_event, test_data):
     event = setup_queue_event(
