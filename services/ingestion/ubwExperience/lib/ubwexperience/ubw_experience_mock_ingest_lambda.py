@@ -16,9 +16,6 @@ def mock(event) -> Data:
     def flatten(t):
         return [item for sublist in t for item in sublist]
 
-    # Dette er ikke riktig forhold til virkelig, da man egentlig får inn kun en reg_period om gangen.
-    # For testdata som inneholder flere reg_perioder så fungerer dette da den tar inn alle.
-
     data = flatten(list(test_json.values())[1:])
 
     return Data(
