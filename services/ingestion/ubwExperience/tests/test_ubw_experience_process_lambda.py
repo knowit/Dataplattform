@@ -9,13 +9,12 @@ import s3fs
 from os import path
 from json import load
 from dataplattform.common import schema
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 
 @fixture
 def test_data():
     with open(path.join(path.dirname(__file__), 'test_data.json'), 'r') as json_file:
         yield load(json_file)
-
 
 @fixture
 def test_data_old():
@@ -49,9 +48,7 @@ def setup_queue_event(s3_bucket):
 
     yield make_queue_event
 
-def test_process_data_person_1(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_1(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -68,10 +65,11 @@ def test_process_data_person_1(create_table_mock,
         'name',
         pd.Series(['Fredrik Arnesen']))
 
+    experience = date.today().year - 1990
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([32]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -93,15 +91,13 @@ def test_process_data_person_1(create_table_mock,
         pd.DataFrame({
             'alias': ['FREARN'],
             'name': ['Fredrik Arnesen'],
-            'experience': [32],
+            'experience': [experience],
             'examination_year': ['1990'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_2(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_2(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -118,10 +114,11 @@ def test_process_data_person_2(create_table_mock,
         'name',
         pd.Series(['Einar Halvorsen']))
 
+    experience = date.today().year - 2000
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([22]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -143,15 +140,13 @@ def test_process_data_person_2(create_table_mock,
         pd.DataFrame({
             'alias': ['EINHAL'],
             'name': ['Einar Halvorsen'],
-            'experience': [22],
+            'experience': [experience],
             'examination_year': ['2000'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_3(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_3(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -168,10 +163,11 @@ def test_process_data_person_3(create_table_mock,
         'name',
         pd.Series(['Sander Ahmed']))
 
+    experience = date.today().year - 2010
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([12]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -193,16 +189,14 @@ def test_process_data_person_3(create_table_mock,
         pd.DataFrame({
             'alias': ['SANAHM'],
             'name': ['Sander Ahmed'],
-            'experience': [12],
+            'experience': [experience],
             'examination_year': ['2010'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
 
-def test_process_data_person_4(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_4(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -219,10 +213,11 @@ def test_process_data_person_4(create_table_mock,
         'name',
         pd.Series(['Cathrine Kristiansen']))
 
+    experience = date.today().year - 1980
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([42]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -244,15 +239,13 @@ def test_process_data_person_4(create_table_mock,
         pd.DataFrame({
             'alias': ['CATKRI'],
             'name': ['Cathrine Kristiansen'],
-            'experience': [42],
+            'experience': [experience],
             'examination_year': ['1980'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_5(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_5(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -269,10 +262,11 @@ def test_process_data_person_5(create_table_mock,
         'name',
         pd.Series(['Tor Amundsen']))
 
+    experience = date.today().year - 1985
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([37]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -294,15 +288,13 @@ def test_process_data_person_5(create_table_mock,
         pd.DataFrame({
             'alias': ['TORAMU'],
             'name': ['Tor Amundsen'],
-            'experience': [37],
+            'experience': [experience],
             'examination_year': ['1985'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_6(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_6(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -319,10 +311,11 @@ def test_process_data_person_6(create_table_mock,
         'name',
         pd.Series(['Cathrine Madsen']))
 
+    experience = date.today().year - 1995
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([27]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -344,15 +337,13 @@ def test_process_data_person_6(create_table_mock,
         pd.DataFrame({
             'alias': ['CATMAD'],
             'name': ['Cathrine Madsen'],
-            'experience': [27],
+            'experience': [experience],
             'examination_year': ['1995'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_7(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_7(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -369,10 +360,11 @@ def test_process_data_person_7(create_table_mock,
         'name',
         pd.Series(['Daniel Bakke']))
 
+    experience = date.today().year - 2005
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([17]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -394,15 +386,13 @@ def test_process_data_person_7(create_table_mock,
         pd.DataFrame({
             'alias': ['DANBAK'],
             'name': ['Daniel Bakke'],
-            'experience': [17],
+            'experience': [experience],
             'examination_year': ['2005'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_8(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_8(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -419,10 +409,11 @@ def test_process_data_person_8(create_table_mock,
         'name',
         pd.Series(['Helge Engen']))
 
+    experience = date.today().year - 1975
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([47]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -444,15 +435,13 @@ def test_process_data_person_8(create_table_mock,
         pd.DataFrame({
             'alias': ['HELENG'],
             'name': ['Helge Engen'],
-            'experience': [47],
+            'experience': [experience],
             'examination_year': ['1975'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_9(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_9(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -469,10 +458,11 @@ def test_process_data_person_9(create_table_mock,
         'name',
         pd.Series(['Ola Berge']))
 
+    experience = date.today().year - 1970
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([52]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -494,15 +484,13 @@ def test_process_data_person_9(create_table_mock,
         pd.DataFrame({
             'alias': ['OLABER'],
             'name': ['Ola Berge'],
-            'experience': [52],
+            'experience': [experience],
             'examination_year': ['1970'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-def test_process_data_person_10(create_table_mock,
-                               setup_queue_event,
-                               test_data):
+def test_process_data_person_10(create_table_mock, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=0),
@@ -519,10 +507,11 @@ def test_process_data_person_10(create_table_mock,
         'name',
         pd.Series(['Knut Ahmed']))
 
+    experience = date.today().year - 1814
     create_table_mock.assert_table_data_column(
         'ubw_experience',
         'experience',
-        pd.Series([208]))
+        pd.Series([experience]))
 
     create_table_mock.assert_table_data_column(
         'ubw_experience',
@@ -544,75 +533,13 @@ def test_process_data_person_10(create_table_mock,
         pd.DataFrame({
             'alias': ['KNUAHM'],
             'name': ['Knut Ahmed'],
-            'experience': [208],
+            'experience': [experience],
             'examination_year': ['1814'],
             'grade': ['Master of Science'],
             'start_year': ['2020-03-16T00:00:00+01:00']
         }))
 
-'''
-def test_process_data_dataframe_content_person_1(
-        create_table_mock,
-        setup_queue_event,
-        test_data):
-    aliases = ['FREARN','EINHAL','SANAHM', 'CATKRI', 'TORAMU', 'CATMAD', 'DANBAK', 'HELENG', 'OLABER', 'KNUAHM']
-    names = ['Fredrik Arnesen', 'Einar Halvorsen', 'Sander Ahmed', 'Cathrine Kristiansen', 'Tor Amundsen', 'Cathrine Madsen', 'Daniel Bakke', 'Helge Engen', 'Ola Berge', 'Knut Ahmed']
-    experience = [32, 22, 12, 42, 37, 27, 17, 47, 52, 208]
-    examination_year = ['1990', '2000', '2010', '1980', '1985', '1995', '2005', '1975', '1970', '1814']
-    grade = ['Master of Science']
-    start_year = ['2020-03-16T00:00:00+01:00']
-    for i in range(0, 9):
-        print("Alias: ", aliases[i])
-        print("Name: ", names[i])
-        print("Experience: ", experience[i])
-        print("Examination year: ", examination_year[i])
-        print("Data: ", test_data['person_'+str(i+1)])
-        event = setup_queue_event(
-            schema.Data(
-                metadata=schema.Metadata(timestamp=1601294392),
-                data=test_data['person_'+str(i+1)]))
-
-        handler(event, None)
-
-        create_table_mock.assert_table_data(
-            'ubw_experience',
-            pd.DataFrame({
-                'alias': [aliases[i]],
-                'name': [names[i]],
-                'experience': [experience[i]],
-                'examination_year': [examination_year[i]],
-                'grade': [grade[0]],
-                'start_year': [start_year[0]]
-            }))
-'''
-'''
-def test_process_data_dataframe_content_person_3(create_table_mock,
-                                                 setup_queue_event,
-                                                 test_data,
-                                                 dynamodb_resource):
-    event = setup_queue_event(
-                schema.Data(
-                    metadata=schema.Metadata(timestamp=1601294392),
-                    data=test_data['person_3']))
-
-    handler(event, None)
-
-    create_table_mock.assert_table_data(
-        'ubw_experience',
-        pd.DataFrame({
-            'alias': 'SANAHM',
-            'name': 'Sander Ahmed',
-            'experience': 12,
-            'examination_year': '2010',
-            'grade': ['Master of Science'],
-            'start_year': ['2020-03-16T00:00:00+01:00']
-        }))
-'''
-def test_process_only_appending_historical_data_person_1(
-        s3_bucket,
-        setup_queue_event,
-        test_data,
-        dynamodb_resource):
+def test_process_only_appending_historical_data_person_1(s3_bucket, setup_queue_event, test_data):
     event = setup_queue_event(
         schema.Data(
             metadata=schema.Metadata(timestamp=1601294392),
