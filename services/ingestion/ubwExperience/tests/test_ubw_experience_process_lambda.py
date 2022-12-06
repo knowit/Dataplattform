@@ -1,10 +1,11 @@
-from pathlib import PurePosixPath
 from pytest import fixture
 from ubwexperience.ubw_experience_process_lambda import handler
 import pandas as pd
+from os import path
 from json import load
 from dataplattform.common import schema
 from datetime import date, datetime, timedelta
+
 
 @fixture
 def test_data():
@@ -565,3 +566,4 @@ def test_process_only_appending_historical_data_person_1(s3_bucket, setup_queue_
     ]
     assert len(expected_keys) == len(keys_in_s3)
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
+

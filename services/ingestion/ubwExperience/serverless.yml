@@ -302,7 +302,7 @@ resources:
                     - 'athena:GetQueryExecution'
                     - 'athena:GetQueryResults'
                   Resource:
-                     !Sub 'arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary' # TODO: dedicated work groups?
+                    - !Sub 'arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary' # TODO: dedicated work groups?
           - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"

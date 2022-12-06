@@ -2,6 +2,7 @@ from ubwexperience.ubw_experience_ingest_lambda import handler
 from pytest import fixture
 from json import loads
 
+
 @fixture(autouse=True)
 def zeep_ubw_mock(mocker):
     mock = mocker.Mock()
