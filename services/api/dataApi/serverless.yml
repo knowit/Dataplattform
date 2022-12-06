@@ -74,6 +74,8 @@ functions:
       include:
         - 'app.py'
         - 'apis/**/*.py'
+        - 'common_lib/**/*.py'
+        - 'common_lib/requirements.txt'
     environment:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}
@@ -104,14 +106,15 @@ functions:
           path: /
           cors: true
   CacheUpdater:
-    handler: cache_updater.handler
-    module: functions
+    handler: functions.cache_updater.handler
     name: ${self:custom.service}-CacheUpdater
     description: Dataplattform API Cache updater
     role: !GetAtt ReportCacheRole.Arn
     package:
       include:
         - 'functions/cache_updater.py'
+        - 'functions/requirements.txt'
+        - 'functions/__init__.py'
     # destinations: # TODO
     # onSuccess: xxx:xxx:target
     # onFailure: xxx:xxx:target
@@ -130,14 +133,15 @@ functions:
           topicName: ${self:custom.stage}-DataUpdate
 
   CacheDeleter:
-    handler: cache_deleter.handler
-    module: functions
+    handler: functions.cache_deleter.handler
     name: ${self:custom.service}-CacheDeleter
     description: Dataplattform API Cache deleter
     role: !GetAtt ReportCacheRole.Arn
     package:
       include:
         - 'functions/cache_deleter.py'
+        - 'functions/requirements.txt'
+        - 'functions/__init__.py'
     environment:
       DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
       STAGE: ${self:custom.stage}

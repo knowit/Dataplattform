@@ -1,2 +1,3 @@
 requests==2.23
 file:../../../packages/common
+numpy==1.22.0

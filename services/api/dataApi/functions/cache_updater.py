@@ -1,7 +1,7 @@
 import json
-from common.repositories.reports import ReportsRepository
-from common.services.athena_engine import execute as execute_query
-import common.services.cache_table_service as cache_table_service
+from common_lib.common.repositories.reports import ReportsRepository
+from common_lib.common.services.athena_engine import execute as execute_query
+import common_lib.common.services.cache_table_service as cache_table_service
 
 
 def handler(event, context):

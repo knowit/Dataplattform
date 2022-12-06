@@ -2,7 +2,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 import pytest
-from common.repositories.reports import ReportsRepository
+from common_lib.common.repositories.reports import ReportsRepository
 
 
 def test_get(dynamo_mock):
@@ -55,7 +55,7 @@ def test_create(dynamo_mock):
 
 
 def test_update_cache_time(dynamo_mock):
-    with patch("common.repositories.reports.datetime") as mock_datetime:
+    with patch("common_lib.common.repositories.reports.datetime") as mock_datetime:
         mock_datetime.now.return_value = datetime(2020, 1, 1)
         mock_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
         with ReportsRepository() as repo:
@@ -65,7 +65,7 @@ def test_update_cache_time(dynamo_mock):
 
 
 def test_update_cache_time_non_existing(dynamo_mock):
-    with patch("common.repositories.reports.datetime") as mock_datetime:
+    with patch("common_lib.common.repositories.reports.datetime") as mock_datetime:
         mock_datetime.now.return_value = datetime(2020, 1, 1)
         mock_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
         with ReportsRepository() as repo:
