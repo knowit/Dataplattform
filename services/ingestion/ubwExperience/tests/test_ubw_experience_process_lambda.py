@@ -566,4 +566,3 @@ def test_process_only_appending_historical_data_person_1(s3_bucket, setup_queue_
     ]
     assert len(expected_keys) == len(keys_in_s3)
     assert all([keys_in_s3[i] == expected_keys[i] for i in range(len(keys_in_s3))])
-
