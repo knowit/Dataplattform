@@ -7,8 +7,7 @@ dataplattform:
     - ../vpc
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${sls:stage}-${self:service}
   project: dataplattform
 
 
@@ -18,7 +17,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 
@@ -27,7 +26,7 @@ resources:
     PersonalMetadataTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.stage}_personal_metadata_table
+        TableName: ${sls:stage}_personal_metadata_table
         AttributeDefinitions:
           - AttributeName: guid
             AttributeType: S
@@ -44,8 +43,8 @@ resources:
     PersonalMetadataTableAccess:
       Type: AWS::IAM::ManagedPolicy
       Properties:
-        Description: Access to ${self:custom.stage} Personal Metadata Table
-        ManagedPolicyName: ${self:custom.stage}-personal-metadata-table
+        Description: Access to ${sls:stage} Personal Metadata Table
+        ManagedPolicyName: ${sls:stage}-personal-metadata-table
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -64,12 +63,12 @@ resources:
       Value:
         Ref: PersonalMetadataTableAccess
       Export:
-        Name: ${self:custom.stage}-personal-metadata-table-access-policy
+        Name: ${sls:stage}-personal-metadata-table-access-policy
     PersonalMetadataTableName:
       Value: ${self:resources.Resources.PersonalMetadataTable.Properties.TableName}
       Export:
-        Name: ${self:custom.stage}-personal-metadata-table-name
+        Name: ${sls:stage}-personal-metadata-table-name
     PersonalMetadataTableArn:
       Value: !GetAtt PersonalMetadataTable.Arn
       Export:
-        Name: ${self:custom.stage}-personal-metadata-tableArn
+        Name: ${sls:stage}-personal-metadata-tableArn

@@ -7,16 +7,13 @@ dataplattform:
     - ../kms
     - ../glue
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -32,31 +29,31 @@ resources:
               Fn::Join:
                 - ""
                 - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                  - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
+                  - !Sub "${ssm:/${sls:stage}/kms/key-id}"
           JobBookmarksEncryption:
             JobBookmarksEncryptionMode: CSE-KMS
             KmsKeyArn:
               Fn::Join:
                 - ""
                 - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                  - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
+                  - !Sub "${ssm:/${sls:stage}/kms/key-id}"
           S3Encryptions:
             - KmsKeyArn:
                 Fn::Join:
                   - ""
                   - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                    - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
+                    - !Sub "${ssm:/${sls:stage}/kms/key-id}"
               S3EncryptionMode: SSE-KMS
     GlueCrawler:
       Type: AWS::Glue::Crawler
       Properties:
         Name: DoraCrawlers
         CrawlerSecurityConfiguration: !Ref GlueEncryptionConfigurations
-        Role: !ImportValue ${self:custom.stage}-level-4-glue-access
-        DatabaseName: !Sub ${self:custom.stage}_level_4_database
+        Role: !ImportValue ${sls:stage}-level-4-glue-access
+        DatabaseName: !Sub ${sls:stage}_level_4_database
         Targets:
           S3Targets:
-            - Path: !Sub ${self:custom.stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos
+            - Path: !Sub ${sls:stage}-kmsbucket-${AWS::AccountId}/data/level-4/dora/structured/github_dora_repos
               Exclusions:
                 - "*_metadata**"
         SchemaChangePolicy:
@@ -70,4 +67,4 @@ resources:
       Description: Glue crawler used for dora
       Value: !Ref GlueCrawler
       Export:
-        Name: ${self:custom.stage}-DoraCrawler
+        Name: ${sls:stage}-DoraCrawler

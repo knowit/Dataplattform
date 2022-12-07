@@ -8,16 +8,13 @@ dataplattform:
     - ../kms
     - ../glue
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -30,5 +27,5 @@ resources:
           Fn::Join:
             - ""
             - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-              - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
+              - !Sub "${ssm:/${sls:stage}/kms/key-id}"
         LogGroupName: /aws-glue/crawlers-role/Level4GlueRole-KMSGlueEncryptionConfigurations

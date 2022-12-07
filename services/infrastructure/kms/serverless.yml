@@ -8,16 +8,13 @@ dataplattform:
     - ../events
     - ../monitoring
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -25,14 +22,14 @@ resources:
     EncryptedS3Bucket:
       Type: "AWS::S3::Bucket"
       Properties:
-        BucketName: !Sub "${self:custom.stage}-kmsbucket-${AWS::AccountId}"
+        BucketName: !Sub "${sls:stage}-kmsbucket-${AWS::AccountId}"
         VersioningConfiguration:
           Status: Enabled
         BucketEncryption:
           ServerSideEncryptionConfiguration:
             - ServerSideEncryptionByDefault:
                 SSEAlgorithm: "aws:kms"
-                KMSMasterKeyID: !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
+                KMSMasterKeyID: !Sub "${ssm:/${sls:stage}/kms/key-id}"
               BucketKeyEnabled: true
         PublicAccessBlockConfiguration:
           BlockPublicAcls: true
@@ -43,6 +40,6 @@ resources:
   Outputs:
     KMSKey:
       Description: KMS key ID used for encryptedbucket
-      Value: !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
+      Value: !Sub "${ssm:/${sls:stage}/kms/key-id}"
       Export:
-        Name: ${self:custom.stage}-KMS-KeyID
+        Name: ${sls:stage}-KMS-KeyID

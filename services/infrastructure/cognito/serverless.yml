@@ -10,9 +10,9 @@ plugins:
   - serverless-plugin-scripts
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
+  stage: ${sls:stage} # Keep for parsing in policies.js
   policies: ${file(./policies.js)}
-  ssmParamName: /${self:custom.stage}/${self:service}/UserPoolClientId
+  ssmParamName: /${sls:stage}/${self:service}/UserPoolClientId
   editable:
     configureDescription: "Perform necessary post-deployment configurations for cognito to function properly."
   scripts:
@@ -26,8 +26,8 @@ provider:
   region: eu-central-1
   runtime: python3.9
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
-  stackName: ${self:service}-${self:custom.stage}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+  stackName: ${self:service}-${sls:stage}
   tracing:
     lambda: true
   versionFunctions: false
@@ -41,18 +41,18 @@ functions:
   migrate_user:
     handler: assign_group_to_new_users_lambda.migrate_user
     environment:
-      STAGE: ${self:custom.stage}
+      STAGE: ${sls:stage}
       SERVICE: ${self:service}
       USER_POOL_ID: !Ref CognitoUserPool
-    name: ${self:service}-${self:custom.stage}-migrate_user
-    description: Automaticcaly assign new users to level 1 group
+    name: ${self:service}-${sls:stage}-migrate_user
+    description: Automatically assign new users to level 1 group
     role: !GetAtt GroupManagementRole.Arn
     package:
       include:
         - '*.py'
     events:
       - cognitoUserPool:
-          pool: ${self:custom.stage}-dataplattform-user-pool
+          pool: ${sls:stage}-dataplattform-user-pool
           trigger: PostConfirmation
           existing: true
 
@@ -73,9 +73,9 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+          - !ImportValue ${sls:stage}-lambda-xray-tracing
         Policies:
-          - PolicyName: ${self:custom.stage}-GroupManagement-${self:service}
+          - PolicyName: ${sls:stage}-GroupManagement-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -86,7 +86,7 @@ resources:
     CognitoUserPool:
       Type: AWS::Cognito::UserPool
       Properties:
-        UserPoolName: ${self:custom.stage}-dataplattform-user-pool
+        UserPoolName: ${sls:stage}-dataplattform-user-pool
         AdminCreateUserConfig:
           AllowAdminCreateUserOnly: true
           UnusedAccountValidityDays: 7
@@ -107,7 +107,7 @@ resources:
     CognitoUserPoolClient:
       Type: AWS::Cognito::UserPoolClient
       Properties:
-        ClientName: ${self:custom.stage}-dataplattform-user-pool-client
+        ClientName: ${sls:stage}-dataplattform-user-pool-client
         UserPoolId: !Ref CognitoUserPool
         ExplicitAuthFlows:
           - ALLOW_USER_PASSWORD_AUTH
@@ -118,7 +118,7 @@ resources:
       Type: AWS::Cognito::UserPoolDomain
       Properties:
         UserPoolId: !Ref CognitoUserPool
-        Domain: !Sub '${self:custom.stage}-dataplattform-userpooldomain-${AWS::AccountId}'
+        Domain: !Sub '${sls:stage}-dataplattform-userpooldomain-${AWS::AccountId}'
 
     CognitoUserPoolGroupLevel1:
       Type: AWS::Cognito::UserPoolGroup
@@ -146,7 +146,7 @@ resources:
     AssumeRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}
+        RoleName: ${sls:stage}-${self:service}
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -157,7 +157,7 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+          - !ImportValue ${sls:stage}-lambda-xray-tracing
         Policies:
           - PolicyName: CanAssumeRole
             PolicyDocument:
@@ -179,7 +179,7 @@ resources:
     Level1:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level1
+        RoleName: ${sls:stage}-${self:service}-level1
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -194,7 +194,7 @@ resources:
     Level2:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level2
+        RoleName: ${sls:stage}-${self:service}-level2
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -209,7 +209,7 @@ resources:
     Level3:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level3
+        RoleName: ${sls:stage}-${self:service}-level3
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -226,16 +226,16 @@ resources:
     CognitoUserPoolOutput:
       Value: !GetAtt CognitoUserPool.Arn
       Export:
-        Name: ${self:custom.stage}-cognito-userPool
+        Name: ${sls:stage}-cognito-userPool
     AssumeRoleOutput:
       Value: !GetAtt AssumeRole.Arn
       Export:
-        Name: ${self:custom.stage}-assumeRole
+        Name: ${sls:stage}-assumeRole
     CognitoUserPoolId:
       Value: !Ref CognitoUserPool
       Export:
-        Name: ${self:custom.stage}-cognito-userPoolId
+        Name: ${sls:stage}-cognito-userPoolId
     CognitoUserPoolClientId:
       Value: !Ref CognitoUserPoolClient
       Export:
-        Name: ${self:custom.stage}-cognito-userPoolClientId
+        Name: ${sls:stage}-cognito-userPoolClientId

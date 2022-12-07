@@ -7,16 +7,15 @@ dataplattform:
     - ../routes
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  project: dataplattform-${self:custom.stage}
+  project: dataplattform-${sls:stage}
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.stage}-${self:service}
+  stackName: ${sls:stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.9
 
   tags:
@@ -33,14 +32,14 @@ resources:
     ingestApiGateway:
       Type: AWS::ApiGateway::RestApi
       Properties:
-        Name: ${self:custom.stage}-ingestApiGateway
+        Name: ${sls:stage}-ingestApiGateway
         Description: main input api gateway
     ingestDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: !ImportValue ${sls:stage}-routes-zoneid
         RecordSets:
-          - Name: ingest.${ssm:/${self:custom.stage}/routes/domain_name}
+          - Name: ingest.${ssm:/${sls:stage}/routes/domain_name}
             Type: A
             AliasTarget:
               DNSName:
@@ -55,7 +54,7 @@ resources:
       Value:
         Ref: ingestApiGateway
       Export:
-        Name: ${self:custom.stage}-ingestApiGateway-restApiId
+        Name: ${sls:stage}-ingestApiGateway-restApiId
 
     apiGatewayRestApiRootResourceId:
       Value:
@@ -63,4 +62,4 @@ resources:
           - ingestApiGateway
           - RootResourceId
       Export:
-        Name: ${self:custom.stage}-ingestApiGateway-rootResourceId
+        Name: ${sls:stage}-ingestApiGateway-rootResourceId

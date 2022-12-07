@@ -1,15 +1,15 @@
 ingest:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-ingest
+  name: ${sls:stage}-${self:service}-ingest
   description: ${self:custom.editable.description}
   role: !GetAtt IngestLambdaRole.Arn
   package:
     include:
       - '${self:custom.editable.srcDir}/*.py'
   environment:
-    STAGE: ${self:custom.stage}
+    STAGE: ${sls:stage}
     SERVICE: ${self:service}
-    DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+    DATALAKE: !Sub '${sls:stage}-kmsbucket-${AWS::AccountId}'
     ACCESS_PATH: ${self:custom.accessPath}
     DEFAULT_DATABASE: ${self:custom.editable.databaseName}
     SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
@@ -17,7 +17,7 @@ ingest:
   tags:
   events:
     - schedule:
-        name: ${self:custom.stage}-${self:service}-timer
+        name: ${sls:stage}-${self:service}-timer
         description: ${self:custom.editable.description}
         rate: ${self:custom.editable.scheduleRate}
         enabled: true
@@ -30,31 +30,31 @@ process:
             - EventQueue
             - Arn
         batchSize: 1
-  name: ${self:custom.stage}-${self:service}-process
+  name: ${sls:stage}-${self:service}-process
   description: ${self:custom.editable.description}
   role: !GetAtt ProcessLambdaRole.Arn
   package:
     include:
       - '${self:custom.editable.srcDir}/*.py'
   environment:
-    STAGE: ${self:custom.stage}
+    STAGE: ${sls:stage}
     SERVICE: ${self:service}
-    DATALAKE: !Sub '${self:custom.stage}-kmsbucket-${AWS::AccountId}'
+    DATALAKE: !Sub '${sls:stage}-kmsbucket-${AWS::AccountId}'
     ACCESS_PATH: ${self:custom.accessPath}
     DEFAULT_DATABASE: ${self:custom.editable.databaseName}
-    DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
+    DATA_UPDATE_TOPIC: !ImportValue ${sls:stage}-data-update-topic-arn
     ACCESS_LEVEL: ${self:custom.editable.accessLevel}
   tags:
 quicksight_usergroup_lambda:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightUsersHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-quicksight-usergroup-lambda
+  name: ${sls:stage}-${self:service}-quicksight-usergroup-lambda
   description: Adds new user groups in quicksight for new repos
   role: !GetAtt QuicksightUserGroupRole.Arn
   package:
     include:
       - '${self:custom.editable.srcDir}/*.py'
   environment:
-    STAGE: ${self:custom.stage}
+    STAGE: ${sls:stage}
     SERVICE: ${self:service}
   events:
     - eventBridge:
@@ -70,19 +70,19 @@ quicksight_usergroup_lambda:
               - Succeeded
 quicksight_register_users_lambda:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.registerUsersHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-quicksight-register-users-lambda
+  name: ${sls:stage}-${self:service}-quicksight-register-users-lambda
   description: Adds new users in quicksight
   role: !GetAtt QuicksightUserCreationRole.Arn
   package:
     include:
       - '${self:custom.editable.srcDir}/*.py'
   environment:
-    STAGE: ${self:custom.stage}
+    STAGE: ${sls:stage}
     SERVICE: ${self:service}
-    DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+    DATALAKE: !ImportValue ${sls:stage}-datalakeName
   events:
     - s3:
-        bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+        bucket: !Sub ${sls:stage}-datalake-bucket-${AWS::AccountId}
         event: s3:ObjectCreated:*
         rules:
           - prefix: data/level-3/dora/
@@ -90,14 +90,14 @@ quicksight_register_users_lambda:
         existing: true
 dataset_ingestion:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.quicksightIngestionHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-quicksight-ingestion-lambda
+  name: ${sls:stage}-${self:service}-quicksight-ingestion-lambda
   description: Performes ingestion to quicksight based on new updates to glue
   role: !GetAtt QuicksightIngestionRole.Arn
   package:
     include:
       - '${self:custom.editable.srcDir}/*.py'
   environment:
-    STAGE: ${self:custom.stage}
+    STAGE: ${sls:stage}
     SERVICE: ${self:service}
   events:
     - eventBridge:
@@ -113,18 +113,18 @@ dataset_ingestion:
               - Succeeded
 rolebindings_ingestion:
   handler: ${self:custom.editable.srcDir}/${self:custom.editable.rolebindingsIngestionHandlerFile}.handler
-  name: ${self:custom.stage}-${self:service}-rolebinding-ingestion-lambda
+  name: ${sls:stage}-${self:service}-rolebinding-ingestion-lambda
   description: Performes ingestion to quicksight rolebindings based on new updates to csv
   role: !GetAtt RolebindingIngestionRole.Arn
   package:
     include:
       - '${self:custom.editable.srcDir}/*.py'
   environment:
-    STAGE: ${self:custom.stage}
+    STAGE: ${sls:stage}
     SERVICE: ${self:service}
   events:
     - s3:
-        bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+        bucket: !Sub ${sls:stage}-datalake-bucket-${AWS::AccountId}
         event: s3:ObjectCreated:*
         rules:
           - prefix: data/level-3/dora/

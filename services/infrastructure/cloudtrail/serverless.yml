@@ -9,16 +9,13 @@ dataplattform:
     - ../monitoring
     - ../glue
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -27,7 +24,7 @@ resources:
       Type: AWS::S3::Bucket
       DeletionPolicy: Retain
       Properties:
-        BucketName: !Sub '${self:custom.stage}-cloudtrail-logging-${AWS::AccountId}'
+        BucketName: !Sub '${sls:stage}-cloudtrail-logging-${AWS::AccountId}'
         PublicAccessBlockConfiguration:
           BlockPublicAcls: true
           BlockPublicPolicy: false
@@ -111,7 +108,7 @@ resources:
           - DataResources:
               - Type: "AWS::S3::Object"
                 Values:
-                  - !Sub 'arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/'
+                  - !Sub 'arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}/'
             IncludeManagementEvents: True
             ReadWriteType: All
       DependsOn:

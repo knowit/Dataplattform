@@ -1,16 +1,13 @@
 # More documentation here: https://serverless.com/framework/docs/providers/aws/guide/serverless.yml/
 service: helloWorld
 
-custom:
-  stage: ${opt:stage, self:provider.stage} #define stage here to include opt:stage, if stage option is passed in with sls deploy
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.stage}-${self:service}
+  stackName: ${sls:stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../services/infrastructure/deploymentBucket/config.yml):bucketName, file(../../services/infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../../services/infrastructure/deploymentBucket/config.yml):bucketName, file(../../services/infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.9
   memorySize: 1024 # MB
   timeout: 6 # seconds
@@ -35,7 +32,7 @@ package:
 functions:
   helloWorld:
     handler: function_1.handler # fileName.functionNameInFile
-    name: ${self:custom.stage}-HelloWorld # Always begin name with stage
+    name: ${sls:stage}-HelloWorld # Always begin name with stage
     description: Hello world lambda <3
     package:
       include:

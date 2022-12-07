@@ -12,16 +12,13 @@ dataplattform:
     - ../dora-glue
     - ../../ingestion/dora
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -37,7 +34,7 @@ resources:
         Type: ATHENA
         DataSourceId: DoraWorkGroup-AthenaID
         Permissions:
-          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
+          - Principal: ${ssm:/${sls:stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSourcePermissions
               - quicksight:DescribeDataSource
@@ -55,10 +52,10 @@ resources:
         DataSourceParameters:
           S3Parameters:
             ManifestFileLocation:
-              Bucket: !Sub ${self:custom.stage}-datalake-bucket-${AWS::AccountId}
+              Bucket: !Sub ${sls:stage}-datalake-bucket-${AWS::AccountId}
               Key: data/level-3/dora/manifest.json
         Permissions:
-          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
+          - Principal: ${ssm:/${sls:stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSourcePermissions
               - quicksight:DescribeDataSource
@@ -88,7 +85,7 @@ resources:
                 ContainsHeader: true
                 Delimiter: ','
         Permissions:
-          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
+          - Principal: ${ssm:/${sls:stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSetPermissions
               - quicksight:DescribeDataSet
@@ -112,7 +109,7 @@ resources:
             CustomSql:
               DataSourceArn: !GetAtt AthenaDataSource.Arn
               Name: deploymentFrequency
-              SqlQuery: !Sub 'SELECT * FROM AwsDataCatalog.${self:custom.stage}_level_4_database.deploymentfrequency'
+              SqlQuery: !Sub 'SELECT * FROM AwsDataCatalog.${sls:stage}_level_4_database.deploymentfrequency'
               Columns:
                 - Name: partition_1
                   Type: STRING
@@ -123,7 +120,7 @@ resources:
           FormatVersion: VERSION_1
           PermissionPolicy: GRANT_ACCESS
         Permissions:
-          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
+          - Principal: ${ssm:/${sls:stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSetPermissions
               - quicksight:DescribeDataSet
@@ -147,7 +144,7 @@ resources:
             CustomSql:
               DataSourceArn: !GetAtt AthenaDataSource.Arn
               Name: DeploymentsNullValues
-              SqlQuery: !Sub 'SELECT * FROM AwsDataCatalog.${self:custom.stage}_level_4_database.github_deployments_with_null_values'
+              SqlQuery: !Sub 'SELECT * FROM AwsDataCatalog.${sls:stage}_level_4_database.github_deployments_with_null_values'
               Columns:
                 - Name: date_column
                   Type: DATETIME
@@ -160,7 +157,7 @@ resources:
           FormatVersion: VERSION_1
           PermissionPolicy: GRANT_ACCESS
         Permissions:
-          - Principal: ${ssm:/${self:custom.stage}/dora/quicksight_principal}
+          - Principal: ${ssm:/${sls:stage}/dora/quicksight_principal}
             Actions:
               - quicksight:UpdateDataSetPermissions
               - quicksight:DescribeDataSet

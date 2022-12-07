@@ -12,15 +12,14 @@ plugins:
   - serverless-plugin-scripts
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${sls:stage}-${self:service}
   bucketName: ${self:custom.service}-staticweb
   distributionAlias:
-    - ${ssm:/${self:custom.stage}/routes/domain_name}
-    - doc.${ssm:/${self:custom.stage}/routes/domain_name}
-  certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
-  cognitoClientId: ${ssm:/${self:custom.stage}/cognito/UserPoolClientId}
-  apiUrl: api.${ssm:/${self:custom.stage}/routes/domain_name}
+    - ${ssm:/${sls:stage}/routes/domain_name}
+    - doc.${ssm:/${sls:stage}/routes/domain_name}
+  certificate: ${ssm:/${sls:stage}/USEA1/sslIdentifier}
+  cognitoClientId: ${ssm:/${sls:stage}/cognito/UserPoolClientId}
+  apiUrl: api.${ssm:/${sls:stage}/routes/domain_name}
   scripts:
     hooks:
       after:deploy:finalize: python postDeploy.py --stack-name ${self:provider.stackName}
@@ -33,7 +32,7 @@ provider:
   stackName: ${self:custom.service}
   timeout: 25
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:
@@ -49,9 +48,9 @@ resources:
     docDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: !ImportValue ${sls:stage}-routes-zoneid
         RecordSets:
-          - Name: doc.${ssm:/${self:custom.stage}/routes/domain_name}
+          - Name: doc.${ssm:/${sls:stage}/routes/domain_name}
             Type: A
             AliasTarget:
               DNSName:
@@ -62,13 +61,13 @@ resources:
       Type: AWS::Route53::RecordSetGroup
       DependsOn: docDNSRecord
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: !ImportValue ${sls:stage}-routes-zoneid
         RecordSets:
-          - Name: ${ssm:/${self:custom.stage}/routes/domain_name}
+          - Name: ${ssm:/${sls:stage}/routes/domain_name}
             Type: A
             AliasTarget:
-              DNSName: doc.${ssm:/${self:custom.stage}/routes/domain_name}
-              HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+              DNSName: doc.${ssm:/${sls:stage}/routes/domain_name}
+              HostedZoneId: !ImportValue ${sls:stage}-routes-zoneid
 
     StaticS3BucketPolicy:
       Type: AWS::S3::BucketPolicy
@@ -128,6 +127,6 @@ resources:
       Value:
         "Fn::GetAtt": [Distribution, DomainName]
       Export:
-        Name: ${self:custom.stage}-api-documentation-url
+        Name: ${sls:stage}-api-documentation-url
     DistributionId:
       Value: !Ref Distribution

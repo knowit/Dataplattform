@@ -5,16 +5,13 @@ dataplattform:
   dependencies:
     - ../deploymentBucket
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -23,34 +20,34 @@ resources:
       Type: AWS::SNS::Topic
       Properties:
         DisplayName: NewReport
-        TopicName: ${self:custom.stage}-NewReport
+        TopicName: ${sls:stage}-NewReport
 
     DataUpdateTopic:
       Type: AWS::SNS::Topic
       Properties:
         DisplayName: DataUpdated
-        TopicName: ${self:custom.stage}-DataUpdate
+        TopicName: ${sls:stage}-DataUpdate
 
     DeleteReportTopic:
       Type: AWS::SNS::Topic
       Properties:
         DisplayName: DeleteReport
-        TopicName: ${self:custom.stage}-DeleteReport
+        TopicName: ${sls:stage}-DeleteReport
 
     AlarmTopic:
       Type: AWS::SNS::Topic
       Properties:
         DisplayName: CloudwatchAlarms
-        TopicName: ${self:custom.stage}-CloudwatchAlarms
+        TopicName: ${sls:stage}-CloudwatchAlarms
 
     TopicPolicy:
       Type: AWS::SNS::TopicPolicy
       Properties:
         PolicyDocument:
-          Id: ${self:custom.stage}-SystemTopicPolicy
+          Id: ${sls:stage}-SystemTopicPolicy
           Version: '2012-10-17'
           Statement:
-            - Sid: ${self:custom.stage}-LambdaTopicAccess
+            - Sid: ${sls:stage}-LambdaTopicAccess
               Effect: Allow
               Principal:
                 Service: lambda.amazonaws.com
@@ -62,7 +59,7 @@ resources:
               Condition:
                 StringEquals:
                   AWS:SourceAccount: !Ref 'AWS::AccountId'
-            - Sid: ${self:custom.stage}-CloudwatchTopicAccess
+            - Sid: ${sls:stage}-CloudwatchTopicAccess
               Effect: Allow
               Principal:
                 Service: cloudwatch.amazonaws.com
@@ -82,7 +79,7 @@ resources:
     ProcessTopicPolicy:
       Type: AWS::IAM::ManagedPolicy
       Properties:
-        ManagedPolicyName: ${self:custom.stage}-lambda-topic-access-role
+        ManagedPolicyName: ${sls:stage}-lambda-topic-access-role
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -96,28 +93,28 @@ resources:
       Value:
         Ref: NewReportTopic
       Export:
-        Name: ${self:custom.stage}-new-report-topic-arn
+        Name: ${sls:stage}-new-report-topic-arn
 
     DataUpdateTopicOutput:
       Value:
         Ref: DataUpdateTopic
       Export:
-        Name: ${self:custom.stage}-data-update-topic-arn
+        Name: ${sls:stage}-data-update-topic-arn
 
     DeleteReportTopicOutput:
       Value:
         Ref: DeleteReportTopic
       Export:
-        Name: ${self:custom.stage}-delete-report-topic-arn
+        Name: ${sls:stage}-delete-report-topic-arn
 
     AlarmTopicOutput:
       Value:
         Ref: AlarmTopic
       Export:
-        Name: ${self:custom.stage}-alarm-topic-arn
+        Name: ${sls:stage}-alarm-topic-arn
 
     LambdaTopicAccessOutput:
       Value:
         Ref: ProcessTopicPolicy
       Export:
-        Name: ${self:custom.stage}-process-lambda-topic-access-role
+        Name: ${sls:stage}-process-lambda-topic-access-role

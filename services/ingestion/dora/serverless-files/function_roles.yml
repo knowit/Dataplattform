@@ -2,7 +2,7 @@ Resources:
   IngestLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.stage}-${self:service}-ingest-role
+      RoleName: ${sls:stage}-${self:service}-ingest-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -14,7 +14,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}
+        - PolicyName: ${sls:stage}-EncryptedBucketIO-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -27,9 +27,9 @@ Resources:
                   - s3:DeleteObjects
                   - s3:DeleteObjectVersion
                 Resource:
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-        - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}/*
+        - PolicyName: ${sls:stage}-EncryptedBucketKMS-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -44,8 +44,8 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
-        - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}-List
+                      - !Sub "${ssm:/${sls:stage}/kms/key-id}"
+        - PolicyName: ${sls:stage}-EncryptedBucketIO-${self:service}-List
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -55,9 +55,9 @@ Resources:
                   - s3:ListBucketVersions
                   - s3:GetBucketLocation
                 Resource:
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-        - PolicyName: ${self:custom.stage}-${self:service}-ingest-sqsRole
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}/*
+        - PolicyName: ${sls:stage}-${self:service}-ingest-sqsRole
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -67,18 +67,18 @@ Resources:
                   - sqs:SendMessageBatch
                   - sqs:SendMessage
                 Resource: !GetAtt EventQueue.Arn
-        - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+        - PolicyName: ${sls:stage}-ParameterStore-${self:service}
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
                 Action:
                   - 'ssm:GetParameter*'
-                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*
+                Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${sls:stage}/${self:service}/*
   QuicksightUserGroupRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.stage}-${self:service}-quicksight-usergroup-lambda-role
+      RoleName: ${sls:stage}-${self:service}-quicksight-usergroup-lambda-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -90,7 +90,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: ${self:custom.stage}-Glue-${self:service}
+        - PolicyName: ${sls:stage}-Glue-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -101,9 +101,9 @@ Resources:
                   - 'glue:GetDatabase'
                 Resource:
                   - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*
-        - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${sls:stage}_${self:custom.editable.databaseName}_database
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_${self:custom.editable.databaseName}_database/*
+        - PolicyName: ${sls:stage}-Quicksight-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -114,7 +114,7 @@ Resources:
                   - 'quicksight:HeadObject'
                 Resource:
                   - "*"
-        - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+        - PolicyName: ${sls:stage}-EncryptedBucketKMS-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -129,8 +129,8 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
-        - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+                      - !Sub "${ssm:/${sls:stage}/kms/key-id}"
+        - PolicyName: ${sls:stage}-DatalakeIO-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -144,14 +144,14 @@ Resources:
                   - s3:DeleteObjectVersion
                   - s3:DeleteObject
                 Resource:
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
-                  - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}*
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}*
+                  - !Sub arn:aws:s3:::${sls:stage}-datalake-bucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-datalake-bucket-${AWS::AccountId}*
   QuicksightUserCreationRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.stage}-${self:service}-quicksight-usercreation-lambda-role
+      RoleName: ${sls:stage}-${self:service}-quicksight-usercreation-lambda-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -163,7 +163,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
+        - PolicyName: ${sls:stage}-Quicksight-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -179,7 +179,7 @@ Resources:
                   - 'quicksight:CreateGroupMembership'
                 Resource:
                   - "*"
-        - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+        - PolicyName: ${sls:stage}-DatalakeIO-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -193,12 +193,12 @@ Resources:
                   - s3:DeleteObjectVersion
                   - s3:DeleteObject
                 Resource:
-                  - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-datalake-bucket-${AWS::AccountId}*
+                  - !Sub arn:aws:s3:::${sls:stage}-datalake-bucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-datalake-bucket-${AWS::AccountId}*
   ProcessLambdaRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.stage}-${self:service}-process-role
+      RoleName: ${sls:stage}-${self:service}-process-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -209,9 +209,9 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-        - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
+        - !ImportValue ${sls:stage}-process-lambda-topic-access-role
       Policies:
-        - PolicyName: ${self:custom.stage}-Glue-${self:service}
+        - PolicyName: ${sls:stage}-Glue-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -221,9 +221,9 @@ Resources:
                   - 'glue:GetDatabase'
                 Resource:
                   - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*
-        - PolicyName: ${self:custom.stage}-Athena-${self:service}
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${sls:stage}_${self:custom.editable.databaseName}_database
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_${self:custom.editable.databaseName}_database/*
+        - PolicyName: ${sls:stage}-Athena-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -234,7 +234,7 @@ Resources:
                   - 'athena:GetQueryResults'
                 Resource:
                   !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/primary
-        - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+        - PolicyName: ${sls:stage}-DatalakeIO-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -248,9 +248,9 @@ Resources:
                   - s3:DeleteObjectVersion
                   - s3:DeleteObject
                 Resource:
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
-        - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}*
+        - PolicyName: ${sls:stage}-DatalakeBucket-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -260,9 +260,9 @@ Resources:
                   - s3:ListBucketVersions
                   - s3:GetBucketLocation
                 Resource:
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}*
-        - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}*
+        - PolicyName: ${sls:stage}-EncryptedBucketKMS-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -277,8 +277,8 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
-        - PolicyName: ${self:custom.stage}-glue-${self:service}-role
+                      - !Sub "${ssm:/${sls:stage}/kms/key-id}"
+        - PolicyName: ${sls:stage}-glue-${self:service}-role
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -288,13 +288,13 @@ Resources:
                   - glue:UpdateCrawler
                 Resource:
                   - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${sls:stage}_*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${sls:stage}_*
   RolebindingIngestionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.stage}-${self:service}-quicksight-ingestion-lambda-role
+      RoleName: ${sls:stage}-${self:service}-quicksight-ingestion-lambda-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -306,7 +306,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
+        - PolicyName: ${sls:stage}-Quicksight-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -318,7 +318,7 @@ Resources:
   QuicksightIngestionRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.stage}-${self:service}-rolebindings-ingestion-lambda-role
+      RoleName: ${sls:stage}-${self:service}-rolebindings-ingestion-lambda-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -330,7 +330,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: ${self:custom.stage}-Quicksight-${self:service}
+        - PolicyName: ${sls:stage}-Quicksight-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -342,7 +342,7 @@ Resources:
   ConfigurationRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: ${self:custom.stage}-${self:service}-configuration-lambda-role
+      RoleName: ${sls:stage}-${self:service}-configuration-lambda-role
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -354,7 +354,7 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
       Policies:
-        - PolicyName: ${self:custom.stage}-start-ingestion-${self:service}
+        - PolicyName: ${sls:stage}-start-ingestion-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -362,8 +362,8 @@ Resources:
                 Action:
                   - 'lambda:InvokeFunction'
                 Resource:
-                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${self:custom.stage}-${self:service}-ingest
-        - PolicyName: ${self:custom.stage}-start-crawler-${self:service}
+                  - !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${sls:stage}-${self:service}-ingest
+        - PolicyName: ${sls:stage}-start-crawler-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -373,7 +373,7 @@ Resources:
                   - 'glue:GetCrawler'
                 Resource:
                   - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/DoraCrawlers
-        - PolicyName: ${self:custom.stage}-athena-${self:service}
+        - PolicyName: ${sls:stage}-athena-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -385,7 +385,7 @@ Resources:
                   - 'athena:StartQueryExecution'
                 Resource:
                   - !Sub arn:aws:athena:${AWS::Region}:${AWS::AccountId}:workgroup/DoraWorkgroups
-        - PolicyName: ${self:custom.stage}-s3-${self:service}
+        - PolicyName: ${sls:stage}-s3-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -399,11 +399,11 @@ Resources:
                   - 's3:AbortMultipartUpload'
                   - 's3:PutObject'
                 Resource:
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/Athena-logs/
-                  - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/Athena-logs/*
-        - PolicyName: ${self:custom.stage}-EncryptedBucketKMS-${self:service}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}/*
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}/Athena-logs/
+                  - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}/Athena-logs/*
+        - PolicyName: ${sls:stage}-EncryptedBucketKMS-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -418,8 +418,8 @@ Resources:
                   Fn::Join:
                     - ""
                     - - !Sub arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/
-                      - !Sub "${ssm:/${self:custom.stage}/kms/key-id}"
-        - PolicyName: ${self:custom.stage}-Glue-${self:service}
+                      - !Sub "${ssm:/${sls:stage}/kms/key-id}"
+        - PolicyName: ${sls:stage}-Glue-${self:service}
           PolicyDocument:
             Version: "2012-10-17"
             Statement:
@@ -432,5 +432,5 @@ Resources:
                   - 'glue:CreateTable'
                 Resource:
                   - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database
-                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${sls:stage}_${self:custom.editable.databaseName}_database
+                  - !Sub arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_${self:custom.editable.databaseName}_database/*

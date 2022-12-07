@@ -7,8 +7,7 @@ dataplattform:
 
 custom:
   project: dataplattform
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${sls:stage}-${self:service}
   level3StagingDir: data/level-3/athena-stage/
   level2StagingDir: data/level-2/athena-stage/
   level1StagingDir: data/level-1/athena-stage/
@@ -23,7 +22,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket: #provide a bucket name to where serverless assets should to be uploaded
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
   tags:
@@ -92,24 +91,24 @@ resources:
     DataLakeArn:
       Value: !GetAtt DataLake.Arn
       Export:
-        Name: ${self:custom.stage}-datalakeArn
+        Name: ${sls:stage}-datalakeArn
     DataLakeName:
       Value: ${self:resources.Resources.DataLake.Properties.BucketName}
       Export:
-        Name: ${self:custom.stage}-datalakeName
+        Name: ${sls:stage}-datalakeName
     DefaultLevel3StagingDir:
       Value: ${self:custom.level3StagingDir}
       Export:
-        Name: ${self:custom.stage}-default-level-3-staging-dir
+        Name: ${sls:stage}-default-level-3-staging-dir
     DefaultLevel2StagingDir:
       Value: ${self:custom.level2StagingDir}
       Export:
-        Name: ${self:custom.stage}-default-level-2-staging-dir
+        Name: ${sls:stage}-default-level-2-staging-dir
     DefaultLevel1StagingDir:
       Value: ${self:custom.level1StagingDir}
       Export:
-        Name: ${self:custom.stage}-default-level-1-staging-dir
+        Name: ${sls:stage}-default-level-1-staging-dir
     LogBucketName:
       Value: ${self:resources.Resources.LogBucket.Properties.BucketName}
       Export:
-        Name: ${self:custom.stage}-logBucketName
+        Name: ${sls:stage}-logBucketName

@@ -7,8 +7,7 @@ dataplattform:
 
 custom:
   project: dataplattform
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${sls:stage}-${self:service}
   VpcCIDR:
     dev: 10.194.0.0/18
     pre-prod: 10.194.128.0/18
@@ -30,14 +29,14 @@ custom:
     pre-prod: 10.194.131.0/24
     prod: 10.194.195.0/24
 
-  PersonalMetadataTable: !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${self:custom.stage}_personal_metadata_table'
+  PersonalMetadataTable: !Sub 'arn:aws:dynamodb:${self:provider.region}:${AWS::AccountId}:table/${sls:stage}_personal_metadata_table'
 
 provider:
   name: aws
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -45,20 +44,20 @@ resources:
     VPC:
       Type: AWS::EC2::VPC
       Properties:
-        CidrBlock: ${self:custom.VpcCIDR.${self:custom.stage}}
+        CidrBlock: ${self:custom.VpcCIDR.${sls:stage}}
         EnableDnsHostnames: true
         EnableDnsSupport: true
         InstanceTenancy: default
         Tags:
           - Key: Name
-            Value: ${self:service}-${self:custom.project}-${self:custom.stage}
+            Value: ${self:service}-${self:custom.project}-${sls:stage}
 
     InternetGateway:
       Type: AWS::EC2::InternetGateway
       Properties:
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-${self:custom.project}-igw
+            Value: ${sls:stage}-${self:custom.project}-igw
 
     InternetGatewayAttachment:
       Type: AWS::EC2::VPCGatewayAttachment
@@ -70,22 +69,22 @@ resources:
       Type: AWS::EC2::Subnet
       Properties:
         AvailabilityZone: !Select [0, !GetAZs ""]
-        CidrBlock: ${self:custom.PublicSubnet1CIDR.${self:custom.stage}}
+        CidrBlock: ${self:custom.PublicSubnet1CIDR.${sls:stage}}
         MapPublicIpOnLaunch: true
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-public-subnet-1
+            Value: ${sls:stage}-public-subnet-1
         VpcId: !Ref VPC
 
     PublicSubnet2:
       Type: AWS::EC2::Subnet
       Properties:
         AvailabilityZone: !Select [1, !GetAZs ""]
-        CidrBlock: ${self:custom.PublicSubnet2CIDR.${self:custom.stage}}
+        CidrBlock: ${self:custom.PublicSubnet2CIDR.${sls:stage}}
         MapPublicIpOnLaunch: true
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-public-subnet-2
+            Value: ${sls:stage}-public-subnet-2
         VpcId: !Ref VPC
 
     PublicRouteTable:
@@ -93,7 +92,7 @@ resources:
       Properties:
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-public-route-table
+            Value: ${sls:stage}-public-route-table
         VpcId: !Ref VPC
 
     PublicRoute:
@@ -119,22 +118,22 @@ resources:
       Type: AWS::EC2::Subnet
       Properties:
         AvailabilityZone: !Select [0, !GetAZs ""]
-        CidrBlock: ${self:custom.PrivateSubnet1CIDR.${self:custom.stage}}
+        CidrBlock: ${self:custom.PrivateSubnet1CIDR.${sls:stage}}
         MapPublicIpOnLaunch: false
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-private-subnet-1
+            Value: ${sls:stage}-private-subnet-1
         VpcId: !Ref VPC
 
     PrivateSubnet2:
       Type: AWS::EC2::Subnet
       Properties:
         AvailabilityZone: !Select [1, !GetAZs ""]
-        CidrBlock: ${self:custom.PrivateSubnet2CIDR.${self:custom.stage}}
+        CidrBlock: ${self:custom.PrivateSubnet2CIDR.${sls:stage}}
         MapPublicIpOnLaunch: false
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-private-subnet-2
+            Value: ${sls:stage}-private-subnet-2
         VpcId: !Ref VPC
 
     PrivateRouteTable:
@@ -142,7 +141,7 @@ resources:
       Properties:
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-private-route-table
+            Value: ${sls:stage}-private-route-table
         VpcId: !Ref VPC
 
     PrivateSubnet1RouteTableAssociation:
@@ -163,15 +162,15 @@ resources:
         GroupDescription: Allows inbound traffic from the public subnets.
         SecurityGroupIngress:
           - IpProtocol: -1
-            CidrIp: ${self:custom.PublicSubnet1CIDR.${self:custom.stage}}
+            CidrIp: ${self:custom.PublicSubnet1CIDR.${sls:stage}}
           - IpProtocol: -1
-            CidrIp: ${self:custom.PublicSubnet2CIDR.${self:custom.stage}}
+            CidrIp: ${self:custom.PublicSubnet2CIDR.${sls:stage}}
         SecurityGroupEgress:
           - IpProtocol: -1
             CidrIp: 0.0.0.0/0
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-public-subnet-default-sg
+            Value: ${sls:stage}-public-subnet-default-sg
         VpcId: !Ref VPC
 
     PrivateSubnetSecurityGroup:
@@ -180,15 +179,15 @@ resources:
         GroupDescription: Allows inbound traffic from the private subnets.
         SecurityGroupIngress:
           - IpProtocol: -1
-            CidrIp: ${self:custom.PrivateSubnet1CIDR.${self:custom.stage}}
+            CidrIp: ${self:custom.PrivateSubnet1CIDR.${sls:stage}}
           - IpProtocol: -1
-            CidrIp: ${self:custom.PrivateSubnet2CIDR.${self:custom.stage}}
+            CidrIp: ${self:custom.PrivateSubnet2CIDR.${sls:stage}}
         SecurityGroupEgress:
           - IpProtocol: -1
             CidrIp: 0.0.0.0/0
         Tags:
           - Key: Name
-            Value: ${self:custom.stage}-private-subnet-default-sg
+            Value: ${sls:stage}-private-subnet-default-sg
         VpcId: !Ref VPC
 
     VPCEndpoint:

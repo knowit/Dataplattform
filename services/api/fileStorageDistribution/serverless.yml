@@ -9,11 +9,10 @@ dataplattform:
     - ../../infrastructure/routes
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${sls:stage}-${self:service}
   userPoolRegion: eu-central-1
-  publicBucketName: ${cf:${self:custom.stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
-  S3PublicOriginAccessIdentity: ${cf:${self:custom.stage}-raw-storage-for-dataplattform.S3PublicOriginAccessIdentity}
+  publicBucketName: ${cf:${sls:stage}-raw-storage-for-dataplattform.PublicRawStorageBucketName}
+  S3PublicOriginAccessIdentity: ${cf:${sls:stage}-raw-storage-for-dataplattform.S3PublicOriginAccessIdentity}
   publicDomainName: ${self:custom.publicBucketName}.s3.amazonaws.com
   publicDomainId: custom/${self:custom.publicDomainName}
   publicFrontOrigin:
@@ -22,12 +21,12 @@ custom:
     S3OriginConfig:
       OriginAccessIdentity: origin-access-identity/cloudfront/${self:custom.S3PublicOriginAccessIdentity}
 
-  userPoolId: ${cf:cognito-${self:custom.stage}.CognitoUserPoolId}
+  userPoolId: ${cf:cognito-${sls:stage}.CognitoUserPoolId}
   scripts:
     hooks:
       "before:deploy:deploy": python preDeploy.py --region ${self:custom.userPoolRegion} --userpool_id ${self:custom.userPoolId}
-  distributionAlias: storage.${ssm:/${self:custom.stage}/routes/domain_name}
-  certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
+  distributionAlias: storage.${ssm:/${sls:stage}/routes/domain_name}
+  certificate: ${ssm:/${sls:stage}/USEA1/sslIdentifier}
   pythonRequirements:
     dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
@@ -46,16 +45,16 @@ provider:
   stackName: ${self:custom.service}
   runtime: python3.9
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
 
 resources:
   Resources:
     storageDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: !ImportValue ${sls:stage}-routes-zoneid
         RecordSets:
-          - Name: storage.${ssm:/${self:custom.stage}/routes/domain_name}
+          - Name: storage.${ssm:/${sls:stage}/routes/domain_name}
             Type: A
             AliasTarget:
               DNSName:
@@ -67,7 +66,7 @@ resources:
       Properties:
         DistributionConfig:
           Aliases:
-            - ${self:custom.stage}-${self:custom.distributionAlias}
+            - ${sls:stage}-${self:custom.distributionAlias}
           Origins:
             - ${self:custom.publicFrontOrigin}
           DefaultCacheBehavior:

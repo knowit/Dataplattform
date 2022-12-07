@@ -17,7 +17,7 @@ const parsedYaml = YAML.parse(file, options={
 
 module.exports = serverless => {
     const stage = parsedYaml.custom.stage;
-    const service = parsedYaml.service.service
+    const service = parsedYaml.service;
 
     const commonStatement = [
         {

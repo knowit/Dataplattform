@@ -8,7 +8,6 @@ dataplattform:
     - ../routes
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
   allowedMethods:
     - GET
     - HEAD
@@ -24,17 +23,17 @@ custom:
     - Access-Control-Request-Method
     - Origin
     - Authorization
-  distributionAlias: api.${ssm:/${self:custom.stage}/routes/domain_name}
-  certificate: ${ssm:/${self:custom.stage}/USEA1/sslIdentifier}
-  originDomain: !ImportValue ${self:custom.stage}-DataAPI-Gateway-url
+  distributionAlias: api.${ssm:/${sls:stage}/routes/domain_name}
+  certificate: ${ssm:/${sls:stage}/USEA1/sslIdentifier}
+  originDomain: !ImportValue ${sls:stage}-DataAPI-Gateway-url
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -49,8 +48,8 @@ resources:
           Origins:
             - DomainName: ${self:custom.originDomain}
 
-              OriginPath: /${self:custom.stage}
-              Id: ${self:custom.stage}-data-api-origin
+              OriginPath: /${sls:stage}
+              Id: ${sls:stage}-data-api-origin
               CustomOriginConfig:
                 HTTPSPort: 443
                 OriginProtocolPolicy: https-only
@@ -58,7 +57,7 @@ resources:
                   - TLSv1.2
 
           DefaultCacheBehavior:
-            TargetOriginId: ${self:custom.stage}-data-api-origin
+            TargetOriginId: ${sls:stage}-data-api-origin
             ForwardedValues:
               QueryString: true
               Headers: ${self:custom.forwardedHeaders}
@@ -79,9 +78,9 @@ resources:
     apiDNSRecord:
       Type: AWS::Route53::RecordSetGroup
       Properties:
-        HostedZoneId: !ImportValue ${self:custom.stage}-routes-zoneid
+        HostedZoneId: !ImportValue ${sls:stage}-routes-zoneid
         RecordSets:
-          - Name: api.${ssm:/${self:custom.stage}/routes/domain_name}
+          - Name: api.${ssm:/${sls:stage}/routes/domain_name}
             Type: A
             AliasTarget:
               DNSName:

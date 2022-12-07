@@ -24,11 +24,10 @@ custom:
     accessLevel: level-2
     dataFolder: slack
   project: dataplattform
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${sls:stage}-${self:service}
   accessPath: data/${self:custom.editable.accessLevel}/${self:custom.editable.dataFolder}/
-  sqsQueueName: ${self:custom.stage}-${self:service}-sqs.fifo
-  sqsQueueDLName: ${self:custom.stage}-${self:service}-sqs-dl.fifo
+  sqsQueueName: ${sls:stage}-${self:service}-sqs.fifo
+  sqsQueueDLName: ${sls:stage}-${self:service}-sqs-dl.fifo
   pythonRequirements:
     dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
@@ -40,17 +39,17 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.stage}-${self:service}
+  stackName: ${sls:stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.9
   memorySize: 1024
   # imports api gateway resources exported by ingestApiGateway service
   apiGateway:
     restApiId:
-      'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-restApiId
+      'Fn::ImportValue': ${sls:stage}-ingestApiGateway-restApiId
     restApiRootResourceId:
-      'Fn::ImportValue': ${self:custom.stage}-ingestApiGateway-rootResourceId
+      'Fn::ImportValue': ${sls:stage}-ingestApiGateway-rootResourceId
   tracing:
     lambda: true
   tags:
@@ -70,16 +69,16 @@ package:
 functions:
   ingest:
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
-    name: ${self:custom.stage}-${self:service}-ingest
+    name: ${sls:stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     package:
       include:
         - '${self:custom.editable.srcDir}/*.py'
     environment:
-      STAGE: ${self:custom.stage}
+      STAGE: ${sls:stage}
       SERVICE: ${self:service}
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      DATALAKE: !ImportValue ${sls:stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
       SQS_QUEUE_NAME: ${self:custom.sqsQueueName}
@@ -99,7 +98,7 @@ functions:
               - EventQueue
               - Arn
           batchSize: 1
-    name: ${self:custom.stage}-${self:service}-process
+    name: ${sls:stage}-${self:service}-process
     timeout: ${self:custom.editable.timeout}
     description: ${self:custom.editable.description}
     role: !GetAtt ProcessLambdaRole.Arn
@@ -107,12 +106,12 @@ functions:
       include:
         - '${self:custom.editable.srcDir}/*.py'
     environment:
-      STAGE: ${self:custom.stage}
+      STAGE: ${sls:stage}
       SERVICE: ${self:service}
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
+      DATALAKE: !ImportValue ${sls:stage}-datalakeName
       ACCESS_PATH: ${self:custom.accessPath}
       DEFAULT_DATABASE: ${self:custom.editable.databaseName}
-      DATA_UPDATE_TOPIC: !ImportValue ${self:custom.stage}-data-update-topic-arn
+      DATA_UPDATE_TOPIC: !ImportValue ${sls:stage}-data-update-topic-arn
       ACCESS_LEVEL: ${self:custom.editable.accessLevel}
 
 resources:
@@ -120,7 +119,7 @@ resources:
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
+        RoleName: ${sls:stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -131,9 +130,9 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+          - !ImportValue ${sls:stage}-lambda-xray-tracing
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+          - PolicyName: ${sls:stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -147,9 +146,9 @@ resources:
                   Resource:
                     - Fn::Join:
                         - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - - !ImportValue ${sls:stage}-datalakeArn
                           - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-sqsRole
+          - PolicyName: ${sls:stage}-test-${self:service}-${self:custom.editable.ingestHandlerFile}-sqsRole
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -159,18 +158,18 @@ resources:
                     - sqs:SendMessageBatch
                     - sqs:SendMessage
                   Resource: !GetAtt EventQueue.Arn
-          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+          - PolicyName: ${sls:stage}-ParameterStore-${self:service}
             PolicyDocument:
               Version: '2012-10-17'
               Statement:
                 - Effect: Allow
                   Action:
                     - 'ssm:GetParameter*'
-                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${sls:stage}/${self:service}/*'
     ProcessLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.processHandlerFile}-role
+        RoleName: ${sls:stage}-${self:service}-${self:custom.editable.processHandlerFile}-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -181,10 +180,10 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-          - !ImportValue ${self:custom.stage}-process-lambda-topic-access-role
-          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+          - !ImportValue ${sls:stage}-process-lambda-topic-access-role
+          - !ImportValue ${sls:stage}-lambda-xray-tracing
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeIO-${self:service}
+          - PolicyName: ${sls:stage}-DatalakeIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -198,9 +197,9 @@ resources:
                   Resource:
                     - Fn::Join:
                         - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - - !ImportValue ${sls:stage}-datalakeArn
                           - /${self:custom.accessPath}*
-          - PolicyName: ${self:custom.stage}-DatalakeBucket-${self:service}
+          - PolicyName: ${sls:stage}-DatalakeBucket-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -211,9 +210,9 @@ resources:
                   Resource:
                     - Fn::Join:
                         - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - - !ImportValue ${sls:stage}-datalakeArn
                           - '*'
-          - PolicyName: ${self:custom.stage}-glue-${self:service}-role
+          - PolicyName: ${sls:stage}-glue-${self:service}-role
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -223,9 +222,9 @@ resources:
                     - glue:UpdateCrawler
                   Resource:
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${sls:stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:crawler/${sls:stage}_*'
     EventQueue:
       Type: AWS::SQS::Queue
       Properties:

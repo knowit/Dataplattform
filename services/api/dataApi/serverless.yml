@@ -12,8 +12,7 @@ dataplattform:
 
 custom:
   project: dataplattform
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
+  service: ${sls:stage}-${self:service}
   wsgi:
     app: app.app
     packRequirements: false
@@ -40,9 +39,9 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.stage}-${self:service}
+  stackName: ${sls:stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.9
   memorySize: 1024
   timeout: 28
@@ -69,7 +68,7 @@ functions:
     handler: wsgi_handler.handler
     name: ${self:custom.service}
     description: Dataplattform Data API
-    role: !ImportValue ${self:custom.stage}-assumeRole
+    role: !ImportValue ${sls:stage}-assumeRole
     package:
       include:
         - 'app.py'
@@ -77,15 +76,15 @@ functions:
         - 'common_lib/**/*.py'
         - 'common_lib/requirements.txt'
     environment:
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
-      STAGE: ${self:custom.stage}
-      AUTHURL: auth.${ssm:/${self:custom.stage}/routes/domain_name}
+      DATALAKE: !ImportValue ${sls:stage}-datalakeName
+      STAGE: ${sls:stage}
+      AUTHURL: auth.${ssm:/${sls:stage}/routes/domain_name}
 
-      NEW_REPORT_TOPIC: !ImportValue ${self:custom.stage}-new-report-topic-arn
-      DELETE_REPORT_TOPIC: !ImportValue ${self:custom.stage}-delete-report-topic-arn
-      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
-      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-2-staging-dir
-      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-1-staging-dir
+      NEW_REPORT_TOPIC: !ImportValue ${sls:stage}-new-report-topic-arn
+      DELETE_REPORT_TOPIC: !ImportValue ${sls:stage}-delete-report-topic-arn
+      LEVEL_3_STAGING_DIR: !ImportValue ${sls:stage}-default-level-3-staging-dir
+      LEVEL_2_STAGING_DIR: !ImportValue ${sls:stage}-default-level-2-staging-dir
+      LEVEL_1_STAGING_DIR: !ImportValue ${sls:stage}-default-level-1-staging-dir
     events:
       - http:
           method: ANY
@@ -119,18 +118,18 @@ functions:
     # onSuccess: xxx:xxx:target
     # onFailure: xxx:xxx:target
     environment:
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
-      LEVEL_3_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-3-staging-dir
-      LEVEL_2_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-2-staging-dir
-      LEVEL_1_STAGING_DIR: !ImportValue ${self:custom.stage}-default-level-1-staging-dir
-      STAGE: ${self:custom.stage}
+      DATALAKE: !ImportValue ${sls:stage}-datalakeName
+      LEVEL_3_STAGING_DIR: !ImportValue ${sls:stage}-default-level-3-staging-dir
+      LEVEL_2_STAGING_DIR: !ImportValue ${sls:stage}-default-level-2-staging-dir
+      LEVEL_1_STAGING_DIR: !ImportValue ${sls:stage}-default-level-1-staging-dir
+      STAGE: ${sls:stage}
     events:
       - sns:
-          arn: !ImportValue ${self:custom.stage}-new-report-topic-arn
-          topicName: ${self:custom.stage}-NewReport
+          arn: !ImportValue ${sls:stage}-new-report-topic-arn
+          topicName: ${sls:stage}-NewReport
       - sns:
-          arn: !ImportValue ${self:custom.stage}-data-update-topic-arn
-          topicName: ${self:custom.stage}-DataUpdate
+          arn: !ImportValue ${sls:stage}-data-update-topic-arn
+          topicName: ${sls:stage}-DataUpdate
 
   CacheDeleter:
     handler: functions.cache_deleter.handler
@@ -143,12 +142,12 @@ functions:
         - 'functions/requirements.txt'
         - 'functions/__init__.py'
     environment:
-      DATALAKE: !ImportValue ${self:custom.stage}-datalakeName
-      STAGE: ${self:custom.stage}
+      DATALAKE: !ImportValue ${sls:stage}-datalakeName
+      STAGE: ${sls:stage}
     events:
       - sns:
-          arn: !ImportValue ${self:custom.stage}-delete-report-topic-arn
-          topicName: ${self:custom.stage}-DeleteReport
+          arn: !ImportValue ${sls:stage}-delete-report-topic-arn
+          topicName: ${sls:stage}-DeleteReport
 
 resources:
   Resources:
@@ -158,13 +157,13 @@ resources:
         IdentitySource: method.request.header.authorization
         Name: DataplattformDataAPIAuthorizer
         ProviderARNs:
-          - !ImportValue ${self:custom.stage}-cognito-userPool
+          - !ImportValue ${sls:stage}-cognito-userPool
         RestApiId: !Ref ApiGatewayRestApi
         Type: COGNITO_USER_POOLS
     ReportsTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.stage}_reports_table
+        TableName: ${sls:stage}_reports_table
         AttributeDefinitions:
           - AttributeName: name
             AttributeType: S
@@ -189,7 +188,7 @@ resources:
               Action: sts:AssumeRole
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+          - !ImportValue ${sls:stage}-lambda-xray-tracing
         Policies:
           - PolicyName: ${self:custom.service}-ReportCache-policy
             PolicyDocument:
@@ -200,7 +199,7 @@ resources:
                     - dynamodb:Scan
                     - dynamodb:GetItem
                     - dynamodb:UpdateItem
-                  Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_reports_table'
+                  Resource: !Sub 'arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_reports_table'
                 - Effect: Allow
                   Action:
                     - s3:GetObject
@@ -211,9 +210,9 @@ resources:
                   Resource:
                     Fn::Join:
                       - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                      - - !ImportValue ${sls:stage}-datalakeArn
                         - "/"
-                        - !ImportValue ${self:custom.stage}-default-level-3-staging-dir
+                        - !ImportValue ${sls:stage}-default-level-3-staging-dir
                         - "*"
                 - Effect: Allow
                   Action:
@@ -225,9 +224,9 @@ resources:
                   Resource:
                     Fn::Join:
                       - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                      - - !ImportValue ${sls:stage}-datalakeArn
                         - "/"
-                        - !ImportValue ${self:custom.stage}-default-level-2-staging-dir
+                        - !ImportValue ${sls:stage}-default-level-2-staging-dir
                         - "*"
                 - Effect: Allow
                   Action:
@@ -239,9 +238,9 @@ resources:
                   Resource:
                     Fn::Join:
                       - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                      - - !ImportValue ${sls:stage}-datalakeArn
                         - "/"
-                        - !ImportValue ${self:custom.stage}-default-level-1-staging-dir
+                        - !ImportValue ${sls:stage}-default-level-1-staging-dir
                         - "*"
                 - Effect: Allow
                   Action:
@@ -250,7 +249,7 @@ resources:
                   Resource:
                     Fn::Join:
                       - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                      - - !ImportValue ${sls:stage}-datalakeArn
                         - /reports/*
                 - Effect: Allow
                   Action:
@@ -258,7 +257,7 @@ resources:
                   Resource:
                     Fn::Join:
                       - ""
-                      - - !ImportValue ${self:custom.stage}-datalakeArn
+                      - - !ImportValue ${sls:stage}-datalakeArn
                         - /data/*
                 - Effect: Allow
                   Action:
@@ -266,7 +265,7 @@ resources:
                     - s3:ListBucket
                     - s3:ListBucketMultipartUploads
                   Resource:
-                    - !ImportValue ${self:custom.stage}-datalakeArn
+                    - !ImportValue ${sls:stage}-datalakeArn
                 - Effect: Allow
                   Action:
                     - athena:ListTableMetadata
@@ -288,8 +287,8 @@ resources:
                     - glue:GetPartitions
                   Resource:
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_*'
-                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${sls:stage}_*'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_*'
 
   Outputs:
     ApiUrl:
@@ -299,7 +298,7 @@ resources:
           - - Ref: ApiGatewayRestApi
             - ".execute-api.${self:provider.region}.amazonaws.com"
       Export:
-        Name: ${self:custom.stage}-DataAPI-Gateway-url
+        Name: ${sls:stage}-DataAPI-Gateway-url
 
 plugins:
   - serverless-python-requirements

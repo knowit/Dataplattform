@@ -6,18 +6,15 @@ dataplattform:
     - ../deploymentBucket
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  publicBucketName: public-raw-storagebucket
-  stagePublicBucketName: ${self:custom.stage}-${self:custom.publicBucketName}
-  service: ${self:custom.stage}-${self:service}
+  stagePublicBucketName: ${sls:stage}-public-raw-storagebucket
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.service}
+  stackName: ${sls:stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -63,8 +60,8 @@ resources:
     PublicBucketName:
       Value: ${self:resources.Resources.PublicRawStorageBucket.Properties.BucketName}
       Export:
-        Name: !Sub '${self:custom.stage}-publicBucketName'
+        Name: !Sub '${sls:stage}-publicBucketName'
     PublicBucketArn:
       Value: !GetAtt PublicRawStorageBucket.Arn
       Export:
-        Name: ${self:custom.stage}-publicBucketArn
+        Name: ${sls:stage}-publicBucketArn

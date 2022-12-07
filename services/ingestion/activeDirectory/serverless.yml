@@ -26,7 +26,6 @@ custom:
     prod: true
     dev: false
 
-  stage: ${opt:stage, self:provider.stage}
   pythonRequirements:
     dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
@@ -38,9 +37,9 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.stage}-${self:service}
+  stackName: ${sls:stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.9
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
@@ -60,52 +59,52 @@ package:
 
 functions:
   ingest:
-    enabled: "${self:custom.ingestEnabled.${self:custom.stage}}"
+    enabled: "${self:custom.ingestEnabled.${sls:stage}}"
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.ingestHandlerFile}.handler
-    name: ${self:custom.stage}-${self:service}-ingest
+    name: ${sls:stage}-${self:service}-ingest
     description: ${self:custom.editable.description}
     role: !GetAtt IngestLambdaRole.Arn
     vpc:
       securityGroupIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
+        - !ImportValue ${sls:stage}-vpc-private-subnet-default-sg
       subnetIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-1
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
+        - !ImportValue ${sls:stage}-vpc-private-subnet-1
+        - !ImportValue ${sls:stage}-vpc-private-subnet-2
     package:
       include:
         - "${self:custom.editable.srcDir}/*.py"
         - "*.json"
     environment:
-      STAGE: ${self:custom.stage}
+      STAGE: ${sls:stage}
       SERVICE: ${self:service}
-      PERSON_DATA_TABLE: !ImportValue ${self:custom.stage}-personal-metadata-table-name
+      PERSON_DATA_TABLE: !ImportValue ${sls:stage}-personal-metadata-table-name
     events:
       - schedule:
-          name: ${self:custom.stage}-${self:service}-timer
+          name: ${sls:stage}-${self:service}-timer
           description: ${self:custom.editable.description}
           rate: ${self:custom.editable.scheduleRate}
           enabled: true
 
   mock:
-    enabled: "${self:custom.mockEnabled.${self:custom.stage}}"
+    enabled: "${self:custom.mockEnabled.${sls:stage}}"
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.mockIngestHandlerFile}.mock
     environment:
-      STAGE: ${self:custom.stage}
-    name: ${self:custom.stage}-${self:service}-mock
+      STAGE: ${sls:stage}
+    name: ${sls:stage}-${self:service}-mock
     description: ${self:custom.editable.mockDescription}
     role: !GetAtt MockLambdaRole.Arn
     vpc:
       securityGroupIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-default-sg
+        - !ImportValue ${sls:stage}-vpc-private-subnet-default-sg
       subnetIds:
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-1
-        - !ImportValue ${self:custom.stage}-vpc-private-subnet-2
+        - !ImportValue ${sls:stage}-vpc-private-subnet-1
+        - !ImportValue ${sls:stage}-vpc-private-subnet-2
     package:
       include:
         - "${self:custom.editable.srcDir}/*.py"
     events:
       - schedule:
-          name: ${self:custom.stage}-${self:service}-mock-timer
+          name: ${sls:stage}-${self:service}-mock-timer
           description: ${self:custom.editable.mockDescription}
           rate: ${self:custom.editable.mockRate}
           enabled: true
@@ -115,7 +114,7 @@ resources:
     MockLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-mock-role
+        RoleName: ${sls:stage}-${self:service}-mock-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -127,12 +126,12 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-          - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
+          - !ImportValue "${sls:stage}-personal-metadata-table-access-policy"
 
     IngestLambdaRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
+        RoleName: ${sls:stage}-${self:service}-${self:custom.editable.ingestHandlerFile}-role
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -144,17 +143,17 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-          - !ImportValue "${self:custom.stage}-personal-metadata-table-access-policy"
-          - !ImportValue ${self:custom.stage}-lambda-xray-tracing
+          - !ImportValue "${sls:stage}-personal-metadata-table-access-policy"
+          - !ImportValue ${sls:stage}-lambda-xray-tracing
         Policies:
-          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+          - PolicyName: ${sls:stage}-ParameterStore-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
                 - Effect: Allow
                   Action:
                     - "ssm:GetParameter*"
-                  Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*"
+                  Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${sls:stage}/${self:service}/*"
 
 plugins:
   - serverless-python-requirements

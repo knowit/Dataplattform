@@ -5,16 +5,13 @@ dataplattform:
   dependencies:
     - ../deploymentBucket
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -22,11 +19,11 @@ resources:
     BasicZone:
       Type: AWS::Route53::HostedZone
       Properties:
-        Name: ${ssm:/${self:custom.stage}/routes/domain_name}
+        Name: ${ssm:/${sls:stage}/routes/domain_name}
 
   Outputs:
     routesZoneId:
       Value:
         "Ref": BasicZone
       Export:
-        Name: ${self:custom.stage}-routes-zoneid
+        Name: ${sls:stage}-routes-zoneid

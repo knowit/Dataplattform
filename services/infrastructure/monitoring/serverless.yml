@@ -7,9 +7,8 @@ dataplattform:
     - ../events
 
 custom:
-  stage: ${opt:stage, self:provider.stage}
-  service: ${self:custom.stage}-${self:service}
-  datalakeName: !Sub '${self:custom.stage}-datalake-bucket-${AWS::AccountId}'
+  service: ${sls:stage}-${self:service}
+  datalakeName: !Sub '${sls:stage}-datalake-bucket-${AWS::AccountId}'
 
 provider:
   name: aws
@@ -17,7 +16,7 @@ provider:
   region: eu-central-1
   stackName: ${self:custom.service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -25,7 +24,7 @@ resources:
     LambdaDashboard:
       Type: AWS::CloudWatch::Dashboard
       Properties:
-        DashboardName: ${self:custom.stage}-lambda-dashboard
+        DashboardName: ${sls:stage}-lambda-dashboard
         DashboardBody:
           '{
             "widgets": [
@@ -39,7 +38,7 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND process `, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${sls:stage} AND process `, `Sum`, 300 )",
                         "label": "All ProcessInvocations",
                         "id": "p",
                         "region": "\${self:provider.region}",
@@ -48,7 +47,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND process`, `Sum`, 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${sls:stage} AND process`, `Sum`, 300)",
                         "label": "",
                         "id": "er",
                         "region": "\${self:provider.region}"
@@ -86,7 +85,7 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(`{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND \${self:custom.stage} AND NOT dl `, `Sum`,3600)",
+                        "expression": "SEARCH(`{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND \${sls:stage} AND NOT dl `, `Sum`,3600)",
                         "label": "AllQueues",
                         "id": "q",
                         "visible": false,
@@ -95,7 +94,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(`{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND \${self:custom.stage} AND dl `, `Sum`,3600)",
+                        "expression": "SEARCH(`{AWS/SQS,QueueName}MetricName=\"NumberOfMessagesReceived\" AND \${sls:stage} AND dl `, `Sum`,3600)",
                         "label": "All DeadLetters",
                         "id": "dl",
                         "visible": false,
@@ -137,7 +136,7 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND ingest `, `Sum`, 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${sls:stage} AND ingest `, `Sum`, 300)",
                         "label": "",
                         "id": "i",
                         "region": "\${self:provider.region}",
@@ -147,7 +146,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND ingest`, `Sum`, 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${sls:stage} AND ingest`, `Sum`, 300)",
                         "label": "",
                         "id": "er",
                         "region": "\${self:provider.region}",
@@ -243,7 +242,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND ingest `, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${sls:stage} AND ingest `, `Sum`, 300 )",
                         "label": "All IngestInvocations",
                         "id": "i",
                         "visible": false,
@@ -252,7 +251,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND ingest`, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${sls:stage} AND ingest`, `Sum`, 300 )",
                         "label": "All IngestErrors",
                         "id": "er",
                         "visible": false,
@@ -291,7 +290,7 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND ingest `, `Sum`, 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${sls:stage} AND ingest `, `Sum`, 300)",
                         "label": "",
                         "id": "i",
                         "region": "\${self:provider.region}",
@@ -300,7 +299,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND ingest`, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${sls:stage} AND ingest`, `Sum`, 300 )",
                         "label": "All IngestErrors",
                         "id": "er",
                         "region": "\${self:provider.region}",
@@ -357,7 +356,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND process `, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${sls:stage} AND process `, `Sum`, 300 )",
                         "label": "All ProcessInvocations",
                         "id": "p",
                         "visible": false,
@@ -366,7 +365,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND process`, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${sls:stage} AND process`, `Sum`, 300 )",
                         "label": "All ProcessErrors",
                         "id": "er",
                         "visible": false,
@@ -405,7 +404,7 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${self:custom.stage} AND process `, `Sum`, 300)",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Invocations\" AND \${sls:stage} AND process `, `Sum`, 300)",
                         "label": "",
                         "id": "p",
                         "region": "\${self:provider.region}"
@@ -413,7 +412,7 @@ resources:
                     ],
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${self:custom.stage} AND process`, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda,FunctionName} MetricName=\"Errors\" AND \${sls:stage} AND process`, `Sum`, 300 )",
                         "label": "All ProcessErrors",
                         "id": "er",
                         "visible": false,
@@ -472,7 +471,7 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND \${self:custom.stage} AND ingest`, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND \${sls:stage} AND ingest`, `Sum`, 300 )",
                         "label": "Expression1",
                         "id": "e1",
                         "region": "\${self:provider.region}"
@@ -509,7 +508,7 @@ resources:
                   "metrics": [
                     [
                       {
-                        "expression": "SEARCH(` {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND \${self:custom.stage} AND process`, `Sum`, 300 )",
+                        "expression": "SEARCH(` {AWS/Lambda, FunctionName } MetricName=\"Duration\" AND \${sls:stage} AND process`, `Sum`, 300 )",
                         "label": "Duration",
                         "id": "e1",
                         "region": "\${self:provider.region}"
@@ -542,7 +541,7 @@ resources:
     DataApiDashboard:
       Type: AWS::CloudWatch::Dashboard
       Properties:
-        DashboardName: ${self:custom.stage}-dataAPI-dashboard
+        DashboardName: ${sls:stage}-dataAPI-dashboard
         DashboardBody:
           '{
             "widgets": [
@@ -558,7 +557,7 @@ resources:
                       "AWS/ApiGateway",
                       "Count",
                       "ApiName",
-                      "\${self:custom.stage}-DataAPI"
+                      "\${sls:stage}-DataAPI"
                     ],
                     [
                       ".",
@@ -593,7 +592,7 @@ resources:
                       "AWS/ApiGateway",
                       "Count",
                       "ApiName",
-                      "\${self:custom.stage}-DataAPI"
+                      "\${sls:stage}-DataAPI"
                     ],
                     [
                       ".",
@@ -624,7 +623,7 @@ resources:
                 "width": 24,
                 "height": 12,
                 "properties": {
-                  "query": "SOURCE `/aws/api-gateway/DataAPI-\${self:custom.stage}` | fields @timestamp, @message\n| sort @timestamp desc\n| limit 100\n| filter @message not like \"200\"",
+                  "query": "SOURCE `/aws/api-gateway/DataAPI-\${sls:stage}` | fields @timestamp, @message\n| sort @timestamp desc\n| limit 100\n| filter @message not like \"200\"",
                   "region": "\${self:provider.region}",
                   "stacked": false,
                   "title": "Non 200 Logs",
@@ -638,7 +637,7 @@ resources:
                "width": 24,
                "height": 12,
                "properties": {
-                 "query": "SOURCE `/aws/api-gateway/DataAPI-\${self:custom.stage}` | fields @timestamp, @message\n| parse @message \"sub: *,\" as @userId\n| stats count_distinct(@userId) by bin(5m)",
+                 "query": "SOURCE `/aws/api-gateway/DataAPI-\${sls:stage}` | fields @timestamp, @message\n| parse @message \"sub: *,\" as @userId\n| stats count_distinct(@userId) by bin(5m)",
                  "region": "\${self:provider.region}",
                  "stacked": false,
                  "title": "Number of unique users",
@@ -652,7 +651,7 @@ resources:
                  "width": 24,
                  "height": 12,
                  "properties": {
-                   "query": "SOURCE `/aws/api-gateway/DataAPI-\${self:custom.stage}` | fields @timestamp, @message \n| parse @message \"sub: *,\" as @userId\n| stats count(*) by @userId",
+                   "query": "SOURCE `/aws/api-gateway/DataAPI-\${sls:stage}` | fields @timestamp, @message \n| parse @message \"sub: *,\" as @userId\n| stats count(*) by @userId",
                    "region": "\${self:provider.region}",
                    "stacked": false,
                    "title": "Number of request per user",
@@ -666,12 +665,12 @@ resources:
       Type: AWS::CloudWatch::Alarm
       Properties:
         AlarmActions:
-          - !ImportValue ${self:custom.stage}-alarm-topic-arn
+          - !ImportValue ${sls:stage}-alarm-topic-arn
         InsufficientDataActions:
-          - !ImportValue ${self:custom.stage}-alarm-topic-arn
+          - !ImportValue ${sls:stage}-alarm-topic-arn
         OKActions:
-          - !ImportValue ${self:custom.stage}-alarm-topic-arn
-        AlarmName: ${self:custom.stage}-lambda-error-alarm
+          - !ImportValue ${sls:stage}-alarm-topic-arn
+        AlarmName: ${sls:stage}-lambda-error-alarm
         AlarmDescription: Goes into ALARM when there are errors in lambda
         ComparisonOperator: GreaterThanThreshold
         DatapointsToAlarm: 1
@@ -687,7 +686,7 @@ resources:
       Type: AWS::IAM::ManagedPolicy
       Properties:
         Description: "Gives lambdas permission to perform XRay tracing"
-        ManagedPolicyName: ${self:custom.stage}-lambda-xray-tracing-policy
+        ManagedPolicyName: ${sls:stage}-lambda-xray-tracing-policy
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -703,4 +702,4 @@ resources:
       Value:
         Ref: LambdaXRayTracing
       Export:
-        Name: ${self:custom.stage}-lambda-xray-tracing
+        Name: ${sls:stage}-lambda-xray-tracing

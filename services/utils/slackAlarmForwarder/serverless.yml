@@ -11,8 +11,7 @@ custom:
     timeout: 900
     srcDir: lib/slackalarmforwarder
     handlerFile: forwarder
-    description: Forwards Alarms from the ${self:custom.stage}-CloudwatchAlarms SNS topic to slack
-  stage: ${opt:stage, self:provider.stage}
+    description: Forwards Alarms from the ${sls:stage}-CloudwatchAlarms SNS topic to slack
   pythonRequirements:
     dockerImage: public.ecr.aws/sam/build-python3.9
     dockerizePip: non-linux
@@ -24,9 +23,9 @@ provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:custom.stage}-${self:service}
+  stackName: ${sls:stage}-${self:service}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../../infrastructure/deploymentBucket/config.yml):bucketName, file(../../infrastructure/deploymentBucket/serverless.yml):defaultBucketName}
   runtime: python3.9
   memorySize: 1024
   timeout: ${self:custom.editable.timeout}
@@ -39,27 +38,27 @@ package:
 functions:
   forwarder:
     handler: ${self:custom.editable.srcDir}/${self:custom.editable.handlerFile}.handler
-    name: ${self:custom.stage}-${self:service}
+    name: ${sls:stage}-${self:service}
     description: ${self:custom.editable.description}
     role: !GetAtt ForwarderRole.Arn
     package:
       include:
         - '${self:custom.editable.srcDir}/*.py'
     environment:
-      STAGE: ${self:custom.stage}
+      STAGE: ${sls:stage}
       SERVICE: ${self:service}
       SLACK_CALLBACK_SSM_NAME: slack_callback_url
     events:
       - sns:
-          arn: !ImportValue ${self:custom.stage}-alarm-topic-arn
-          topicName: ${self:custom.stage}-CloudwatchAlarms
+          arn: !ImportValue ${sls:stage}-alarm-topic-arn
+          topicName: ${sls:stage}-CloudwatchAlarms
 
 resources:
   Resources:
     ForwarderRole:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-forwarderRole
+        RoleName: ${sls:stage}-${self:service}-forwarderRole
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -71,7 +70,7 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-ParameterStore-${self:service}
+          - PolicyName: ${sls:stage}-ParameterStore-${self:service}
             PolicyDocument:
               Version: '2012-10-17'
               Statement:
@@ -79,7 +78,7 @@ resources:
                   Action:
                     - 'ssm:GetParameter*'
                     - 'ssm:PutParameter*'
-                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${self:custom.stage}/${self:service}/*'
+                  Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${sls:stage}/${self:service}/*'
 
 plugins:
   - serverless-python-requirements

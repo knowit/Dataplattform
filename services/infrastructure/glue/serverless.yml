@@ -10,15 +10,14 @@ dataplattform:
 custom:
   editable:
     databaseName: level_4
-  stage: ${opt:stage, self:provider.stage}
 
 provider:
   name: aws
   stage: dev
   region: eu-central-1
-  stackName: ${self:service}-${self:custom.stage}
+  stackName: ${self:service}-${sls:stage}
   deploymentBucket:
-    name: ${self:custom.stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
+    name: ${sls:stage}-${file(../deploymentBucket/config.yml):bucketName, file(../deploymentBucket/serverless.yml):defaultBucketName}
   runtime: nodejs16.x
 
 resources:
@@ -29,11 +28,11 @@ resources:
       Properties:
         CatalogId: !Ref AWS::AccountId
         DatabaseInput:
-          Name: ${self:custom.stage}_level_1_database
+          Name: ${sls:stage}_level_1_database
     Level1GlueAccess:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level-1-glue-access
+        RoleName: ${sls:stage}-${self:service}-level-1-glue-access
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -45,7 +44,7 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeRead-${self:service}
+          - PolicyName: ${sls:stage}-DatalakeRead-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -56,7 +55,7 @@ resources:
                   Resource:
                     - Fn::Join:
                         - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - - !ImportValue ${sls:stage}-datalakeArn
                           - /data/level-1*
 
     # Level 2
@@ -65,11 +64,11 @@ resources:
       Properties:
         CatalogId: !Ref AWS::AccountId
         DatabaseInput:
-          Name: ${self:custom.stage}_level_2_database
+          Name: ${sls:stage}_level_2_database
     Level2GlueAccess:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level-2-glue-access
+        RoleName: ${sls:stage}-${self:service}-level-2-glue-access
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -81,7 +80,7 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeRead-${self:service}
+          - PolicyName: ${sls:stage}-DatalakeRead-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -92,7 +91,7 @@ resources:
                   Resource:
                     - Fn::Join:
                         - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - - !ImportValue ${sls:stage}-datalakeArn
                           - /data/level-2*
 
     # Level 3
@@ -101,11 +100,11 @@ resources:
       Properties:
         CatalogId: !Ref AWS::AccountId
         DatabaseInput:
-          Name: ${self:custom.stage}_level_3_database
+          Name: ${sls:stage}_level_3_database
     Level3GlueAccess:
       Type: AWS::IAM::Role
       Properties:
-        RoleName: ${self:custom.stage}-${self:service}-level-3-glue-access
+        RoleName: ${sls:stage}-${self:service}-level-3-glue-access
         AssumeRolePolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -117,7 +116,7 @@ resources:
         ManagedPolicyArns:
           - "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-DatalakeRead-${self:service}
+          - PolicyName: ${sls:stage}-DatalakeRead-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -128,7 +127,7 @@ resources:
                   Resource:
                     - Fn::Join:
                         - ""
-                        - - !ImportValue ${self:custom.stage}-datalakeArn
+                        - - !ImportValue ${sls:stage}-datalakeArn
                           - /data/level-3*
 
     # Level 4
@@ -137,7 +136,7 @@ resources:
       Properties:
         CatalogId: !Ref AWS::AccountId
         DatabaseInput:
-          Name: ${self:custom.stage}_level_4_database
+          Name: ${sls:stage}_level_4_database
     Level4GlueAccess:
       Type: AWS::IAM::Role
       Properties:
@@ -152,7 +151,7 @@ resources:
               Action:
                 - "sts:AssumeRole"
         Policies:
-          - PolicyName: ${self:custom.stage}-Glue-${self:service}
+          - PolicyName: ${sls:stage}-Glue-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -168,9 +167,9 @@ resources:
                     - 'glue:BatchCreatePartition'
                   Resource:
                     - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:catalog'
-                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${self:custom.stage}_${self:custom.editable.databaseName}_database'
-                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${self:custom.stage}_${self:custom.editable.databaseName}_database/*'
-          - PolicyName: ${self:custom.stage}-GlueSecurity-${self:service}
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:database/${sls:stage}_${self:custom.editable.databaseName}_database'
+                    - !Sub 'arn:aws:glue:${AWS::Region}:${AWS::AccountId}:table/${sls:stage}_${self:custom.editable.databaseName}_database/*'
+          - PolicyName: ${sls:stage}-GlueSecurity-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -183,7 +182,7 @@ resources:
                     - 'glue:GetSecurityConfigurations'
                     - 'glue:DeleteSecurityConfiguration'
                   Resource: '*'
-          - PolicyName: ${self:custom.stage}-Logs-${self:service}
+          - PolicyName: ${sls:stage}-Logs-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -195,7 +194,7 @@ resources:
                     - 'logs:AssociateKmsKey'
                   Resource:
                     - !Sub 'arn:aws:logs:*:*:/aws-glue/*'
-          - PolicyName: ${self:custom.stage}-EncryptedBucketIO-${self:service}
+          - PolicyName: ${sls:stage}-EncryptedBucketIO-${self:service}
             PolicyDocument:
               Version: "2012-10-17"
               Statement:
@@ -207,23 +206,23 @@ resources:
                     - s3:CopyObject
                     - s3:PutObject
                   Resource:
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}
-                    - !Sub arn:aws:s3:::${self:custom.stage}-kmsbucket-${AWS::AccountId}/*
+                    - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}
+                    - !Sub arn:aws:s3:::${sls:stage}-kmsbucket-${AWS::AccountId}/*
 
   Outputs:
     Level1GlueAccessOutput:
       Value: !GetAtt Level1GlueAccess.Arn
       Export:
-        Name: ${self:custom.stage}-level-1-glue-access
+        Name: ${sls:stage}-level-1-glue-access
     Level2GlueAccessOutput:
       Value: !GetAtt Level2GlueAccess.Arn
       Export:
-        Name: ${self:custom.stage}-level-2-glue-access
+        Name: ${sls:stage}-level-2-glue-access
     Level3GlueAccessOutput:
       Value: !GetAtt Level3GlueAccess.Arn
       Export:
-        Name: ${self:custom.stage}-level-3-glue-access
+        Name: ${sls:stage}-level-3-glue-access
     Level4GlueAccessOutput:
       Value: !GetAtt Level4GlueAccess.Arn
       Export:
-        Name: ${self:custom.stage}-level-4-glue-access
+        Name: ${sls:stage}-level-4-glue-access
