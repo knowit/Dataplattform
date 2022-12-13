@@ -1,6 +1,7 @@
 from argparse import ArgumentParser, Namespace
 import boto3
 import datetime
+import time
 from typing import List
 
 
@@ -48,6 +49,12 @@ def create_record_for_validation(hosted_zone_id: str, cert_arn: str) -> None:
     response = acm.describe_certificate(
         CertificateArn=cert_arn
     )
+    if 'ResourceRecord' not in response['Certificate']['DomainValidationOptions'][0]:
+        print('No ResourceRecord found. Sleeping for 5 seconds before trying again')
+        time.sleep(5)
+        response = acm.describe_certificate(
+            CertificateArn=cert_arn
+        )
     route53 = boto3.client('route53')
     validation_record = [dvo['ResourceRecord'] for dvo in response['Certificate']['DomainValidationOptions']][0]
     route53.change_resource_record_sets(
