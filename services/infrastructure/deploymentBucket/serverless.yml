@@ -8,15 +8,13 @@ plugins:
 defaultBucketName: dataplattform-deploymentbucket
 
 custom:
-  service: ${sls:stage}-${self:service}
   deploymentBucket:
     blockPublicAccess: true
 
 provider:
   name: aws
-  stage: dev
   region: eu-central-1
-  stackName: ${self:custom.service}
+  stackName: ${sls:stage}-${self:service}
   runtime: nodejs16.x
 
   # Lag en fil config.yml med feltet "bucketName" hvor du skriver inn et globalt unikt navn for deploymentbucket

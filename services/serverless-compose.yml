@@ -1,0 +1,301 @@
+services:
+
+  api-dataApi:
+    path: api/dataApi
+    dependsOn:
+      - infra-cognito
+      - infra-datalake
+      - infra-events
+      - infra-monitoring
+      - infra-glue
+
+  api-documentation:
+    path: api/documentation
+    dependsOn:
+      - infra-cognito
+      - infra-routes
+      - infra-distribution
+
+  api-fileStorageDistribution:
+    path: api/fileStorageDistribution
+    dependsOn:
+      - infra-storage
+      - infra-cognito
+      - infra-routes
+
+  infra-athena:
+    path: infrastructure/athena
+    dependsOn:
+      - infra-deploymentBucket
+      - infra-datalake
+      - infra-kms
+      - infra-glue
+
+  infra-cloudtrail:
+    path: infrastructure/cloudtrail
+    dependsOn:
+      - infra-deploymentBucket
+      - infra-datalake
+      - infra-events
+      - infra-monitoring
+      - infra-glue
+
+  infra-cloudwatch:
+    path: infrastructure/cloudwatch
+    dependsOn:
+      - infra-deploymentBucket
+      - infra-datalake
+      - infra-kms
+      - infra-glue
+
+  infra-cognito:
+    path: infrastructure/cognito
+    dependsOn:
+      - infra-deploymentBucket
+      - infra-monitoring
+      - infra-datalake
+
+  infra-datalake:
+    path: infrastructure/datalake
+    dependsOn:
+      - infra-deploymentBucket
+
+  infra-deploymentBucket:
+    path: infrastructure/deploymentBucket
+
+  infra-distribution:
+    path: infrastructure/distribution
+    dependsOn:
+      - infra-routes
+      - infra-deploymentBucket
+      - api-dataApi
+
+  infra-doraGlue:
+    path: infrastructure/dora-glue
+    dependsOn:
+      - infra-kms
+      - infra-glue
+      - infra-deploymentBucket
+
+  infra-events:
+    path: infrastructure/events
+    dependsOn:
+      - infra-deploymentBucket
+
+  infra-glue:
+    path: infrastructure/glue
+    dependsOn:
+      - infra-datalake
+      - infra-kms
+      - infra-deploymentBucket
+
+  infra-ingestApiGateway:
+    path: infrastructure/ingestApiGateway
+    dependsOn:
+      - infra-routes
+      - infra-deploymentBucket
+
+  infra-kms:
+    path: infrastructure/kms
+    dependsOn:
+      - infra-datalake
+      - infra-events
+      - infra-monitoring
+      - infra-deploymentBucket
+
+  infra-metadata:
+    path: infrastructure/metadata
+    dependsOn:
+      - infra-vpc
+      - infra-deploymentBucket
+
+  infra-monitoring:
+    path: infrastructure/monitoring
+    dependsOn:
+      - infra-events
+      - infra-deploymentBucket
+
+#  infra-quicksight:
+#    path: infrastructure/quicksight
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-kms
+#      - infra-doraGlue
+#      - infra-deploymentBucket
+#      - ingest-dora
+
+  infra-routes:
+    path: infrastructure/routes
+    dependsOn:
+      - infra-deploymentBucket
+
+  infra-storage:
+    path: infrastructure/storage
+    dependsOn:
+      - infra-deploymentBucket
+
+  infra-vpc:
+    path: infrastructure/vpc
+    dependsOn:
+      - infra-deploymentBucket
+
+  utils-downloadToBucket:
+    path: utils/downloadToBucket
+    dependsOn:
+      - infra-storage
+
+  utils-slackAlarmForwarder:
+    path: utils/slackAlarmForwarder
+    dependsOn:
+      - infra-events
+
+## Ingestors are not quite working, due to dependencies and custom hooks
+#  ingest-activeDirectory:
+#    path: ingestion/activeDirectory
+#    dependsOn:
+#      - infra-vpc
+#      - infra-metadata
+#      - infra-monitoring
+#
+#  ingest-activeDirectoryProcess:
+#    path: ingestion/activeDirectoryProcess
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-metadata
+#      - utils-downloadToBucket
+#
+#  ingest-cvPartner:
+#    path: ingestion/cvPartner
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-storage
+#      - infra-metadata
+#      - utils-downloadToBucket
+#
+#  ingest-dora:
+#    path: ingestion/dora
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-doraGlue
+#      - infra-kms
+#
+#  ingest-gitHub:
+#    path: ingestion/gitHub
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-ingestApiGateway
+#
+#  ingest-googleEvent:
+#    path: ingestion/googleEvent
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#
+#  ingest-googleForms:
+#    path: ingestion/googleForms
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-ingestApiGateway
+#
+#  ingest-googleSheets:
+#    path: ingestion/googleSheets
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-ingestApiGateway
+#
+#  ingest-jiraSales:
+#    path: ingestion/jiraSales
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-ingestApiGateway
+#
+#  ingest-knowitLabs:
+#    path: ingestion/knowitLabs
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#
+#  ingest-kompetanseKartlegging:
+#    path: ingestion/kompetanseKartlegging
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#
+#  ingest-slack:
+#    path: ingestion/slack
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#      - infra-ingestApiGateway
+#
+#  ingest-twitter:
+#    path: ingestion/twitter
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#
+#  ingest-ubwCustomerPerResource:
+#    path: ingestion/ubwCustomerPerResource
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#
+#  ingest-ubwExperience:
+#    path: ingestion/ubwExperience
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#
+#  ingest-ubwFagtime:
+#    path: ingestion/ubwFagtime
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
+#
+#  ingest-yrWeather:
+#    path: ingestion/yrWeather
+#    dependsOn:
+#      - infra-datalake
+#      - infra-events
+#      - infra-monitoring
+#      - infra-glue
