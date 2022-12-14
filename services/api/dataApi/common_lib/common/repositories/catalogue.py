@@ -24,7 +24,7 @@ class DatabaseRepository(GlueRepositoryBase):
     def get(self, database_name: str):
         try:
             db = self.client.get_database(Name=f'{STAGE}_{database_name}' if STAGE else database_name)
-            if (db['Database']['Name'] in self.ignore_databases):
+            if db['Database']['Name'] in self.ignore_databases:
                 raise GlueRepositoryNotFoundException('Not found')
             return {
                 **db['Database'],

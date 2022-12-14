@@ -7,7 +7,7 @@ def handler(event, context):
 
     def load_message(record):
         rec = record.get('Sns')
-        return (rec.get('Subject', None), rec.get('Message', None))
+        return rec.get('Subject', None), rec.get('Message', None)
 
     messages = [(topic, json.loads(msg)) for topic, msg in [
         load_message(record) for record in records

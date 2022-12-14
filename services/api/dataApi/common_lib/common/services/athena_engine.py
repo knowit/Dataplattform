@@ -46,7 +46,7 @@ def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
             tmp_database = database
             tmp_str = tmp_database.replace(f'{environ.get("STAGE", "dev")}_level_', '').split('_database')
             protection_level_tmp = int(tmp_str[0])
-            if (protection_level_tmp not in [1, 2, 3]):
+            if protection_level_tmp not in [1, 2, 3]:
                 raise ValueError("Protection level not in correct range")
             else:
                 protection_level = max(protection_level_tmp, protection_level)
