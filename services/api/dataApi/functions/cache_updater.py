@@ -26,9 +26,9 @@ def handler(event, context):
                        for topic, message in messages]
     reports = [report for reports in report_sets for report in reports]
     for report in reports:
-        updateCache = cache_table_service.cache_table(
+        update_cache = cache_table_service.cache_table(
             report['dataProtection'], report['name'])
-        updateCache(
+        update_cache(
             execute_query(report['queryString'],
                           protection_level=report['dataProtection'],
                           preprocess_sql=False)

@@ -29,7 +29,7 @@ class UserSession(object):
     def boto_session(self):
         claims = self.user_claims
         if claims:
-            group = self.cognito_group(claims.get('cognito:groups', None), claims.get('iss', None))
+            group = self.cognito_group(claims.get('cognito:groups', ''), claims.get('iss', '/'))
             if group:
                 return self.create_boto_session(group['RoleArn'])
         return boto3._get_default_session()
