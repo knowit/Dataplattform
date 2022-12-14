@@ -1,6 +1,6 @@
 {
   "name": "DataAPI",
-  "description": "",
+  "description": "Data api",
   "version": "0.1.0",
   "devDependencies": {
     "serverless-python-requirements": "knowit/serverless-python-requirements",

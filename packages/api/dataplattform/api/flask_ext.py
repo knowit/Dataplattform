@@ -29,18 +29,20 @@ class UserSession(object):
     def boto_session(self):
         claims = self.user_claims
         if claims:
-            group = self.cognito_group(claims.get('cognito:groups', ''), claims.get('iss', '/'))
+            group = self.cognito_group(claims.get('cognito:groups', ''), claims.get('iss', ''))
             if group:
                 return self.create_boto_session(group['RoleArn'])
-        return boto3._get_default_session()
+        return boto3.setup_default_session()
 
     @cached(TTLCache(maxsize=10, ttl=60))
     def cognito_group(self, group: str, iss: str):
-        cognito_client = self.base_session.client('cognito-idp')
-        response = cognito_client.get_group(
-            GroupName=re.sub(r"[\[\]]", "", group),
-            UserPoolId=iss.split('/')[-1])
-        return response.get('Group', None)
+        if group and iss:
+            cognito_client = self.base_session.client('cognito-idp')
+            response = cognito_client.get_group(
+                GroupName=re.sub(r"[\[\]]", "", group),
+                UserPoolId=iss.split('/')[-1])
+            return response.get('Group', None)
+        return None
 
     @cached(TTLCache(maxsize=10, ttl=60))
     def create_boto_session(self, role_arn: str):
