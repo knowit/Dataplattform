@@ -16,7 +16,7 @@ To configure `aws-cli`, please contact an existing member of the team for creden
 Members of the Dataplattform team can find useful information pertaining to the project on the [wiki](https://github.com/knowit/Dataplattform-issues/wiki).
 
 ## Running the services
-The indvidual services are deployed to AWS using
+The individual services are deployed to AWS using
 `dataplattform deploy -s {PATHS TO SERVICES SEPARATED BY SPACE}` 
 ## Contributing
 Contributing by adding a new datasource or other small improvements can be done by creating a pull request as local testing can be utilized and AWS connections mocked. For cloud testing one must be member of the Dataplattform team at Knowit Objectnet.
