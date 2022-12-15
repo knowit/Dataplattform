@@ -57,6 +57,18 @@ def glue_test_data():
                 'Error': {
                     'Code': 'EntityNotFoundException',
                     'Message': ''
+                },
+                'ResponseMetadata': {
+                    'HTTPStatusCode': 404
+                }
+            },
+            'forbidden': {
+                'Error': {
+                    'Code': 'AccessDeniedException',
+                    'Message': 'secret message'
+                },
+                'ResponseMetadata': {
+                    'HTTPStatusCode': 403
                 }
             }
         }
@@ -70,6 +82,9 @@ def mocked_glue_services(mocker, glue_test_data):
     def raise_(ex):
         raise ex
 
+    def error_type(name):
+        return 'forbidden' if 'forbidden' in name else 'not_found'
+
     glue_mock.get_databases = mocker.MagicMock(
         return_value={
             'DatabaseList': glue_test_data['databases'].values(),
@@ -80,14 +95,14 @@ def mocked_glue_services(mocker, glue_test_data):
             'Database': glue_test_data['databases'][kwargs['Name']]
         }
         if kwargs['Name'] in glue_test_data['databases']
-        else raise_(ClientError(glue_test_data['errors']['not_found'], 'get_database')))
+        else raise_(ClientError(glue_test_data['errors'][error_type(kwargs['Name'])], 'get_database')))
 
     glue_mock.get_tables = mocker.MagicMock(
         side_effect=lambda **kwargs: {
             'TableList': glue_test_data['tables'][kwargs['DatabaseName']].values()
         }
         if kwargs['DatabaseName'] in glue_test_data['tables']
-        else raise_(ClientError(glue_test_data['errors']['not_found'], 'get_tables')))
+        else raise_(ClientError(glue_test_data['errors'][error_type(kwargs['Name'])], 'get_tables')))
 
     glue_mock.get_table = mocker.MagicMock(
         side_effect=lambda **kwargs: {
@@ -95,7 +110,7 @@ def mocked_glue_services(mocker, glue_test_data):
         }
         if kwargs['DatabaseName'] in glue_test_data['tables'] and
         kwargs['Name'] in glue_test_data['tables'][kwargs['DatabaseName']]
-        else raise_(ClientError(glue_test_data['errors']['not_found'], 'get_table')))
+        else raise_(ClientError(glue_test_data['errors'][error_type(kwargs['Name'])], 'get_table')))
 
     def mock_paginator_side_effect(service):
         def mock_generator(**kwargs):

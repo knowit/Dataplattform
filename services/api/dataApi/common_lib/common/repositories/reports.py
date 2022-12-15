@@ -48,22 +48,16 @@ class ReportsRepository(DynamoDBRepository):
         return True
 
     def update_cache_time(self, name: str):
-        from botocore.exceptions import ClientError
         now = datetime.now()
-        try:
-            self.table.update_item(
-                Key={'name': name},
-                UpdateExpression="set lastCacheUpdate = :now",
-                ExpressionAttributeValues={
-                    ':now': now.isoformat()
-                },
-                ConditionExpression=Key("name").eq(name)
-            )
-        except ClientError as e:
-            if e.response['Error']['Code'] == "ConditionalCheckFailedException":
-                raise KeyError("Could not find report with name: " + name) from e
-            else:
-                raise
+
+        self.table.update_item(
+            Key={'name': name},
+            UpdateExpression="set lastCacheUpdate = :now",
+            ExpressionAttributeValues={
+                ':now': now.isoformat()
+            },
+            ConditionExpression=Key("name").eq(name)
+        )
 
     def delete(self, name: str):
         self.table.delete_item(

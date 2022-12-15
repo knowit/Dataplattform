@@ -1,7 +1,7 @@
 from flask_restx import Resource, fields, Namespace
 from common_lib.common.repositories.catalogue import (
     TableRepository, DatabaseRepository,
-    GlueRepositoryException, GlueRepositoryNotFoundException
+    GlueRepositoryNotFoundException
 )
 
 ns = Namespace('Catalogue', path="/catalogue")
@@ -35,19 +35,16 @@ class DatabaseList(Resource):
     @ns.marshal_with(DatabaseModel, as_list=True)
     @ns.doc(model=DatabaseModel)
     def get(self):
-        try:
-            database_repository = DatabaseRepository()
-            table_repository = TableRepository()
-            return [
-                {
-                    'name': db['Name'],
-                    'tables': [table['Name'] for table in table_repository.all(db['Name'])],
-                    'createTime': db['CreateTime']
-                }
-                for db in database_repository.all()
-            ]
-        except (GlueRepositoryException, Exception) as e:
-            ns.abort(500, str(e))
+        database_repository = DatabaseRepository()
+        table_repository = TableRepository()
+        return [
+            {
+                'name': db['Name'],
+                'tables': [table['Name'] for table in table_repository.all(db['Name'])],
+                'createTime': db['CreateTime']
+            }
+            for db in database_repository.all()
+        ]
 
 
 @ns.route('/table', strict_slashes=False)
@@ -55,25 +52,22 @@ class TableList(Resource):
     @ns.marshal_with(TableModel, as_list=True)
     @ns.doc(model=TableModel)
     def get(self):
-        try:
-            database_repository = DatabaseRepository()
-            table_repository = TableRepository()
-            return [
-                {
-                    'name': table['Name'],
-                    'databaseName': table['DatabaseName'],
-                    'createTime': table['CreateTime'],
-                    'updateTime': table.get('UpdateTime'),
-                    'lastAccessTime': table.get('LastAccessTime'),
-                    'columns': [
-                        {'name': column['Name'], 'type': column['Type']}
-                        for column in [*table['StorageDescriptor']['Columns'], *table['PartitionKeys']]
-                    ]
-                }
-                for db in database_repository.all() for table in table_repository.all(db['Name'])
-            ]
-        except (GlueRepositoryException, Exception) as e:
-            ns.abort(500, str(e))
+        database_repository = DatabaseRepository()
+        table_repository = TableRepository()
+        return [
+            {
+                'name': table['Name'],
+                'databaseName': table['DatabaseName'],
+                'createTime': table['CreateTime'],
+                'updateTime': table.get('UpdateTime'),
+                'lastAccessTime': table.get('LastAccessTime'),
+                'columns': [
+                    {'name': column['Name'], 'type': column['Type']}
+                    for column in [*table['StorageDescriptor']['Columns'], *table['PartitionKeys']]
+                ]
+            }
+            for db in database_repository.all() for table in table_repository.all(db['Name'])
+        ]
 
 
 @ns.route('/database/<string:database_name>')
@@ -82,20 +76,15 @@ class Database(Resource):
     @ns.marshal_with(DatabaseModel)
     @ns.doc(model=DatabaseModel)
     def get(self, database_name):
-        try:
-            database_repository = DatabaseRepository()
-            table_repository = TableRepository()
+        database_repository = DatabaseRepository()
+        table_repository = TableRepository()
 
-            db = database_repository.get(database_name)
-            return {
-                'name': db['Name'],
-                'tables': [table['Name'] for table in table_repository.all(db['Name'])],
-                'createTime': db['CreateTime']
-            }
-        except GlueRepositoryNotFoundException:
-            ns.abort(404)
-        except (GlueRepositoryException, Exception) as e:
-            ns.abort(500, str(e))
+        db = database_repository.get(database_name)
+        return {
+            'name': db['Name'],
+            'tables': [table['Name'] for table in table_repository.all(db['Name'])],
+            'createTime': db['CreateTime']
+        }
 
 
 @ns.route(
@@ -117,34 +106,28 @@ class Table(Resource):
     @ns.marshal_with(TableModel)
     @ns.doc(model=TableModel)
     def get(self, **kwargs):
-        try:
-            table_repository = TableRepository()
-            table = table_repository.get(kwargs['database_name'], kwargs['table_name']) \
-                if 'database_name' in kwargs else None
+        table_repository = TableRepository()
+        table = table_repository.get(kwargs['database_name'], kwargs['table_name']) \
+            if 'database_name' in kwargs else None
 
-            if table is None:
-                for database in DatabaseRepository().all():
-                    try:
-                        table = table_repository.get(database['Name'], kwargs['table_name'])
-                    except GlueRepositoryNotFoundException:
-                        continue
+        if table is None:
+            for database in DatabaseRepository().all():
+                try:
+                    table = table_repository.get(database['Name'], kwargs['table_name'])
+                except GlueRepositoryNotFoundException:
+                    continue
 
-            if table is None:
-                raise GlueRepositoryNotFoundException()
+        if table is None:
+            raise GlueRepositoryNotFoundException()
 
-            return {
-                'name': table['Name'],
-                'databaseName': table['DatabaseName'],
-                'createTime': table['CreateTime'],
-                'updateTime': table.get('UpdateTime'),
-                'lastAccessTime': table.get('LastAccessTime'),
-                'columns': [
-                    {'name': column['Name'], 'type': column['Type']}
-                    for column in [*table['StorageDescriptor']['Columns'], *table['PartitionKeys']]
-                ]
-            }
-
-        except GlueRepositoryNotFoundException:
-            ns.abort(404)
-        except (GlueRepositoryException, Exception) as e:
-            ns.abort(500, str(e))
+        return {
+            'name': table['Name'],
+            'databaseName': table['DatabaseName'],
+            'createTime': table['CreateTime'],
+            'updateTime': table.get('UpdateTime'),
+            'lastAccessTime': table.get('LastAccessTime'),
+            'columns': [
+                {'name': column['Name'], 'type': column['Type']}
+                for column in [*table['StorageDescriptor']['Columns'], *table['PartitionKeys']]
+            ]
+        }

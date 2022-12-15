@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest.mock import patch
 
 import pytest
+from botocore.exceptions import ClientError
 from common_lib.common.repositories.reports import ReportsRepository
 
 
@@ -69,7 +70,7 @@ def test_update_cache_time_non_existing(dynamo_mock):
         mock_datetime.now.return_value = datetime(2020, 1, 1)
         mock_datetime.side_effect = lambda *args, **kwargs: datetime(*args, **kwargs)
         with ReportsRepository() as repo:
-            with pytest.raises(KeyError):
+            with pytest.raises(ClientError):
                 repo.update_cache_time("testReport_non_existing")
 
 

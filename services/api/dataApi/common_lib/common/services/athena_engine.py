@@ -1,5 +1,4 @@
 import boto3
-from botocore.exceptions import ClientError
 import sqlparse
 from time import sleep
 import pandas as pd
@@ -17,25 +16,21 @@ def table_map():
     list_databases = athena.get_paginator('list_databases')
     list_tables = athena.get_paginator('list_table_metadata')
 
-    try:
-        return [
-            (catalog, db, table['Name'])
-            for (catalog, db) in [
-                (catalog, db['Name'])
-                for catalog in [
-                    catalog['CatalogName']
-                    for resp in list_catalogs.paginate()
-                    for catalog in resp['DataCatalogsSummary']
-                ]
-                for resp in list_databases.paginate(CatalogName=catalog)
-                for db in resp['DatabaseList']
+    return [
+        (catalog, db, table['Name'])
+        for (catalog, db) in [
+            (catalog, db['Name'])
+            for catalog in [
+                catalog['CatalogName']
+                for resp in list_catalogs.paginate()
+                for catalog in resp['DataCatalogsSummary']
             ]
-            for resp in list_tables.paginate(CatalogName=catalog, DatabaseName=db)
-            for table in resp['TableMetadataList']
+            for resp in list_databases.paginate(CatalogName=catalog)
+            for db in resp['DatabaseList']
         ]
-
-    except ClientError as error:
-        raise Exception(error.response['Error']['Message'])
+        for resp in list_tables.paginate(CatalogName=catalog, DatabaseName=db)
+        for table in resp['TableMetadataList']
+    ]
 
 
 def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
@@ -56,7 +51,7 @@ def process_sql(sql: str) -> Tuple[str, List[Tuple[str, str]]]:
 
     statement = sqlparse.parse(sql)[0]
     if statement.get_type() != 'SELECT':
-        raise Exception('Illegal SQL statement')
+        raise ValueError('Illegal SQL statement')
 
     return str(statement), used_tables, protection_level
 
@@ -67,7 +62,7 @@ def query_complete(athena, query_id: str):
     if status == 'SUCCEEDED':
         return response['QueryExecution']['ResultConfiguration']['OutputLocation']
     elif status == 'FAILED' or status == 'CANCELLED':
-        raise Exception(f'Athena exection failed: {response["QueryExecution"]["Status"]["StateChangeReason"]}')
+        raise Exception(f'Athena execution failed: {response["QueryExecution"]["Status"]["StateChangeReason"]}')
     else:
         return None
 
