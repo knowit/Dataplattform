@@ -48,18 +48,12 @@ class Query(Resource):
     @ns.doc(security={'oauth2': ['openid']})
     def get(self):
         args = parser.parse_args()
-        try:
-            return self.query(args.sql, args.output_format)
-        except Exception as e:
-            ns.abort(500, e)
+        return self.query(args.sql, args.output_format)
 
     @ns.expect(QueryRequest)
     @ns.doc(security={'oauth2': ['openid']})
     def post(self):
-        try:
-            return self.query(ns.payload['sql'], ns.payload.get('format', 'json'))
-        except Exception as e:
-            ns.abort(500, e)
+        return self.query(ns.payload['sql'], ns.payload.get('format', 'json'))
 
 
 class FilterType:
