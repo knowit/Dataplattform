@@ -1,8 +1,7 @@
 import json
-
-from botocore.exceptions import ClientError
 import logging
 
+from botocore.exceptions import ClientError
 from common_lib.common.repositories.catalogue import GlueRepositoryNotFoundException
 from werkzeug.exceptions import HTTPException
 
@@ -45,10 +44,10 @@ def handle_any(e: Exception):
 # https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#services-apigateway-errors
 def format_error(response: object, code: int):
     return {
-               'statusCode': code,
-               'headers': {
-                   'Content-Type': 'application/json'
-               },
-               'isBase64Encoded': False,
-               'body': str(code) + ': ' + json.dumps(response)
-           }, code
+        'statusCode': code,
+        'headers': {
+            'Content-Type': 'application/json'
+        },
+        'isBase64Encoded': False,
+        'body': json.dumps(response)
+    }
