@@ -4,6 +4,7 @@ from os import environ
 from flask_cors import CORS
 from dataplattform.api import flask_ext
 from botocore.exceptions import ClientError
+import logging
 
 from apis.query import ns as query_ns
 from apis.report import ns as report_ns
@@ -42,6 +43,13 @@ CORS(app)
 api.add_namespace(query_ns)
 api.add_namespace(report_ns)
 api.add_namespace(catalogue_ns)
+
+if len(logging.getLogger().handlers) > 0:
+    # The Lambda environment pre-configures a handler logging to stderr. If a handler is already configured,
+    # `.basicConfig` does not execute. Thus we set the level directly.
+    logging.getLogger().setLevel(logging.INFO)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 
 @app.route('/schema.json')

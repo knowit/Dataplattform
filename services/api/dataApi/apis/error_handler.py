@@ -3,6 +3,7 @@ from flask import jsonify
 import logging
 
 from common_lib.common.repositories.catalogue import GlueRepositoryNotFoundException
+from werkzeug.exceptions import HTTPException
 
 
 # https://boto3.amazonaws.com/v1/documentation/api/latest/guide/error-handling.html#parsing-error-responses-and-catching-exceptions-from-aws-services
@@ -28,4 +29,8 @@ def handle_not_found(e: GlueRepositoryNotFoundException):
 
 def handle_any(e: Exception):
     logging.error(str(e), exc_info=e)
-    return jsonify({'message': 'Internal Server Error'}), 500
+
+    if isinstance(e, HTTPException):
+        return e
+    else:
+        return jsonify({'message': 'Internal Server Error'}), 500
