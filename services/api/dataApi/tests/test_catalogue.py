@@ -45,7 +45,7 @@ def test_database_table_route_404_ignore(client):
 
 def test_database_route_403(client):
     response = client.get('/catalogue/database/forbidden_database1')
-    assert response.status_code == 403 and 'User does not have access to resource' in response.json['Message']
+    assert response.status_code == 403 and 'User does not have access to resource' in response.json['body']
 
 
 def test_table_route(client):
@@ -60,7 +60,7 @@ def test_database_table_route_404(client):
 
 def test_database_table_route_403(client):
     response = client.get('/catalogue/database/test_database/table/forbidden_table1')
-    assert response.status_code == 403 and 'User does not have access to resource' in response.json['Message']
+    assert response.status_code == 403 and 'User does not have access to resource' in response.json['body']
 
 
 def test_database_table_content(client):
@@ -84,7 +84,7 @@ def test_table_route_404_ignore(client):
 
 def test_table_route_403(client):
     response = client.get('/catalogue/table/forbidden_database1')
-    assert response.status_code == 403 and 'User does not have access to resource' in response.json['Message']
+    assert response.status_code == 403 and 'User does not have access to resource' in response.json['body']
 
 
 def test_table_content(client):

@@ -1,5 +1,6 @@
+import json
+
 from botocore.exceptions import ClientError
-from flask import jsonify
 import logging
 
 from common_lib.common.repositories.catalogue import GlueRepositoryNotFoundException
@@ -16,21 +17,38 @@ def handle_client_error(error: ClientError):
     if error_message['Code'] == 'AccessDeniedException':  # Obfuscate internal information
         error_message['Message'] = 'User does not have access to resource'
 
-    return jsonify(error_message), error_code
+    return format_error(error_message, error_code)
 
 
 def handle_value_error(e: ValueError):
-    return jsonify({'Message': str(e)}), 400
+    return format_error({'Message': str(e)}, 400)
 
 
 def handle_not_found(e: GlueRepositoryNotFoundException):
-    return jsonify({'Message': str(e)}), 404
+    return format_error({'Message': str(e)}, 404)
 
 
 def handle_any(e: Exception):
     logging.error(str(e), exc_info=e)
 
     if isinstance(e, HTTPException):
-        return e
+        return format_error({
+            'code': e.code,
+            'name': e.name,
+            'description': e.description,
+        }, e.code)
     else:
-        return jsonify({'message': 'Internal Server Error'}), 500
+        return format_error({'Message': 'Internal Server Error'}, 500)
+
+
+# ApiGateway demands error objects to be formatted a certain way
+# https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#services-apigateway-errors
+def format_error(response: object, code: int):
+    return {
+               'statusCode': code,
+               'headers': {
+                   'Content-Type': 'application/json'
+               },
+               'isBase64Encoded': False,
+               'body': str(code) + ': ' + json.dumps(response)
+           }, code
