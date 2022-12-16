@@ -24,3 +24,8 @@ def handle_value_error(e: ValueError):
 
 def handle_not_found(e: GlueRepositoryNotFoundException):
     return jsonify({'Message': str(e)}), 404
+
+
+def handle_any(e: Exception):
+    logging.error(str(e), exc_info=e)
+    return jsonify({'message': 'Internal Server Error'}), 500
