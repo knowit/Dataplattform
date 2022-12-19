@@ -11,7 +11,7 @@ def handle_client_error(error: ClientError):
     error_code = error.response.get('ResponseMetadata', {}).get('HTTPStatusCode', 500)
     error_message = error.response.get('Error', {'Message': 'Unknown error'})
     error_message['RequestId'] = error.response.get('ResponseMetadata', {}).get('RequestId')
-    logging.error(str(error_message), exc_info=error)
+    logging.getLogger().error(str(error_message), exc_info=error)
 
     if error_message['Code'] == 'AccessDeniedException':  # Obfuscate internal information
         error_message['Message'] = 'User does not have access to resource'
@@ -28,7 +28,7 @@ def handle_not_found(e: GlueRepositoryNotFoundException):
 
 
 def handle_any(e: Exception):
-    logging.error(str(e), exc_info=e)
+    logging.getLogger().error(str(e), exc_info=e)
 
     if isinstance(e, HTTPException):
         return format_error({
@@ -41,8 +41,10 @@ def handle_any(e: Exception):
 
 
 # ApiGateway demands error objects to be formatted a certain way
-# https://docs.aws.amazon.com/lambda/latest/dg/services-apigateway.html#services-apigateway-errors
+# https://docs.aws.amazon.com/apigateway/latest/developerguide/handle-errors-in-lambda-integration.html
 def format_error(response: object, code: int):
+    logging.getLogger().info("Formatting error message")
+
     return {
         'statusCode': code,
         'headers': {
