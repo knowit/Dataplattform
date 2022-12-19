@@ -39,6 +39,7 @@ api.add_namespace(query_ns)
 api.add_namespace(report_ns)
 api.add_namespace(catalogue_ns)
 
+api._default_error_handler = Exception
 api.error_handlers[ValueError] = handle_value_error
 api.error_handlers[GlueRepositoryNotFoundException] = handle_not_found
 api.error_handlers[ClientError] = handle_client_error
