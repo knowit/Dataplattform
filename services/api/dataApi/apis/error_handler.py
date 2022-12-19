@@ -3,7 +3,6 @@ import logging
 
 from botocore.exceptions import ClientError
 from common_lib.common.repositories.catalogue import GlueRepositoryNotFoundException
-from flask import jsonify
 from werkzeug.exceptions import HTTPException
 
 
@@ -46,11 +45,11 @@ def handle_any(e: Exception):
 def format_error(response: object, code: int):
     logging.getLogger().info("Formatting error message")
 
-    return jsonify({
+    return {
         'statusCode': code,
         'headers': {
             'Content-Type': 'application/json'
         },
         'isBase64Encoded': False,
         'body': json.dumps(response)
-    }), code
+    }, code

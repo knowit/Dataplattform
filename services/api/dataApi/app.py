@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restx import Api
 from os import environ
 from flask_cors import CORS
+
 from dataplattform.api import flask_ext
 from botocore.exceptions import ClientError
 import logging
@@ -15,12 +16,6 @@ from common_lib.common.repositories.catalogue import GlueRepositoryNotFoundExcep
 auth_url = environ.get('AUTHURL')
 
 app = Flask(__name__)
-
-app.register_error_handler(ClientError, handle_client_error)
-app.register_error_handler(ValueError, handle_value_error)
-app.register_error_handler(GlueRepositoryNotFoundException, handle_not_found)
-app.register_error_handler(Exception, handle_any)
-
 
 api = Api(
     app,
@@ -43,6 +38,11 @@ CORS(app)
 api.add_namespace(query_ns)
 api.add_namespace(report_ns)
 api.add_namespace(catalogue_ns)
+
+api.error_handlers[ValueError] = handle_value_error
+api.error_handlers[GlueRepositoryNotFoundException] = handle_not_found
+api.error_handlers[ClientError] = handle_client_error
+api.error_handlers[Exception] = handle_any
 
 if len(logging.getLogger().handlers) > 0:
     # The Lambda environment pre-configures a handler logging to stderr. If a handler is already configured,
