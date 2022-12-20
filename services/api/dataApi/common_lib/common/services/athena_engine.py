@@ -62,7 +62,7 @@ def query_complete(athena, query_id: str):
     if status == 'SUCCEEDED':
         return response['QueryExecution']['ResultConfiguration']['OutputLocation']
     elif status == 'FAILED' or status == 'CANCELLED':
-        raise Exception(f'Athena execution failed: {response["QueryExecution"]["Status"]["StateChangeReason"]}')
+        raise ValueError(f'Athena execution failed: {response["QueryExecution"]["Status"]["StateChangeReason"]}')
     else:
         return None
 

@@ -1,4 +1,3 @@
-import json
 import logging
 
 from botocore.exceptions import ClientError
@@ -23,21 +22,20 @@ def handle_client_error(error: ClientError):
     }
 
     return error_response, status_code
-    # return format_error(error_message, error_code)
 
 
 def handle_value_error(e: ValueError):
-    logging.getLogger().warning("value error" + str(e))
+    logging.getLogger().warning("value error: " + str(e))
     return {'message': str(e)}, 400
 
 
 def handle_not_found(e: GlueRepositoryNotFoundException):
-    logging.getLogger().warning("repo not found error" + str(e))
+    logging.getLogger().warning("repo not found error: " + str(e))
     return {'message': str(e)}, 404
 
 
 def handle_any(e: Exception):
-    logging.getLogger().error("unhandled exception" + str(e), exc_info=e)
+    logging.getLogger().error("unhandled exception: " + str(e), exc_info=e)
 
     if isinstance(e, HTTPException):
         return {
@@ -47,18 +45,3 @@ def handle_any(e: Exception):
         }, e.code
     else:
         return {'message': 'Internal Server Error'}, 500
-
-
-# ApiGateway demands error objects to be formatted a certain way
-# https://docs.aws.amazon.com/apigateway/latest/developerguide/handle-errors-in-lambda-integration.html
-def format_error(response: object, code: int):
-    logging.getLogger().info("Formatting error message")
-
-    return {
-        'statusCode': code,
-        'headers': {
-            'Content-Type': 'application/json'
-        },
-        'isBase64Encoded': False,
-        'body': json.dumps(response)
-    }, code

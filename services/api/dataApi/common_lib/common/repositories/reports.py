@@ -4,6 +4,7 @@ from typing import List
 
 from boto3.dynamodb.conditions import Key
 from common_lib.common.repositories.dynamo_db import DynamoDBRepository
+from werkzeug.exceptions import NotFound
 
 
 class ReportsRepository(DynamoDBRepository):
@@ -17,6 +18,10 @@ class ReportsRepository(DynamoDBRepository):
         response = self.table.get_item(
             Key={'name': name}
         )
+
+        if 'Item' not in response:
+            raise NotFound('Report not found')
+
         return response['Item']
 
     def get_by_tables(self, tables: List[str]):
