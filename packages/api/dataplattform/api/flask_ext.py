@@ -1,10 +1,13 @@
 import boto3
 import botocore
 import datetime
+
+from botocore.exceptions import ClientError
 from dateutil.tz import tzlocal
 from flask import Flask, request
 import re
 from cachetools import cached, TTLCache
+from werkzeug.exceptions import Forbidden
 
 
 class UserSession(object):
@@ -13,7 +16,7 @@ class UserSession(object):
             self.init_app(app)
 
     def init_app(self, app: Flask, assume_user_role=True):
-        self.base_session = boto3._get_default_session()
+        self.base_session = boto3.setup_default_session()
         if assume_user_role:
             app.before_request(self.assume_role)
 
@@ -38,10 +41,15 @@ class UserSession(object):
     def cognito_group(self, group: str, iss: str):
         if group and iss:
             cognito_client = self.base_session.client('cognito-idp')
-            response = cognito_client.get_group(
-                GroupName=re.sub(r"[\[\]]", "", group),
-                UserPoolId=iss.split('/')[-1])
-            return response.get('Group', None)
+            try:
+                response = cognito_client.get_group(
+                    GroupName=re.sub(r"[\[\]]", "", group),
+                    UserPoolId=iss.split('/')[-1])
+                return response.get('Group', None)
+            except ClientError as ce:
+                if ce.response['Error']['Code'] == 'ResourceNotFoundException':
+                    raise Forbidden('User does not have access to resource')
+                raise ce
         return None
 
     @cached(TTLCache(maxsize=10, ttl=60))
