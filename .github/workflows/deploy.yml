@@ -75,3 +75,23 @@ jobs:
         run: |
           echo -e "Deploying services to stage $STAGE\n"
           dataplattform deploy -s $SERVICES --stage $STAGE --ignore services/infrastructure/quicksight
+      
+      - name: Notify failure on Slack
+        if: failure()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        uses: knowit/Dataplattform@master
+        with:
+          channel: '#dataplattform_deployment'
+          status: ${{ job.status }}
+          color: danger
+
+      - name: Notify success on Slack
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        uses: knowit/Dataplattform@master
+        with:
+          channel: '#dataplattform_deployment'
+          status: SUCCESS
+          color: good
