@@ -12,7 +12,7 @@ jobs:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}     
         SLACK_CHANNEL: dataplattform_deployment
         SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-        SLACK_MESSAGE: '${env.GITHUB_WORKFLOW}'
+        SLACK_MESSAGE: ${{ env.GITHUB_WORKFLOW }}
         SLACK_TITLE: 'PUSH'
         SLACK_USERNAME: Dataplattform Deployment
   
