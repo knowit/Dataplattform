@@ -1,22 +1,18 @@
-name: Notify on Slack
 on: push
-jobs: 
+name: Slack Notification Demo
+jobs:
   slackNotification:
-    name: Slack Notifications 
+    name: Slack Notification
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Slack Notifications
-        uses: adamkdean/simple-slack-notify@master
-        env:
-          # required
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          channel: 'dataplattform_deployment'
-          status: ${{ job.status }}
-          success_text: 'Deployment (#${env.GITHUB_RUN_NUMBER}) completed successfully'
-          failure_text: 'Deployment (#${env.GITHUB_RUN_NUMBER}) failed'
-          cancelled_text: 'Deployment (#${env.GITHUB_RUN_NUMBER}) was cancelled'
-          fields: |
-            [{ "title": "Host", "value": "${{ secrets.DEPLOY_HOST }}"},
-            { "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+    - uses: actions/checkout@v2
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: dataplattform_deployments
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_ICON: https://github.com/rtCamp.png?size=48
+        SLACK_MESSAGE: 'Post Content :rocket:'
+        SLACK_TITLE: Post Title
+        SLACK_USERNAME: Dataplattform Deployments
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL
