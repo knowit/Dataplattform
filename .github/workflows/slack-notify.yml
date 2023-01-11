@@ -1,13 +1,12 @@
 name: Notify on Slack
 on: push
 jobs: 
-  slackNotification:
-     name: Slack Notifications
-     runs-on: ubuntu-latest
-     steps:
-     - uses: actions/checkout@v2
-     - name: Slack Notifications
-       uses: adamkdean/simple-slack-notify@master
+  name: Slack Notifications 
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v2
+    - name: Slack Notifications
+      uses: adamkdean/simple-slack-notify@master
       env:
         # required
         SLACK_WEBHOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
