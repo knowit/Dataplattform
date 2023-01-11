@@ -12,7 +12,6 @@ jobs:
         SLACK_CHANNEL: dataplattform_deployments
         SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
         SLACK_ICON: https://github.com/rtCamp.png?size=48
-        SLACK_MESSAGE: 'Post Content :rocket:'
-        SLACK_TITLE: Post Title
+        SLACK_TITLE: ${{ env.BRANCH }}
         SLACK_USERNAME: Dataplattform Deployments
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
