@@ -77,6 +77,7 @@ jobs:
           dataplattform deploy -s $SERVICES --stage $STAGE --ignore services/infrastructure/quicksight
 
       - name: Slack Notification
+        if: always()
         uses: rtCamp/action-slack-notify@v2.2.0
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}     
