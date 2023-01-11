@@ -12,6 +12,11 @@ jobs:
           # required
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
-          # custom message to send to slack
-          args: '{\"channel\":\"dataplattform_deployment",\"blocks\":[{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Pull Request:* ${{ github.event.pull_request.title }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"*Contributor :* ${{ github.event.pull_request.user.login }}\n*Request State:* ${{ github.event.pull_request.state }}\"}},{\"type\":\"section\",\"text\":{\"type\":\"mrkdwn\",\"text\":\"<${{ github.event.pull_request.html_url }}|View Pull Request>\"}}]}' 
-        
+          channel: 'dataplattform_deployment'
+          status: ${{ job.status }}
+          success_text: 'Deployment (#${env.GITHUB_RUN_NUMBER}) completed successfully'
+          failure_text: 'Deployment (#${env.GITHUB_RUN_NUMBER}) failed'
+          cancelled_text: 'Deployment (#${env.GITHUB_RUN_NUMBER}) was cancelled'
+          fields: |
+            [{ "title": "Host", "value": "${{ secrets.DEPLOY_HOST }}"},
+            { "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
