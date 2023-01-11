@@ -83,7 +83,7 @@ jobs:
     needs: [deploy]
 
     # Only run this workflow if it target is main branch on pull_request event
-    if: ${{ github.base_ref == 'main' && github.event_name == 'push' }}
+    if: ${{ github.base_ref == 'main' || github.event_name == 'push' }}
 
     steps:
 
