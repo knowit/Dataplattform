@@ -78,12 +78,12 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 'employees': df_with_employees[
                     (df_with_employees["customer"] == row["customer"])
                     & (df_with_employees["work_order_description"] == row["work_order_description"])
-                    ]["employees"].sum(),
+                ]["employees"].sum(),
                 'hours': dataframe[
                     (dataframe['customer'] == row["customer"])
                     & (dataframe['work_order_description'] == row["work_order_description"])
                     & (dataframe['reg_period'] == row["reg_period"])
-                    ]['used_hrs'].sum(),
+                ]['used_hrs'].sum(),
                 'reg_period': row["reg_period"],
                 'timestamp': timestamp,
                 'work_order': row["work_order_description"]
@@ -102,10 +102,23 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
         num_weeks = int(os.environ.get('NUM_WEEKS', '4'))
 
-        reg_periods_int = old_frame['reg_period'].astype('str').astype('int')
-        reg_periods = reg_periods_int.drop_duplicates(
-        ).sort_values(ascending=False).astype('str')
-        reg_periods = reg_periods.head(num_weeks)
+        updated_reg_periods = old_frame['reg_period'].astype('str')
+        reg_periods = old_frame['reg_period'].astype('str')
+
+        # need to adjust for single char weeks, since 202252 is greater than 20251
+        for index, value in reg_periods.items():
+            if len(value) < 6:
+                updated_reg_periods.update(
+                    pd.Series([value[:4] + "0" + value[4:]], index=[index]))
+
+        updated_reg_periods = updated_reg_periods.astype(
+            'int').sort_values(ascending=False).astype('str')
+
+        # replace date with correct date. ex 202301 becomes 20231
+        for index, value in reg_periods.items():
+            updated_reg_periods.loc[index] = value
+
+        reg_periods = updated_reg_periods.head(num_weeks)
 
         old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
         df = pd.concat([df, old_frame]).drop(columns=['guid']).drop_duplicates(
