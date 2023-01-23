@@ -6,7 +6,9 @@ import json
 
 def mock(event, context):
     try:
-        mock_file_path = Path(__file__).resolve().parent.parent.parent / Path('tests/test_data') / Path('test_data_mock.json')
+        mock_file_path = (
+            Path(__file__).resolve().parent.parent.parent / Path('tests/test_data') / Path('test_data_mock.json')
+            )
         with open(mock_file_path) as f:
             mock_json = json.load(f)
 
