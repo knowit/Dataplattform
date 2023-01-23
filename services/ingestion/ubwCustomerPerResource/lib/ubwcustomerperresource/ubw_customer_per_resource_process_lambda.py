@@ -114,10 +114,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
         updated_reg_periods = updated_reg_periods.astype(
             'int').sort_values(ascending=False).astype('str')
 
-        # replace date with correct date. ex 202301 becomes 20231
-        for index, value in reg_periods.items():
-            updated_reg_periods.loc[index] = value
-
         reg_periods = updated_reg_periods.head(num_weeks)
 
         old_frame = old_frame[old_frame['reg_period'].isin(reg_periods)]
