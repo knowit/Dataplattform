@@ -1,3 +1,2 @@
 requests==2.23
-faker==8.8.1
 file:../../../packages/common
