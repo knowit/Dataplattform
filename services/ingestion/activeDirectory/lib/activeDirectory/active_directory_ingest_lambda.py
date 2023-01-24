@@ -8,7 +8,7 @@ from dataplattform.common.aws import SSM
 
 
 def handler(event, context):
-    url = SSM(with_decryption=False).get('active_directory_url')
+    url = SSM(with_decryption=False).get('API_URL')
     res = requests.get(f'{url}')
     data_json = res.json()
 
