@@ -4,11 +4,11 @@ import boto3
 from os import environ
 import json
 import hashlib
-
-url = 'http://10.205.0.5:20201/api/Users'
+from dataplattform.common.aws import SSM
 
 
 def handler(event, context):
+    url = SSM(with_decryption=False).get('active_directory_url')
     res = requests.get(f'{url}')
     data_json = res.json()
 
@@ -52,8 +52,10 @@ def handler(event, context):
         'managerDistinguishedName': 'manager'}, inplace=True)
     employee_df = employee_df.fillna("")
 
-    employee_df['manager'] = employee_df['manager'].str.split('=').str[1].str.split(',').str[0]
-    employee_df['distinguished_name'] = employee_df['distinguished_name'].str.split('=').str[1].str.split(',').str[0]
+    employee_df['manager'] = employee_df['manager'].str.split(
+        '=').str[1].str.split(',').str[0]
+    employee_df['distinguished_name'] = employee_df['distinguished_name'].str.split(
+        '=').str[1].str.split(',').str[0]
 
     for i in employee_df.columns:
         employee_df[i] = employee_df[i].astype(str)

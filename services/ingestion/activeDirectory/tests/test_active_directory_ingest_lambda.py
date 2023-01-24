@@ -29,7 +29,8 @@ def add_ddb_dummy_data(ddb_table):
 
 
 def test_initial_ingest(s3_bucket, test_data, dynamodb_resource):
-    responses.add(responses.GET, 'http://10.205.0.5:20201/api/Users', json=make_test_json(test_data), status=200)
+    responses.add(responses.GET, 'http://test.no/api/Users',
+                  json=make_test_json(test_data), status=200)
     resource = boto3.resource('dynamodb')
     table = resource.Table(environ.get('PERSON_DATA_TABLE'))
 
@@ -49,7 +50,8 @@ def test_initial_ingest(s3_bucket, test_data, dynamodb_resource):
 
 def test_filter_service_user(s3_bucket, test_data, dynamodb_resource):
     test_data[2]['isServiceUser'] = True
-    responses.add(responses.GET, 'http://10.205.0.5:20201/api/Users', json=make_test_json(test_data), status=200)
+    responses.add(responses.GET, 'http://test.no/api/Users',
+                  json=make_test_json(test_data), status=200)
 
     handler(None, None)
 
