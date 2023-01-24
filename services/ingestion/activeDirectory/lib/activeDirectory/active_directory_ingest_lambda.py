@@ -42,6 +42,7 @@ def handler(event, context):
         'knowitBranch',
         'distinguishedName',
         'managerDistinguishedName',
+        'title'
     ]
 
     employee_df = df[employee_table].copy()
@@ -49,7 +50,8 @@ def handler(event, context):
         'primaryEmailAddress': 'email',
         'samAccountName': 'alias',
         'distinguishedName': 'distinguished_name',
-        'managerDistinguishedName': 'manager'}, inplace=True)
+        'managerDistinguishedName': 'manager',
+        'title': 'title'}, inplace=True)
     employee_df = employee_df.fillna("")
 
     employee_df['manager'] = employee_df['manager'].str.split('=').str[1].str.split(',').str[0]

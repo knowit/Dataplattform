@@ -18,6 +18,7 @@
   "isExternalUser": false,
   "isPasswordExpired": false,
   "isDeleted": false,
+  "title": "Consultant",
   "licenses": [
     {
       "product": "1Password",
@@ -64,6 +65,7 @@
   "isExternalUser": false,
   "isPasswordExpired": false,
   "isDeleted": false,
+  "title": "Consultant",
   "licenses": [
     {
       "product": "1Password",
@@ -110,6 +112,7 @@
   "isExternalUser": false,
   "isPasswordExpired": false,
   "isDeleted": false,
+  "title": "Consultant",
   "licenses": [
     {
       "product": "1Password",

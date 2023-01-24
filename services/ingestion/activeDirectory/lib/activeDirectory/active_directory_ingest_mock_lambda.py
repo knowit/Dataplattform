@@ -27,7 +27,8 @@ def mock(event, context):
                         'distinguished_name': ad_user['distinguished_name'],
                         'email': ad_user['email'],
                         'knowitBranch': ad_user['knowitBranch'],
-                        'manager': ad_user['manager']
+                        'manager': ad_user['manager'],
+                        'title': ad_user['title']
                     }
                 )
 
