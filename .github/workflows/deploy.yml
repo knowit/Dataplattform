@@ -6,7 +6,7 @@ on:
     types: [published]
   push:
     branches:
-      - main
+      - 461-slack-notifications
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -87,7 +87,7 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_CHANNEL: dataplattform_deployments
-          SLACK_COLOR: ${{ jobs.deploy.result }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_COLOR: ${{ needs.deploy.result }} # or a specific color like 'good' or '#ff00ff'
           SLACK_ICON: https://github.com/rtCamp.png?size=48
           SLACK_USERNAME: Dataplattform Deployments
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
