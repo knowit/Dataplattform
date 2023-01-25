@@ -1,0 +1,43 @@
+name: Test deploy dataplattform
+
+on:
+  push:
+    branches:
+      - feature/461-slack-notifications
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.workflow-scripts/deploy/**'
+
+jobs:
+  test_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.2.1
+
+      - uses: actions/checkout@v2
+        with:
+          ref: feature/main-cicd
+          fetch-depth: 0
+
+      - name: Run tests
+        run: bats -r .workflow-scripts/deploy/test/.
+  slackNotification:
+    if: ${{ always() }}
+    needs: [test_deploy]
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: dataplattform_deployments
+          SLACK_COLOR: ${{ needs.deploy.result }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_USERNAME: Dataplattform Deployments
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
