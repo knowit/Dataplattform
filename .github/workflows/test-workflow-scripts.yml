@@ -1,6 +1,9 @@
 name: Test workflow scripts
 
 on:
+push:
+    branches:
+      - feature/461-slack-notifications
   pull_request:
     branches:
       - main
@@ -22,3 +25,19 @@ jobs:
 
       - name: Run tests
         run: bats -r .workflow-scripts/.
+
+  slackNotification:
+    if: ${{ always() }}
+    needs: [test_deploy]
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: dataplattform_deployments
+          SLACK_COLOR: ${{ needs.test_deploy.result }} # or a specific color like 'good' or '#ff00ff'
+          SLACK_ICON: https://github.com/rtCamp.png?size=48
+          SLACK_USERNAME: Dataplattform Deployments
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
