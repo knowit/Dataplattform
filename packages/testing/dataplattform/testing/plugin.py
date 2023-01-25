@@ -104,7 +104,7 @@ def db_person_data():
         {'guid': 'faeb1af849a926d21bda012e4b3a971e1107fd0e', 'email': 'cathrine.kristiansen@knowit.no',
          'displayName': 'Cathrine Kristiansen', 'alias': 'catkri', 'company': 'Knowit Objectnet',
          'knowitBranch': 'Objectnet', 'distinguished_name': 'Cathrine Kristiansen', 'manager': 'Finn-Pål Myhre',
-          'title': 'Consultatnt'}
+         'title': 'Consultatnt'}
     ]
 
 
