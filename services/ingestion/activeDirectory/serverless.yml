@@ -103,6 +103,7 @@ functions:
     package:
       include:
         - "${self:custom.editable.srcDir}/*.py"
+        - "tests/test_data/test_data_mock.json"
     events:
       - schedule:
           name: ${self:custom.stage}-${self:service}-mock-timer

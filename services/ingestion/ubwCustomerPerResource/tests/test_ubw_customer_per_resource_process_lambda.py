@@ -31,7 +31,11 @@ def create_date_string(num_weeks_back):
     date = datetime.now()
     delta = timedelta(weeks=num_weeks_back)
     tmp_year, tmp_week = (date - delta).isocalendar()[0:2]
-    return str(tmp_year) + str(tmp_week)
+    tmp_year = str(tmp_year)
+    tmp_week = str(tmp_week)
+    if len(tmp_week) == 1:
+        tmp_week = "0"+tmp_week
+    return tmp_year + tmp_week
 
 
 @fixture
