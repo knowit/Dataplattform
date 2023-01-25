@@ -6,7 +6,7 @@ on:
     types: [published]
   push:
     branches:
-      - 461-slack-notifications
+      - main
     paths:
       - 'services/**'
       - '.config/.serverless'
@@ -75,7 +75,6 @@ jobs:
         run: |
           echo -e "Deploying services to stage $STAGE\n"
           dataplattform deploy -s $SERVICES --stage $STAGE --ignore services/infrastructure/quicksight
-
   slackNotification:
     if: ${{ always() }}
     needs: [deploy]
