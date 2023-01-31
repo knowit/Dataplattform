@@ -28,7 +28,7 @@ def mock(event, context):
                         'email': ad_user['email'],
                         'knowitBranch': ad_user['knowitBranch'],
                         'manager': ad_user['manager'],
-                        'title': ad_user['title']
+                        'manager_email': ad_user['manager_email']
                     }
                 )
 

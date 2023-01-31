@@ -31,9 +31,7 @@ def test_process(s3_bucket, setup_queue_event, dynamodb_resource):
     handler(event, None)
 
     ad_data_parquet = s3_bucket.Object("data/test/structured/active_directory/part.0.parquet")
-    print(ad_data_parquet)
     ad_data = pd.read_parquet(BytesIO(ad_data_parquet.get()['Body'].read()))
-    print(ad_data)
 
     test_person_1 = ad_data.loc[ad_data['guid'] == "20dbbfa18380233aa643575720b893fac5137699"]
     test_person_2 = ad_data.loc[ad_data['guid'] == "491b9fa9bfac17563882b0fdc6f3a8a97417bd99"]
