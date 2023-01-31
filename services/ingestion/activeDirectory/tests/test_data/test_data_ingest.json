@@ -18,6 +18,8 @@
   "isExternalUser": false,
   "isPasswordExpired": false,
   "isDeleted": false,
+  "title": "Consultant",
+  "manager": null,
   "licenses": [
     {
       "product": "1Password",
@@ -64,6 +66,7 @@
   "isExternalUser": false,
   "isPasswordExpired": false,
   "isDeleted": false,
+  "title": "Consultant",
   "licenses": [
     {
       "product": "1Password",
@@ -89,7 +92,18 @@
       "iconFilename": "Office365-64x64.png",
       "licenseGroupName": "license"
     }
-  ]
+  ],
+  "manager": {
+    "userPrinicipalName": "per.nordmann@knowit.no",
+    "primaryEmailAddress": "per.nordmann@knowit.no",
+    "displayName": "Per Nordmann",
+    "samAccountName": "pernord",
+    "telephoneNumber": "+47 12345678",
+    "company": "Knowit Objectnet",
+    "knowitBranch": "Solutions",
+    "distinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+    "managerDistinguishedName": "CN=Olav Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local"
+  }
 },
 {
   "hasActiveDirectoryUser": true,
@@ -110,6 +124,7 @@
   "isExternalUser": false,
   "isPasswordExpired": false,
   "isDeleted": false,
+  "title": "Consultant",
   "licenses": [
     {
       "product": "1Password",
@@ -135,5 +150,16 @@
       "iconFilename": "Office365-64x64.png",
       "licenseGroupName": "license"
     }
-  ]
+  ],
+  "manager":{
+    "userPrinicipalName": "per.nordmann@knowit.no",
+    "primaryEmailAddress": "per.nordmann@knowit.no",
+    "displayName": "Per Nordmann",
+    "samAccountName": "pernord",
+    "telephoneNumber": "+47 12345678",
+    "company": "Knowit Objectnet",
+    "knowitBranch": "Solutions",
+    "distinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+    "managerDistinguishedName": "CN=Olav Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local"
+  }
 }]

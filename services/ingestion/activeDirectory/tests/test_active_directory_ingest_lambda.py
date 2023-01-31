@@ -46,6 +46,8 @@ def test_initial_ingest(s3_bucket, test_data, dynamodb_resource):
     assert persons[0]['displayName'] == 'Per Nordmann'
     assert persons[1]['displayName'] == 'Kari Nordmann'
     assert persons[2]['displayName'] == 'Lisa Nordmann'
+    assert persons[1]['manager_email'] == 'per.nordmann@knowit.no'
+    assert persons[2]['manager_email'] == 'per.nordmann@knowit.no'
 
 
 def test_filter_service_user(s3_bucket, test_data, dynamodb_resource):

@@ -14,7 +14,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
     db = boto3.resource('dynamodb')
     person_data_table = db.Table(environ.get('PERSON_DATA_TABLE'))
     persons = pd.DataFrame(person_data_table.scan()['Items'])
-    persons_filtered = persons[['guid', 'displayName', 'email', 'manager']]
+    persons_filtered = persons[['guid', 'displayName', 'email', 'manager', 'manager_email']]
     number_of_employees = len(persons_filtered)
     ad_num_employees = pd.DataFrame({'time': int(datetime.now().timestamp()),
                                      'number_of_employees': number_of_employees}, index=[0])

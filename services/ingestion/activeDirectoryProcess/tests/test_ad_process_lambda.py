@@ -40,7 +40,7 @@ def test_process(s3_bucket, setup_queue_event, dynamodb_resource):
     assert 'displayName' in test_person_1.columns
     assert 'email' in test_person_1.columns
     assert 'manager' in test_person_1.columns
-    assert test_person_1.columns.size == 4
+    assert test_person_1.columns.size == 5
     assert test_person_1['displayName'][0] == "Per Nordmann"
     assert test_person_2['email'][1] == "kari.nordmann@knowit.no"
     assert test_person_3['manager'][2] == "Per Nordmann"
