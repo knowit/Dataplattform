@@ -6,7 +6,8 @@ from unittest.mock import patch, MagicMock
 
 
 def pytest_addoption(parser):
-    parser.addini('dataplattform-aws-ssm', type='linelist', help='', default=[])
+    parser.addini('dataplattform-aws-ssm',
+                  type='linelist', help='', default=[])
 
 
 @hookimpl(tryfirst=True)
@@ -161,9 +162,9 @@ def s3_buckets():
         s3.create_bucket(Bucket=environ.get('DATALAKE'))
         s3.create_bucket(Bucket=environ.get('PUBLIC_BUCKET'))
         yield {
-                "datalake": s3.Bucket(environ.get('DATALAKE')),
-                "public_bucket": s3.Bucket(environ.get('PUBLIC_BUCKET'))
-              }
+            "datalake": s3.Bucket(environ.get('DATALAKE')),
+            "public_bucket": s3.Bucket(environ.get('PUBLIC_BUCKET'))
+        }
 
 
 @fixture
@@ -249,7 +250,8 @@ def create_table_mock(mocker):
             assert False, 'Number of tables provided does not equal number of on_to_parquet calls'
 
         error_msg = 'No tables created, or wrong naming of tables provided'
-        assert all([t == tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)]), error_msg
+        assert all([t == tables[i] for i, ((_, t, ), _) in enumerate(
+            on_to_parquet_stub.call_args_list)]), error_msg
 
     def assert_table_not_created(*tables):
         tables = [f'structured/{t}' for t in tables]
@@ -257,7 +259,8 @@ def create_table_mock(mocker):
             assert True, 'No tables are created'
 
         error_msg = 'One or more tables are created'
-        assert all([t != tables[i] for i, ((_, t, ), _) in enumerate(on_to_parquet_stub.call_args_list)]), error_msg
+        assert all([t != tables[i] for i, ((_, t, ), _) in enumerate(
+            on_to_parquet_stub.call_args_list)]), error_msg
 
     def df_from_calls(table):
         from pandas import concat
@@ -290,20 +293,21 @@ def create_table_mock(mocker):
     def assert_table_data_contains_df(table, df, **kwargs):
         import string
         import random
-        import numpy as np
         # pandas.isin() does not support comparing dataframes with null/nullable values.
         # Comparing two dataframes containing null at the same locations will not work.
         # Therefor all nullable values in both dataframes are assigned to the same random value.
 
-        df = df.astype(np.object)
-        df_from_calls_object = df_from_calls(f'structured/{table}').astype(np.object)
+        df = df.astype(object)
+        df_from_calls_object = df_from_calls(
+            f'structured/{table}').astype(object)
 
         fill_value = ''.join(random.choices(string.ascii_uppercase +
                                             string.digits, k=7))
         input_df = df.fillna(fill_value)
         df_from_calls_object = df_from_calls_object.fillna(fill_value)
         tmp_df = input_df.isin(df_from_calls_object)
-        assert tmp_df.eq(True).all().all(), "Dataframe is not contained in table, values differ"
+        assert tmp_df.eq(True).all().all(
+        ), "Dataframe is not contained in table, values differ"
 
     on_to_parquet_stub.assert_table_created = assert_table_created
     on_to_parquet_stub.assert_table_not_created = assert_table_not_created
