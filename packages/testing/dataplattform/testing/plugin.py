@@ -290,13 +290,12 @@ def create_table_mock(mocker):
     def assert_table_data_contains_df(table, df, **kwargs):
         import string
         import random
-        import numpy as np
         # pandas.isin() does not support comparing dataframes with null/nullable values.
         # Comparing two dataframes containing null at the same locations will not work.
         # Therefor all nullable values in both dataframes are assigned to the same random value.
 
-        df = df.astype(np.object)
-        df_from_calls_object = df_from_calls(f'structured/{table}').astype(np.object)
+        df = df.astype(object)
+        df_from_calls_object = df_from_calls(f'structured/{table}').astype(object)
 
         fill_value = ''.join(random.choices(string.ascii_uppercase +
                                             string.digits, k=7))
