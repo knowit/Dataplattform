@@ -1,0 +1,150 @@
+[
+    {
+        "name": "ubwExperience",
+        "queryString": "SELECT ue.name, ad.email, ue.alias, ue.experience, ue.examination_year, ue.grade, ue.start_year, ub.guid FROM ubw_experience ue JOIN ubw_customer_per_resource ub ON UPPER(ue.alias) = UPPER(ub.alias) JOIN active_directory ad ON ad.guid = ub.guid GROUP BY ue.name, ad.email, ue.alias, ue.experience, ue.examination_year, ue.grade, ue.start_year, ub.guid"
+    },
+    {
+        "name": "employeeInformation",
+        "queryString": "WITH last_education AS (SELECT a.user_id, array_agg(a.degree)[1] AS degree, array_agg(a.year_to)[1] AS year_to FROM cv_partner_education a INNER JOIN (SELECT user_id, max(year_to) AS year_to FROM cv_partner_education GROUP BY user_id) b ON a.user_id = b.user_id AND a.year_to = b.year_to GROUP BY  a.user_id) SELECT emp.user_id, emp.guid, navn,ad.manager, title, link, degree, emp.email, image_key, ubw_cost.customer, ubw_cost.weigth as weight, ubw_cost.work_order_description FROM cv_partner_employees AS emp LEFT OUTER JOIN last_education AS e ON e.user_id = emp.user_id LEFT OUTER JOIN (SELECT guid, CASE WHEN work_order_description = arbeids_ordre THEN prosjekt ELSE work_order_description END as work_order_description, weigth, CASE WHEN customer = dagens_ubw_prosjekt THEN kunde ELSE customer END as customer FROM (SELECT * FROM ubw_customer_per_resource LEFT JOIN (SELECT DISTINCT \"dagens ubw prosjekt\" AS dagens_ubw_prosjekt, arbeids_ordre, kunde, prosjekt FROM thomas_do_knowit_no_kundemapping) ON dagens_ubw_prosjekt = customer AND arbeids_ordre = work_order_description)) as ubw_cost ON emp.guid=ubw_cost.guid LEFT OUTER JOIN active_directory as ad ON ad.guid=emp.guid order by navn"
+    },
+    {
+        "name": "ageDistribution",
+        "queryString": "select age, count(age) as count from (SELECT year(now()) - born_year as age FROM cv_partner_employees where born_year > 0) where age > 10 group by age order by age asc"
+    },
+    {
+        "name": "employeeDataUBW",
+        "queryString": "SELECT b.customer, ad.email, ad.manager, b.guid, a.hours, a.timestamp, a.reg_period, b.project_type, b.work_order, b.work_order_description FROM ubw_per_project_data a JOIN ubw_customer_per_resource b ON a.reg_period = b.reg_period JOIN active_directory ad ON ad.guid = b.guid"
+    },
+    {
+        "name": "fagActivity",
+        "queryString": "SELECT substr(reg_period, 1, 4) as year, substr(reg_period, 5, 6) as week, used_hrs FROM ubw_fagtimer order by year, week asc"
+    },
+    {
+        "name": "employeeSkills",
+        "queryString": "SELECT employee.user_id, employee.email, array_join(language, ';', '') AS language, array_join(skill, ';', '') AS skill, array_join(role, ';', '') AS role FROM (SELECT user_id, email FROM cv_partner_employees) AS employee INNER JOIN (SELECT user_id, array_distinct(array_agg(name)) AS language FROM cv_partner_languages GROUP BY  user_id) AS langs ON langs.user_id = employee.user_id INNER JOIN (SELECT DISTINCT user_id, array_distinct(array_agg(category)) AS skill FROM cv_partner_technology_skills WHERE technology_skills != '' AND category != '' GROUP BY  user_id ) AS skills ON skills.user_id = employee.user_id INNER JOIN (SELECT DISTINCT user_id, array_distinct(array_agg(roles)) AS role FROM cv_partner_project_experience WHERE roles != '' GROUP BY  user_id ) AS roles ON roles.user_id = employee.user_id"
+    },
+    {
+        "name": "employeeImages",
+        "queryString": "select * from cv_partner_employee_images"
+    },
+    {
+        "name": "ageDistributionGroups",
+        "queryString": "SELECT CASE grouped_age WHEN 30 THEN 'under 30' WHEN 40 THEN 'under 40' WHEN 50 THEN 'under 50' ELSE 'over 50' END AS age_group, count(grouped_age) AS count FROM ( SELECT CASE WHEN age <= 30 THEN 30 WHEN age <= 40 THEN 40 WHEN age <= 50 THEN 50 ELSE 60 END AS grouped_age FROM (SELECT year(now()) - born_year AS age FROM cv_partner_employees WHERE born_year > 0) WHERE age > 10) GROUP BY  grouped_age ORDER BY  grouped_age"
+    },
+    {
+        "name": "basicEmployeeInformation",
+        "queryString": "WITH mapped_primary_customers AS (SELECT guid, CASE WHEN work_order_description = arbeids_ordre THEN prosjekt ELSE work_order_description END as work_order_description, CASE WHEN customer = dagens_ubw_prosjekt THEN kunde ELSE customer END AS customer FROM (SELECT guid, customer, work_order_description FROM ubw_customer_per_resource ubw1 WHERE weigth = 1 AND time = (SELECT MAX(time) FROM ubw_customer_per_resource ubw2 WHERE ubw2.guid = ubw1.guid)) LEFT JOIN (SELECT DISTINCT \"dagens ubw prosjekt\" AS dagens_ubw_prosjekt, arbeids_ordre, kunde, prosjekt FROM thomas_do_knowit_no_kundemapping) ON dagens_ubw_prosjekt = customer AND arbeids_ordre = work_order_description) SELECT cvpartner.user_id, cvpartner.guid, cvpartner.email, cvpartner.navn AS name, cvpartner.title, cvpartner.link, cvpartner.image_key, ubw.customer AS primary_customer, ubw.work_order_description AS primary_work_order_description FROM cv_partner_employees AS cvpartner LEFT JOIN mapped_primary_customers AS ubw ON cvpartner.guid = ubw.guid ORDER BY name"
+    },
+    {
+        "name": "allProjectsOverview",
+        "queryString": "SELECT customer, SUM(billedTotal) as billedTotal, SUM(billedLastPeriod) as billedLastPeriod, SUM(consultants) as consultants FROM (SELECT CASE WHEN total.customer = dagens_ubw_prosjekt THEN kunde ELSE total.customer END AS customer, total.work_order, billedTotal, billedLastPeriod, consultants FROM ((SELECT customer, work_order, sum(hours) as billedTotal FROM ubw_per_project_data d1 WHERE timestamp = (SELECT MAX(timestamp) FROM ubw_per_project_data d2 WHERE d1.customer = d2.customer AND d1.reg_period = d2.reg_period) GROUP BY customer, employees, work_order ) total JOIN (SELECT customer, work_order,hours as billedLastPeriod FROM ubw_per_project_data d1 WHERE reg_period = (SELECT MAX(reg_period) FROM ubw_per_project_data d2 WHERE d1.customer = d2.customer AND d1.work_order = d2.work_order) group by customer, hours, work_order) lastPeriod ON total.customer = lastPeriod.customer AND total.work_order = lastPeriod.work_order JOIN (SELECT customer, work_order, MAX(employees) as consultants FROM ( SELECT *, RANK() OVER (PARTITION BY customer ORDER BY reg_period DESC) AS row_number FROM ( SELECT customer, employees, reg_period, work_order FROM ubw_per_project_data d1 WHERE timestamp = (SELECT MAX(timestamp) FROM ubw_per_project_data d2 WHERE d1.customer = d2.customer AND d1.reg_period = d2.reg_period AND d1.work_order = d2.work_order) ORDER BY customer DESC, reg_period DESC ) ) WHERE row_number <= 5 GROUP BY customer, work_order) numConsul ON total.customer = numConsul.customer AND total.work_order = numConsul.work_order LEFT JOIN (SELECT \"dagens ubw prosjekt\" AS dagens_ubw_prosjekt, arbeids_ordre, kunde, prosjekt FROM thomas_do_knowit_no_kundemapping) ON total.customer = dagens_ubw_prosjekt AND total.work_order = arbeids_ordre) ) GROUP BY customer"
+    },
+    {
+        "name": "newCategories",
+        "queryString": "SELECT DISTINCT c.text AS category, CAST(ARRAY_AGG(DISTINCT q.topic) AS JSON) AS subCategories FROM kompetansekartlegging_questions AS q INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' AND q.type = 'knowledgeMotivation' GROUP BY c.text"
+    },
+    {
+        "name": "projectStatus",
+        "queryString": "select user_id, navn, title, email from cv_partner_employees"
+    },
+    {
+        "name": "newCompetenceMotivationAverages",
+        "queryString": "WITH competenceAverage AS ( SELECT AVG(a.knowledge) AS avgCompetence, q.topic as subCategory, c.text as category FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' GROUP BY q.topic, c.text ), motivationAverage as ( SELECT AVG(a.motivation) AS avgMotivation, q.topic as subCategory, c.text as category FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' GROUP BY q.topic, c.text ) SELECT avgCompetence AS competence, avgMotivation as motivation, ca.subCategory, ca.category FROM competenceAverage AS ca LEFT JOIN (SELECT * FROM motivationAverage) AS ma ON ca.subCategory = ma.subCategory AND ca.category = ma.category"
+    },
+    {
+        "name": "competenceAmountAggregated",
+        "queryString": "WITH categoryAverage AS ( SELECT a.email AS email, c.text AS category, AVG(a.motivation) AS categoryMotivationAvg, AVG(a.knowledge) AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' GROUP BY DISTINCT a.email, c.text ), b as ( SELECT DISTINCT a.email AS email, a.motivation AS motivation, a.knowledge AS competence, q.topic AS subCategory, c.text AS category, ca.categoryMotivationAvg AS categoryMotivationAvg, ca.categoryCompetenceAvg AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id INNER JOIN categoryAverage AS ca ON a.email = ca.email AND c.text = ca.category ) SELECT subCategory, subMotivationAmount, (100 * CAST(subMotivationAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS subMotivationPropotion, subCompetenceAmount, (100 * CAST(subCompetenceAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS subCompetencePropotion, category, motivationAmount, (CAST(motivationAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS motivationPropotion, competenceAmount, (CAST(competenceAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS competencePropotion FROM ( SELECT subCategory, count(CASE WHEN motivation > 3 THEN 1 END) as subMotivationAmount, count(CASE WHEN competence > 3 THEN 1 END) as subCompetenceAmount, ba.category, motivationAmount, competenceAmount, numEmails FROM b as ba LEFT JOIN ( select category, count(CASE WHEN categoryMotivationAvg > 3 THEN 1 END) as motivationAmount, count(CASE WHEN categoryCompetenceAvg > 3 THEN 1 END) as competenceAmount, count(DISTINCT email) as numEmails from b group by category ) as bb ON ba.category = bb.category group by subCategory, ba.category, motivationAmount, competenceAmount, numEmails )"
+    },
+    {
+        "name": "employeesWithPrimaryCustomer",
+        "queryString": "WITH primary_customer AS (SELECT guid, CASE WHEN work_order_description = arbeids_ordre THEN prosjekt ELSE work_order_description END as work_order_description, CASE WHEN customer = dagens_ubw_prosjekt THEN kunde ELSE customer END AS customer_name FROM (SELECT * FROM ubw_customer_per_resource LEFT JOIN (SELECT DISTINCT \"dagens ubw prosjekt\" AS dagens_ubw_prosjekt, arbeids_ordre, kunde, prosjekt FROM thomas_do_knowit_no_kundemapping) ON dagens_ubw_prosjekt = customer AND arbeids_ordre = work_order_description) ubw1 WHERE weigth = 1 AND time = (SELECT MAX(time) FROM ubw_customer_per_resource ubw2 WHERE ubw2.guid = ubw1.guid)) SELECT cvpartner.user_id, cvpartner.guid, email, navn, title, link, image_key, primary_customer.customer_name, primary_customer.work_order_description FROM cv_partner_employees AS cvpartner INNER JOIN primary_customer ON cvpartner.guid = primary_customer.guid ORDER BY navn"
+    },
+    {
+        "name": "employeeProfileInformation",
+        "queryString": "WITH last_education AS (SELECT a.user_id, array_agg(a.degree)[1] AS degree, array_agg(a.year_to)[1] AS year_to FROM cv_partner_education a INNER JOIN (SELECT user_id, max(year_to) AS year_to FROM cv_partner_education GROUP BY user_id) b ON a.user_id = b.user_id AND a.year_to = b.year_to GROUP BY a.user_id) SELECT cv.user_id, cv.guid, cv.email, cv.navn AS name, cv.telefon AS phone, cv.title, edu.degree, ad.manager, ad2.email AS manager_email, cv.image_key, cv.link FROM cv_partner_employees AS cv LEFT OUTER JOIN last_education AS edu ON edu.user_id = cv.user_id LEFT OUTER JOIN active_directory AS ad ON ad.guid = cv.guid LEFT JOIN active_directory ad2 ON ad2.displayname = ad.manager OR (ad2.displayname IS NULL AND ad.manager IS NULL) WHERE ad.guid IS NOT NULL OR ad2.displayname IS NOT NULL ORDER BY name"
+    },
+    {
+        "name": "countEmployees",
+        "queryString": "select count(*) as antallAnsatte from cv_partner_employees"
+    },
+    {
+        "name": "fullProfile4",
+        "queryString": "WITH last_education AS (SELECT a.user_id, array_agg(a.degree)[1] AS degree, array_agg(a.year_to)[1] AS year_to FROM cv_partner_education a INNER JOIN (SELECT user_id, max(year_to) AS year_to FROM cv_partner_education GROUP BY user_id) b ON a.user_id = b.user_id AND a.year_to = b.year_to GROUP BY a.user_id) SELECT cv.user_id, cv.guid, cv.email, cv.navn AS name, cv.telefon AS phone, cv.title, edu.degree, ad.manager, COALESCE(ad2.email, 'undefined') AS manager_email, cv.image_key, cv.link FROM cv_partner_employees AS cv LEFT OUTER JOIN last_education AS edu ON edu.user_id = cv.user_id LEFT OUTER JOIN active_directory AS ad ON ad.guid = cv.guid FULL JOIN active_directory ad2 ON ad2.displayname = ad.manager WHERE ad2.displayname IS NULL OR ad2.displayname = '' ORDER BY name"
+    },
+    {
+        "name": "employeeCustomers",
+        "queryString": "WITH mapped_customers_per_resource_per_period AS (SELECT DISTINCT guid, reg_period, CASE WHEN customer = dagens_ubw_prosjekt THEN kunde ELSE customer END AS customer, CASE WHEN work_order_description = arbeids_ordre THEN prosjekt ELSE work_order_description END as work_order_description FROM ubw_customer_per_resource LEFT JOIN ( SELECT DISTINCT \"dagens ubw prosjekt\" AS dagens_ubw_prosjekt, arbeids_ordre, kunde, prosjekt FROM thomas_do_knowit_no_kundemapping ) ON dagens_ubw_prosjekt = customer AND arbeids_ordre = work_order_description ORDER BY reg_period) SELECT cvpartner.user_id, cvpartner.email, ubw.customer, ubw.work_order_description, array_join(array_agg(ubw.reg_period), ';', '') AS reg_periods FROM cv_partner_employees AS cvpartner INNER JOIN mapped_customers_per_resource_per_period AS ubw ON cvpartner.guid = ubw.guid GROUP BY cvpartner.user_id, cvpartner.email, ubw.customer, ubw.work_order_description"
+    },
+    {
+        "name": "workExperienceDistributedInYears",
+        "queryString": "with a as (SELECT user_id, month_from, month_to, year_from, year_to from cv_partner_work_experience), b as (SELECT user_id from cv_partner_employees) SELECT years_working, Count(years_working) AS count FROM ( SELECT user_id, sum(coalesce(try( date_diff('Month', try_cast( Concat( Cast(year_from AS VARCHAR), '-', Cast(month_from AS VARCHAR), '-01' ) as date), IF (month_to = 0 OR year_to = 0, now(), try_cast(concat(cast(year_to AS varchar), '-', cast(month_to AS varchar), '-', cast(day(now()) AS varchar)) AS date)))), 0)) / 12 AS years_working FROM ( SELECT b.user_id, month_from, month_to, year_from, year_to from a right join b on a.user_id = b.user_id ) GROUP BY user_id ) GROUP BY years_working ORDER BY count DESC"
+    },
+    {
+        "name": "workExperience",
+        "queryString": "SELECT ex.user_id, emp.email, employer, month_from, year_from, month_to, year_to FROM cv_partner_work_experience ex LEFT outer JOIN cv_partner_employees emp on ex.user_id = emp.user_id"
+    },
+    {
+        "name": "debug-marie",
+        "queryString": "WITH categoryAverage AS ( SELECT a.email AS email, c.text AS category, AVG(a.motivation) AS categoryMotivationAvg, AVG(a.knowledge) AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' AND q.type = 'knowledgeMotivation' GROUP BY DISTINCT a.email, c.text ), b as ( SELECT DISTINCT a.email AS email, a.motivation AS motivation, a.knowledge AS competence, q.topic AS subCategory, c.text AS category, ca.categoryMotivationAvg AS categoryMotivationAvg, ca.categoryCompetenceAvg AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id INNER JOIN categoryAverage AS ca ON a.email = ca.email AND c.text = ca.category ) SELECT subCategory, subMotivationAmount, (100 * CAST(subMotivationAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS subMotivationPropotion, subCompetenceAmount, (100 * CAST(subCompetenceAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS subCompetencePropotion, category, motivationAmount, (CAST(motivationAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS motivationPropotion, competenceAmount, (CAST(competenceAmount AS DOUBLE) / CAST(numEmails AS DOUBLE)) AS competencePropotion FROM ( SELECT subCategory, count(CASE WHEN motivation > 3 THEN 1 END) as subMotivationAmount, count(CASE WHEN competence > 3 THEN 1 END) as subCompetenceAmount, ba.category, motivationAmount, competenceAmount, numEmails FROM b as ba LEFT JOIN ( select category, count(CASE WHEN categoryMotivationAvg > 3 THEN 1 END) as motivationAmount, count(CASE WHEN categoryCompetenceAvg > 3 THEN 1 END) as competenceAmount, count(DISTINCT email) as numEmails from b group by category ) as bb ON ba.category = bb.category group by subCategory, ba.category, motivationAmount, competenceAmount, numEmails )"
+    },
+    {
+        "name": "fullProfile7",
+        "queryString": "WITH last_education AS (SELECT a.user_id, array_agg(a.degree)[1] AS degree, array_agg(a.year_to)[1] AS year_to FROM cv_partner_education a INNER JOIN (SELECT user_id, max(year_to) AS year_to FROM cv_partner_education GROUP BY user_id) b ON a.user_id = b.user_id AND a.year_to = b.year_to GROUP BY a.user_id) SELECT cv.user_id, cv.guid, cv.email, cv.navn AS name, cv.telefon AS phone, cv.title, edu.degree, ad.manager, ad2.email AS manager_email, cv.image_key, cv.link FROM cv_partner_employees AS cv LEFT OUTER JOIN last_education AS edu ON edu.user_id = cv.user_id LEFT OUTER JOIN active_directory AS ad ON ad.guid = cv.guid LEFT JOIN active_directory ad2 ON ad2.displayname = ad.manager OR (ad2.displayname IS NULL AND ad.manager IS NULL) WHERE ad.guid IS NOT NULL OR ad2.displayname IS NOT NULL ORDER BY name"
+    },
+    {
+        "name": "newCompetenceAverage",
+        "queryString": "SELECT AVG(a.knowledge) AS value, q.topic as subCategory, c.text as category FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' GROUP BY q.topic, c.text"
+    },
+    {
+        "name": "averageCompetenceAndMotivation",
+        "queryString": "SELECT competence, motivation, c.subCategory, c.category FROM (SELECT AVG(a.knowledge) AS competence, q.topic as subCategory, c.text as category FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' GROUP BY q.topic, c.text) as c INNER JOIN ( SELECT AVG(a.motivation) AS motivation, q.topic as subCategory, c.text as category FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' AND q.type = 'knowledgeMotivation' GROUP BY q.topic, c.text ) as m ON c.subCategory = m.subCategory and c.category = m.category"
+    },
+    {
+        "name": "filteredCategories",
+        "queryString": "SELECT DISTINCT c.text AS category, CAST(ARRAY_AGG(DISTINCT q.topic) AS JSON) AS subCategories FROM kompetansekartlegging_questions AS q INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' AND q.type = 'knowledgeMotivation' GROUP BY c.text"
+    },
+    {
+        "name": "yearsSinceSchoolDist",
+        "queryString": "WITH ad_users AS (SELECT cpemp.user_id, year_from, year_to, month_from, month_to FROM cv_partner_employees AS cpemp INNER JOIN cv_partner_education AS cped ON cpemp.user_id = cped.user_id) SELECT year(now()) - career_start AS years, count(career_start) AS count FROM (SELECT user_id, max(year_to) AS career_start FROM ad_users AS cped GROUP BY  user_id) GROUP BY  career_start ORDER BY  count desc"
+    },
+    {
+        "name": "degreeDist",
+        "queryString": "WITH ad_users AS (SELECT cpemp.user_id, degree FROM cv_partner_employees AS cpemp INNER JOIN cv_partner_education AS cped ON cpemp.user_id = cped.user_id) SELECT CASE highest_degree WHEN 1 THEN 'bachelor' WHEN 2 THEN 'master' WHEN 3 THEN 'phd' END AS degree, count(highest_degree) AS count FROM (SELECT user_id, max(norm_degree) AS highest_degree FROM (SELECT user_id, CASE WHEN lower(degree) LIKE '%phd %' OR lower(degree) LIKE '%doktor %' OR lower(degree) LIKE '%doktorgrad%' OR lower(degree) LIKE '%profesjonsstudiet%' THEN 3 WHEN lower(degree) LIKE '%master %' OR lower(degree) LIKE '% master' OR lower(degree) LIKE '%master%' OR lower(degree) LIKE '%mastergrad%' OR lower(degree) LIKE '%sivil%' OR lower(degree) LIKE '%(master)%' OR lower(degree) LIKE '%siv.%' OR lower(degree) LIKE '%cand%' OR lower(degree) LIKE '%m.%' THEN 2 WHEN lower(degree) LIKE '%bachelor %' OR lower(degree) LIKE '%bachelor,%' OR lower(degree) LIKE '%bachelor' OR lower(degree) LIKE '%(bachelor)%' OR lower(degree) LIKE '%bachelorgrad%' OR lower(degree) LIKE '%ingeni\u00f8r%' OR lower(degree) LIKE '%b.%' OR lower(degree) LIKE '%3-\u00e5r%' THEN 1 ELSE 0 END AS norm_degree FROM ad_users) GROUP BY  user_id) WHERE highest_degree > 0 GROUP BY  highest_degree"
+    },
+    {
+        "name": "projectExperience",
+        "queryString": "SELECT emp.user_id, email, navn, customer, description, year_from, year_to, month_from, month_to FROM cv_partner_project_experience AS exp JOIN (SELECT user_id, navn, email FROM cv_partner_employees) emp ON exp.user_id = emp.user_id"
+    },
+    {
+        "name": "fagEvents",
+        "queryString": "select distinct(event_summary), date_add('second', timestamp_from, date_parse('Jan-01-1970','%b-%d-%Y')) as time_from, date_add('second', timestamp_to, date_parse('Jan-01-1970','%b-%d-%Y')) as time_to from google_calendar_events where date_add('second', timestamp_from, date_parse('Jan-01-1970','%b-%d-%Y')) > current_date - interval '3' year"
+    },
+    {
+        "name": "employeeMotivationAndCompetence",
+        "queryString": "WITH categoryAverage AS (SELECT a.email AS email, c.text AS category, AVG(a.motivation) AS categoryMotivationAvg, AVG(a.knowledge) AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' AND q.type = 'knowledgeMotivation' GROUP BY a.email, c.text) SELECT a.email AS email, a.motivation AS motivation, a.knowledge AS competence, q.topic AS subCategory, c.text AS category, ca.categoryMotivationAvg AS categoryMotivationAvg, ca.categoryCompetenceAvg AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id INNER JOIN categoryAverage AS ca ON a.email = ca.email AND c.text = ca.category"
+    },
+    {
+        "name": "jobRotationInformation",
+        "queryString": "SELECT username, email, questionid, customscalevalue, guid, index, text, categoryid FROM kompetansekartlegging_answers a JOIN kompetansekartlegging_questions b ON a.questionid = b.id WHERE b.categoryid = 'bdcfb7c4-12ed-4191-8e98-64be3e68f2c8';"
+    },
+    {
+        "name": "perProject",
+        "queryString": "SELECT employees, hours, reg_period, timestamp, CASE WHEN work_order = arbeids_ordre THEN prosjekt ELSE work_order END as work_order, CASE WHEN customer = dagens_ubw_prosjekt THEN kunde ELSE customer END AS customer FROM (SELECT ubw_per_project_data.customer, employees, hours, ubw_per_project_data.reg_period, ubw_per_project_data.timestamp, work_order FROM ubw_per_project_data INNER JOIN (SELECT customer, reg_period, Max(timestamp) as timestamp from ubw_per_project_data GROUP BY customer, reg_period ) as distinct_values ON ubw_per_project_data.customer = distinct_values.customer AND ubw_per_project_data.timestamp=distinct_values.timestamp AND ubw_per_project_data.reg_period = distinct_values.reg_period) LEFT JOIN (SELECT \"dagens ubw prosjekt\" AS dagens_ubw_prosjekt, arbeids_ordre, kunde, prosjekt FROM thomas_do_knowit_no_kundemapping) ON customer = dagens_ubw_prosjekt AND work_order=arbeids_ordre"
+    },
+    {
+        "name": "newMotivationAverage",
+        "queryString": "SELECT AVG(a.motivation) AS value, q.topic as subCategory, c.text as category FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' GROUP BY q.topic, c.text"
+    },
+    {
+        "name": "accountManager",
+        "queryString": "SELECT kunde AS customer, kundeansvarlig AS account_manager FROM tjo_knowit_no_kundeansvarlig"
+    },
+    {
+        "name": "employeeMotivationAndCompetence2",
+        "queryString": "WITH categoryAverage AS (SELECT a.email AS email, c.text AS category, AVG(a.motivation) AS categoryMotivationAvg, AVG(a.knowledge) AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id WHERE c.text != 'Jobbrotasjon' AND q.type = 'knowledgeMotivation' GROUP BY a.email, c.text) SELECT a.email AS email, a.motivation AS motivation, a.knowledge AS competence, q.topic AS subCategory, c.text AS category, ca.categoryMotivationAvg AS categoryMotivationAvg, ca.categoryCompetenceAvg AS categoryCompetenceAvg FROM kompetansekartlegging_answers AS a INNER JOIN kompetansekartlegging_questions AS q ON a.questionid = q.id INNER JOIN kompetansekartlegging_categories AS c ON q.categoryid = c.id INNER JOIN categoryAverage AS ca ON a.email = ca.email AND c.text = ca.category"
+    },
+    {
+        "name": "employeeWorkStatus",
+        "queryString": "SELECT alias, guid, customer, project_type, MAX(reg_period) as last_reg_period, SUM(weigth - 1) AS weight_sum FROM ubw_customer_per_resource GROUP BY alias, guid, customer, project_type"
+    }
+]
