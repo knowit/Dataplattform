@@ -39,14 +39,23 @@ def test_initial_process(setup_queue_event, test_data, create_table_mock, dynamo
     handler(event, None)
     create_table_mock.assert_table_created(
         'cv_partner_employees',
+        'cv_partner_historical_employees',
         'cv_partner_education',
+        'cv_partner_historical_eduation',
         'cv_partner_blogs',
         'cv_partner_courses',
+        'cv_partner_historical_courses',
         'cv_partner_key_qualification',
+        'cv_partner_historical_key_qualification',
         'cv_partner_languages',
+        'cv_partner_historical_languages',
         'cv_partner_project_experience',
+        'cv_partner_historical_project_experience',
         'cv_partner_technology_skills',
-        'cv_partner_work_experience')
+        'cv_partner_historical_technology_skills',
+        'cv_partner_work_experience',
+        'cv_partner_historical_work_experience'
+    )
 
 
 def test_process_table_content(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
@@ -101,6 +110,25 @@ def test_process_table_content_missing_born_date(setup_queue_event, test_data, c
             'nationality': ["Norwegian", "Norwegian"],
             'place_of_residence': ['', 'Sandvika'],
             'twitter': ['', '']
+        }))
+
+
+def test_process_table_content_historical_employees(setup_queue_event, test_data, create_table_mock, dynamodb_resource):
+    tmp_data = test_data['data']
+    tmp_data[0]['cv'].pop('born_year', None)
+
+    event = setup_queue_event(
+        schema.Data(
+            metadata=schema.Metadata(timestamp=0),
+            data=tmp_data))
+
+    handler(event, None)
+    create_table_mock.assert_table_data_contains_df(
+        'cv_partner_historical_employees',
+        pd.DataFrame({
+            'born_year': [-1, 1985],
+            'nationality': ["Norwegian", "Swedish"],
+            'place_of_residence': ['Oslo', 'Oslo'],
         }))
 
 
