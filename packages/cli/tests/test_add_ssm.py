@@ -5,7 +5,7 @@ import dataplattform.cli.commands.add_ssm as add_ssm
 
 @mock_ssm
 def test_add_parameter():
-    client = boto3.client('ssm')
+    client = boto3.client('ssm', region_name="eu-central-1")
     parameter_name = add_ssm.add_parameter(
         stage="TestStage",
         service="TestService",
