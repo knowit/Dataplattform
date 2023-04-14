@@ -14,6 +14,7 @@ def test_get_client():
     assert len(configure.regional_clients) == 2
 
 
+@mock_ssm
 def test_get_regions():
     regions_1 = configure.get_regions({
         "Regions": ["us-east-1", "eu-central-2"]
@@ -23,12 +24,14 @@ def test_get_regions():
     assert regions_2 == ["eu-central-1"]
 
 
+@mock_ssm
 def test_dict_is_parameter():
     assert configure.dict_is_parameter({"Value": "Test"}) is True
     assert configure.dict_is_parameter({"Foo": "bar"}) is False
     assert configure.dict_is_parameter({}) is False
 
 
+@mock_ssm
 def test_get_parameter_type():
     assert configure.get_parameter_type({}) == "SecureString"
     assert configure.get_parameter_type({"Type": "String"}) == "String"
