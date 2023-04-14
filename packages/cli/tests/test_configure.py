@@ -86,7 +86,15 @@ def test_add_parameter_recursively():
     assert len(client_1.get_parameters_by_path(Path="/test", Recursive=True)["Parameters"]) == 1
     assert len(client_2.get_parameters_by_path(Path="/", Recursive=True)["Parameters"]) == 1
     assert len(client_2.get_parameters_by_path(Path="/test", Recursive=True)["Parameters"]) == 1
-    assert client_1.get_parameter(Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1")["Parameter"]["Value"] == "Test_1"
-    assert client_1.get_parameter(Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1")["Parameter"]["Type"] == "String"
-    assert client_2.get_parameter(Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1")["Parameter"]["Value"] == "Test_1"
-    assert client_2.get_parameter(Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1")["Parameter"]["Type"] == "String"
+    assert client_1.get_parameter(
+        Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1"
+    )["Parameter"]["Value"] == "Test_1"
+    assert client_1.get_parameter(
+        Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1"
+    )["Parameter"]["Type"] == "String"
+    assert client_2.get_parameter(
+        Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1"
+    )["Parameter"]["Value"] == "Test_1"
+    assert client_2.get_parameter(
+        Name="/test/path/1/SomeKey/SomeRecursiveKey/TestKey1"
+    )["Parameter"]["Type"] == "String"
