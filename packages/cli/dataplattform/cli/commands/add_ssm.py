@@ -31,7 +31,7 @@ def interactive(value=None, type_=None):
 
 
 def add_parameter(stage, service, name, value, type_, description, overwrite, tags):
-    client = boto3.client('ssm')
+    client = boto3.client('ssm', region_name="eu-central-1")
 
     finalName = "/" + stage + "/" + service + "/" + name
 
