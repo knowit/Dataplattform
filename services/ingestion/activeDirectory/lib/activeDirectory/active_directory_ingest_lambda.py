@@ -21,6 +21,12 @@ def handler(event, context):
 
     users = get_list_of_users(data_json)
 
+    for user in users:
+        for manager in users:
+            if user["managerDistinguishedName"] == manager["distinguishedName"]:
+                user["manager"] = manager["distinguishedName"]
+                user["manager_email"] = manager["primaryEmailAddress"]
+
     def make_dataframe(d):
         df = pd.json_normalize(d)
         m = hashlib.sha1()
@@ -41,8 +47,8 @@ def handler(event, context):
         'company',
         'knowitBranch',
         'distinguishedName',
-        'managerDistinguishedName',
-        'manager.primaryEmailAddress',
+        'manager',
+        'manager_email',
     ]
 
     employee_df = df[employee_table].copy()
@@ -50,8 +56,6 @@ def handler(event, context):
         'primaryEmailAddress': 'email',
         'samAccountName': 'alias',
         'distinguishedName': 'distinguished_name',
-        'manager.primaryEmailAddress': 'manager_email',
-        'managerDistinguishedName': 'manager'
         }, inplace=True)
     employee_df = employee_df.fillna("")
 
