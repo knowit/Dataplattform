@@ -13,13 +13,12 @@
   "company": "Knowit Objectnet",
   "knowitBranch": "Solutions",
   "distinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
-  "managerDistinguishedName": "CN=Per Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
+  "managerDistinguishedName": "CN=Erik Nordmann,OU=Knowit Objectnet,OU=Knowit,DC=knowit,DC=local",
   "isServiceUser": false,
   "isExternalUser": false,
   "isPasswordExpired": false,
   "isDeleted": false,
   "title": "Consultant",
-  "manager": null,
   "licenses": [
     {
       "product": "1Password",
