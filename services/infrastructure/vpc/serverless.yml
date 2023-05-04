@@ -231,7 +231,7 @@ resources:
         SecurityGroupIds:
           - !Ref PrivateSubnetSecurityGroup
         ServiceName: !Sub 'com.amazonaws.${self:provider.region}.ssm'
-        SubnetIds: 
+        SubnetIds:
           - !Ref PrivateSubnet1
           - !Ref PrivateSubnet2
         VpcEndpointType: Interface
