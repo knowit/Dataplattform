@@ -227,7 +227,7 @@ resources:
                 - "*"
               Resource:
                 - "*"
-        PrivateDnsEnabled: false
+        PrivateDnsEnabled: true
         SecurityGroupIds:
           - !Ref PrivateSubnetSecurityGroup
         ServiceName: !Sub 'com.amazonaws.${self:provider.region}.ssm'
