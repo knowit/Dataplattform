@@ -2,9 +2,8 @@
   "name": "googleSheetsWebhook",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {},
   "devDependencies": {
     "serverless-add-api-key": "^4.1.0",
-    "serverless-python-requirements": "knowit/serverless-python-requirements"
+    "serverless-python-requirements": "^6.0.0"
   }
 }
