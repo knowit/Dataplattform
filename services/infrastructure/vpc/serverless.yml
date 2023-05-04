@@ -217,7 +217,7 @@ resources:
 
     VPCEndpointSSM:
       Type: AWS::EC2::VPCEndpoint
-      Properties: 
+      Properties:
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -228,7 +228,7 @@ resources:
               Resource:
                 - "*"
         PrivateDnsEnabled: false
-        SecurityGroupIds: 
+        SecurityGroupIds:
           - !Ref PrivateSubnetSecurityGroup
         ServiceName: !Sub 'com.amazonaws.${self:provider.region}.ssm'
         SubnetIds: 
