@@ -227,7 +227,7 @@ resources:
                 - "ssm:GetParameter*"
               Resource:
                 - "*"
-        PrivateDnsEnabled: true
+        PrivateDnsEnabled: false
         SecurityGroupIds:
           - !Ref PrivateSubnetSecurityGroup
         ServiceName: !Sub 'com.amazonaws.${self:provider.region}.ssm'
