@@ -215,6 +215,28 @@ resources:
               Resource:
                 - "${self:custom.PersonalMetadataTable}"
 
+    VPCEndpointSSM:
+      Type: AWS::EC2::VPCEndpoint
+      Properties:
+        PolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal: "*"
+              Action:
+                - "ssm:GetParameter*"
+              Resource:
+                - "*"
+        PrivateDnsEnabled: true
+        SecurityGroupIds:
+          - !Ref PrivateSubnetSecurityGroup
+        ServiceName: !Sub 'com.amazonaws.${self:provider.region}.ssm'
+        SubnetIds:
+          - !Ref PrivateSubnet1
+          - !Ref PrivateSubnet2
+        VpcEndpointType: Interface
+        VpcId: !Ref VPC
+
   Outputs:
     VPC:
       Description: VPC ID

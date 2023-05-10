@@ -10,7 +10,7 @@ dataplattform:
 
 custom:
   editable:
-    timeout: 60
+    timeout: 120
     srcDir: lib/activeDirectory
     ingestHandlerFile: active_directory_ingest_lambda
     databaseName: level_3
