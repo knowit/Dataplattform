@@ -41,8 +41,14 @@ resources:
         BucketName: !Sub '${self:custom.service}-logbucket-${AWS::AccountId}'
         VersioningConfiguration:
           Status: Enabled #keeps different versions of object if overwrited/updated
-        AccessControl:
-          LogDeliveryWrite
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerEnforced
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
 
     DataLake:
       Type: AWS::S3::Bucket
