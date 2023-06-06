@@ -41,7 +41,14 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: !Sub '${self:custom.bucketName}-${AWS::AccountId}'
-        AccessControl: PublicRead
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerEnforced
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
         WebsiteConfiguration:
           IndexDocument: index.html
           ErrorDocument: index.html
