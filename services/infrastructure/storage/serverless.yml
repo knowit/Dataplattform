@@ -26,7 +26,14 @@ resources:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: !Sub '${self:custom.stagePublicBucketName}-${AWS::AccountId}'
-        AccessControl: PublicRead
+        OwnershipControls:
+          Rules:
+            - ObjectOwnership: BucketOwnerEnforced
+        PublicAccessBlockConfiguration:
+          BlockPublicAcls: false
+          BlockPublicPolicy: false
+          IgnorePublicAcls: false
+          RestrictPublicBuckets: false
 
     PublicCloudFrontOriginAccessIdentity:
       Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
