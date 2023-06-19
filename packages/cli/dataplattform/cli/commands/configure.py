@@ -3,7 +3,7 @@ import boto3
 import yaml
 import traceback
 
-default_client = boto3.client('ssm')
+default_client = boto3.client('ssm', region_name='eu-central-1')
 default_region = default_client.meta.region_name
 regional_clients = dict({str(default_region): default_client})
 
