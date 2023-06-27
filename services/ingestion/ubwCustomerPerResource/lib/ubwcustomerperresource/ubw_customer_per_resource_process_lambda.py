@@ -89,7 +89,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 'work_order': row["work_order_description"]
             })
 
-        
         return pd.DataFrame(project_customers)
     
     def get_per_customer_data(dataframe):
