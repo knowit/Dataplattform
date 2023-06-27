@@ -90,7 +90,7 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
             })
 
         return pd.DataFrame(project_customers)
-    
+
     def get_per_customer_data(dataframe):
         project_customers = []
         timestamp = dataframe.iloc[0]['time']
@@ -107,7 +107,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 'employees': df_without_workorders[
                     (df_without_workorders["customer"] == row["customer"])
                 ]["employees"].sum(),
-                
                 'hours': dataframe[
                     (dataframe['customer'] == row["customer"])
                     & (dataframe['reg_period'] == row["reg_period"])
