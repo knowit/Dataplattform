@@ -88,9 +88,36 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
                 'timestamp': timestamp,
                 'work_order': row["work_order_description"]
             })
+
+        return pd.DataFrame(project_customers)
+
+    def get_per_customer_data(dataframe):
+        project_customers = []
+        timestamp = dataframe.iloc[0]['time']
+        new_dataframe = dataframe.drop_duplicates(
+            subset=["customer", "work_order_description", "reg_period"], keep="last")
+        df_without_workorders = dataframe.drop_duplicates(
+            subset=["customer", "work_order_description", "alias"],
+            keep="last"
+        ).groupby(
+            ['customer']).size().reset_index(name="employees")
+        for (index, row) in new_dataframe.iterrows():
+            project_customers.append({
+                'customer': row["customer"],
+                'employees': df_without_workorders[
+                    (df_without_workorders["customer"] == row["customer"])
+                ]["employees"].sum(),
+                'hours': dataframe[
+                    (dataframe['customer'] == row["customer"])
+                    & (dataframe['reg_period'] == row["reg_period"])
+                ]['used_hrs'].sum(),
+                'reg_period': row["reg_period"],
+                'timestamp': timestamp
+            })
         return pd.DataFrame(project_customers)
 
     per_project_data = get_per_project_data(df)
+    per_customer_data = get_per_customer_data(df)
     df.pop('used_hrs')
 
     s3 = S3()
@@ -122,5 +149,6 @@ def process(data, events) -> Dict[str, pd.DataFrame]:
 
     return {
         'ubw_customer_per_resource': df,
-        'ubw_per_project_data': per_project_data
+        'ubw_per_project_data': per_project_data,
+        'ubw_per_customer_data': per_customer_data
     }
